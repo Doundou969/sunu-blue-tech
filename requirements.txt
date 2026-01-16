@@ -1,0 +1,6 @@
+copernicusmarine
+numpy
+matplotlib
+requests
+xarray
+netcdf4
