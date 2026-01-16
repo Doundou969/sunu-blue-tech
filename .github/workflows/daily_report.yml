@@ -1,0 +1,31 @@
+name: Sunu-Blue-Tech Auto
+
+on:
+  schedule:
+    # 05:00 UTC (L'heure du réveil de l'ordinateur)
+    - cron: '0 5 * * *'
+  workflow_dispatch: # Ce bouton permet de tester manuellement
+
+jobs:
+  execution:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Copier le code sur l'ordinateur virtuel
+        uses: actions/checkout@v3
+
+      - name: Installer Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Installer les outils du fichier requirements
+        run: pip install -r requirements.txt
+
+      - name: Lancer le script de pêche
+        env:
+          # On lie les secrets du coffre-fort au code
+          USER_COP: ${{ secrets.USER_COP }}
+          PWD_COP: ${{ secrets.PWD_COP }}
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_ID: ${{ secrets.TG_ID }}
+        run: python script_peche.py
