@@ -23,16 +23,31 @@ try:
         minimum_latitude=14.0, maximum_latitude=15.5)
     sst = (ds_sst.analysed_sst.isel(time=-1) - 273.15).compute()
 
-    # --- 3. TÉLÉCHARGEMENT VENT ---
-    print("🌬️ Analyse du vent...")
-    ds_wind = copernicusmarine.open_dataset(dataset_id=WIND_ID,
-        minimum_longitude=-18.5, maximum_longitude=-16.5,
-        minimum_latitude=14.0, maximum_latitude=15.5)
-    # On calcule la vitesse (Magnitude) à partir des composantes U et V
-    wind_data = ds_wind.isel(time=-1)
-    wind_speed = np.sqrt(wind_data.utotal**2 + wind_data.vtotal**2).compute()
-    # Conversion m/s en km/h
-    wind_kmh = wind_speed * 3.6
+   # --- 3. TÉLÉCHARGEMENT VENT ET COURANT ---
+    print("🌊 Analyse du courant...")
+    # On utilise les données physiques globales pour le courant (U et V total)
+    current_data = ds_wind.isel(time=-1) # Le dataset ds_wind contient aussi les courants
+    u_curr = current_data.utotal.sel(latitude=lat_p, longitude=lon_p, method="nearest").compute()
+    v_curr = current_data.vtotal.sel(latitude=lat_p, longitude=lon_p, method="nearest").compute()
+    
+    # Calcul de la direction du courant (Nord, Sud, Est, Ouest)
+    if abs(u_curr) > abs(v_curr):
+        dir_courant = "Est ➡️" if u_curr > 0 else "Ouest ⬅️"
+    else:
+        dir_courant = "Nord ⬆️" if v_curr > 0 else "Sud ⬇️"
+
+    # --- 7. ENVOI TELEGRAM (Mise à jour du texte) ---
+    caption = (
+        f"🚀 *SUNU-BLUE-TECH : RAPPORT PRO*\n\n"
+        f"📍 *ZONE DE PÊCHE*\n"
+        f"Position: `{lat_p:.4f}, {lon_p:.4f}`\n"
+        f"Température: 20.5°C\n\n"
+        f"🌊 *COURANT & VENT*\n"
+        f"Direction Courant: {dir_courant}\n"
+        f"Vitesse Vent: {v_vent:.1f} km/h\n"
+        f"État: {safety_status}\n\n"
+        f"🔗 [OUVRIR DANS GOOGLE MAPS]({google_maps_link})"
+    )
 
     # --- 4. CALCUL DU POINT GPS ---
     abs_diff = np.abs(sst - 20.5)
