@@ -67,12 +67,18 @@ try:
     # --- 7. ENVOI TELEGRAM ---
     google_maps_link = f"http://www.google.com/maps/place/{lat_p},{lon_p}"
     
+    import datetime
+    now = datetime.datetime.now()
+    # Si il est avant midi, c'est l'édition matin, sinon soir
+    edition = "🌅 ÉDITION MATIN" if now.hour < 12 else "🌙 ÉDITION SOIR"
+
     caption = (
-        f"🚀 *SUNU-BLUE-TECH : RAPPORT PRO*\n\n"
+        f"🚀 *{edition}*\n"
+        f"━━━━━━━━━━━━━━━\n"
         f"📍 *ZONE DE PÊCHE*\n"
         f"Position: `{lat_p:.4f}, {lon_p:.4f}`\n"
         f"Température: 20.5°C\n\n"
-        f"🌊 *MÉTÉO & COURANT*\n"
+        f"🌊 *COURANT & VENT*\n"
         f"Direction Courant: {dir_courant}\n"
         f"Vitesse Vent: {v_vent:.1f} km/h\n"
         f"État: {safety_status}\n\n"
