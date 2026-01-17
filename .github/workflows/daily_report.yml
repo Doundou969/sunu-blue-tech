@@ -2,27 +2,27 @@ name: Sunu-Blue-Tech Auto
 
 on:
   schedule:
-    # 05:00 du matin pour les départs du jour
-    - cron: '0 5 * * *'
-    # 15:00 de l'après-midi pour les départs de nuit
-    - cron: '0 15 * * *'
-  workflow_dispatch: # Pour pouvoir le lancer à la main quand tu veux
+    - cron: '0 5 * * *'  # Matin
+    - cron: '0 15 * * *' # Après-midi
+  workflow_dispatch:
+
 jobs:
-  execution:
+  run-script:
     runs-on: ubuntu-latest
     steps:
-      - name: Copier le code sur l'ordinateur virtuel
+      - name: Récupérer le code
         uses: actions/checkout@v3
 
       - name: Installer Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.9'
 
-      - name: Installer les outils du fichier requirements
-        run: pip install -r requirements.txt
+      - name: Installer les bibliothèques
+        run: |
+          pip install xarray copernicusmarine numpy requests
 
-     - name: Lancer le script de pêche
+      - name: Lancer le script de pêche
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_ID: ${{ secrets.TG_ID }}
