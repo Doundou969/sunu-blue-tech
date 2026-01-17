@@ -21,7 +21,9 @@ def job():
         # 1. CONNEXION SIMPLIFIÉE
         # On passe les identifiants directement dans open_dataset
         ds = copernicusmarine.open_dataset(
-            dataset_id="cmems_mod_glo_phy_anfc_0.083deg_PT6H-i",
+            # 1. CONNEXION AVEC LE NOM DE DATASET CORRIGÉ
+        ds = copernicusmarine.open_dataset(
+            dataset_id="cmems_mod_glo_phy_anfc_0.083deg_static", # Version physique stable
             username=user,
             password=pw,
             minimum_longitude=-18.0, 
