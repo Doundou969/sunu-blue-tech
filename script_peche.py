@@ -17,14 +17,9 @@ def send_tg_with_photo(caption, photo_path):
         requests.post(url, data={"chat_id": TG_ID, "caption": caption, "parse_mode": "Markdown"}, files={"photo": photo})
 
 def job():
-        try:
-        print("🚀 Récupération des données maritimes...")
-        
+    try:
         DATASET_ID = "cmems_mod_glo_phy-cur_anfc_0.083deg_PT6H-i"
-        lat, lon = 14.9, -17.5 # Coordonnées Dakar/Kayar
         lat, lon = 14.9, -17.5
-
-
 
         ds = copernicusmarine.open_dataset(
             dataset_id=DATASET_ID, username=USER, password=PASS,
