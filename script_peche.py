@@ -4,7 +4,7 @@ import copernicusmarine
 import datetime
 import numpy as np
 
-# --- RÉCUPÉRATION DES SECRETS ---
+# --- RÉCUPÉRATION ---
 user = os.getenv("COPERNICUS_USERNAME")
 pw = os.getenv("COPERNICUS_PASSWORD")
 tg_token = os.getenv("TG_TOKEN")
@@ -15,40 +15,46 @@ def send_tg(message):
     requests.post(url, data={"chat_id": tg_id, "text": message, "parse_mode": "Markdown"})
 
 def job():
-    try:
-        print(f"🚀 Recherche du dataset pour {user}...")
-        
-        # On utilise le dataset de courant global standard
-        # Si le nom change, cette version est la plus robuste en 2026
-        ds = copernicusmarine.open_dataset(
-            dataset_id="cmems_mod_glo_phy_anfc_0.083deg_PT6H-i",
-            username=user,
-            password=pw,
-            variables=["uo", "vo"],
-            minimum_longitude=-18.0, 
-            maximum_longitude=-17.0,
-            minimum_latitude=14.5, 
-            maximum_latitude=15.5
-        )
+    # Liste des IDs possibles (Copernicus change parfois les tirets en points)
+    dataset_ids = [
+        "cmems_mod_glo_phy_anfc_0.083deg_PT6H-i",
+        "GLOBAL_ANALYSISFORECAST_PHY_001_024"
+    ]
+    
+    ds = None
+    for d_id in dataset_ids:
+        try:
+            print(f"🚀 Tentative avec : {d_id}")
+            ds = copernicusmarine.open_dataset(
+                dataset_id=d_id,
+                username=user,
+                password=pw,
+                minimum_longitude=-18.0, 
+                maximum_longitude=-17.0,
+                minimum_latitude=14.5, 
+                maximum_latitude=15.5
+            )
+            if ds is not None:
+                print(f"✅ Succès avec {d_id}")
+                break
+        except:
+            continue
 
-        # 2. EXTRACTION DES DONNÉES (Dakar/Kayar)
-        # On récupère le dernier temps disponible
+    if ds is None:
+        send_tg("❌ Erreur : Impossible de trouver le catalogue Copernicus. Vérifiez l'ID.")
+        return
+
+    try:
+        # Extraction Dakar/Kayar
         data = ds.isel(time=-1).sel(latitude=14.9, longitude=-17.5, method="nearest")
         
-        # Courants (uo = Est/Ouest, vo = Nord/Sud)
+        # Données physiques (uo, vo sont les courants)
         u = float(data.uo.values)
         v = float(data.vo.values)
-        
-        # Calcul de la vitesse en km/h
         vitesse = np.sqrt(u**2 + v**2) * 3.6
         
-        # Direction du courant
-        if abs(u) > abs(v):
-            dir_c = "Est ➡️" if u > 0 else "Ouest ⬅️"
-        else:
-            dir_c = "Nord ⬆️" if v > 0 else "Sud ⬇️"
+        dir_c = "Est ➡️" if u > 0 else "Ouest ⬅️" if abs(u) > abs(v) else "Nord ⬆️" if v > 0 else "Sud ⬇️"
 
-        # 3. PRÉPARATION DU MESSAGE
         now = datetime.datetime.now()
         edition = "🌅 MATIN" if now.hour < 12 else "🌙 SOIR"
         
@@ -57,20 +63,15 @@ def job():
             f"━━━━━━━━━━━━━━━\n"
             f"📍 *ZONE : DAKAR / KAYAR*\n"
             f"🌊 Courant : {dir_c}\n"
-            f"💨 Vitesse : {vitesse:.1f} km/h\n"
-            f"🛰️ État : Opérationnel\n"
-            f"━━━━━━━━━━━━━━━\n"
-            f"⚓ *Bonne pêche aux Capitaines !*"
+            f"💨 Vitesse : {vitesse:.1f} km/h\n\n"
+            f"⚓ *Bonne pêche !* (Test OK)"
         )
 
-        # 4. ENVOI
         send_tg(rapport)
-        print("✅ Rapport envoyé avec succès !")
+        print("✅ Terminé !")
 
     except Exception as e:
-        error_msg = f"❌ Erreur technique : {str(e)}"
-        print(error_msg)
-        send_tg(error_msg)
+        send_tg(f"❌ Erreur lecture données : {str(e)}")
 
 if __name__ == "__main__":
     job()
