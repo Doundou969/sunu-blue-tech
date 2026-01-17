@@ -19,7 +19,11 @@ def send_tg_with_photo(caption, photo_path):
 def job():
     try:
         DATASET_ID = "cmems_mod_glo_phy-cur_anfc_0.083deg_PT6H-i"
-        lat, lon = 14.9, -17.5
+        
+        # --- MODIFIE CES DEUX LIGNES ICI ---
+        lat, lon = 16.0, -16.6  # Coordonnées pour Saint-Louis
+        nom_zone = "Saint-Louis"
+
 
         ds = copernicusmarine.open_dataset(
             dataset_id=DATASET_ID, username=USER, password=PASS,
