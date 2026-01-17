@@ -3,35 +3,31 @@ import requests
 import copernicusmarine
 import datetime
 import numpy as np
+import matplotlib.pyplot as plt
 
-# --- RÉCUPÉRATION ---
+# --- CONFIGURATION ---
 USER = os.getenv("COPERNICUS_USERNAME")
 PASS = os.getenv("COPERNICUS_PASSWORD")
 TG_TOKEN = os.getenv("TG_TOKEN")
 TG_ID = os.getenv("TG_ID")
 
-def send_tg(message):
-    url = f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage"
-    # On utilise parse_mode="Markdown" pour que le lien soit cliquable
-    requests.post(url, data={"chat_id": TG_ID, "text": message, "parse_mode": "Markdown", "disable_web_page_preview": False})
+def send_tg_with_photo(caption, photo_path):
+    url = f"https://api.telegram.org/bot{TG_TOKEN}/sendPhoto"
+    with open(photo_path, 'rb') as photo:
+        requests.post(url, data={"chat_id": TG_ID, "caption": caption, "parse_mode": "Markdown"}, files={"photo": photo})
 
 def job():
     try:
-        print("🚀 Récupération des données maritimes...")
-        
         DATASET_ID = "cmems_mod_glo_phy-cur_anfc_0.083deg_PT6H-i"
-        lat, lon = 14.9, -17.5 # Coordonnées Dakar/Kayar
+        lat, lon = 14.9, -17.5
 
         ds = copernicusmarine.open_dataset(
-            dataset_id=DATASET_ID,
-            username=USER,
-            password=PASS,
-            minimum_longitude=lon-0.1, maximum_longitude=lon+0.1,
-            minimum_latitude=lat-0.1, maximum_latitude=lat+0.1
+            dataset_id=DATASET_ID, username=USER, password=PASS,
+            minimum_longitude=lon-0.5, maximum_longitude=lon+0.5,
+            minimum_latitude=lat-0.5, maximum_latitude=lat+0.5
         )
 
         data = ds.sel(latitude=lat, longitude=lon, method="nearest")
-        
         if 'time' in data.dims: data = data.isel(time=-1)
         if 'depth' in data.dims: data = data.isel(depth=0)
 
@@ -39,40 +35,43 @@ def job():
         v = float(np.array(data.vo.values).flatten()[0])
         vitesse = np.sqrt(u**2 + v**2) * 3.6 
         
-        if abs(u) > abs(v):
-            dir_c = "Vers l'Est ➡️" if u > 0 else "Vers l'Ouest ⬅️"
-        else:
-            dir_c = "Vers le Nord ⬆️" if v > 0 else "Vers le Sud ⬇️"
-
-        etat_mer = "✅ CALME" if vitesse < 15 else "⚠️ AGITÉE" if vitesse < 25 else "🛑 DANGER"
-
-        now = datetime.datetime.now()
-        date_str = now.strftime("%d/%m/%Y à %H:%M")
+        # --- CRÉATION DE L'IMAGE ---
+        plt.figure(figsize=(5, 5))
+        # Dessiner la flèche du courant
+        plt.quiver(0, 0, u, v, color='red', scale=1)
+        plt.text(0, -0.2, f"Vitesse: {vitesse:.1f} km/h", ha='center', fontsize=12, fontweight='bold')
+        plt.title(f"Direction du Courant - Dakar/Kayar")
+        plt.axis('off')
+        plt.xlim(-1, 1)
+        plt.ylim(-1, 1)
         
-        # --- CRÉATION DU LIEN GOOGLE MAPS ---
-        # Ce lien pointera précisément sur la zone de pêche
-        google_maps_link = f"https://www.google.com/maps?q={lat},{lon}"
+        image_path = "courant.png"
+        plt.savefig(image_path, bbox_inches='tight')
+        plt.close()
 
+        # --- RAPPORT TEXTE ---
+        now = datetime.datetime.now()
+        google_maps_link = f"https://www.google.com/maps?q={lat},{lon}"
+        
         rapport = (
-            f"🌊 *SUNU-BLUE-TECH : RAPPORT PÊCHE*\n"
+            f"🌊 *SUNU-BLUE-TECH : BULLETIN DU GÉEJ*\n"
             f"━━━━━━━━━━━━━━━\n"
-            f"📅 Date : `{date_str}`\n"
-            f"📍 Zone : *Dakar / Kayar*\n\n"
+            f"📅 `{now.strftime('%d/%m/%Y à %H:%M')}`\n"
+            f"📍 *Dakar / Kayar*\n\n"
             f"🚩 *INFOS COURANT :*\n"
-            f"Direction : {dir_c}\n"
             f"Vitesse : {vitesse:.1f} km/h\n"
-            f"État : {etat_mer}\n\n"
-            f"📍 *LOCALISATION :*\n"
-            f"👉 [CLIQUEZ ICI POUR VOIR SUR LA CARTE]({google_maps_link})\n"
+            f"État : {'✅ CALME' if vitesse < 15 else '⚠️ AGITÉE'}\n\n"
+            f"👉 [VOIR SUR LA CARTE]({google_maps_link})\n"
             f"━━━━━━━━━━━━━━━\n"
             f"⚓ *Xam-Xam au service du Géej !*"
         )
 
-        send_tg(rapport)
-        print("✅ Rapport complet envoyé !")
+        send_tg_with_photo(rapport, image_path)
+        print("✅ Rapport avec image envoyé !")
 
     except Exception as e:
-        send_tg(f"❌ *Erreur technique :* \n`{str(e)}`")
+        requests.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage", 
+                      data={"chat_id": TG_ID, "text": f"❌ Erreur : {e}"})
 
 if __name__ == "__main__":
     job()
