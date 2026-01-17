@@ -18,9 +18,10 @@ jobs:
         with:
           python-version: '3.9'
 
-     - name: Installer les bibliothèques
+      - name: Installer les bibliothèques
         run: |
           pip install xarray copernicusmarine numpy requests matplotlib
+
       - name: Lancer le script de pêche
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
