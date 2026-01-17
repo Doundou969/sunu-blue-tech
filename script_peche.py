@@ -16,41 +16,42 @@ def send_tg(message):
 
 def job():
     try:
-        # 1. CONNEXION SÉCURISÉE (On force l'absence de fichier config pour éviter les erreurs d'écriture)
-        print("🚀 Connexion au catalogue Copernicus...")
+        print("🚀 Récupération des données maritimes...")
         
-        # Le dataset le plus stable pour le courant à Dakar en 2026
         DATASET_ID = "cmems_mod_glo_phy-cur_anfc_0.083deg_PT6H-i"
 
         ds = copernicusmarine.open_dataset(
             dataset_id=DATASET_ID,
             username=USER,
             password=PASS,
-            # On restreint la zone pour que ce soit rapide
-            minimum_longitude=-18.0, 
-            maximum_longitude=-17.0,
-            minimum_latitude=14.0, 
+            minimum_longitude=-17.6, 
+            maximum_longitude=-17.4,
+            minimum_latitude=14.8, 
             maximum_latitude=15.0
         )
 
-        # 2. EXTRACTION DES DONNÉES (Point Kayar/Dakar)
-        # On récupère uo (Est) et vo (Nord)
-        data = ds.isel(time=-1).sel(latitude=14.9, longitude=-17.5, method="nearest")
+        # Extraction point Dakar/Kayar (14.9N, -17.5W)
+        # On force la sélection sur un seul point, un seul temps, une seule profondeur
+        data = ds.sel(latitude=14.9, longitude=-17.5, method="nearest")
         
-        u = float(data.uo.values)
-        v = float(data.vo.values)
-        vitesse = np.sqrt(u**2 + v**2) * 3.6 # Conversion m/s -> km/h
-        
-        # Détermination de la direction
-        if abs(u) > abs(v):
-            dir_c = "Est ➡️" if u > 0 else "Ouest ⬅️"
-        else:
-            dir_c = "Nord ⬆️" if v > 0 else "Sud ⬇️"
+        if 'time' in data.dims:
+            data = data.isel(time=-1)
+        if 'depth' in data.dims:
+            data = data.isel(depth=0)
 
-        # État de la mer (Sécurité)
+        # On utilise .values.flatten()[0] pour être SÛR de n'avoir qu'un seul chiffre
+        u = float(np.array(data.uo.values).flatten()[0])
+        v = float(np.array(data.vo.values).flatten()[0])
+        
+        vitesse = np.sqrt(u**2 + v**2) * 3.6 # km/h
+        
+        if abs(u) > abs(v):
+            dir_c = "Vers l'Est ➡️" if u > 0 else "Vers l'Ouest ⬅️"
+        else:
+            dir_c = "Vers le Nord ⬆️" if v > 0 else "Vers le Sud ⬇️"
+
         etat_mer = "✅ CALME" if vitesse < 15 else "⚠️ AGITÉE" if vitesse < 25 else "🛑 DANGER"
 
-        # 3. MISE EN FORME DU RAPPORT
         now = datetime.datetime.now()
         date_str = now.strftime("%d/%m/%Y à %H:%M")
         
@@ -64,7 +65,6 @@ def job():
             f"Vitesse : {vitesse:.1f} km/h\n"
             f"État : {etat_mer}\n"
             f"━━━━━━━━━━━━━━━\n"
-            f"🔗 [Google Maps](http://www.google.com/maps/place/14.9,-17.5)\n"
             f"⚓ *Xam-Xam au service du Géej !*"
         )
 
@@ -72,8 +72,7 @@ def job():
         print("✅ Rapport envoyé avec succès !")
 
     except Exception as e:
-        # En cas d'erreur, on t'envoie le détail technique sur Telegram
-        send_tg(f"❌ *Erreur Copernicus :* \n`{str(e)}` \nVérifiez vos identifiants sur le site Copernicus.")
+        send_tg(f"❌ *Erreur technique :* \n`{str(e)}`")
 
 if __name__ == "__main__":
     job()
