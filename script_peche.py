@@ -5,75 +5,49 @@ import requests
 import datetime
 import os
 
-# --- CONFIGURATION ---
-TG_TOKEN = os.getenv("TG_TOKEN")
-TG_ID = os.getenv("TG_ID")
-CP_USER = os.getenv("COPERNICUS_USERNAME")
-CP_PASS = os.getenv("COPERNICUS_PASSWORD")
-
-DATASET_ID = "cmems_mod_glo_phy_anfc_0.083deg_PT6H-i"
+# --- RÉCUPÉRATION ---
+user = os.getenv("COPERNICUS_USERNAME")
+pw = os.getenv("COPERNICUS_PASSWORD")
+tg_token = os.getenv("TG_TOKEN")
+tg_id = os.getenv("TG_ID")
 
 def job():
     try:
-        now = datetime.datetime.now()
-        edition = "🌅 ÉDITION MATIN" if now.hour < 12 else "🌙 ÉDITION SOIR"
-        
-        print(f"🚀 Tentative de connexion pour {CP_USER}...")
+        # Vérification immédiate
+        if not user or not pw:
+            print(f"❌ ERREUR : Les secrets GitHub sont vides !")
+            print(f"Vérifiez que vous avez bien nommé COPERNICUS_USERNAME dans GitHub Settings.")
+            return
 
-        # FORCE L'AUTHENTIFICATION
+        print(f"🚀 Connexion avec l'utilisateur : {user}")
+
+        # Configurer la session une bonne fois pour toutes
+        copernicusmarine.login(username=user, password=pw, force_persist=True)
+
+        # Chargement des données
         ds = copernicusmarine.open_dataset(
-            dataset_id=DATASET_ID,
-            username=CP_USER,
-            password=CP_PASS,
+            dataset_id="cmems_mod_glo_phy_anfc_0.083deg_PT6H-i",
             minimum_longitude=-18.0, 
             maximum_longitude=-17.0,
             minimum_latitude=14.5, 
-            maximum_latitude=15.5,
-            force_download=True  # Force le rafraîchissement
+            maximum_latitude=15.5
         )
 
-        if ds is None:
-            raise Exception("Le dataset n'a pas pu être chargé (ds est None). Vérifiez vos identifiants Copernicus.")
-
-        # 2. Point GPS (Dakar/Kayar)
-        lat_p, lon_p = 14.90, -17.50
+        # On prend le dernier point
+        data = ds.isel(time=-1).sel(latitude=14.9, longitude=-17.5, method="nearest")
         
-        # 3. Extraction
-        # Note : On utilise 'time' ou 'step' selon le dataset, ici on essaie le dernier index
-        data = ds.isel(time=-1).sel(latitude=lat_p, longitude=lon_p, method="nearest")
+        u = float(data.uo.values)
+        v = float(data.vo.values)
+        vit = np.sqrt(u**2 + v**2) * 3.6
         
-        # Récupération des courants uo et vo
-        u_curr = float(data.uo.values)
-        v_curr = float(data.vo.values)
-        
-        vitesse = np.sqrt(u_curr**2 + v_curr**2) * 3.6
-        dir_c = "Est ➡️" if u_curr > 0 else "Ouest ⬅️" if abs(u_curr) > abs(v_curr) else "Nord ⬆️" if v_curr > 0 else "Sud ⬇️"
-
-        # 4. Envoi Telegram
-        google_maps = f"https://www.google.com/maps?q={lat_p},{lon_p}"
-        
-        caption = (
-            f"{edition} : *SUNU-BLUE-TECH*\n"
-            f"━━━━━━━━━━━━━━━\n"
-            f"📍 *ZONE DE PÊCHE*\n"
-            f"Position: `{lat_p}, {lon_p}`\n\n"
-            f"🌊 *INFOS MER*\n"
-            f"Direction Courant: {dir_c}\n"
-            f"Vitesse: {vitesse:.1f} km/h\n\n"
-            f"🔗 [OUVRIR GOOGLE MAPS]({google_maps})\n"
-            f"━━━━━━━━━━━━━━━\n"
-            f"📢 *ABONNEMENT : +221 77 702 08 18*"
-        )
-
-        url = f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage"
-        requests.post(url, data={"chat_id": TG_ID, "text": caption, "parse_mode": "Markdown"})
-        print("✅ Rapport envoyé avec succès !")
+        # Envoi simple
+        msg = f"✅ SUNU-BLUE-TECH : TEST RÉUSSI !\nVitesse mer : {vit:.1f} km/h"
+        url = f"https://api.telegram.org/bot{tg_token}/sendMessage"
+        requests.post(url, data={"chat_id": tg_id, "text": msg})
+        print("✅ Message envoyé !")
 
     except Exception as e:
-        print(f"❌ ERREUR FINALE : {str(e)}")
-        # On affiche aussi les secrets pour vérifier s'ils sont vides (sans afficher le mot de passe entier)
-        print(f"DEBUG: User={CP_USER}, Pass OK={'OUI' if CP_PASS else 'NON'}")
-        raise e
+        print(f"❌ ERREUR : {str(e)}")
 
 if __name__ == "__main__":
     job()
