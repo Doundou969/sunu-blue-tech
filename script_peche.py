@@ -16,16 +16,15 @@ def send_tg(message):
 
 def job():
     try:
-        print(f"🚀 Connexion Copernicus pour {user}...")
+        print(f"🚀 Recherche du dataset pour {user}...")
         
-        # 1. CONNEXION SIMPLIFIÉE
-        # On passe les identifiants directement dans open_dataset
+        # On utilise le dataset de courant global standard
+        # Si le nom change, cette version est la plus robuste en 2026
         ds = copernicusmarine.open_dataset(
-            # 1. CONNEXION AVEC LE NOM DE DATASET CORRIGÉ
-        ds = copernicusmarine.open_dataset(
-            dataset_id="cmems_mod_glo_phy_anfc_0.083deg_static", # Version physique stable
+            dataset_id="cmems_mod_glo_phy_anfc_0.083deg_PT6H-i",
             username=user,
             password=pw,
+            variables=["uo", "vo"],
             minimum_longitude=-18.0, 
             maximum_longitude=-17.0,
             minimum_latitude=14.5, 
