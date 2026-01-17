@@ -12,38 +12,32 @@ TG_ID = os.getenv("TG_ID")
 
 def send_tg(message):
     url = f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage"
-    requests.post(url, data={"chat_id": TG_ID, "text": message, "parse_mode": "Markdown"})
+    # On utilise parse_mode="Markdown" pour que le lien soit cliquable
+    requests.post(url, data={"chat_id": TG_ID, "text": message, "parse_mode": "Markdown", "disable_web_page_preview": False})
 
 def job():
     try:
         print("🚀 Récupération des données maritimes...")
         
         DATASET_ID = "cmems_mod_glo_phy-cur_anfc_0.083deg_PT6H-i"
+        lat, lon = 14.9, -17.5 # Coordonnées Dakar/Kayar
 
         ds = copernicusmarine.open_dataset(
             dataset_id=DATASET_ID,
             username=USER,
             password=PASS,
-            minimum_longitude=-17.6, 
-            maximum_longitude=-17.4,
-            minimum_latitude=14.8, 
-            maximum_latitude=15.0
+            minimum_longitude=lon-0.1, maximum_longitude=lon+0.1,
+            minimum_latitude=lat-0.1, maximum_latitude=lat+0.1
         )
 
-        # Extraction point Dakar/Kayar (14.9N, -17.5W)
-        # On force la sélection sur un seul point, un seul temps, une seule profondeur
-        data = ds.sel(latitude=14.9, longitude=-17.5, method="nearest")
+        data = ds.sel(latitude=lat, longitude=lon, method="nearest")
         
-        if 'time' in data.dims:
-            data = data.isel(time=-1)
-        if 'depth' in data.dims:
-            data = data.isel(depth=0)
+        if 'time' in data.dims: data = data.isel(time=-1)
+        if 'depth' in data.dims: data = data.isel(depth=0)
 
-        # On utilise .values.flatten()[0] pour être SÛR de n'avoir qu'un seul chiffre
         u = float(np.array(data.uo.values).flatten()[0])
         v = float(np.array(data.vo.values).flatten()[0])
-        
-        vitesse = np.sqrt(u**2 + v**2) * 3.6 # km/h
+        vitesse = np.sqrt(u**2 + v**2) * 3.6 
         
         if abs(u) > abs(v):
             dir_c = "Vers l'Est ➡️" if u > 0 else "Vers l'Ouest ⬅️"
@@ -55,6 +49,10 @@ def job():
         now = datetime.datetime.now()
         date_str = now.strftime("%d/%m/%Y à %H:%M")
         
+        # --- CRÉATION DU LIEN GOOGLE MAPS ---
+        # Ce lien pointera précisément sur la zone de pêche
+        google_maps_link = f"https://www.google.com/maps?q={lat},{lon}"
+
         rapport = (
             f"🌊 *SUNU-BLUE-TECH : RAPPORT PÊCHE*\n"
             f"━━━━━━━━━━━━━━━\n"
@@ -63,13 +61,15 @@ def job():
             f"🚩 *INFOS COURANT :*\n"
             f"Direction : {dir_c}\n"
             f"Vitesse : {vitesse:.1f} km/h\n"
-            f"État : {etat_mer}\n"
+            f"État : {etat_mer}\n\n"
+            f"📍 *LOCALISATION :*\n"
+            f"👉 [CLIQUEZ ICI POUR VOIR SUR LA CARTE]({google_maps_link})\n"
             f"━━━━━━━━━━━━━━━\n"
             f"⚓ *Xam-Xam au service du Géej !*"
         )
 
         send_tg(rapport)
-        print("✅ Rapport envoyé avec succès !")
+        print("✅ Rapport complet envoyé !")
 
     except Exception as e:
         send_tg(f"❌ *Erreur technique :* \n`{str(e)}`")
