@@ -43,16 +43,24 @@ try:
     # --- 5. ENVOI TELEGRAM ---
     print("📲 Envoi à Telegram...")
     url = f"https://api.telegram.org/bot{TOKEN}/sendPhoto"
-    caption = f"🚀 POINT DE PÊCHE TROUVÉ !\n📍 GPS: {lat_p:.4f}, {lon_p:.4f}\n🌡️ Temp: 20.5°C\n📅 {date_str}"
+    
+    # Création du lien Google Maps
+    google_maps_link = f"https://www.google.com/maps/search/?api=1&query={lat_p},{lon_p}"
+    
+    caption = (
+        f"🚀 *POINT DE PÊCHE TROUVÉ !*\n\n"
+        f"🌡️ *Température :* 20.5°C\n"
+        f"📍 *Position :* `{lat_p:.4f}, {lon_p:.4f}`\n"
+        f"📅 *Date :* {date_str}\n\n"
+        f"🔗 [CLIQUEZ ICI POUR NAVIGUER]({google_maps_link})"
+    )
     
     with open('carte.jpg', 'rb') as photo:
-        response = requests.post(url, data={'chat_id': ID, 'caption': caption}, files={'photo': photo})
-        print(f"Réponse de Telegram : {response.text}")
-
-    if response.status_code == 200:
-        print("✅ Fiche envoyée avec succès !")
-    else:
-        print(f"❌ Erreur Telegram : {response.status_code}")
+        response = requests.post(url, data={
+            'chat_id': ID, 
+            'caption': caption, 
+            'parse_mode': 'Markdown' # Très important pour le lien cliquable
+        }, files={'photo': photo})
 
 except Exception as e:
     print(f"❌ Erreur critique : {e}")
