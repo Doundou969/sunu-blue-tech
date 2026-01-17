@@ -17,12 +17,13 @@ def send_tg_with_photo(caption, photo_path):
         requests.post(url, data={"chat_id": TG_ID, "caption": caption, "parse_mode": "Markdown"}, files={"photo": photo})
 
 def job():
-    try:
-        DATASET_ID = "cmems_mod_glo_phy-cur_anfc_0.083deg_PT6H-i"
+        try:
+        print("🚀 Récupération des données maritimes...")
         
-        # --- MODIFIE CES DEUX LIGNES ICI ---
-        lat, lon = 16.0, -16.6  # Coordonnées pour Saint-Louis
-        nom_zone = "Saint-Louis"
+        DATASET_ID = "cmems_mod_glo_phy-cur_anfc_0.083deg_PT6H-i"
+        lat, lon = 14.9, -17.5 # Coordonnées Dakar/Kayar
+        lat, lon = 14.9, -17.5
+
 
 
         ds = copernicusmarine.open_dataset(
