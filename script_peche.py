@@ -43,13 +43,17 @@ try:
     # Vitesse du vent au point précis
     v_vent = float(wind_kmh.sel(latitude=lat_p, longitude=lon_p, method="nearest"))
 
-    # --- 5. ANALYSE SÉCURITÉ ---
-    if v_vent < 20:
-        safety_status = "✅ MER CALME"
-    elif v_vent < 30:
-        safety_status = "⚠️ VENT MODÉRÉ (PRUDENCE)"
+    # --- 5. ANALYSE SÉCURITÉ (Ajustée pour les pirogues du Sénégal) ---
+    # 0-15 km/h : Mer d'huile / 15-25 : Petite brise / +30 : Risque de chavirement
+    if v_vent < 15:
+        safety_status = "✅ MER CALME (Conditions Idéales)"
+        emoji = "🌊"
+    elif v_vent < 27:
+        safety_status = "⚠️ VENT MODÉRÉ (Prudence en mer)"
+        emoji = "⛵"
     else:
-        safety_status = "🚫 DANGER : VENT FORT"
+        safety_status = "🚫 DANGER : VENT FORT (Sortie Déconseillée)"
+        emoji = "🚩"
 
     # --- 6. CARTE ---
     plt.figure(figsize=(10, 8))
