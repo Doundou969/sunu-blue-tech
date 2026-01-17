@@ -4,6 +4,7 @@ import copernicusmarine
 import datetime
 import numpy as np
 import matplotlib.pyplot as plt
+import json
 
 # --- CONFIGURATION ---
 USER = os.getenv("COPERNICUS_USERNAME")
@@ -18,14 +19,16 @@ ZONES = [
 ]
 
 def send_tg_album(media_list):
-    """ Envoie un groupe de photos avec leurs légendes respectives """
     url = f"https://api.telegram.org/bot{TG_TOKEN}/sendMediaGroup"
+    
     files = {}
     media_payload = []
     
     for i, item in enumerate(media_list):
-        file_key = f"p{i}"
+        file_key = f"photo{i}"
+        # On ouvre le fichier
         files[file_key] = open(item['path'], 'rb')
+        # On prépare l'entrée pour l'album
         media_payload.append({
             "type": "photo",
             "media": f"attach://{file_key}",
@@ -33,11 +36,17 @@ def send_tg_album(media_list):
             "parse_mode": "Markdown"
         })
     
-    requests.post(url, data={"chat_id": TG_ID, "media": requests.utils.quote(str(media_payload).replace("'", '"'))}, files=files)
+    # Envoi avec formatage JSON correct
+    response = requests.post(
+        url, 
+        data={"chat_id": TG_ID, "media": json.dumps(media_payload)}, 
+        files=files
+    )
+    return response.json()
 
 def job():
     try:
-        print("🚀 Préparation de l'album Multi-Zones...")
+        print("🚀 Chargement des données nationales...")
         DATASET_ID = "cmems_mod_glo_phy-cur_anfc_0.083deg_PT6H-i"
         
         ds = copernicusmarine.open_dataset(
@@ -47,10 +56,8 @@ def job():
         )
 
         album = []
-        now = datetime.datetime.now().strftime('%d/%m/%Y à %H:%M')
-
         for zone in ZONES:
-            # Extraction
+            # Extraction des données
             data = ds.sel(latitude=zone['lat'], longitude=zone['lon'], method="nearest")
             if 'time' in data.dims: data = data.isel(time=-1)
             if 'depth' in data.dims: data = data.isel(depth=0)
@@ -59,7 +66,7 @@ def job():
             v = float(np.array(data.vo.values).flatten()[0])
             vitesse = np.sqrt(u**2 + v**2) * 3.6 
             
-            # Graphique
+            # Création du graphique
             plt.figure(figsize=(4, 4))
             plt.quiver(0, 0, u, v, color='blue', scale=1, width=0.02)
             plt.text(0, -0.4, f"{vitesse:.1f} km/h", ha='center', fontsize=12, fontweight='bold')
@@ -67,7 +74,6 @@ def job():
             plt.axis('off')
             plt.xlim(-1, 1); plt.ylim(-1, 1)
             
-            # Nom de fichier sécurisé (pas de /)
             clean_name = zone['nom'].replace(' ', '_').replace('/', '_')
             img_path = f"img_{clean_name}.png"
             plt.savefig(img_path, bbox_inches='tight')
@@ -81,16 +87,20 @@ def job():
                 f"⚓ État : {'✅ CALME' if vitesse < 15 else '⚠️ AGITÉE'}\n"
                 f"📍 [Carte]({maps_link})"
             )
-            
             album.append({"path": img_path, "caption": caption})
 
-        # Envoi de l'album
-        send_tg_album(album)
-        print("✅ Album national envoyé !")
+        # Envoi
+        res = send_tg_album(album)
+        if not res.get("ok"):
+            # Si l'album échoue, on envoie un message d'erreur
+            requests.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage", 
+                          data={"chat_id": TG_ID, "text": f"❌ Erreur Telegram : {res.get('description')}"})
+        else:
+            print("✅ Album national envoyé !")
 
     except Exception as e:
         requests.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage", 
-                      data={"chat_id": TG_ID, "text": f"❌ Erreur Album : {e}"})
+                      data={"chat_id": TG_ID, "text": f"❌ Erreur Script : {e}"})
 
 if __name__ == "__main__":
     job()
