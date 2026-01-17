@@ -16,24 +16,12 @@ def send_tg(message):
 
 def job():
     # Liste des IDs possibles (Copernicus change parfois les tirets en points)
+    # Liste mise à jour pour les serveurs 2026
     dataset_ids = [
-        "cmems_mod_glo_phy_anfc_0.083deg_PT6H-i",
-        "GLOBAL_ANALYSISFORECAST_PHY_001_024"
+        "cmems_mod_glo_phy_anfc_0.083deg_PT1H-m", # Version temps réel haute précision
+        "cmems_mod_glo_phy_anfc_0.083deg_static",
+        "cmems_mod_glo_phy-cur_anfc_0.083deg_PT6H-i"
     ]
-    
-    ds = None
-    for d_id in dataset_ids:
-        try:
-            print(f"🚀 Tentative avec : {d_id}")
-            ds = copernicusmarine.open_dataset(
-                dataset_id=d_id,
-                username=user,
-                password=pw,
-                minimum_longitude=-18.0, 
-                maximum_longitude=-17.0,
-                minimum_latitude=14.5, 
-                maximum_latitude=15.5
-            )
             if ds is not None:
                 print(f"✅ Succès avec {d_id}")
                 break
