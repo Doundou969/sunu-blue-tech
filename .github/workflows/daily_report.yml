@@ -2,10 +2,11 @@ name: Sunu-Blue-Tech Auto
 
 on:
   schedule:
-    - cron: '0 5 * * *'  # Rapport du matin (5h UTC)
-    - cron: '0 15 * * *' # Rapport de l'après-midi (15h UTC)
-  workflow_dispatch: # Ce bouton permet de tester manuellement
-
+    # 05:00 du matin pour les départs du jour
+    - cron: '0 5 * * *'
+    # 15:00 de l'après-midi pour les départs de nuit
+    - cron: '0 15 * * *'
+  workflow_dispatch: # Pour pouvoir le lancer à la main quand tu veux
 jobs:
   execution:
     runs-on: ubuntu-latest
