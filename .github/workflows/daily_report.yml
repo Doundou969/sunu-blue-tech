@@ -2,8 +2,8 @@ name: Sunu-Blue-Tech Auto
 
 on:
   schedule:
-    - cron: '0 5 * * *'  # Matin
-    - cron: '0 15 * * *' # Après-midi
+    - cron: '0 5 * * *'
+    - cron: '0 15 * * *'
   workflow_dispatch:
 
 jobs:
