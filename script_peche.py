@@ -72,17 +72,28 @@ try:
     # Si il est avant midi, c'est l'édition matin, sinon soir
     edition = "🌅 ÉDITION MATIN" if now.hour < 12 else "🌙 ÉDITION SOIR"
 
+   import datetime
+    heure_actuelle = datetime.datetime.now().hour
+    edition = "🌅 ÉDITION MATIN" if heure_actuelle < 12 else "🌙 ÉDITION SOIR"
+
+    # --- TEXTE DU RAPPORT ---
     caption = (
-        f"🚀 *{edition}*\n"
+        f"🚀 *{edition} : SUNU-BLUE-TECH*\n"
         f"━━━━━━━━━━━━━━━\n"
-        f"📍 *ZONE DE PÊCHE*\n"
+        f"📍 *ZONE DE PÊCHE PRÉCISE*\n"
         f"Position: `{lat_p:.4f}, {lon_p:.4f}`\n"
-        f"Température: 20.5°C\n\n"
-        f"🌊 *COURANT & VENT*\n"
+        f"Température: 20.5°C (Zone Idéale)\n\n"
+        f"🌊 *SÉCURITÉ ET COURANT*\n"
         f"Direction Courant: {dir_courant}\n"
         f"Vitesse Vent: {v_vent:.1f} km/h\n"
         f"État: {safety_status}\n\n"
-        f"🔗 [OUVRIR DANS GOOGLE MAPS]({google_maps_link})"
+        f"🔗 [CLIQUEZ ICI POUR NAVIGUER]({google_maps_link})\n"
+        f"━━━━━━━━━━━━━━━\n"
+        f"📢 *POUR S'ABONNER (1 000 FCFA/sem) :*\n"
+        f"Envoyez 'PECHE' par WhatsApp au :\n"
+        f"👉 **+22177 702 08 18**\n"
+        f"👉 **+221 702 08 18**\n"
+        f"*Sunu-Blue-Tech : Xam-Xam au service du Géej!*"
     )
     
     with open('carte.jpg', 'rb') as photo:
