@@ -20,8 +20,8 @@ jobs:
 
       - name: Installer les bibliothèques
         run: |
-          pip install xarray copernicusmarine numpy requests matplotlib
-
+          pip install xarray copernicusmarine numpy requests matplotlib cftime
+          
       - name: Lancer le script de pêche
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
