@@ -20,7 +20,7 @@ jobs:
 
       - name: Installer les bibliothèques
         run: |
-          pip install xarray copernicusmarine numpy requests matplotlib cftime
+          pip install -r requirements.txt
           
       - name: Lancer le script de pêche
         env:
