@@ -5,6 +5,7 @@ import datetime
 import numpy as np
 import matplotlib.pyplot as plt
 import json
+from app import db, FishingData, app  # Import DB and model
 
 # --- CONFIGURATION ---
 USER = os.getenv("COPERNICUS_USERNAME")
@@ -75,18 +76,20 @@ def job():
 
         send_tg_with_photo(rapport, image_path)
 
-        # Integrate data from Python script
-        # (removed index.html handling for Flask app)
-
-        # Create data.json with sample data
-        data = [
-            {"date": "2026-01-21", "zone": "Dakar", "temp": 24.5, "species": "Sardine, Thon"},
-            {"date": "2026-01-20", "zone": "Cap Vert", "temp": 23.8, "species": "Maquereau"},
-            {"date": "2026-01-19", "zone": "Goree", "temp": 25.2, "species": "Poisson volant"}
-        ]
-
-        with open("data.json", "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=4)
+        # Save to DB
+        with app.app_context():
+            # Clear existing data
+            db.session.query(FishingData).delete()
+            # Add new data (dummy for now)
+            for nom in ZONES.keys():
+                db_data = FishingData(
+                    date=datetime.datetime.now().strftime('%Y-%m-%d'),
+                    zone=nom,
+                    temp=24.0 + np.random.rand() * 2,
+                    species="Sardine, Thon"
+                )
+                db.session.add(db_data)
+            db.session.commit()
 
         # Update sw.js to cache data.json
         sw = '''

@@ -25,6 +25,26 @@ class FishingData(db.Model):
             'species': self.species
         }
 
+# Create DB tables
+with app.app_context():
+    db.create_all()
+    # Add default data if empty
+    if FishingData.query.count() == 0:
+        default_data = [
+            {"date": "2026-01-22", "zone": "Dakar", "temp": 24.5, "species": "Sardine, Thon"},
+            {"date": "2026-01-21", "zone": "Cap Vert", "temp": 23.8, "species": "Maquereau"},
+            {"date": "2026-01-20", "zone": "Goree", "temp": 25.2, "species": "Poisson volant"}
+        ]
+        for item in default_data:
+            db_data = FishingData(
+                date=item['date'],
+                zone=item['zone'],
+                temp=item['temp'],
+                species=item['species']
+            )
+            db.session.add(db_data)
+        db.session.commit()
+
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -69,22 +89,10 @@ def run_script():
         return jsonify({"status": "error", "message": str(e)})
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        # Add default data if empty
-        if FishingData.query.count() == 0:
-            default_data = [
-                {"date": "2026-01-22", "zone": "Dakar", "temp": 24.5, "species": "Sardine, Thon"},
-                {"date": "2026-01-21", "zone": "Cap Vert", "temp": 23.8, "species": "Maquereau"},
-                {"date": "2026-01-20", "zone": "Goree", "temp": 25.2, "species": "Poisson volant"}
-            ]
-            for item in default_data:
-                db_data = FishingData(
-                    date=item['date'],
-                    zone=item['zone'],
-                    temp=item['temp'],
-                    species=item['species']
-                )
-                db.session.add(db_data)
-            db.session.commit()
     app.run(debug=True, host='0.0.0.0', port=5000)
+heroku create sunu-blue-tech-app
+heroku config:set COPERNICUS_USERNAME=your_username
+heroku config:set COPERNICUS_PASSWORD=your_password  
+heroku config:set TG_TOKEN=your_token
+heroku config:set TG_ID=your_id
+git push heroku main
