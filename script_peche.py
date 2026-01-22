@@ -85,6 +85,7 @@ def job():
 
         # Save to DB
         with app.app_context():
+            db.create_all()  # Ensure DB tables exist
             # Clear existing data
             db.session.query(FishingData).delete()
             # Add new data (dummy for now)
