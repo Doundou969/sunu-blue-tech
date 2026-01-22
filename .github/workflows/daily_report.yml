@@ -1,124 +1,29 @@
 name: Sunu-Blue-Tech Auto
-
 on:
   schedule:
-    - cron: '0 5 * * *'    # 05h00 UTC quotidien
-    - cron: '0 15 * * *'   # 15h00 UTC quotidien
-  workflow_dispatch:        # Déclenchement manuel
-  push:
-    branches: [ main ]
-    paths:
-      - 'script_peche.py'
-      - 'requirements.txt'
-      - 'app.py'
-  pull_request:
-    branches: [ main ]
-
-env:
-  PYTHON_VERSION: '3.12'
+    - cron: '0 5 * * *'
+    - cron: '0 15 * * *'
+  workflow_dispatch:
 
 jobs:
   run-script:
     runs-on: ubuntu-latest
-    environment: production    # Protège les secrets
-    
+    permissions:
+      contents: write  # ← AJOUTÉ
+      
     steps:
-    - name: Récupérer le code
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
+    
+    - uses: actions/setup-python@v5
       with:
-        fetch-depth: 0          # Historique complet
-
-    - name: Installer Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ env.PYTHON_VERSION }}
-
-    - name: Cache pip
-      uses: actions/cache@v4
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-
-    - name: Installer les bibliothèques
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-
-    - name: Vérifier les données Copernicus
-      env:
-        COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
-        COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
-      run: |
-        python -c "
-        import copernicusmarine
-        print('✅ Copernicus OK')
-        "
-
-    - name: Lancer le script de pêche
+        python-version: '3.12'
+        
+    - run: pip install -r requirements.txt
+    
+    - name: Lancer script pêche
       env:
         TG_TOKEN: ${{ secrets.TG_TOKEN }}
         TG_ID: ${{ secrets.TG_ID }}
         COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
         COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
       run: python script_peche.py
-
-    - name: Vérifier les fichiers générés
-      run: |
-        ls -la static/
-        ls -la templates/
-        cat static/data.json | jq . || true
-
-    - name: Commit fichiers générés
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "Sunu-Blue-Tech Bot"
-        git add static/ templates/ README.md
-        git diff --staged --quiet || git commit -m "chore: update data and web files [skip ci]"
-      continue-on-error: true
-
-    - name: Push fichiers générés
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: main
-      if: success()
-
-  deploy-web:
-    runs-on: ubuntu-latest
-    needs: run-script
-    if: github.ref == 'refs/heads/main'
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Deploy to Netlify
-      uses: nwtgck/actions-netlify@v3.1
-      with:
-        publish-dir: './'
-        production-branch: main
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        deploy-message: "Déploiement Sunu-Blue-Tech ${{ github.sha }}"
-        enable-pull-request-comment: false
-        enable-commit-comment: true
-      env:
-        NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-        NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-      continue-on-error: true
-
-  notify:
-    runs-on: ubuntu-latest
-    needs: [run-script, deploy-web]
-    
-    steps:
-    - name: Telegram Status
-      uses: appleboy/telegram-action@v0.1.7
-      with:
-        to: ${{ secrets.TG_ID }}
-        token: ${{ secrets.TG_TOKEN }}
-        message: |
-          🚀 *Sunu-Blue-Tech* workflow terminé !
-          ✅ Données mises à jour
-          📱 PWA déployée
-          ⏰ ${{ github.event.head_commit.message || 'Auto-run' }}
