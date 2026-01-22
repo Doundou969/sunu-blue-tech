@@ -62,6 +62,10 @@ Le script `script_peche.py` génère automatiquement :
 ### Docker
 Utilisez le Dockerfile fourni pour containeriser l'app.
 
+### Local
+- Dev : `python app.py`
+- Prod : `python wsgi.py`
+
 ---
 
 *Xam-Xam au service du Géej* ⚓
