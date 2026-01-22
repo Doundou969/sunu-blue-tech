@@ -29,7 +29,7 @@ Application made in Dakar 🇸🇳 pour la navigation et la pêche artisanale.
    - `TG_TOKEN`
    - `TG_ID`
 4. Pour développement : `python app.py`
-5. Pour production : `gunicorn --bind 0.0.0.0:8000 wsgi:app`
+5. Pour production : `python wsgi.py` (Windows) ou `gunicorn --bind 0.0.0.0:8000 wsgi:app` (Linux/Mac)
 
 ## 🌐 Utilisation
 
