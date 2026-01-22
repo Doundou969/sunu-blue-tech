@@ -99,6 +99,18 @@ def job():
                 db.session.add(db_data)
             db.session.commit()
 
+            # Create data for JSON from DB
+            fishing_records = FishingData.query.all()
+            data = [
+                {
+                    "date": record.date,
+                    "zone": record.zone,
+                    "temp": record.temp,
+                    "species": record.species
+                }
+                for record in fishing_records
+            ]
+
         # Update sw.js to cache data.json
         sw = '''
         self.addEventListener('install', event => {
