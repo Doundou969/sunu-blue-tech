@@ -1,16 +1,16 @@
 [build]
-  publish = "."  
-  command = "echo 'Sunu-Blue-Tech Ready'"
+  publish = "."
+  command = ""  # ← VIDE = pas de build !
 
 [[headers]]
-  for = "/static/manifest.json"
+  for = "/static/*"
   [headers.values]
-    Content-Type = "application/manifest+json"
+    Cache-Control = "public, max-age=3600"
 
-[[headers]] 
-  for = "/static/sw.js"
+[[headers]]
+  for = "/*.json"
   [headers.values]
-    ServiceWorker-Allowed = "/"
+    Content-Type = "application/json"
 
 [[redirects]]
   from = "/*"
