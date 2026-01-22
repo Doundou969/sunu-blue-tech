@@ -4,19 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Services - Sunu Blue Tech</title>
+    <link rel="manifest" href="/static/manifest.json">
     <style>
-        body { 
-            font-family: Arial, sans-serif; margin: 0; padding: 20px; 
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px;
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white; text-align: center;
-        }
-        .container { max-width: 600px; margin: 0 auto; background: rgba(255,255,255,0.1); 
-            padding: 40px; border-radius: 20px; backdrop-filter: blur(10px);
-        }
+            color: white; text-align: center; }
+        .container { max-width: 600px; margin: 0 auto;
+            background: rgba(255,255,255,0.1); padding: 40px;
+            border-radius: 20px; backdrop-filter: blur(10px); }
         nav { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 15px; margin-bottom: 30px; }
-        nav a { color: #00d4ff; text-decoration: none; margin: 0 20px; font-weight: bold; }
+        nav a { color: #00d4ff; text-decoration: none; margin: 0 20px; font-weight: bold; font-size: 1.1em; }
         nav a:hover { color: white; }
-        h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .service { background: rgba(0,0,0,0.2); padding: 20px; margin: 15px 0; border-radius: 15px; }
     </style>
 </head>
 <body>
@@ -27,8 +26,25 @@
             <a href="/services">⚙️ Services</a>
         </nav>
         <h1>⚙️ Nos Services</h1>
-        <p>Développement web, mobile et solutions tech adaptées au Sénégal.</p>
-        <button onclick="history.back()" style="background: #00d4ff; color: black; border: none; padding: 15px 30px; font-size: 1.2em; border-radius: 50px; cursor: pointer;">← Retour</button>
+        
+        <div class="service">
+            <h2>🌊 Bulletins Maritimes</h2>
+            <p>Données vagues, courants, température - 2x/jour Telegram</p>
+        </div>
+        
+        <div class="service">
+            <h2>📱 PWA Mobile</h2>
+            <p>Application installable hors ligne - Dakar → Casamance</p>
+        </div>
+        
+        <div class="service">
+            <h2>🆘 Urgences Mer</h2>
+            <p>119 - Numéro d'urgence maritime Sénégal</p>
+        </div>
+        
+        <div style="margin-top: 30px; font-size: 0.9em; opacity: 0.8;">
+            *Xam-Xam au service du Géej* ⚓🇸🇳
+        </div>
     </div>
 </body>
 </html>
