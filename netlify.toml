@@ -1,16 +1,18 @@
 [build]
   publish = "."
-  command = ""  # ← VIDE = pas de build !
+  command = ""                    # ← VIDE = pas de build
+  functions = ""                  # ← DÉSACTIVE fonctions
+  base = "."                      # ← Statique only
+
+# IGNORER Python complètement
+[build.environment]
+  NODE_VERSION = "18"
+  PYTHON_VERSION = ""             # ← VIDE = pas de Python
 
 [[headers]]
   for = "/static/*"
   [headers.values]
     Cache-Control = "public, max-age=3600"
-
-[[headers]]
-  for = "/*.json"
-  [headers.values]
-    Content-Type = "application/json"
 
 [[redirects]]
   from = "/*"
