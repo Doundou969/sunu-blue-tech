@@ -1,39 +1,31 @@
-name: Rapport quotidien pêche 🇸🇳
+name: Sunu-Blue-Tech Auto
 
 on:
   schedule:
-    - cron: '0 8 * * *'  # 8h UTC = 9h Dakar
+    - cron: '0 5 * * *'
+    - cron: '0 15 * * *'
   workflow_dispatch:
 
 jobs:
-  peche:
+  run-script:
     runs-on: ubuntu-latest
-    
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Configurer Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-        
-    - name: Installer dépendances
-      run: pip install requests pandas beautifulsoup4 python-telegram-bot==20.7
-      
-    - name: 🧪 TEST TELEGRAM DIRECT
-      env:
-        TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-      run: |
-        echo "🔍 Token détecté: ${TELEGRAM_TOKEN:0:10}..."
-        echo "📱 Chat ID: $TELEGRAM_CHAT_ID"
-        curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage" \
-          -d chat_id="$TELEGRAM_CHAT_ID" \
-          -d "text=🎣 *TEST URGENT SUNU-BLUE-TECH* ✅ 22 Jan 2026\n📊 Workflow OK!" \
-          -d parse_mode=Markdown || echo "❌ Erreur Telegram"
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Installer les bibliothèques
+        run: |
+          pip install -r requirements.txt
           
-    - name: Lancer script pêche
-      env:
-        TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-      run: python script_peche.py
+      - name: Lancer le script de pêche
+        env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_ID: ${{ secrets.TG_ID }}
+          COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
+          COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
+        run: python script_peche.py
