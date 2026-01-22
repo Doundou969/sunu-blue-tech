@@ -5,7 +5,13 @@ import datetime
 import numpy as np
 import matplotlib.pyplot as plt
 import json
-from app import db, FishingData, app  # Import DB and model
+# from app import db, FishingData, app  # Import DB and model - moved inside function to avoid circular import
+
+# --- CONFIGURATION ---
+USER = os.getenv("COPERNICUS_USERNAME")
+PASS = os.getenv("COPERNICUS_PASSWORD")
+TG_TOKEN = os.getenv("TG_TOKEN")
+TG_ID = os.getenv("TG_ID")
 
 # --- CONFIGURATION ---
 USER = os.getenv("COPERNICUS_USERNAME")
@@ -28,6 +34,7 @@ def send_tg_with_photo(caption, photo_path):
         requests.post(url, data={"chat_id": TG_ID, "caption": caption, "parse_mode": "Markdown"}, files={"photo": photo})
 
 def job():
+    from app import db, FishingData, app  # Import DB and model inside function to avoid circular import
     try:
         # Datasets
         ds_phys = copernicusmarine.open_dataset(dataset_id="cmems_mod_glo_phy_anfc_0.083deg_PT1H-m", username=USER, password=PASS, minimum_longitude=-18.5, maximum_longitude=-16.0, minimum_latitude=12.0, maximum_latitude=17.0)
