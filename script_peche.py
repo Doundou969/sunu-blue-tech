@@ -13,12 +13,6 @@ PASS = os.getenv("COPERNICUS_PASSWORD")
 TG_TOKEN = os.getenv("TG_TOKEN")
 TG_ID = os.getenv("TG_ID")
 
-# --- CONFIGURATION ---
-USER = os.getenv("COPERNICUS_USERNAME")
-PASS = os.getenv("COPERNICUS_PASSWORD")
-TG_TOKEN = os.getenv("TG_TOKEN")
-TG_ID = os.getenv("TG_ID")
-
 # Zones avec coordonnées précises
 ZONES = {
     "SAINT-LOUIS": {"lat": 16.03, "lon": -16.55},
@@ -199,9 +193,9 @@ def job():
 <body>
     <div class="container">
         <nav>
-            <a href="index.html">🏠 Accueil</a>
-            <a href="about.html">👨‍💻 À Propos</a>
-            <a href="services.html">⚙️ Services</a>
+            <a href="/">🏠 Accueil</a>
+            <a href="/about">👨‍💻 À Propos</a>
+            <a href="/services">⚙️ Services</a>
         </nav>
         <h1>🌊 Sunu Blue Tech</h1>
         <p>Votre application officielle est prête ! Navigation complète ✅</p>
@@ -260,11 +254,11 @@ Application made in Dakar 🇸🇳 pour la navigation et la pêche artisanale.
 
 ## 📍 Zones couvertes
 
-- Saint-Louis
-- Loumpoul
-- Dakar / Kayar
-- Mbour / Joal
-- Casamance
+- Saint-LOUIS
+- LOMPOUL
+- DAKAR / KAYAR
+- MBOUR / JOAL
+- CASAMANCE
 
 ## 🛠 Installation
 
