@@ -90,9 +90,3 @@ def run_script():
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
-heroku create sunu-blue-tech-app
-heroku config:set COPERNICUS_USERNAME=your_username
-heroku config:set COPERNICUS_PASSWORD=your_password  
-heroku config:set TG_TOKEN=your_token
-heroku config:set TG_ID=your_id
-git push heroku main
