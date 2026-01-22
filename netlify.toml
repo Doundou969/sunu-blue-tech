@@ -1,0 +1,18 @@
+[build]
+  publish = "."  
+  command = "echo 'Sunu-Blue-Tech Ready'"
+
+[[headers]]
+  for = "/static/manifest.json"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+
+[[headers]] 
+  for = "/static/sw.js"
+  [headers.values]
+    ServiceWorker-Allowed = "/"
+
+[[redirects]]
+  from = "/*"
+  to = "/templates/index.html"
+  status = 200
