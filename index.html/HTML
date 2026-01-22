@@ -35,9 +35,9 @@
 <body>
     <div class="container">
         <nav>
-            <a href="index.html">🏠 Accueil</a>
-            <a href="about.html">👨‍💻 À Propos</a>
-            <a href="services.html">⚙️ Services</a>
+            <a href="/">🏠 Accueil</a>
+            <a href="/about">👨‍💻 À Propos</a>
+            <a href="/services">⚙️ Services</a>
         </nav>
         <h1>🌊 Sunu Blue Tech</h1>
         <p>Votre application officielle est prête ! Navigation complète ✅</p>

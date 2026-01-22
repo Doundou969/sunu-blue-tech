@@ -125,7 +125,7 @@ def job():
             "name": "Sunu Blue Tech",
             "short_name": "SunuBT",
             "description": "Application de navigation et pêche made in Dakar",
-            "start_url": "/index.html",
+            "start_url": "/",
             "display": "standalone",
             "background_color": "#1e3c72",
             "theme_color": "#00d4ff",
@@ -205,8 +205,8 @@ def job():
             alert("🎉 Félicitations ! Navigation multi-pages fonctionnelle !");
         }
 
-        // Load data from data.json
-        fetch('data.json')
+        // Load data from /api/data
+        fetch('/api/data')
             .then(response => response.json())
             .then(data => {
                 const dataList = document.getElementById('data-list');
@@ -226,7 +226,7 @@ def job():
 </body>
 </html>"""
 
-        with open("index.html", "w", encoding="utf-8") as f:
+        with open("templates/index.html", "w", encoding="utf-8") as f:
             f.write(html_content)
 
         # Create README.md
