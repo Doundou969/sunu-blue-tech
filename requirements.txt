@@ -6,3 +6,4 @@ xarray
 netcdf4
 cftime
 flask
+flask-sqlalchemy
