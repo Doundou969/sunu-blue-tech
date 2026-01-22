@@ -1,16 +1,29 @@
-- name: Lancer le script de pêche (debug)
-  run: |
-    set -e
-    echo "Debug: Vérif env vars"
-    env | grep -E "(COPERNICUS|TG_|ANACIM)" || echo "Vars manquantes"
-    echo "Debug: Test imports"
-    python -c "import copernicusmarine, requests; print('Imports OK')"
-    echo "Debug: Test DB"
-    python -c "import sqlite3; print('SQLite OK')"
-    echo "=== LANCEMENT SCRIPT ==="
-    python script_peche.py
-  env:
-    COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
-    COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
-    TG_TOKEN: ${{ secrets.TG_TOKEN }}
-    TG_ID: ${{ secrets.TG_ID }}
+name: Rapport quotidien pêche 🇸🇳
+
+on:
+  schedule:
+    - cron: '0 8 * * *'  # 8h UTC = 9h Dakar
+  workflow_dispatch:  # Bouton manuel
+
+jobs:
+  peche:
+    runs-on: ubuntu-latest
+    name: 🚀 Lancer le script de pêche (debug)
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Configurer Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        
+    - name: Installer dépendances
+      run: |
+        pip install requests pandas beautifulsoup4 python-telegram-bot==20.7
+        
+    - name: Lancer script pêche
+      env:
+        TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      run: python script_peche.py
