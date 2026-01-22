@@ -118,9 +118,8 @@ def job():
                 caches.open('sunu-cache').then(cache => {
                     return cache.addAll([
                         '/',
-                        '/index.html',
-                        '/manifest.json',
-                        '/data.json'
+                        '/static/manifest.json',
+                        '/static/data.json'
                     ]);
                 })
             );
@@ -135,7 +134,7 @@ def job():
         });
         '''
 
-        with open("sw.js", "w", encoding="utf-8") as f:
+        with open("static/sw.js", "w", encoding="utf-8") as f:
             f.write(sw)
 
         # Create manifest.json for PWA
@@ -156,7 +155,7 @@ def job():
             ]
         }
 
-        with open("manifest.json", "w", encoding="utf-8") as f:
+        with open("static/manifest.json", "w", encoding="utf-8") as f:
             json.dump(manifest, f, ensure_ascii=False, indent=4)
 
         # Update index.html with dynamic data loading
@@ -166,7 +165,7 @@ def job():
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sunu Blue Tech - App Officielle</title>
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="/static/manifest.json">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -216,7 +215,7 @@ def job():
 
     <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
+            navigator.serviceWorker.register('/static/sw.js');
         }
 
         function showMessage() {
@@ -311,7 +310,7 @@ Application made in Dakar 🇸🇳 pour la navigation et la pêche artisanale.
         ]
 
     # Always create the web files
-    with open("data.json", "w", encoding="utf-8") as f:
+    with open("static/data.json", "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
 
     # Update sw.js to cache data.json
