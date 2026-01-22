@@ -1,31 +1,16 @@
-name: Sunu-Blue-Tech Auto
-
-on:
-  schedule:
-    - cron: '0 5 * * *'
-    - cron: '0 15 * * *'
-  workflow_dispatch:
-
-jobs:
-  run-script:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Récupérer le code
-        uses: actions/checkout@v4
-
-      - name: Installer Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Installer les bibliothèques
-        run: |
-          pip install -r requirements.txt
-          
-      - name: Lancer le script de pêche
-        env:
-          TG_TOKEN: ${{ secrets.TG_TOKEN }}
-          TG_ID: ${{ secrets.TG_ID }}
-          COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
-          COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
-        run: python script_peche.py
+- name: Lancer le script de pêche (debug)
+  run: |
+    set -e
+    echo "Debug: Vérif env vars"
+    env | grep -E "(COPERNICUS|TG_|ANACIM)" || echo "Vars manquantes"
+    echo "Debug: Test imports"
+    python -c "import copernicusmarine, requests; print('Imports OK')"
+    echo "Debug: Test DB"
+    python -c "import sqlite3; print('SQLite OK')"
+    echo "=== LANCEMENT SCRIPT ==="
+    python script_peche.py
+  env:
+    COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
+    COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
+    TG_TOKEN: ${{ secrets.TG_TOKEN }}
+    TG_ID: ${{ secrets.TG_ID }}
