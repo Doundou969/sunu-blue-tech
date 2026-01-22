@@ -3,12 +3,11 @@ name: Rapport quotidien pêche 🇸🇳
 on:
   schedule:
     - cron: '0 8 * * *'  # 8h UTC = 9h Dakar
-  workflow_dispatch:  # Bouton manuel
+  workflow_dispatch:
 
 jobs:
   peche:
     runs-on: ubuntu-latest
-    name: 🚀 Lancer le script de pêche (debug)
     
     steps:
     - uses: actions/checkout@v4
@@ -19,9 +18,20 @@ jobs:
         python-version: '3.11'
         
     - name: Installer dépendances
+      run: pip install requests pandas beautifulsoup4 python-telegram-bot==20.7
+      
+    - name: 🧪 TEST TELEGRAM DIRECT
+      env:
+        TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       run: |
-        pip install requests pandas beautifulsoup4 python-telegram-bot==20.7
-        
+        echo "🔍 Token détecté: ${TELEGRAM_TOKEN:0:10}..."
+        echo "📱 Chat ID: $TELEGRAM_CHAT_ID"
+        curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage" \
+          -d chat_id="$TELEGRAM_CHAT_ID" \
+          -d "text=🎣 *TEST URGENT SUNU-BLUE-TECH* ✅ 22 Jan 2026\n📊 Workflow OK!" \
+          -d parse_mode=Markdown || echo "❌ Erreur Telegram"
+          
     - name: Lancer script pêche
       env:
         TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
