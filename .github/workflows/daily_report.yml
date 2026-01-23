@@ -1,6 +1,4 @@
-- name: Lancer le script de pêche
-  run: |
-    python script_peche.py || echo "Script échoué mais on continue"
+name: Sunu-Blue-Tech Auto
 
 on:
   schedule:
