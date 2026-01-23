@@ -31,7 +31,7 @@ jobs:
           
           echo '{"name": "Sunu Blue Tech", "short_name": "SunuBlue", "start_url": "/", "display": "standalone"}' > public/manifest.json
       
-      - name: Send Telegram
+            - name: Send Telegram
         if: secrets.TG_TOKEN != ''
         run: |
           curl -s -X POST "https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMessage" \
@@ -54,4 +54,4 @@ jobs:
 🔗 https://www.google.com/maps?q=12.55,-16.85
 
 🆘 URGENCE MER : 119
-⚓️ Site: https://doundou969.github.io/sunu-blue-
+⚓️ Site: https://doundou969.github.io/sunu-blue-tech/"
