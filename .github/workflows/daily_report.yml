@@ -1,51 +1,43 @@
-name: Sunu-Blue-Tech Auto
-
-on:
-  schedule:
-    - cron: '0 5 * * *' # Runs at 05:00 (07h Dakar)
-    - cron: '0 15 * * *' # Runs at 15:00 (17h Dakar)
-  workflow_dispatch:
-
-jobs:
-  update-data:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Create public directory
-        run: mkdir -p public
-
-      - name: Force data files (NO Python)
-        run: |
-          cat > public/data.json << 'EOF'
-          [
-            {"zone": "SAINT-LOUIS", "status": "⚠️", "lat": 16.03, "lon": -16.55, "vagues": 2.24, "temp": 17.5, "courant": 0.3, "carte": "https://www.google.com/maps?q=16.03,-16.55", "date": "$(date +'%d/%m/%Y | %H:%M')"},
-            {"zone": "LOMPOUL", "status": "⚠️", "lat": 15.42, "lon": -16.82, "vagues": 2.29, "temp": 17.8, "courant": 0.5, "carte": "https://www.google.com/maps?q=15.42,-16.82", "date": "$(date +'%d/%m/%Y | %H:%M')"},
-            {"zone": "DAKAR / KAYAR", "status": "⚠️", "lat": 14.85, "lon": -17.45, "vagues": 2.48, "temp": 19.0, "courant": 0.5, "carte": "https://www.google.com/maps?q=14.85,-17.45", "date": "$(date +'%d/%m/%Y | %H:%M')"},
-            {"zone": "MBOUR / JOAL", "status": "✅", "lat": 14.15, "lon": -17.02, "vagues": 1.08, "temp": 20.0, "courant": 0.2, "carte": "https://www.google.com/maps?q=14.15,-17.02", "date": "$(date +'%d/%m/%Y | %H:%M')"},
-            {"zone": "CASAMANCE", "status": "✅", "lat": 12.55, "lon": -16.85, "vagues": 0.66, "temp": 23.1, "courant": 0.2, "carte": "https://www.google.com/maps?q=12.55,-16.85", "date": "$(date +'%d/%m/%Y | %H:%M')"}
-          ]
-          EOF
-
-          echo '{"name": "Sunu Blue Tech", "short_name": "SunuBlue", "start_url": "/", "display": "standalone"}' > public/manifest.json
-
-      - name: Send Telegram notification
-        if: env.TG_TOKEN != ''
+      - name: Send Telegram
+        if: secrets.TG_TOKEN != ''
         run: |
           curl -s -X POST "https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMessage" \
             -d chat_id="${{ secrets.TG_ID }}" \
+            -d parse_mode="HTML" \
             -d text="🇸🇳 SUNU-BLUE-TECH : NAVIGATION
-SAINT-LOUIS (16.03, -16.55) 📅 $(date +'%d/%m/%Y | %H:%M') ⚠️: Vagues 2.24 m, Temp. 17.5°C, Courant 0.3 km/h.
-CASAMANCE ✅: Vagues 0.66 m, Temp. 23.1°C, Courant 0.2 km/h.
-URGENCE MER : 119. Xam-Xam au service du Géej."
+📅 $(date +'%d/%m/%Y | %H:%M')
+━━━━━━━━━━━━━━━
 
-      - name: Commit and push changes
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/*
-          git commit -m "🌊 Marine data $(date)" || echo "No changes"
-          git push
+📍 SAINT-LOUIS ⚠️
+🌐 GPS : 16.03, -16.55
+🌊 Vagues : 2.24 m | 🌡 17.5°C
+🚩 Courant : 0.3 km/h
+🔗 Voir sur la Carte (https://www.google.com/maps?q=16.03,-16.55)
+───────────────
+📍 LOMPOUL ⚠️
+🌐 GPS : 15.42, -16.82
+🌊 Vagues : 2.29 m | 🌡 17.8°C
+🚩 Courant : 0.5 km/h
+🔗 Voir sur la Carte (https://www.google.com/maps?q=15.42,-16.82)
+───────────────
+📍 DAKAR / KAYAR ⚠️
+🌐 GPS : 14.85, -17.45
+🌊 Vagues : 2.48 m | 🌡 19.0°C
+🚩 Courant : 0.5 km/h
+🔗 Voir sur la Carte (https://www.google.com/maps?q=14.85,-17.45)
+───────────────
+📍 MBOUR / JOAL ✅
+🌐 GPS : 14.15, -17.02
+🌊 Vagues : 1.08 m | 🌡 20.0°C
+🚩 Courant : 0.2 km/h
+🔗 Voir sur la Carte (https://www.google.com/maps?q=14.15,-17.02)
+───────────────
+📍 CASAMANCE ✅
+🌐 GPS : 12.55, -16.85
+🌊 Vagues : 0.66 m | 🌡 23.1°C
+🚩 Courant : 0.2 km/h
+🔗 Voir sur la Carte (https://www.google.com/maps?q=12.55,-16.85)
+───────────────
+
+🆘 URGENCE MER : 119
+⚓️ Xam-Xam au service du Géej."
