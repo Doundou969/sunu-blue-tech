@@ -2,49 +2,48 @@ name: Daily Report
 
 on:
   schedule:
-    # Exécute tous les jours à 8h00 UTC (ajustez selon vos besoins)
+    # Tous les jours à 8h00 UTC (13h00 Dakar)
     - cron: '0 8 * * *'
-  workflow_dispatch:  # Permet de déclencher manuellement
+  workflow_dispatch:  # Test manuel possible
 
 jobs:
   generate-report:
     runs-on: ubuntu-latest
     
     steps:
-      # Étape 1: Checkout du code
+      # 1. Récupérer le code
       - name: Checkout repository
         uses: actions/checkout@v4
       
-      # Étape 2: Setup de l'environnement (exemple Python)
+      # 2. Configurer Python
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       
-      # Étape 3: Installation des dépendances
+      # 3. Installer les dépendances
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install pandas matplotlib requests
       
-      # Étape 4: Génération du rapport
+      # 4. Générer le rapport (personnalisez cette commande)
       - name: Generate daily report
         run: |
-          python generate_report.py
+          echo "Génération du rapport quotidien..."
+          echo "Date: $(date)" > daily_report.txt
+          echo "Repo: ${{ github.repository }}" >> daily_report.txt
+          echo "Commit: ${{ github.sha }}" >> daily_report.txt
+          echo "Statut: SUCCESS" >> daily_report.txt
       
-      # Étape 5: Upload du rapport comme artifact
-      - name: Upload report
+      # 5. Sauvegarder le rapport (téléchargeable 30 jours)
+      - name: Upload report artifact
         uses: actions/upload-artifact@v4
         with:
           name: daily-report-${{ github.run_number }}
-          path: report_*.pdf  # ou report_*.html, etc.
+          path: daily_report.txt
           retention-days: 30
       
-      # Étape 6: Notification (optionnel)
-      - name: Notify team
-        if: always()
-        uses: 0479/simple-weather-notify@v1.1.2
-        with:
-          bot_token: ${{ secrets.BOT_TOKEN }}
-          chat_id: ${{ secrets.CHAT_ID }}
-          text: "Rapport quotidien terminé: ${{ job.status }}"
+      # 6. Afficher le contenu (facultatif)
+      - name: Show report preview
+        run: cat daily_report.txt
