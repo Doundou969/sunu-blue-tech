@@ -54,12 +54,4 @@ jobs:
 🔗 https://www.google.com/maps?q=12.55,-16.85
 
 🆘 URGENCE MER : 119
-⚓️ Site: https://doundou969.github.io/sunu-blue-tech/"
-      
-      - name: Commit and push
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/*
-          git commit -m "🌊 Marine data $(date)" || echo "No changes"
-          git push
+⚓️ Site: https://doundou969.github.io/sunu-blue-
