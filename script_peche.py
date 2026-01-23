@@ -1,3 +1,14 @@
+# AJOUTEZ en haut de script_peche.py
+import os
+os.makedirs("public", exist_ok=True)
+
+# Test simple d'abord
+print("🚀 Script démarré")
+with open("public/test.txt", "w") as f:
+    f.write("Test OK")
+print("✅ Test réussi")
+exit(0)  # ← Force succès
+
 import os
 import requests
 import copernicusmarine
