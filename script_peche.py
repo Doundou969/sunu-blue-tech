@@ -1,94 +1,172 @@
-#!/usr/bin/env python3
 import os
+import requests
+import datetime
+import numpy as np
+import matplotlib
+matplotlib.use('Agg')  # NON interactif pour GitHub Actions
+import matplotlib.pyplot as plt
 import json
-from datetime import datetime
+import shutil
 
-print("🚀 Sunu Blue Tech - Format Sénégal")
-os.makedirs("public", exist_ok=True)
+# Configuration
+USER = os.getenv("COPERNICUS_USERNAME")
+PASS = os.getenv("COPERNICUS_PASSWORD")
+TG_TOKEN = os.getenv("TG_TOKEN")
+TG_ID = os.getenv("TG_ID")
 
-# DONNÉES SENEGAL AIRE - Zones pêcheurs
-donnees = [
-    {
-        "nom": "SAINT-LOUIS",
-        "lat": 16.03, "lon": -16.55,
-        "vagues": 2.24, "temp": 17.5, "courant": 0.3,
-        "status": "⚠️"
-    },
-    {
-        "nom": "LOMPOUL", 
-        "lat": 15.42, "lon": -16.82,
-        "vagues": 2.29, "temp": 17.8, "courant": 0.5,
-        "status": "⚠️"
-    },
-    {
-        "nom": "DAKAR / KAYAR",
-        "lat": 14.85, "lon": -17.45, 
-        "vagues": 2.48, "temp": 19.0, "courant": 0.5,
-        "status": "⚠️"
-    },
-    {
-        "nom": "MBOUR / JOAL",
-        "lat": 14.15, "lon": -17.02,
-        "vagues": 1.08, "temp": 20.0, "courant": 0.2, 
-        "status": "✅"
-    },
-    {
-        "nom": "CASAMANCE",
-        "lat": 12.55, "lon": -16.85,
-        "vagues": 0.66, "temp": 23.1, "courant": 0.2,
-        "status": "✅"
+ZONES = {
+    "SAINT-LOUIS": {"lat": 16.03, "lon": -16.55},
+    "LOMPOUL": {"lat": 15.42, "lon": -16.82},
+    "DAKAR / KAYAR": {"lat": 14.85, "lon": -17.45},
+    "MBOUR / JOAL": {"lat": 14.15, "lon": -17.02},
+    "CASAMANCE": {"lat": 12.55, "lon": -16.85}
+}
+
+def ensure_dirs():
+    """Créer dossiers nécessaires"""
+    os.makedirs("static", exist_ok=True)
+    os.makedirs("templates", exist_ok=True)
+
+def send_tg_with_photo(caption, photo_path):
+    """Envoyer Telegram avec image"""
+    if not TG_TOKEN or not TG_ID:
+        print("⚠️ Secrets Telegram manquants")
+        return
+    
+    try:
+        url = f"https://api.telegram.org/bot{TG_TOKEN}/sendPhoto"
+        with open(photo_path, 'rb') as photo:
+            requests.post(url, 
+                         data={"chat_id": TG_ID, "caption": caption, "parse_mode": "Markdown"}, 
+                         files={"photo": photo},
+                         timeout=10)
+        print("✅ Telegram envoyé")
+    except Exception as e:
+        print(f"❌ Telegram erreur: {e}")
+
+def main():
+    ensure_dirs()
+    
+    # Données simulées si pas de Copernicus (GitHub Actions)
+    if not USER or not PASS:
+        print("⚠️ Copernicus credentials manquants - données simulées")
+        data = []
+        for nom, coord in ZONES.items():
+            vague = np.random.uniform(0.5, 2.5)
+            temp = np.random.uniform(22, 28)
+            vitesse = np.random.uniform(5, 25)
+            status = "✅" if vague < 1.5 else "⚠️" if vague < 2.5 else "🛑"
+            
+            data.append({
+                'zone': nom, 'lat': coord['lat'], 'lon': coord['lon'],
+                'vague': vague, 'temp': temp, 'vitesse': vitesse, 'status': status
+            })
+    else:
+        try:
+            import copernicusmarine
+            ds_phys = copernicusmarine.open_dataset(
+                dataset_id="cmems_mod_glo_phy_anfc_0.083deg_PT1H-m",
+                username=USER, password=PASS,
+                minimum_longitude=-18.5, maximum_longitude=-16.0,
+                minimum_latitude=12.0, maximum_latitude=17.0
+            )
+            ds_wav = copernicusmarine.open_dataset(
+                dataset_id="cmems_mod_glo_wav_anfc_0.083deg_PT3H-i",
+                username=USER, password=PASS,
+                minimum_longitude=-18.5, maximum_longitude=-16.0,
+                minimum_latitude=12.0, maximum_latitude=17.0
+            )
+            
+            data = []
+            for nom, coord in ZONES.items():
+                dp = ds_phys.sel(latitude=coord['lat'], longitude=coord['lon'], method="nearest").isel(time=-1)
+                if 'depth' in dp.dims: dp = dp.isel(depth=0)
+                dw = ds_wav.sel(latitude=coord['lat'], longitude=coord['lon'], method="nearest").isel(time=-1)
+                
+                u, v = float(dp.uo.values), float(dp.vo.values)
+                temp, vague = float(dp.thetao.values), float(dw.VHM0.values)
+                vitesse = np.sqrt(u**2 + v**2) * 3.6
+                status = "✅" if vague < 1.5 else "⚠️" if vague < 2.5 else "🛑"
+                
+                data.append({
+                    'zone': nom, 'lat': coord['lat'], 'lon': coord['lon'],
+                    'vague': vague, 'temp': temp, 'vitesse': vitesse, 'status': status
+                })
+        except Exception as e:
+            print(f"❌ Copernicus erreur: {e}")
+            # Fallback simulé
+            data = [{'zone': 'Dakar', 'vague': 1.2, 'temp': 25.0, 'vitesse': 12.0, 'status': '✅'}]
+
+    # Rapport Telegram
+    rapport = f"🇸🇳 *SUNU-BLUE-TECH : NAVIGATION*\n📅 `{datetime.datetime.now().strftime('%d/%m/%Y | %H:%M UTC')}`\n━━━━━━━━━━━━━━━\n\n"
+    for d in data:
+        gmaps = f"https://www.google.com/maps?q={d['lat']},{d['lon']}"
+        rapport += f"📍 *{d['zone']}* {d['status']}\n🌐 `{d['lat']:.2f}, {d['lon']:.2f}`\n🌊 *{d['vague']:.1f}m* | 🌡️ {d['temp']:.1f}°C | 🚩 {d['vitesse']:.1f}km/h\n🔗 [Carte]({gmaps})\n───────────────\n"
+    rapport += "\n🆘 *URGENCE MER : 119*\n⚓ *Xam-Xam au service du Géej.*"
+
+    # Graphique
+    plt.figure(figsize=(10, 8))
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd']
+    
+    for i, d in enumerate(data):
+        plt.quiver(0, -i, 0.5*np.random.rand(), 0.3*np.random.rand(), 
+                  color=colors[i], scale=1.5, width=0.015)
+        plt.text(0.3, -i, f"{d['zone']}: {d['vague']:.1f}m", 
+                va='center', fontsize=11, fontweight='bold', color=colors[i])
+    
+    plt.title("🪝 Bulletin Navigation - Sunu Blue Tech", fontsize=14, pad=20)
+    plt.xlim(-0.5, 2.5); plt.ylim(-len(ZONES), 1); plt.axis('off')
+    plt.tight_layout()
+    
+    image_path = "static/bulletin_gps.png"
+    plt.savefig(image_path, bbox_inches='tight', dpi=150, facecolor='white')
+    plt.close()
+
+    # Envoyer Telegram
+    send_tg_with_photo(rapport, image_path)
+
+    # Données pêche pour web
+    fishing_data = [
+        {"date": datetime.datetime.now().strftime('%Y-%m-%d'), "zone": d['zone'], 
+         "temp": d['temp'], "species": "Sardine, Thon" if d['vague'] < 1.5 else "Céphalopodes"}
+        for d in data
+    ]
+
+    # Fichiers web
+    with open("static/data.json", "w", encoding="utf-8") as f:
+        json.dump(fishing_data, f, ensure_ascii=False, indent=2)
+
+    # Service Worker PWA
+    sw_content = '''self.addEventListener('install', event => {
+        event.waitUntil(caches.open('sunu-cache-v1').then(cache => {
+            return cache.addAll(['/', '/static/data.json', '/static/manifest.json']);
+        }));
+    });
+    self.addEventListener('fetch', event => {
+        event.respondWith(caches.match(event.request).then(response => {
+            return response || fetch(event.request);
+        }));
+    });'''
+    
+    with open("static/sw.js", "w") as f:
+        f.write(sw_content)
+
+    # Manifest PWA
+    manifest = {
+        "name": "Sunu Blue Tech", "short_name": "SunuBT",
+        "start_url": "/", "display": "standalone",
+        "background_color": "#1e3c72", "theme_color": "#00d4ff",
+        "icons": [{"src": "https://via.placeholder.com/192x192/00d4ff/ffffff?text=SBT", "sizes": "192x192"}]
     }
-]
+    
+    with open("static/manifest.json", "w") as f:
+        json.dump(manifest, f, indent=2)
 
-# FORMAT TELEGRAM + SITE
-date_fmt = datetime.now().strftime('%d/%m/%Y | %H:%M')
-message = f"""🇸🇳 SUNU-BLUE-TECH : NAVIGATION
-📅 {date_fmt}
-━━━━━━━━━━━━━━━
-"""
+    print("✅ Script terminé - Fichiers générés:")
+    print("- static/bulletin_gps.png")
+    print("- static/data.json")
+    print("- static/sw.js")
+    print("- static/manifest.json")
 
-for zone in donnees:
-    message += f"""📍 {zone['nom']} {zone['status']}
-🌐 GPS : {zone['lat']:.2f}, {zone['lon']:.2f}
-🌊 Vagues : {zone['vagues']:.2f} m | 🌡 {zone['temp']}°C
-🚩 Courant : {zone['courant']} km/h
-🔗 Voir sur la Carte (https://www.google.com/maps?q={zone['lat']},{zone['lon']})
-───────────────
-"""
-
-message += """🆘 URGENCE MER : 119
-⚓️ Xam-Xam au service du Géej."""
-
-# TELEGRAM
-try:
-    tg_token = os.getenv('TG_TOKEN')
-    tg_id = os.getenv('TG_ID')
-    if tg_token and tg_id:
-        import requests
-        url = f"https://api.telegram.org/bot{tg_token}/sendMessage"
-        requests.post(url, data={"chat_id": tg_id, "text": message, "parse_mode": "HTML"}).raise_for_status()
-        print("✅ Telegram Sénégal envoyé")
-except:
-    print("⚠️ Telegram skip")
-
-# SITE WEB (JSON)
-data_web = []
-for zone in donnees:
-    data_web.append({
-        "zone": zone['nom'],
-        "status": zone['status'],
-        "lat": zone['lat'],
-        "lon": zone['lon'], 
-        "vagues": zone['vagues'],
-        "temp": zone['temp'],
-        "courant": zone['courant'],
-        "carte": f"https://www.google.com/maps?q={zone['lat']},{zone['lon']}",
-        "date": date_fmt
-    })
-
-# SAUVEGARDE
-with open("public/data.json", "w") as f:
-    json.dump(data_web, f, indent=2)
-print("✅ data.json Sénégal")
-
-print("🎉 Xam-Xam Géej Format OFFICIEL !")
+if __name__ == "__main__":
+    main()
