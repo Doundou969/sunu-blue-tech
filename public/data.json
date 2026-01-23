@@ -1,1 +1,10 @@
-[{"date":"2026-01-23","zone":"Dakar","temp":24.5,"species":"Thon"}]
+[
+  {
+    "date": "2026-01-23 15:35",
+    "zone": "Dakar",
+    "temp": 24.5,
+    "courant": "0.2 m/s",
+    "vagues": "1.2 m",
+    "species": "Thon, Daurade"
+  }
+]
