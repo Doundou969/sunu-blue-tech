@@ -1,22 +1,29 @@
 name: Sunu-Blue-Tech Auto
 on:
   schedule:
-    - cron: '0 5 * * *'    # 07h Dakar
-    - cron: '0 15 * * *'   # 17h Dakar
+    - cron: '0 5 * * *'
+    - cron: '0 15 * * *'
   workflow_dispatch:
 
 jobs:
   update-data:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          
       - name: Create public directory
         run: mkdir -p public
         
+      - name: Run script (ignore errors)
+        run: |
+          python script_peche.py || echo "Script failed but continuing..."
+          
       - name: Force data files
         run: |
           cat > public/data.json << EOF
@@ -30,28 +37,15 @@ jobs:
           EOF
           
           echo '{"name": "Sunu Blue Tech", "short_name": "SunuBlue", "start_url": "/", "display": "standalone"}' > public/manifest.json
-      
-            - name: Send Telegram
-        if: secrets.TG_TOKEN != ''
+          
+      - name: Commit and push
         run: |
-          curl -s -X POST "https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMessage" \
-            -d chat_id="${{ secrets.TG_ID }}" \
-            -d parse_mode="HTML" \
-            -d text="🇸🇳 SUNU-BLUE-TECH : NAVIGATION
-📅 $(date +'%d/%m/%Y | %H:%M')
-━━━━━━━━━━━━━━━
-
-📍 SAINT-LOUIS ⚠️
-🌐 GPS : 16.03, -16.55
-🌊 Vagues : 2.24 m | 🌡 17.5°C
-🚩 Courant : 0.3 km/h
-🔗 https://www.google.com/maps?q=16.03,-16.55
-
-📍 CASAMANCE ✅
-🌐 GPS : 12.55, -16.85
-🌊 Vagues : 0.66 m | 🌡 23.1°C
-🚩 Courant : 0.2 km/h
-🔗 https://www.google.com/maps?q=12.55,-16.85
-
-🆘 URGENCE MER : 119
-⚓️ Site: https://doundou969.github.io/sunu-blue-tech/"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/*
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "🌊 Marine data update $(date)"
+            git push
+          fi
