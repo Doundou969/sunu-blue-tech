@@ -3,87 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sunu Blue Tech - Navigation Pêche Sénégal</title>
+    <title>Sunu Blue Tech - Navigation Pêche</title>
     <link rel="manifest" href="/public/manifest.json">
+    <meta name="theme-color" content="#1e3c72">
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 20px;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white; text-align: center; }
-        .container { max-width: 600px; margin: 0 auto;
-            background: rgba(255,255,255,0.1); padding: 40px;
-            border-radius: 20px; backdrop-filter: blur(10px); }
-        nav { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 15px; margin-bottom: 30px; }
-        nav a { color: #00d4ff; text-decoration: none; margin: 0 20px; font-weight: bold; font-size: 1.1em; }
-        nav a:hover { color: white; }
-        h1 { font-size: 2.5em; margin-bottom: 10px; }
-        button { background: #00d4ff; color: black; border: none; padding: 15px 30px;
-            font-size: 1.2em; border-radius: 50px; cursor: pointer; margin: 10px;
-            transition: all 0.3s; }
-        button:hover { background: #00b8e6; transform: scale(1.05); }
-        #data-container { margin-top: 30px; text-align: left; }
-        .data-item { background: rgba(0,0,0,0.2); padding: 15px; margin: 10px 0; border-radius: 10px; }
-        .loading { opacity: 0.6; }
+            color: white; min-height: 100vh; 
+        }
+        .header { 
+            text-align: center; padding: 2rem; 
+            background: rgba(0,0,0,0.3);
+        }
+        .header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .status { 
+            font-size: 1.2rem; padding: 1rem; 
+            background: rgba(255,255,255,0.1); border-radius: 10px; margin: 1rem auto; max-width: 400px;
+        }
+        #data-list { max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
+        .zone { 
+            background: rgba(255,255, refresh255,0.15); 
+            margin: 1rem 0; padding: 1.5rem; border-radius: 15px; 
+            border-left: 5px solid #00d4ff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .zone.danger { border-left-color: #ff4444; }
+        .zone.warning { border-left-color: #ffaa00; }
+        .zone.safe { border-left-color: #44ff44; }
+        .nom { font-size: 1.4rem; font-weight: bold; margin-bottom: 0.5rem; }
+        .gps { color: #00d4ff; font-family: monospace; }
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+        .stat { background: rgba(0,212,255,0.2); padding: 0.8rem; border-radius: 8px; text-align: center; }
+        .carte-btn { 
+            display: block; width: 100%; margin-top: 1rem;
+            background: #00d4ff; color: #1e3c72; padding: 0.8rem; 
+            text-decoration: none; border-radius: 8px; font-weight: bold;
+            text-align: center; transition: all 0.3s;
+        }
+        .carte-btn:hover { background: #00b8d4; transform: translateY(-2px); }
+        .refresh-btn { 
+            position: fixed; bottom: 20px; right: 20px;
+            width: 60px; height: 60px; border-radius: 50%; 
+            background: #44ff44; color: white; border: none; font-size: 1.5rem;
+            box-shadow: 0 5px 20px rgba(68,255,68,0.4);
+        }
+        @media (max-width: 600px) { 
+            .header h1 { font-size: 2rem; }
+            .stats { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <nav>
-            <a href="/">🏠 Accueil</a>
-            <a href="/about.html">👨‍💻 À Propos</a>
-            <a href="/services.html">⚙️ Services</a>
-        </nav>
-        <h1>🌊 Sunu Blue Tech</h1>
-        <p>Navigation et pêche artisanale - Dakar 🇸🇳</p>
-        <button onclick="loadData()">🔄 Données Marines</button>
-        <button onclick="installPWA()">📱 Installer PWA</button>
-        
-        <div id="data-container" class="loading">
-            <h2>📊 Données de Pêche</h2>
-            <div id="data-list">Chargement...</div>
-        </div>
+    <div class="header">
+        <h1>⚓ Sunu Blue Tech</h1>
+        <div id="status" class="status">Chargement des données...</div>
     </div>
+    
+    <div id="data-list"></div>
+    
+    <button class="refresh-btn" onclick="loadData()">🔄</button>
 
     <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/public/sw.js');
-        }
-
+        let lastUpdate = '';
+        
         async function loadData() {
             try {
                 const response = await fetch('/public/data.json');
                 const data = await response.json();
+                
                 const dataList = document.getElementById('data-list');
+                const statusEl = document.getElementById('status');
                 dataList.innerHTML = '';
+                
+                // Status global
+                const vaguesMax = Math.max(...data.map(z => z.vagues));
+                const statusText = vaguesMax > 2 ? '⚠️ MER FORMÉE - PRUDENCE' : 
+                                  vaguesMax > 1 ? '⚠️ VAGUES MODÉRÉES' : '✅ CONDITIONS FAVORABLES';
+                statusEl.textContent = `📅 ${data[0]?.date || '---'} | ${statusText}`;
+                
+                // Zones Sénégal
                 data.forEach(item => {
+                    const statusClass = item.vagues > 2 ? 'danger' : 
+                                       item.vagues > 1 ? 'warning' : 'safe';
+                    
                     const div = document.createElement('div');
-                    div.className = 'data-item';
+                    div.className = `zone ${statusClass}`;
                     div.innerHTML = `
-                        <strong>${item.date}</strong> - ${item.zone}<br>
-                        Température: ${item.temp}°C<br>
-                        Espèces: ${item.species}
+                        <div class="nom">${item.status || ''} ${item.zone}</div>
+                        <div class="gps">🌐 GPS: ${item.lat.toFixed(2)}, ${item.lon.toFixed(2)}</div>
+                        <div class="stats">
+                            <div class="stat">🌊 ${item.vagues.toFixed(2)}m</div>
+                            <div class="stat">🌡 ${item.temp}°C</div>
+                            <div class="stat">🚩 ${item.courant} km/h</div>
+                        </div>
+                        <a href="${item.carte}" target="_blank" class="carte-btn">🗺️ Voir sur Google Maps</a>
                     `;
                     dataList.appendChild(div);
                 });
+                
+                lastUpdate = new Date().toLocaleString('fr-FR');
+                console.log('✅ Données chargées:', data.length, 'zones');
+                
             } catch(e) {
-                document.getElementById('data-list').innerHTML = 'Données indisponibles';
+                document.getElementById('data-list').innerHTML = 
+                    '<div class="zone danger"><strong>❌ Données indisponibles</strong><br>Actualisez ou vérifiez la connexion.</div>';
+                console.error('Erreur données:', e);
             }
         }
-
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            deferredPrompt = e;
-        });
-
-        async function installPWA() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                deferredPrompt = null;
-            }
+        
+        // Auto-refresh 5min + PWA
+        setInterval(loadData, 5*60*1000);
+        loadData(); // Premier chargement
+        
+        // Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/public/sw.js');
         }
-
-        // Auto-load
-        loadData();
     </script>
 </body>
 </html>
