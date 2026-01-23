@@ -21,13 +21,13 @@ jobs:
         with:
           python-version: '3.11'
       
-      # 3. Installer dépendances de base
+      # 3. Installer dépendances
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pandas matplotlib requests
       
-      # 4. Créer rapport quotidien complet
+      # 4. Créer rapport complet
       - name: Generate daily report
         run: |
           echo "# Rapport Quotidien - $(date '+%Y-%m-%d')" > daily_report.md
@@ -35,12 +35,9 @@ jobs:
           echo "- Repository: ${{ github.repository }}" >> daily_report.md
           echo "- Commit: ${{ github.sha }}" >> daily_report.md
           echo "- Branche: ${{ github.ref_name }}" >> daily_report.md
-          echo "- Date UTC: $(date -u)" >> daily_report.md
           echo "- Date Dakar: $(date '+%Y-%m-%d %Hh%Mm' --date='TZ="Africa/Dakar"')" >> daily_report.md
           echo "" >> daily_report.md
-          echo "## Statistiques système" >> daily_report.md
-          echo "- Runner: ubuntu-latest" >> daily_report.md
-          echo "- Temps d'exécution: $(date '+%H:%M:%S')" >> daily_report.md
+          echo "## Statut: ✅ SUCCESS" >> daily_report.md
       
       # 5. Sauvegarder rapport (30 jours)
       - name: Upload report
@@ -50,6 +47,19 @@ jobs:
           path: daily_report.md
           retention-days: 30
       
-      # 6. Aperçu console (optionnel)
-      - name: Show report preview
-        run: cat daily_report.md
+      # 6. Notification Telegram
+      - name: Send Telegram notification
+        if: always()
+        uses: appleboy/telegram-action@v1.0.0
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          message: |
+            📊 *Rapport Quotidien Généré*
+            
+            ✅ *Statut:* ${{ job.status }}
+            📁 *Repo:* ${{ github.repository }}
+            📅 *Date:* $(date '+%Y-%m-%d %Hh%Mm')
+            🔗 *[Voir workflow]*(${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            
+            📎 Rapport disponible dans *Artifacts*
