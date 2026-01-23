@@ -1,34 +1,31 @@
-name: Update Marine Data
+name: Sunu-Blue-Tech Auto
+
 on:
   schedule:
-    - cron: '0 5,17 * * *'  # 05h/17h UTC
-  workflow_dispatch:          # Manuel
+    - cron: '0 5 * * *'
+    - cron: '0 15 * * *'
+  workflow_dispatch:
 
 jobs:
-  update-data:
+  run-script:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.9'
-        
-    - name: Install dependencies
-      run: |
-        pip install requests pandas numpy matplotlib
-        
-    - name: Create public directory
-      run: mkdir -p public
-      
-    - name: Run script
-      run: python script_peche.py
-      
-    - name: Commit data
-      run: |
-        git config user.name "GitHub Action"
-        git config user.email "action@github.com"
-        git add public/*
-        git commit -m "Update marine data $(date)" || exit 0
-        git push
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Installer les bibliothèques
+        run: |
+          pip install -r requirements.txt
+          
+      - name: Lancer le script de pêche
+        env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_ID: ${{ secrets.TG_ID }}
+          COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
+          COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
+        run: python script_peche.py
