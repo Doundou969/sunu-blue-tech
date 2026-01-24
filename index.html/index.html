@@ -14,102 +14,84 @@
             color: white; min-height: 100vh;
         }
         .header { 
-            text-align: center; padding: 2rem 1rem; 
+            text-align: center; padding: 1.5rem 1rem; 
             background: rgba(0,0,0,0.5); backdrop-filter: blur(10px);
+            position: sticky; top: 0; z-index: 1000;
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
         .status { 
-            font-size: 0.9rem; padding: 0.8rem; border-radius: 10px;
-            background: rgba(255,255,255,0.1); margin: 1rem auto; max-width: 400px;
+            font-size: 0.85rem; padding: 0.5rem 1rem; border-radius: 20px;
+            background: rgba(255,255,255,0.1); margin-top: 0.8rem;
+            display: inline-block; border: 1px solid rgba(255,255,255,0.2);
         }
         #data-list { max-width: 600px; margin: 1.5rem auto; padding: 0 1rem 5rem; }
+        
         .zone { 
-            background: rgba(255, 255, 255, 0.1); margin-bottom: 1rem;
-            padding: 1.2rem; border-radius: 15px; border-left: 6px solid #44ff44;
+            background: rgba(255, 255, 255, 0.08); margin-bottom: 1.2rem;
+            padding: 1.5rem; border-radius: 18px; border-left: 8px solid #44ff44;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
-        .zone.danger { border-left-color: #ff4444; background: rgba(255, 0, 0, 0.15); }
-        .zone.warning { border-left-color: #ffaa00; background: rgba(255, 170, 0, 0.15); }
+        .zone.danger { border-left-color: #ff4444; background: rgba(255, 0, 0, 0.1); }
+        .zone.warning { border-left-color: #ffaa00; background: rgba(255, 170, 0, 0.1); }
         
-        .nom { font-size: 1.3rem; font-weight: bold; }
-        .gps { color: #00d4ff; font-family: monospace; font-size: 0.85rem; display: block; margin: 5px 0 15px; }
-        
-        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .stat { background: rgba(0,0,0,0.3); padding: 0.6rem; border-radius: 8px; text-align: center; }
-        .stat-val { display: block; font-weight: bold; font-size: 1rem; }
-        .stat-label { font-size: 0.65rem; opacity: 0.7; text-transform: uppercase; }
+        .nom { font-size: 1.4rem; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 10px; }
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 15px 0; }
+        .stat { background: rgba(0,0,0,0.3); padding: 0.8rem 0.4rem; border-radius: 12px; text-align: center; }
+        .stat-val { display: block; font-weight: bold; font-size: 1.1rem; color: #00d4ff; }
+        .stat-label { font-size: 0.6rem; opacity: 0.7; text-transform: uppercase; margin-top: 4px; display: block; }
 
         .carte-btn { 
-            display: block; width: 100%; margin-top: 1rem;
-            background: #ffffff; color: #1e3c72; padding: 0.8rem; 
-            text-decoration: none; border-radius: 8px; font-weight: bold; text-align: center;
+            display: block; width: 100%; padding: 1rem; border-radius: 12px;
+            background: #ffffff; color: #1e3c72; font-weight: bold;
+            text-decoration: none; text-align: center; font-size: 0.9rem;
+            transition: 0.2s;
         }
+        .carte-btn:active { transform: scale(0.96); background: #00d4ff; }
+
         .refresh-btn { 
             position: fixed; bottom: 25px; right: 25px;
-            width: 60px; height: 60px; border-radius: 50%; 
-            background: #00d4ff; border: none; font-size: 1.5rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5); cursor: pointer;
+            width: 65px; height: 65px; border-radius: 50%; 
+            background: #00d4ff; color: #1e3c72; border: none; font-size: 1.8rem;
+            box-shadow: 0 5px 20px rgba(0,212,255,0.4); cursor: pointer;
         }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>⚓ Sunu Blue Tech</h1>
-        <div id="status" class="status">Initialisation...</div>
+        <div id="status" class="status">Chargement des balises...</div>
     </div>
     
     <div id="data-list"></div>
     
-    <button class="refresh-btn" onclick="loadData()">🔄</button>
+    <button class="refresh-btn" onclick="loadData()" aria-label="Actualiser">🔄</button>
 
     <script>
         async function loadData() {
             const statusEl = document.getElementById('status');
             const dataList = document.getElementById('data-list');
             
-            // On ajoute un timestamp pour éviter le cache navigateur agressif sur GitHub
-            const url = `public/data.json?t=${new Date().getTime()}`;
+            // ANTI-CACHE : On génère un nombre unique pour forcer GitHub à envoyer le vrai fichier
+            const cacheBuster = new Date().getTime();
+            const url = `public/data.json?t=${cacheBuster}`;
 
             try {
                 const response = await fetch(url);
-                if (!response.ok) throw new Error(`Fichier introuvable (${response.status})`);
+                if (!response.ok) throw new Error(`Signal perdu (${response.status})`);
                 
                 const data = await response.json();
                 dataList.innerHTML = '';
 
-                const vaguesMax = Math.max(...data.map(z => z.vagues || 0));
-                statusEl.innerHTML = `📅 ${data[0].date} | ${vaguesMax > 2 ? '⚠️ MER TRÈS FORTE' : '✅ MER PRATICABLE'}`;
-
                 data.forEach(item => {
-                    const statusClass = item.vagues > 2 ? 'danger' : item.vagues > 1.2 ? 'warning' : 'safe';
+                    const statusClass = item.vagues > 2.0 ? 'danger' : item.vagues > 1.2 ? 'warning' : 'safe';
                     const div = document.createElement('div');
                     div.className = `zone ${statusClass}`;
                     div.innerHTML = `
                         <div class="nom">${item.zone}</div>
-                        <span class="gps">📍 ${item.lat.toFixed(3)}, ${item.lon.toFixed(3)}</span>
                         <div class="stats">
-                            <div class="stat"><span class="stat-label">Vagues</span><span class="stat-val">${item.vagues}m</span></div>
-                            <div class="stat"><span class="stat-label">Temp.</span><span class="stat-val">${item.temp}°C</span></div>
-                            <div class="stat"><span class="stat-label">Courant</span><span class="stat-val">${item.courant}</span></div>
-                        </div>
-                        <a href="${item.carte}" target="_blank" class="carte-btn">🗺️ VOIR LA CARTE</a>
-                    `;
-                    dataList.appendChild(div);
-                });
-            } catch (error) {
-                statusEl.innerHTML = "❌ Erreur de connexion";
-                dataList.innerHTML = `<div class="zone danger">Erreur : ${error.message}</div>`;
-            }
-        }
-
-        loadData();
-
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('public/sw.js')
-                    .then(reg => console.log('SW enregistré !'))
-                    .catch(err => console.log('Erreur SW', err));
-            });
-        }
-    </script>
-</body>
-</html>
+                            <div class="stat">
+                                <span class="stat-val">${item.vagues}m</span>
+                                <span class="stat-label">Vagues</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat
