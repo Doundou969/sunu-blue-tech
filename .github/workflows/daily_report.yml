@@ -19,15 +19,73 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Installer TOUTES les dépendances
+      - name: Installer TOUTES les dépendances (ROBUSTE)
         run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
+          echo "📦 Mise à jour pip..."
+          pip install --upgrade pip setuptools wheel
+          
+          echo "📋 Vérification requirements.txt..."
+          ls -la requirements.txt || { echo "❌ requirements.txt MANQUANT !"; exit 1; }
+          
+          echo "🔧 Installation dépendances..."
+          pip install -r requirements.txt --timeout=120
+          
+          echo "✅ Dépendances installées !"
+          pip list
 
-      - name: Lancer le script de pêche
+      ######################################################################
+      # STEP 5 DEBUG URGENT - REMPLACE L'ANCIEN
+      ######################################################################
+      - name: Lancer le script de pêche (DEBUG URGENT)
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_ID: ${{ secrets.TG_ID }}
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
-        run: python script_peche.py
+        run: |
+          echo "🔥 DEBUG URGENT - $(date)"
+          echo "📂 Répertoire: $(pwd)"
+          echo "🐍 Python: $(python --version)"
+          echo "📍 Python: $(which python)"
+          
+          echo "📋 FICHIERS PYTHON:"
+          find . -name "*.py" -type f || echo "❌ AUCUN .py trouvé !"
+          
+          echo "🧪 TEST BASE PYTHON:"
+          python -c "
+import sys, os
+print('✅ Python de base OK')
+print('📍 Working dir:', os.getcwd())
+" || { echo "❌ Python cassé"; exit 1; }
+          
+          echo "🔍 VÉRIFICATION script_peche.py:"
+          if [ -f "script_peche.py" ]; then
+            echo "✅ script_peche.py trouvé !"
+            echo "🔎 Test syntaxe..."
+            python -m py_compile script_peche.py || echo "⚠️ Syntaxe OK"
+            
+            echo "🚀 LANCEMENT script_peche.py:"
+            python script_peche.py 2>&1 || {
+              echo "💥 ERREUR FATALE:"
+              echo "   Code sortie: \$?"
+              echo "   📄 Voir traceback ci-dessus ↑↑↑"
+              exit 1
+            }
+            echo "🎉 SUCCÈS script_peche.py !"
+          else
+            echo "❌ script_peche.py ABSENT ! Fichiers trouvés:"
+            ls -la *.py 2>/dev/null || echo "❌ AUCUN .py à la racine"
+            exit 1
+          fi
+        shell: bash
+        timeout-minutes: 5
+
+      - name: Notification succès (optionnel)
+        if: success()
+        env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_ID: ${{ secrets.TG_ID }}
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+            -d chat_id="${TG_ID}" \
+            -d text="✅ Sunu-Blue-Tech: Pêche réussie ! 🐟"
