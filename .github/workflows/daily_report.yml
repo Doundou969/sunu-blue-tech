@@ -1,60 +1,36 @@
-name: Sunu Blue Tech - Pêche Copernicus Dakar 🛰️🎣
+name: Sunu-Blue-Tech Auto
 
 on:
-  push:
-    branches: [ main ]
   schedule:
-    - cron: '0 */6 * * *'  # Toutes les 6h
+    # 5h00 UTC (10h Dakar) et 15h00 UTC (20h Dakar)
+    - cron: '0 5 * * *'
+    - cron: '0 15 * * *'
   workflow_dispatch:  # Manuel
 
 jobs:
-  copernicus-fishing:
+  run-script:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
     
     steps:
-    - name: 📥 Checkout code
-      uses: actions/checkout@v4
-    
-    - name: 🐍 Python 3.11
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-    
-    - name: 📦 Installer TOUTES dépendances Copernicus
-      run: |
-        pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install openeo==0.12.0 sentinelsat==1.3.0 earthaccess==0.10.2
-        echo "✅ Copernicus libraries OK"
-    
-    - name: 🔑 Configurer Credentials Copernicus
-      env:
-        CDSE_CLIENT_ID: ${{ secrets.CDSE_CLIENT_ID }}
-        CDSE_CLIENT_SECRET: ${{ secrets.CDSE_CLIENT_SECRET }}
-        SH_CLIENT_ID: ${{ secrets.SH_CLIENT_ID }}
-        SH_CLIENT_SECRET: ${{ secrets.SH_CLIENT_SECRET }}
-      run: |
-        echo "CDSE_CLIENT_ID=${{ secrets.CDSE_CLIENT_ID }}" >> $GITHUB_ENV
-        echo "CDSE_CLIENT_SECRET=${{ secrets.CDSE_CLIENT_SECRET }}" >> $GITHUB_ENV
-        echo "Credentials détectés: $([ ! -z '$CDSE_CLIENT_ID' ] && echo '✅' || echo '❌')"
-    
-    - name: 🎣 Lancer Pêche Copernicus Dakar
-      run: |
-        python fishing_script.py
-        echo "📊 Résultats:"
-        cat copernicus_results.json || echo "Fichier créé"
-    
-    - name: 📤 Upload résultats JSON
-      uses: actions/upload-artifact@v4
-      with:
-        name: copernicus-dakar-results
-        path: |
-          copernicus_results.json
-          copernicus_debug.log
-    
-    - name: 🔔 Notification Discord (optionnel)
-      if: always()
-      uses: Ilshidur/action-discord@master
-      with:
-        args: '🚤 Sunu Blue Tech {{ github.repository }} - ${{ job.status }} - ${{ github.run_number }}'
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Installer les bibliothèques
+        run: |
+          pip install --upgrade pip
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+
+      - name: Lancer le script de pêche
+        env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_ID: ${{ secrets.TG_ID }}
+          COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
+          COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
+        run: python script_peche.py
