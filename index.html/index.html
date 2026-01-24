@@ -4,157 +4,103 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sunu Blue Tech - Navigation Pêche</title>
-    <link rel="manifest" href="/public/manifest.json">
+    <link rel="manifest" href="public/manifest.json">
     <meta name="theme-color" content="#1e3c72">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
-            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
-            color: white; min-height: 100vh; line-height: 1.5;
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%);
+            color: white; min-height: 100vh;
         }
         .header { 
             text-align: center; padding: 2rem 1rem; 
-            background: rgba(0,0,0,0.4); backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(8px);
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        .header h1 { font-size: 2.2rem; letter-spacing: 1px; }
-        
         .status { 
-            font-size: 1.1rem; padding: 1rem; font-weight: 500;
-            background: rgba(255,255,255,0.1); border-radius: 12px; 
-            margin: 1.5rem auto 0; max-width: 450px;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+            font-size: 1rem; padding: 0.8rem; border-radius: 10px;
+            background: rgba(255,255,255,0.1); margin: 1rem auto; max-width: 400px;
         }
-
-        #data-list { max-width: 650px; margin: 1.5rem auto; padding: 0 1rem 5rem; }
-        
+        #data-list { max-width: 600px; margin: 2rem auto; padding: 0 1rem 5rem; }
         .zone { 
-            background: rgba(255, 255, 255, 0.08); 
-            margin-bottom: 1.5rem; padding: 1.5rem; border-radius: 18px; 
-            border-left: 6px solid #00d4ff;
-            transition: transform 0.2s;
+            background: rgba(255, 255, 255, 0.1); margin-bottom: 1.2rem;
+            padding: 1.5rem; border-radius: 15px; border-left: 6px solid #00d4ff;
         }
-        .zone.danger { border-left-color: #ff4b2b; background: rgba(255, 75, 43, 0.1); }
-        .zone.warning { border-left-color: #f9d423; background: rgba(249, 212, 35, 0.1); }
-        .zone.safe { border-left-color: #00f260; background: rgba(0, 242, 96, 0.1); }
-
-        .nom { font-size: 1.5rem; font-weight: 800; display: flex; justify-content: space-between; }
-        .gps { 
-            display: inline-block; background: rgba(0,0,0,0.3);
-            padding: 0.3rem 0.6rem; border-radius: 5px;
-            color: #00d4ff; font-family: 'Courier New', monospace; font-size: 0.9rem; margin: 0.5rem 0;
-        }
-
-        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin: 1rem 0; }
-        .stat { background: rgba(255,255,255,0.1); padding: 0.7rem; border-radius: 10px; text-align: center; }
-        .stat-val { display: block; font-size: 1.2rem; font-weight: bold; }
-        .stat-label { font-size: 0.7rem; text-transform: uppercase; opacity: 0.8; }
-
+        .zone.danger { border-left-color: #ff4444; background: rgba(255, 0, 0, 0.1); }
+        .zone.warning { border-left-color: #ffaa00; background: rgba(255, 170, 0, 0.1); }
+        .zone.safe { border-left-color: #44ff44; background: rgba(68, 255, 68, 0.1); }
+        .nom { font-size: 1.4rem; font-weight: bold; margin-bottom: 0.5rem; }
+        .gps { color: #00d4ff; font-family: monospace; font-size: 0.9rem; margin-bottom: 1rem; display: block; }
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .stat { background: rgba(0,0,0,0.2); padding: 0.8rem; border-radius: 8px; text-align: center; }
+        .stat-val { display: block; font-weight: bold; font-size: 1.1rem; }
+        .stat-label { font-size: 0.7rem; opacity: 0.7; text-transform: uppercase; }
         .carte-btn { 
             display: block; width: 100%; margin-top: 1rem;
-            background: #ffffff; color: #1e3c72; padding: 1rem; 
-            text-decoration: none; border-radius: 12px; font-weight: bold;
-            text-align: center; transition: background 0.3s;
+            background: #00d4ff; color: #1e3c72; padding: 0.8rem; 
+            text-decoration: none; border-radius: 8px; font-weight: bold; text-align: center;
         }
-        .carte-btn:active { transform: scale(0.98); }
-
         .refresh-btn { 
-            position: fixed; bottom: 25px; right: 25px;
-            width: 65px; height: 65px; border-radius: 50%; 
-            background: #00f260; color: #000; border: none; font-size: 1.8rem;
-            box-shadow: 0 8px 25px rgba(0, 242, 96, 0.4); cursor: pointer;
-            z-index: 100;
-        }
-        .refresh-btn:active { transform: rotate(180deg) scale(0.9); transition: 0.3s; }
-
-        @media (max-width: 400px) {
-            .stats { grid-template-columns: 1fr; }
-            .header h1 { font-size: 1.8rem; }
+            position: fixed; bottom: 20px; right: 20px;
+            width: 60px; height: 60px; border-radius: 50%; 
+            background: #44ff44; border: none; font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor: pointer; z-index: 100;
         }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>⚓ Sunu Blue Tech</h1>
-        <div id="status" class="status">Connexion aux balises...</div>
+        <div id="status" class="status">Chargement...</div>
     </div>
     
     <div id="data-list"></div>
     
-    <button class="refresh-btn" onclick="loadData()" title="Actualiser">🔄</button>
+    <button class="refresh-btn" onclick="loadData()">🔄</button>
 
     <script>
         async function loadData() {
-            const dataList = document.getElementById('data-list');
             const statusEl = document.getElementById('status');
-            
+            const dataList = document.getElementById('data-list');
+
             try {
-                const response = await fetch('/public/data.json');
-                if (!response.ok) throw new Error("Fichier introuvable");
+                // Chemin relatif sans "/" au début pour GitHub Pages
+                const response = await fetch('public/data.json');
+                if (!response.ok) throw new Error(`Erreur ${response.status}: Fichier non trouvé`);
                 
                 const data = await response.json();
-                if (!data || data.length === 0) throw new Error("Données vides");
-
                 dataList.innerHTML = '';
-                
-                // Analyse météo globale
-                const vaguesMax = Math.max(...data.map(z => z.vagues || 0));
-                let globalStatus = '✅ MER CALME';
-                if (vaguesMax > 2.0) globalStatus = '🔴 DANGER : MER TRÈS FORTE';
-                else if (vaguesMax > 1.2) globalStatus = '⚠️ ATTENTION : MER AGITÉE';
 
-                statusEl.innerHTML = `📅 ${data[0].date || 'Aujourd\'hui'} <br> ${globalStatus}`;
+                const vaguesMax = Math.max(...data.map(z => z.vagues));
+                statusEl.innerHTML = `📅 ${data[0].date} | ${vaguesMax > 2 ? '⚠️ MER FORTE' : '✅ MER CALME'}`;
 
                 data.forEach(item => {
-                    const statusClass = item.vagues > 2.0 ? 'danger' : item.vagues > 1.2 ? 'warning' : 'safe';
-                    
+                    const statusClass = item.vagues > 2 ? 'danger' : item.vagues > 1.2 ? 'warning' : 'safe';
                     const div = document.createElement('div');
                     div.className = `zone ${statusClass}`;
                     div.innerHTML = `
-                        <div class="nom">
-                            <span>${item.zone}</span>
-                            <span>${item.vagues > 2.0 ? '🚩' : ''}</span>
-                        </div>
-                        <div class="gps">📍 ${item.lat.toFixed(3)}°N , ${item.lon.toFixed(3)}°W</div>
+                        <div class="nom">${item.zone}</div>
+                        <span class="gps">📍 ${item.lat.toFixed(3)}, ${item.lon.toFixed(3)}</span>
                         <div class="stats">
-                            <div class="stat">
-                                <span class="stat-label">Vagues</span>
-                                <span class="stat-val">🌊 ${item.vagues.toFixed(1)}m</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-label">Temp.</span>
-                                <span class="stat-val">🌡 ${item.temp}°C</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-label">Courant</span>
-                                <span class="stat-val">🚩 ${item.courant}</span>
-                            </div>
+                            <div class="stat"><span class="stat-label">Vagues</span><span class="stat-val">${item.vagues}m</span></div>
+                            <div class="stat"><span class="stat-label">Temp.</span><span class="stat-val">${item.temp}°C</span></div>
+                            <div class="stat"><span class="stat-label">Courant</span><span class="stat-val">${item.courant}</span></div>
                         </div>
-                        <a href="${item.carte || '#'}" target="_blank" class="carte-btn">🗺️ VOIR LA CARTE</a>
+                        <a href="${item.carte}" target="_blank" class="carte-btn">VOIR LA CARTE</a>
                     `;
                     dataList.appendChild(div);
                 });
-                
-            } catch(e) {
-                statusEl.textContent = "❌ Mode Hors-ligne ou Erreur";
-                dataList.innerHTML = `
-                    <div class="zone danger">
-                        <strong>Erreur de chargement</strong><br>
-                        Vérifiez votre connexion ou les paramètres du serveur.<br>
-                        <small>${e.message}</small>
-                    </div>`;
+            } catch (error) {
+                console.error(error);
+                statusEl.innerHTML = "❌ Erreur de données";
+                dataList.innerHTML = `<div class="zone danger"><strong>Erreur :</strong> ${error.message}<br>Vérifiez que le dossier 'public' contient 'data.json'.</div>`;
             }
         }
 
-        // Initialisation
         loadData();
-        
-        // Auto-refresh toutes les 5 minutes
-        setInterval(loadData, 300000);
-
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/public/sw.js').catch(() => {});
+            navigator.serviceWorker.register('public/sw.js').catch(err => console.log("SW error:", err));
         }
     </script>
 </body>
