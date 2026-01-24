@@ -8,24 +8,38 @@ jobs:
   run-script:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Critique pour éviter l'erreur 1
+      contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Récupère tout l'historique pour éviter les erreurs de pull
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       
-      - name: Installation
+      - name: Installation des dépendances
         run: pip install numpy matplotlib requests
 
-      - name: Execution
+      - name: Execution du script de pêche
+        env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_ID: ${{ secrets.TG_ID }}
+          COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
+          COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
         run: python script_peche.py
 
-      - name: Nettoyage et Publication
+      - name: Sauvegarde et Publication (Correction Push)
         run: |
           git config --global user.name "SunuBlue-Bot"
           git config --global user.email "bot@sunubluetech.sn"
-          # On s'assure que seul le dossier public est suivi
+          
+          # On ajoute les fichiers générés
           git add public/data.json public/bulletin_gps.png
+          
+          # On commit si des changements existent
           git commit -m "Mise à jour météo $(date +'%d/%m/%Y')" || exit 0
-          git push
+          
+          # Correction de l'erreur REJECTED : On récupère les changements distants avant de pousser
+          git pull --rebase origin main
+          git push origin main
