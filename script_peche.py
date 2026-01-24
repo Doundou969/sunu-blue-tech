@@ -12,7 +12,7 @@ import requests
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 
-print("🚀 SUNU BLUE TECH - Dakar Offshore PRO")
+print("🚀 SUNU BLUE TECH - Sénégal Offshore PRO")
 
 # 🔐 SECRETS
 TG_TOKEN = os.getenv('TG_TOKEN', '').strip()
@@ -48,59 +48,72 @@ def copernicus_vagues():
         return round(np.random.uniform(1.2, 2.4), 1)
 
 def create_modern_bulletin(vagues, vent, temp, timestamp, source):
-    """🎨 Bulletin ULTRA-MODERNE avec GPS + Poissons"""
+    """🎨 Bulletin ULTRA-MODERNE - TOUT SÉNÉGAL + SÉCURITÉ"""
     
-    # 🐟 Poissons intelligents
+    # 🐟 Poissons + Sécurité
     if vagues < 1.2:
         poissons = "🐟🐟🐟 <b>THON + DENTS DE CHIEN</b> ⭐⭐⭐"
-        spot_star = "YOFE ROCHE"
+        spot_star = "1️⃣ DAKAR-YOFF"
+        securite = "🟢 <b>EXCELLENTE</b> - Sortie recommandée"
     elif vagues < 1.8:
         poissons = "🐟🐟 <b>SARDINES + LIEUTENANT</b> ⭐⭐"
-        spot_star = "ALMADIÈS"
+        spot_star = "2️⃣ ALMADIÈS"
+        securite = "🟡 <b>ATTENTION</b> - Petites pirogues prudence"
     else:
         poissons = "🐟 <b>CHINCHARD + THIOF</b> ⭐"
-        spot_star = "NGOR 25M"
+        spot_star = "3️⃣ NGOR 25M"
+        securite = "🔴 <b>RISQUE</b> - Pêche côtière uniquement"
     
-    bulletin = f"""<b>🚤 SUNU BLUE TECH PRO</b>
+    bulletin = f"""<b>🚤 SUNU BLUE TECH PRO</b> 🇸🇳
 
-📊 <b>DAKAR OFFSHORE</b> • {timestamp}
+📊 <b>SÉNÉGAL OFFSHORE</b> • {timestamp}
 
-🌊 <b>Vagues:</b> <code>{vagues}m</code> ({source})
+🌊 <b>Vagues Dakar:</b> <code>{vagues}m</code> ({source})
 💨 <b>Vent:</b> <code>{vent}km/h</code> 
 🌡 <b>Temp:</b> <code>{temp}°C</code>
 
-📍 <b>SPOT {spot_star} ⭐ PRIORITÉ</b>
-<code>https://maps.google.com/?q=14.752,-17.482</code>
+⚠️ <b>SÉCURITÉ:</b> {securite}
 
-📍 <b>Autres spots:</b>
-• <code>Almadies → https://maps.google.com/?q=14.768,-17.510</code>
-• <code>Ngor → https://maps.google.com/?q=14.725,-17.510</code>
+🐟 <b>POISSONS DU JOUR:</b> {poissons}
 
-🐟 <b>POISSONS DU JOUR:</b>
-{poissons}
+🏆 <b>TOP 3 SPOTS (GPS CLIC)</b>
+
+<code>1️⃣ {spot_star}</code>
+<a href="https://www.google.com/maps?q=14.752,-17.482" style="color:#00ff00">📍 14.752°N 17.482°W</a>
+
+<code>2️⃣ CAYAR (Grande Côte)</code>
+<a href="https://www.google.com/maps?q=14.923,-17.012" style="color:#00ff00">📍 14.923°N 17.012°W</a>
+
+<code>3️⃣ JOAL (Petite Côte)</code>
+<a href="https://www.google.com/maps?q=14.168,-16.812" style="color:#00ff00">📍 14.168°N 16.812°W</a>
+
+📍 <b>AUTRES ZONES SÉNÉGAL:</b>
+• <code>SAINT-LOUIS</code> <a href="https://www.google.com/maps?q=16.020,-16.508" style="color:#00ccff">16.020°N 16.508°W</a>
+• <code>CASAMANCE</code> <a href="https://www.google.com/maps?q=12.583,-16.717" style="color:#00ccff">12.583°N 16.717°W</a>
+• <code>SALOUM</code> <a href="https://www.google.com/maps?q=13.917,-16.483" style="color:#00ccff">13.917°N 16.483°W</a>
 
 ⛺ <b>Valable 12h</b> | sunubluetech.com"""
     
     return bulletin
 
 def telegram_send(msg, photo=None):
-    """📱 Telegram robuste"""
+    """📱 Telegram avec liens GOOGLE MAPS"""
     if not TG_TOKEN or not TG_ID:
         print("⚠️ Telegram secrets")
         return False
     
     try:
         url = f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage"
-        data = {"chat_id": TG_ID, "text": msg, "parse_mode": "HTML", "disable_web_page_preview": True}
-        r = requests.post(url, data=data, timeout=10)
+        data = {"chat_id": TG_ID, "text": msg, "parse_mode": "HTML", "disable_web_page_preview": False}
+        r = requests.post(url, data=data, timeout=15)
         print(f"📱 Status: {r.status_code}")
         
         if photo and os.path.exists(photo):
             with open(photo, 'rb') as f:
                 url = f"https://api.telegram.org/bot{TG_TOKEN}/sendPhoto"
                 files = {'photo': f}
-                data = {"chat_id": TG_ID, "caption": "📊 Bulletin graphique", "parse_mode": "HTML"}
-                requests.post(url, files=files, data=data, timeout=15)
+                data = {"chat_id": TG_ID, "caption": "📊 Bulletin Sénégal PRO", "parse_mode": "HTML"}
+                requests.post(url, files=files, data=data, timeout=20)
                 print("📸 Photo OK")
         return True
     except:
@@ -117,49 +130,51 @@ def main():
         timestamp = now.strftime('%d/%m %H:%M UTC')
         source = "Copernicus Marine" if COP_USER else "Sunu Blue Tech"
         
-        # 🎨 BULLETIN MODERNE
+        # 🎨 BULLETIN SÉNÉGAL COMPLET
         bulletin = create_modern_bulletin(vagues, vent, temp, timestamp, source)
-        print("📱 Envoi bulletin moderne...")
+        print("📱 Envoi bulletin Sénégal...")
         telegram_ok = telegram_send(bulletin)
         
-        # 📈 GRAPHIQUE PRO
-        print("📊 Graphique moderne...")
-        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 10), 
+        # 📈 GRAPHIQUE 5 ZONES
+        print("📊 Graphique 5 zones...")
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 12), 
                                      gridspec_kw={'height_ratios': [3, 2]})
         
-        # Graphique vagues
-        zones = ['Yoff Roche ⭐', 'Almadies', 'Ngor']
-        vagues_zones = [vagues+0.1, vagues, vagues-0.1]
-        colors = ['#10b981', '#1e40af', '#f59e0b']
+        # Graphique vagues 5 zones Sénégal
+        zones = ['Dakar ⭐', 'Cayar', 'Joal', 'Saint-Louis', 'Casamance']
+        vagues_zones = [vagues+0.1, vagues+0.05, vagues, vagues-0.1, vagues-0.15]
+        colors = ['#10b981', '#059669', '#047857', '#065f46', '#064e3b']
         
         bars = ax1.bar(zones, vagues_zones, color=colors, alpha=0.8, edgecolor='white', linewidth=2)
-        ax1.set_ylabel('Hauteur vagues (m)', fontsize=12, fontweight='bold')
-        ax1.set_title(f'🌊 Conditions Pêche Dakar - {timestamp}', fontsize=16, fontweight='bold', pad=20)
+        ax1.set_ylabel('Hauteur vagues (m)', fontsize=14, fontweight='bold')
+        ax1.set_title(f'🌊 Sénégal Offshore - {timestamp}', fontsize=18, fontweight='bold', pad=20)
+        ax1.tick_params(axis='x', rotation=45)
         ax1.grid(True, alpha=0.3)
         ax1.set_ylim(0, max(vagues_zones)+0.5)
         
         for bar, val in zip(bars, vagues_zones):
-            ax1.text(bar.get_x()+bar.get_width()/2, val+0.05, f'{val:.1f}m', 
-                    ha='center', fontweight='bold', fontsize=12)
+            ax1.text(bar.get_x()+bar.get_width()/2, val+0.02, f'{val:.1f}m', 
+                    ha='center', fontweight='bold', fontsize=11)
         
-        # Mini-météo
-        meteo_data = [vent, temp]
-        meteo_labels = ['Vent\nkm/h', 'Temp\n°C']
-        ax2.bar(meteo_labels, meteo_data, color=['#3b82f6', '#f97316'], alpha=0.8)
+        # Sécurité + Météo
+        meteo_data = [vent, temp, vagues]
+        meteo_labels = ['Vent\nkm/h', 'Temp\n°C', 'Vagues\nm']
+        colors_meteo = ['#3b82f6', '#f97316', '#10b981']
+        ax2.bar(meteo_labels, meteo_data, color=colors_meteo, alpha=0.8)
         ax2.set_ylabel('Valeurs', fontweight='bold')
         for i, v in enumerate(meteo_data):
-            ax2.text(i, v+0.5, f'{v}', ha='center', fontweight='bold')
+            ax2.text(i, v+0.3, f'{v}', ha='center', fontweight='bold', fontsize=12)
         
         plt.tight_layout()
-        img = 'dakar_pro.png'
+        img = 'senegal_pro.png'
         plt.savefig(img, dpi=300, bbox_inches='tight', facecolor='white', edgecolor='none')
         plt.close()
         print(f"✅ {img} généré")
         
         if telegram_ok:
-            telegram_send("📊 Graphique PRO", img)
+            telegram_send("📊 Graphique 5 zones Sénégal", img)
         
-        print("🎉 BULLETIN ULTRA-MODERNE ✅")
+        print("🎉 SÉNÉGAL BULLETIN PRO ✅")
         return 0
         
     except Exception as e:
