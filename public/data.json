@@ -1,42 +1,57 @@
 [
   {
     "zone": "SAINT-LOUIS",
-    "vagues": 1.73,
-    "poissons": "Thiof/Céphalopodes",
-    "temp": 20.2,
-    "courant": "0.6 km/h",
-    "date": "24/01/2026 | 03:53"
+    "lat": 16.03,
+    "lon": -16.55,
+    "vagues": 1.14,
+    "temp": 24.0,
+    "courant": "0.75 m/s",
+    "poissons": "Thiof, Sardinelles",
+    "status": "SÉCURITÉ",
+    "date": "24/01/2026 | 04:04"
   },
   {
     "zone": "KAYAR",
-    "vagues": 1.93,
-    "poissons": "Thiof/Céphalopodes",
-    "temp": 18.5,
-    "courant": "0.4 km/h",
-    "date": "24/01/2026 | 03:53"
-  },
-  {
-    "zone": "DAKAR",
-    "vagues": 1.26,
-    "poissons": "Sardinelles",
-    "temp": 20.9,
-    "courant": "0.6 km/h",
-    "date": "24/01/2026 | 03:53"
-  },
-  {
-    "zone": "MBOUR",
-    "vagues": 1.28,
-    "poissons": "Sardinelles",
+    "lat": 14.91,
+    "lon": -17.12,
+    "vagues": 1.11,
     "temp": 20.1,
-    "courant": "0.3 km/h",
-    "date": "24/01/2026 | 03:53"
+    "courant": "0.69 m/s",
+    "poissons": "Thiof, Sardinelles",
+    "status": "SÉCURITÉ",
+    "date": "24/01/2026 | 04:04"
+  },
+  {
+    "zone": "DAKAR (YOFF)",
+    "lat": 14.76,
+    "lon": -17.48,
+    "vagues": 2.49,
+    "temp": 19.9,
+    "courant": "0.16 m/s",
+    "poissons": "Zone profonde (Céphalopodes)",
+    "status": "DANGER",
+    "date": "24/01/2026 | 04:04"
+  },
+  {
+    "zone": "MBOUR / JOAL",
+    "lat": 14.15,
+    "lon": -17.02,
+    "vagues": 1.54,
+    "temp": 19.7,
+    "courant": "0.22 m/s",
+    "poissons": "Thiof, Sardinelles",
+    "status": "PRUDENCE",
+    "date": "24/01/2026 | 04:04"
   },
   {
     "zone": "CASAMANCE",
-    "vagues": 2.77,
-    "poissons": "Thiof/Céphalopodes",
-    "temp": 22.2,
-    "courant": "0.5 km/h",
-    "date": "24/01/2026 | 03:53"
+    "lat": 12.55,
+    "lon": -16.85,
+    "vagues": 2.02,
+    "temp": 21.3,
+    "courant": "0.54 m/s",
+    "poissons": "Zone profonde (Céphalopodes)",
+    "status": "PRUDENCE",
+    "date": "24/01/2026 | 04:04"
   }
 ]
