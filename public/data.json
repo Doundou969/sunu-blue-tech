@@ -1,52 +1,57 @@
 [
   {
     "zone": "SAINT-LOUIS",
-    "lat": 14.5,
-    "lon": -17.2,
-    "vagues": 1.29,
-    "temp": 21.5,
-    "courant": "11.7 km/h",
+    "lat": 16.03,
+    "lon": -16.55,
+    "vagues": 1.72,
+    "temp": 23.9,
+    "courant": "4.2 km/h",
+    "poissons": "Espadons, Thonines",
     "date": "24/01/2026",
-    "carte": "https://www.google.com/maps"
+    "carte": "https://www.google.com/maps?q=16.03,-16.55"
   },
   {
-    "zone": "LOMPOUL",
-    "lat": 14.5,
-    "lon": -17.2,
-    "vagues": 2.02,
-    "temp": 24.0,
-    "courant": "6.8 km/h",
+    "zone": "KAYAR",
+    "lat": 14.91,
+    "lon": -17.12,
+    "vagues": 1.8,
+    "temp": 26.0,
+    "courant": "13.9 km/h",
+    "poissons": "Espadons, Thonines",
     "date": "24/01/2026",
-    "carte": "https://www.google.com/maps"
+    "carte": "https://www.google.com/maps?q=14.91,-17.12"
   },
   {
-    "zone": "DAKAR / KAYAR",
-    "lat": 14.5,
-    "lon": -17.2,
-    "vagues": 1.03,
-    "temp": 24.0,
-    "courant": "7.9 km/h",
+    "zone": "DAKAR (YOFF)",
+    "lat": 14.76,
+    "lon": -17.48,
+    "vagues": 1.97,
+    "temp": 22.1,
+    "courant": "11.6 km/h",
+    "poissons": "Espadons, Thonines",
     "date": "24/01/2026",
-    "carte": "https://www.google.com/maps"
+    "carte": "https://www.google.com/maps?q=14.76,-17.48"
   },
   {
     "zone": "MBOUR / JOAL",
-    "lat": 14.5,
-    "lon": -17.2,
-    "vagues": 1.34,
-    "temp": 25.0,
-    "courant": "24.1 km/h",
+    "lat": 14.15,
+    "lon": -17.02,
+    "vagues": 1.44,
+    "temp": 21.1,
+    "courant": "14.1 km/h",
+    "poissons": "Espadons, Thonines",
     "date": "24/01/2026",
-    "carte": "https://www.google.com/maps"
+    "carte": "https://www.google.com/maps?q=14.15,-17.02"
   },
   {
     "zone": "CASAMANCE",
-    "lat": 14.5,
-    "lon": -17.2,
-    "vagues": 2.76,
-    "temp": 24.5,
-    "courant": "15.3 km/h",
+    "lat": 12.55,
+    "lon": -16.85,
+    "vagues": 1.33,
+    "temp": 25.5,
+    "courant": "4.6 km/h",
+    "poissons": "Espadons, Thonines",
     "date": "24/01/2026",
-    "carte": "https://www.google.com/maps"
+    "carte": "https://www.google.com/maps?q=12.55,-16.85"
   }
 ]
