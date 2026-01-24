@@ -1,15 +1,16 @@
 name: Sunu-Blue-Tech Auto
-
 on:
   schedule:
-    # 5h00 UTC (10h Dakar) et 15h00 UTC (20h Dakar)
     - cron: '0 5 * * *'
     - cron: '0 15 * * *'
-  workflow_dispatch:  # Manuel
+  workflow_dispatch:
 
 jobs:
   run-script:
     runs-on: ubuntu-latest
+    # Autorise le bot à modifier les fichiers de votre dépôt
+    permissions:
+      contents: write
     
     steps:
       - name: Récupérer le code
@@ -23,9 +24,7 @@ jobs:
       - name: Installer les bibliothèques
         run: |
           pip install --upgrade pip
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          fi
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
       - name: Lancer le script de pêche
         env:
@@ -34,3 +33,12 @@ jobs:
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
         run: python script_peche.py
+
+      - name: Sauvegarder et Publier data.json
+        run: |
+          git config --global user.name "SunuBlue-Bot"
+          git config --global user.email "bot@sunubluetech.sn"
+          # On s'assure d'ajouter le fichier généré dans le dossier public
+          git add public/data.json
+          git commit -m "Mise à jour météo automatique $(date +'%d/%m/%Y %H:%M')" || exit 0
+          git push
