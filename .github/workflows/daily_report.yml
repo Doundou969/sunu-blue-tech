@@ -18,7 +18,8 @@ jobs:
         with:
           python-version: '3.12'
       
-      - run: pip install numpy matplotlib requests
+      - name: Installation
+        run: pip install numpy matplotlib requests
 
       - name: Lancer Script Python
         env:
@@ -30,11 +31,8 @@ jobs:
         run: |
           git config --global user.name "PecheurConnect-Bot"
           git config --global user.email "bot@pecheurconnect.sn"
-          
-          # On s'assure que le dossier public est pris en compte
           mkdir -p public
           git add public/data.json public/bulletin_gps.png || true
-          
           git commit -m "Mise à jour PecheurConnect $(date +'%d/%m/%Y')" || exit 0
           git pull --rebase origin main
           git push origin main
