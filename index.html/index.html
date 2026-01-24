@@ -3,50 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PecheurConnect</title>
+    <title>PecheurConnect - Copernicus GPS</title>
     <style>
-        body { font-family: sans-serif; background: #000; color: #fff; padding: 20px; }
-        .card { border: 1px solid #333; padding: 15px; border-radius: 10px; margin-bottom: 10px; background: #111; border-left: 5px solid #00d4ff; }
-        .card.danger { border-left-color: #ff4444; }
-        .accent { color: #00d4ff; font-weight: bold; }
-        #status { text-align: center; color: #888; margin-bottom: 20px; font-size: 0.8rem; }
+        :root { --danger: #ef4444; --warning: #f59e0b; --safe: #22c55e; --accent: #38bdf8; }
+        body { font-family: sans-serif; background: #0f172a; color: white; padding: 15px; margin: 0; }
+        .card { background: #1e293b; padding: 15px; border-radius: 12px; margin-bottom: 20px; border-left: 8px solid var(--accent); }
+        .DANGER { border-left-color: var(--danger); }
+        .SÉCURITÉ { border-left-color: var(--safe); }
+        .gps { font-family: monospace; color: var(--accent); font-size: 0.85rem; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 15px 0; }
+        .stat { background: #000; padding: 8px; border-radius: 8px; text-align: center; }
+        .val { display: block; font-weight: bold; color: var(--accent); font-size: 1.1rem; }
+        .label { font-size: 0.6rem; opacity: 0.7; text-transform: uppercase; }
+        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .btn { padding: 12px; border-radius: 8px; text-decoration: none; text-align: center; font-weight: bold; font-size: 0.8rem; }
+        .btn-maps { background: white; color: black; }
+        .btn-wa { background: #25D366; color: white; }
     </style>
 </head>
 <body>
     <h2 style="text-align:center">⚓ PECHEUR CONNECT</h2>
-    <div id="status">Vérification des balises...</div>
+    <div id="status" style="text-align:center; font-size:0.7rem; margin-bottom:20px; opacity:0.6;">Connexion Copernicus...</div>
     <div id="list"></div>
 
     <script>
-        async function load() {
-            const list = document.getElementById('list');
-            const status = document.getElementById('status');
-            const url = `public/data.json?t=${Date.now()}`;
-
+        async function loadData() {
             try {
-                const res = await fetch(url);
-                if (!res.ok) {
-                    status.innerHTML = "❌ Les données ne sont pas encore prêtes sur le serveur.";
-                    return;
-                }
+                const res = await fetch(`public/data.json?t=${Date.now()}`);
                 const data = await res.json();
+                const list = document.getElementById('list');
                 list.innerHTML = '';
+                
                 data.forEach(item => {
-                    const isDanger = item.vagues > 2.0;
+                    const waMsg = encodeURIComponent(`⚓ *INFO PÊCHE*\nZone: ${item.zone}\n🌊 Vagues: ${item.vagues}m\n📍 GPS: ${item.lat},${item.lon}`);
+                    
                     list.innerHTML += `
-                        <div class="card ${isDanger ? 'danger' : ''}">
-                            <h3>${item.zone} ${isDanger ? '⚠️' : '✅'}</h3>
-                            <p>🌊 Vagues: <span class="accent">${item.vagues}m</span> | 🌡️ ${item.temp}°C</p>
-                            <p>🚩 Courant: ${item.courant} | 🐟 ${item.poissons}</p>
+                        <div class="card ${item.status}">
+                            <div style="font-weight:bold; font-size:1.2rem">${item.zone}</div>
+                            <div class="gps">📍 ${item.lat}, ${item.lon}</div>
+                            <div class="grid">
+                                <div class="stat"><span class="val">${item.vagues}m</span><span class="label">Vagues</span></div>
+                                <div class="stat"><span class="val">${item.temp}°</span><span class="label">Eau</span></div>
+                                <div class="stat"><span class="val">${item.courant}</span><span class="label">Courant</span></div>
+                            </div>
+                            <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; font-size:0.85rem; margin-bottom:15px;">
+                                🐟 <b>Poissons :</b> ${item.poissons}
+                            </div>
+                            <div class="actions">
+                                <a href="https://www.google.com/maps/search/?api=1&query=${item.lat},${item.lon}" class="btn btn-maps" target="_blank">CARTE GPS</a>
+                                <a href="https://wa.me/?text=${waMsg}" class="btn btn-wa">PARTAGER</a>
+                            </div>
                         </div>
                     `;
                 });
-                status.innerText = `Mis à jour : ${data[0].date}`;
-            } catch (e) {
-                status.innerText = "❌ Erreur de chargement (Fichier JSON corrompu ou absent).";
-            }
+                document.getElementById('status').innerText = `Dernière mise à jour : ${data[0].date}`;
+            } catch (e) { document.getElementById('status').innerText = "❌ Données indisponibles"; }
         }
-        load();
+        loadData();
     </script>
 </body>
 </html>
