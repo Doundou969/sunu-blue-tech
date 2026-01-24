@@ -1,13 +1,15 @@
 # requirements.txt - Sunu Blue Tech Pêche Automatisée
 # ==================================================
 
+# VISUALISATION (PROBLÈME RÉSOLU)
+matplotlib>=3.8.0
+
 # API & Web Scraping (obligatoire)
 requests>=2.31.0
 aiohttp>=3.9.0
 
 # Telegram Bot (vos secrets TG_TOKEN/TG_ID)
 python-telegram-bot>=20.7
-aiohttp>=3.9.0
 
 # Copernicus (vos secrets USER/PWD)
 earthaccess>=0.9.0
@@ -26,9 +28,5 @@ geopandas>=0.14.0
 # Logging & Utils
 python-dotenv>=1.0.0
 tqdm>=4.66.0
-
-# Temps d'exécution
 schedule>=1.2.0
-
-# Debug & Monitoring
 rich>=13.7.0
