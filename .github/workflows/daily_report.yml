@@ -19,10 +19,10 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Installer les dépendances
+      - name: Installer TOUTES les dépendances
         run: |
           pip install --upgrade pip
-          pip install copernicusmarine requests numpy matplotlib
+          pip install -r requirements.txt
 
       - name: Lancer le script de pêche
         env:
