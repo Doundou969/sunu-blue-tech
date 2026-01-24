@@ -1,1 +1,15 @@
-{"name": "Sunu Blue Tech", "short_name": "SunuBlue", "start_url": "/", "display": "standalone"}
+{
+  "name": "Sunu Blue Tech",
+  "short_name": "SunuBlue",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1e3c72",
+  "theme_color": "#1e3c72",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
