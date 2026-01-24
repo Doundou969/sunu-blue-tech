@@ -1,1 +1,52 @@
-[]
+[
+  {
+    "zone": "SAINT-LOUIS",
+    "lat": 14.5,
+    "lon": -17.2,
+    "vagues": 2.68,
+    "temp": 26.9,
+    "courant": "11.3 km/h",
+    "date": "24/01/2026",
+    "carte": "https://www.google.com/maps"
+  },
+  {
+    "zone": "LOMPOUL",
+    "lat": 14.5,
+    "lon": -17.2,
+    "vagues": 1.55,
+    "temp": 25.9,
+    "courant": "6.1 km/h",
+    "date": "24/01/2026",
+    "carte": "https://www.google.com/maps"
+  },
+  {
+    "zone": "DAKAR / KAYAR",
+    "lat": 14.5,
+    "lon": -17.2,
+    "vagues": 1.0,
+    "temp": 23.0,
+    "courant": "8.2 km/h",
+    "date": "24/01/2026",
+    "carte": "https://www.google.com/maps"
+  },
+  {
+    "zone": "MBOUR / JOAL",
+    "lat": 14.5,
+    "lon": -17.2,
+    "vagues": 1.87,
+    "temp": 23.1,
+    "courant": "13.6 km/h",
+    "date": "24/01/2026",
+    "carte": "https://www.google.com/maps"
+  },
+  {
+    "zone": "CASAMANCE",
+    "lat": 14.5,
+    "lon": -17.2,
+    "vagues": 1.65,
+    "temp": 22.8,
+    "courant": "16.0 km/h",
+    "date": "24/01/2026",
+    "carte": "https://www.google.com/maps"
+  }
+]
