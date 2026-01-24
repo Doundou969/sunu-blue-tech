@@ -1,17 +1,20 @@
-# requirements.txt - Sunu Blue Tech Pêche Automatisée
-# ==================================================
+# requirements.txt - Sunu Blue Tech Pêche Automatisée + Copernicus
+# ================================================================
 
-# VISUALISATION (PROBLÈME RÉSOLU)
+# VISUALISATION
 matplotlib>=3.8.0
 
-# API & Web Scraping (obligatoire)
+# FUS HORAIRES DAKAR (CRITIQUE)
+pytz>=2024.1
+
+# API & Web Scraping
 requests>=2.31.0
 aiohttp>=3.9.0
 
-# Telegram Bot (vos secrets TG_TOKEN/TG_ID)
+# TELEGRAM BOT (TG_TOKEN/TG_ID)
 python-telegram-bot>=20.7
 
-# Copernicus (vos secrets USER/PWD)
+# COPERNICUS AUTH (vos secrets USER/PWD)
 earthaccess>=0.9.0
 pystac-client>=0.7.0
 
@@ -20,7 +23,7 @@ beautifulsoup4>=4.12.2
 lxml>=4.9.3
 html5lib>=1.1
 
-# Données & Traitement
+# Données & Géospatial
 pandas>=2.1.4
 numpy>=1.24.0
 geopandas>=0.14.0
@@ -30,3 +33,7 @@ python-dotenv>=1.0.0
 tqdm>=4.66.0
 schedule>=1.2.0
 rich>=13.7.0
+
+# NetCDF Copernicus (bonus)
+netcdf4>=1.6.5
+xarray>=2024.6.0
