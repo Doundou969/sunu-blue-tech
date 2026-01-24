@@ -4,7 +4,7 @@ on:
   schedule:
     - cron: '0 5 * * *'   # 10h Dakar
     - cron: '0 15 * * *'  # 20h Dakar
-  workflow_dispatch:
+  workflow_dispatch:     # Bouton manuel
 
 jobs:
   run-script:
@@ -21,8 +21,15 @@ jobs:
 
       - name: Installer TOUTES les dépendances
         run: |
-          pip install --upgrade pip
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip list | grep matplotlib || echo "Matplotlib installé"
+
+      - name: Vérifier environnement
+        run: |
+          python --version
+          pip list | head -10
+          ls -la script_peche.py
 
       - name: Lancer le script de pêche
         env:
