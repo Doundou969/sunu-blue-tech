@@ -1,57 +1,52 @@
 [
   {
     "zone": "SAINT-LOUIS",
-    "lat": 16.03,
-    "lon": -16.55,
-    "vagues": 1.19,
-    "temp": 25.7,
-    "courant": "8.0 km/h",
-    "poissons": "Thiof, Sardinelles (Abondant)",
-    "date": "24/01/2026",
-    "carte": "https://www.google.com/maps?q=16.03,-16.55"
+    "lat": 14.7,
+    "lon": -17.4,
+    "vagues": 1.43,
+    "temp": 20.9,
+    "courant": "0.2 km/h",
+    "poissons": "Thiof",
+    "date": "24/01/2026 | 03:35"
   },
   {
     "zone": "KAYAR",
-    "lat": 14.91,
-    "lon": -17.12,
-    "vagues": 1.47,
-    "temp": 25.0,
-    "courant": "14.7 km/h",
-    "poissons": "Espadons, Thonines",
-    "date": "24/01/2026",
-    "carte": "https://www.google.com/maps?q=14.91,-17.12"
+    "lat": 14.7,
+    "lon": -17.4,
+    "vagues": 2.05,
+    "temp": 18.7,
+    "courant": "0.6 km/h",
+    "poissons": "Sardinelles",
+    "date": "24/01/2026 | 03:35"
   },
   {
-    "zone": "DAKAR (YOFF)",
-    "lat": 14.76,
-    "lon": -17.48,
-    "vagues": 1.27,
-    "temp": 21.9,
-    "courant": "5.1 km/h",
-    "poissons": "Espadons, Thonines",
-    "date": "24/01/2026",
-    "carte": "https://www.google.com/maps?q=14.76,-17.48"
+    "zone": "DAKAR",
+    "lat": 14.7,
+    "lon": -17.4,
+    "vagues": 0.87,
+    "temp": 22.7,
+    "courant": "0.6 km/h",
+    "poissons": "Thiof",
+    "date": "24/01/2026 | 03:35"
   },
   {
-    "zone": "MBOUR / JOAL",
-    "lat": 14.15,
-    "lon": -17.02,
-    "vagues": 2.47,
-    "temp": 22.9,
-    "courant": "14.5 km/h",
-    "poissons": "Céphalopodes (Zone agitée)",
-    "date": "24/01/2026",
-    "carte": "https://www.google.com/maps?q=14.15,-17.02"
+    "zone": "MBOUR",
+    "lat": 14.7,
+    "lon": -17.4,
+    "vagues": 2.0,
+    "temp": 19.0,
+    "courant": "0.1 km/h",
+    "poissons": "Sardinelles",
+    "date": "24/01/2026 | 03:35"
   },
   {
     "zone": "CASAMANCE",
-    "lat": 12.55,
-    "lon": -16.85,
-    "vagues": 0.65,
-    "temp": 24.0,
-    "courant": "13.5 km/h",
-    "poissons": "Thiof, Sardinelles (Abondant)",
-    "date": "24/01/2026",
-    "carte": "https://www.google.com/maps?q=12.55,-16.85"
+    "lat": 14.7,
+    "lon": -17.4,
+    "vagues": 1.35,
+    "temp": 18.4,
+    "courant": "0.6 km/h",
+    "poissons": "Thiof",
+    "date": "24/01/2026 | 03:35"
   }
 ]
