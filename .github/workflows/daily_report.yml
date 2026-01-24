@@ -1,11 +1,11 @@
-name: PecheurConnect-Auto
+name: PecheurConnect-Copernicus
 on:
   schedule:
-    - cron: '0 5,15 * * *'
+    - cron: '0 5,15 * * *' # 5h et 15h UTC
   workflow_dispatch:
 
 jobs:
-  update:
+  build:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -14,25 +14,28 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      
-      - name: Installation
-        run: pip install numpy matplotlib requests
 
-      - name: Lancer Script Python
+      - name: Install dependencies
+        run: pip install numpy requests
+
+      - name: Run Copernicus Script
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_ID: ${{ secrets.TG_ID }}
+          COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
+          COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
         run: python script_peche.py
 
-      - name: Publication Forcee
+      - name: Deploy to GitHub Pages
         run: |
           git config --global user.name "PecheurConnect-Bot"
           git config --global user.email "bot@pecheurconnect.sn"
           mkdir -p public
-          git add public/data.json public/bulletin_gps.png || true
-          git commit -m "Mise à jour PecheurConnect $(date +'%d/%m/%Y')" || exit 0
+          git add public/data.json
+          git commit -m "Update Marine Data $(date +'%d/%m/%Y')" || exit 0
           git pull --rebase origin main
           git push origin main
