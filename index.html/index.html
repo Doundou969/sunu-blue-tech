@@ -6,9 +6,10 @@
     <title>PecheurConnect</title>
     <style>
         body { font-family: sans-serif; background: #000; color: #fff; padding: 20px; }
-        .card { border: 1px solid #333; padding: 15px; border-radius: 10px; margin-bottom: 10px; background: #111; }
+        .card { border: 1px solid #333; padding: 15px; border-radius: 10px; margin-bottom: 10px; background: #111; border-left: 5px solid #00d4ff; }
+        .card.danger { border-left-color: #ff4444; }
         .accent { color: #00d4ff; font-weight: bold; }
-        #status { text-align: center; color: #888; margin-bottom: 20px; }
+        #status { text-align: center; color: #888; margin-bottom: 20px; font-size: 0.8rem; }
     </style>
 </head>
 <body>
@@ -20,37 +21,29 @@
         async function load() {
             const list = document.getElementById('list');
             const status = document.getElementById('status');
-            
-            // On pointe vers le dossier public
             const url = `public/data.json?t=${Date.now()}`;
 
             try {
                 const res = await fetch(url);
-                
-                // Si le serveur répond 404, res.ok sera false
                 if (!res.ok) {
-                    status.innerHTML = "❌ Les données ne sont pas encore prêtes.<br><small>Le script doit finir de tourner sur GitHub.</small>";
+                    status.innerHTML = "❌ Les données ne sont pas encore prêtes sur le serveur.";
                     return;
                 }
-
                 const data = await res.json();
                 list.innerHTML = '';
-                
                 data.forEach(item => {
+                    const isDanger = item.vagues > 2.0;
                     list.innerHTML += `
-                        <div class="card">
-                            <h3>${item.zone}</h3>
-                            <p>🌊 Vagues: <span class="accent">${item.vagues}m</span></p>
-                            <p>🚩 Courant: <span class="accent">${item.courant}</span></p>
-                            <p>🐟 Poisson: ${item.poissons}</p>
+                        <div class="card ${isDanger ? 'danger' : ''}">
+                            <h3>${item.zone} ${isDanger ? '⚠️' : '✅'}</h3>
+                            <p>🌊 Vagues: <span class="accent">${item.vagues}m</span> | 🌡️ ${item.temp}°C</p>
+                            <p>🚩 Courant: ${item.courant} | 🐟 ${item.poissons}</p>
                         </div>
                     `;
                 });
-                status.innerText = `Dernière mise à jour : ${data[0].date}`;
-
+                status.innerText = `Mis à jour : ${data[0].date}`;
             } catch (e) {
-                console.error(e);
-                status.innerText = "❌ Erreur de lecture des données.";
+                status.innerText = "❌ Erreur de chargement (Fichier JSON corrompu ou absent).";
             }
         }
         load();
