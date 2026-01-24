@@ -1,57 +1,57 @@
 [
   {
-    "zone": "SAINT-LOUIS",
+    "zone": "SAINT-LOUIS (Guet Ndar)",
     "lat": 16.03,
     "lon": -16.55,
-    "vagues": 1.14,
-    "temp": 24.0,
-    "courant": "0.75 m/s",
-    "poissons": "Thiof, Sardinelles",
-    "status": "SÉCURITÉ",
-    "date": "24/01/2026 | 04:04"
+    "vagues": 2.5,
+    "temp": 19.0,
+    "courant": "0.88 m/s",
+    "poissons": "Danger : Sortie déconseillée. Repli sur les estuaires.",
+    "risque": "CRITIQUE",
+    "date": "24/01/2026 | 04:25"
   },
   {
     "zone": "KAYAR",
     "lat": 14.91,
     "lon": -17.12,
-    "vagues": 1.11,
-    "temp": 20.1,
-    "courant": "0.69 m/s",
-    "poissons": "Thiof, Sardinelles",
-    "status": "SÉCURITÉ",
-    "date": "24/01/2026 | 04:04"
+    "vagues": 2.25,
+    "temp": 19.2,
+    "courant": "0.46 m/s",
+    "poissons": "Danger : Sortie déconseillée. Repli sur les estuaires.",
+    "risque": "CRITIQUE",
+    "date": "24/01/2026 | 04:25"
   },
   {
-    "zone": "DAKAR (YOFF)",
+    "zone": "DAKAR (Yoff/Soumbédioune)",
     "lat": 14.76,
     "lon": -17.48,
-    "vagues": 2.49,
-    "temp": 19.9,
-    "courant": "0.16 m/s",
-    "poissons": "Zone profonde (Céphalopodes)",
-    "status": "DANGER",
-    "date": "24/01/2026 | 04:04"
+    "vagues": 1.82,
+    "temp": 19.0,
+    "courant": "1.04 m/s",
+    "poissons": "Passage de Thonines et Dorades.",
+    "risque": "MODÉRÉ",
+    "date": "24/01/2026 | 04:25"
   },
   {
     "zone": "MBOUR / JOAL",
-    "lat": 14.15,
-    "lon": -17.02,
-    "vagues": 1.54,
-    "temp": 19.7,
-    "courant": "0.22 m/s",
-    "poissons": "Thiof, Sardinelles",
-    "status": "PRUDENCE",
-    "date": "24/01/2026 | 04:04"
+    "lat": 14.41,
+    "lon": -16.98,
+    "vagues": 0.89,
+    "temp": 23.1,
+    "courant": "1.18 m/s",
+    "poissons": "Abondance : Thiof, Sardinelles, Sompat.",
+    "risque": "FAIBLE",
+    "date": "24/01/2026 | 04:25"
   },
   {
-    "zone": "CASAMANCE",
+    "zone": "CASAMANCE (Elinkine)",
     "lat": 12.55,
     "lon": -16.85,
-    "vagues": 2.02,
-    "temp": 21.3,
-    "courant": "0.54 m/s",
-    "poissons": "Zone profonde (Céphalopodes)",
-    "status": "PRUDENCE",
-    "date": "24/01/2026 | 04:04"
+    "vagues": 2.74,
+    "temp": 24.8,
+    "courant": "1.13 m/s",
+    "poissons": "Danger : Sortie déconseillée. Repli sur les estuaires.",
+    "risque": "CRITIQUE",
+    "date": "24/01/2026 | 04:25"
   }
 ]
