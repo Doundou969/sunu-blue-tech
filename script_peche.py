@@ -1,70 +1,59 @@
-import os, json, datetime, requests
-import copernicusmarine
+#!/usr/bin/env python3
+import os
+import requests
+import datetime
+import numpy as np          # ← FIX #1
+import matplotlib
+matplotlib.use('Agg')       # ← FIX #2 : Backend GitHub Actions
+import matplotlib.pyplot as plt
+import json
+from copernicusmarine import Toolbox  # ← Données océan
+import xarray as xr
 
-# Configuration des accès
-TARGET_DIR = "public"
-TG_TOKEN = os.getenv("TG_TOKEN")
-TG_ID = os.getenv("TG_ID")
-COP_USER = os.getenv("COPERNICUS_USERNAME")
-COP_PASS = os.getenv("COPERNICUS_PASSWORD")
+# Configuration Telegram
+TG_TOKEN = os.getenv('TG_TOKEN')
+TG_ID = os.getenv('TG_ID')
 
-def get_real_data(lat, lon):
-    """
-    Extrait les données réelles via l'API Copernicus Marine
-    Produit : GLOBAL_ANALYSISFORECAST_PHY_001_024
-    """
+def get_copernicus_data():
+    """Récupère données vagues Copernicus"""
     try:
-        # On récupère la dernière valeur disponible pour le point GPS
-        data = copernicusmarine.read_dataframe(
-            dataset_id="cmems_mod_glo_phy-cur_anfc_0.083deg_PT1H-m",
-            longitude=lon,
-            latitude=lat,
-            variables=["uo", "vo", "thetao"], # Courants et Température
-            username=COP_USER,
-            password=COP_PASS,
-            latest=True
+        toolbox = Toolbox(
+            username=os.getenv('COPERNICUS_USERNAME'),
+            password=os.getenv('COPERNICUS_PASSWORD')
         )
-        # Calcul simplifié pour l'exemple (vagues simulées si le dataset vagues est différent)
-        temp = round(float(data['thetao'].iloc[0]), 1)
-        # Vitesse du courant : sqrt(u^2 + v^2)
-        vitesse = round(((data['uo'].iloc[0]**2 + data['vo'].iloc[0]**2)**0.5), 2)
-        return temp, vitesse
+        # Données vagues Dakar (exemple dataset)
+        ds = toolbox.get(
+            dataset_id="cmems_mod_glo_phy-wave_my_0.083deg_PT1H-m",
+            variables=["VHM0"],  # Hauteur vagues
+            start_datetime="2026-01-24T00:00:00",
+            end_datetime="2026-01-24T12:00:00",
+            area=[14.7, -17.5, 14.8, -17.4]  # Dakar
+        )
+        return float(ds['VHM0'].isel(time=-1))  # Dernière valeur
     except:
-        # Valeurs de secours si l'API est indisponible
-        return 22.5, 0.4
+        return round(np.random.uniform(1.0, 2.8), 2)  # Fallback
+
+def send_telegram(msg, image_path=None):
+    """Envoie bulletin Telegram"""
+    url = f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage"
+    data = {"chat_id": TG_ID, "text": msg, "parse_mode": "HTML"}
+    requests.post(url, data=data)
+    
+    if image_path and os.path.exists(image_path):
+        with open(image_path, 'rb') as img:
+            url = f"https://api.telegram.org/bot{TG_TOKEN}/sendPhoto"
+            files = {"photo": img}
+            data = {"chat_id": TG_ID, "caption": "📊 Bulletin GPS Dakar"}
+            requests.post(url, files=files, data=data)
 
 def main():
-    os.makedirs(TARGET_DIR, exist_ok=True)
+    """Fonction principale"""
+    print("🚀 Sunu Blue Tech - Bulletin Pêche Dakar")
     
-    SITES = {
-        "SAINT-LOUIS": {"lat": 16.03, "lon": -16.55},
-        "KAYAR": {"lat": 14.91, "lon": -17.12},
-        "DAKAR": {"lat": 14.76, "lon": -17.48},
-        "MBOUR / JOAL": {"lat": 14.41, "lon": -16.98}
-    }
+    # Données simulées + Copernicus
+    vagues = get_copernicus_data()
+    vent = round(np.random.uniform(8, 25), 1)
+    temp = round(np.random.uniform(22.5, 26.8), 1)
     
-    final_data = []
-    
-    for nom, coord in SITES.items():
-        # RÉCUPÉRATION DES VRAIES DONNÉES
-        temp, courant = get_real_data(coord['lat'], coord['lon'])
-        
-        # Pour les vagues, on utilise un modèle météo (ici simplifié)
-        vagues = round(np.random.uniform(0.8, 2.5), 2) 
-
-        final_data.append({
-            "zone": nom,
-            "lat": coord['lat'],
-            "lon": coord['lon'],
-            "vagues": vagues,
-            "temp": temp,
-            "courant": f"{courant} m/s",
-            "date": datetime.datetime.now().strftime('%d/%m/%Y | %H:%M')
-        })
-
-    # Sauvegarde JSON
-    with open(os.path.join(TARGET_DIR, "data.json"), "w", encoding="utf-8") as f:
-        json.dump(final_data, f, ensure_ascii=False, indent=2)
-
-if __name__ == "__main__":
-    main()
+    # Bulletin
+    bull
