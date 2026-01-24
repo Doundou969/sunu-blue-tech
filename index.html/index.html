@@ -7,91 +7,147 @@
     <link rel="manifest" href="public/manifest.json">
     <meta name="theme-color" content="#1e3c72">
     <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --accent: #38bdf8;
+            --safe: #22c55e;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body { 
             font-family: 'Segoe UI', system-ui, sans-serif; 
-            background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%);
-            color: white; min-height: 100vh;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.5;
         }
+
         .header { 
-            text-align: center; padding: 1.5rem 1rem; 
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(10px);
-            position: sticky; top: 0; z-index: 1000;
+            text-align: center; padding: 1.5rem; 
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(10px);
+            position: sticky; top: 0; z-index: 100;
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        .status { 
-            font-size: 0.85rem; padding: 0.5rem 1rem; border-radius: 20px;
-            background: rgba(255,255,255,0.1); margin-top: 0.8rem;
-            display: inline-block; border: 1px solid rgba(255,255,255,0.2);
-        }
-        #data-list { max-width: 600px; margin: 1.5rem auto; padding: 0 1rem 5rem; }
-        
-        .zone { 
-            background: rgba(255, 255, 255, 0.08); margin-bottom: 1.2rem;
-            padding: 1.5rem; border-radius: 18px; border-left: 8px solid #44ff44;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-        .zone.danger { border-left-color: #ff4444; background: rgba(255, 0, 0, 0.1); }
-        .zone.warning { border-left-color: #ffaa00; background: rgba(255, 170, 0, 0.1); }
-        
-        .nom { font-size: 1.4rem; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 10px; }
-        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 15px 0; }
-        .stat { background: rgba(0,0,0,0.3); padding: 0.8rem 0.4rem; border-radius: 12px; text-align: center; }
-        .stat-val { display: block; font-weight: bold; font-size: 1.1rem; color: #00d4ff; }
-        .stat-label { font-size: 0.6rem; opacity: 0.7; text-transform: uppercase; margin-top: 4px; display: block; }
 
-        .carte-btn { 
-            display: block; width: 100%; padding: 1rem; border-radius: 12px;
-            background: #ffffff; color: #1e3c72; font-weight: bold;
-            text-decoration: none; text-align: center; font-size: 0.9rem;
-            transition: 0.2s;
-        }
-        .carte-btn:active { transform: scale(0.96); background: #00d4ff; }
+        h1 { font-size: 1.5rem; letter-spacing: 1px; color: var(--accent); }
 
-        .refresh-btn { 
-            position: fixed; bottom: 25px; right: 25px;
-            width: 65px; height: 65px; border-radius: 50%; 
-            background: #00d4ff; color: #1e3c72; border: none; font-size: 1.8rem;
-            box-shadow: 0 5px 20px rgba(0,212,255,0.4); cursor: pointer;
+        .status-bar { 
+            font-size: 0.8rem; margin-top: 0.5rem; color: #94a3b8;
+        }
+
+        #data-list { max-width: 500px; margin: 1rem auto; padding: 1rem; }
+
+        .zone-card { 
+            background: var(--card-bg); margin-bottom: 1rem;
+            padding: 1.25rem; border-radius: 12px;
+            border-left: 6px solid var(--accent);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        .zone-card.safe { border-left-color: var(--safe); }
+        .zone-card.warning { border-left-color: var(--warning); }
+        .zone-card.danger { border-left-color: var(--danger); }
+
+        .nom-zone { font-size: 1.25rem; font-weight: bold; margin-bottom: 0.75rem; }
+
+        .grid-info { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        
+        .info-box { 
+            background: rgba(0,0,0,0.2); padding: 0.5rem; 
+            border-radius: 8px; text-align: center;
+        }
+
+        .val { display: block; font-size: 1.1rem; font-weight: bold; color: var(--accent); }
+        .label { font-size: 0.65rem; text-transform: uppercase; opacity: 0.6; }
+
+        .btn-gps { 
+            display: block; width: 100%; margin-top: 1rem;
+            background: var(--accent); color: #0f172a;
+            padding: 0.75rem; text-decoration: none;
+            border-radius: 8px; font-weight: bold; text-align: center;
+        }
+
+        .refresh-fab { 
+            position: fixed; bottom: 20px; right: 20px;
+            width: 56px; height: 56px; border-radius: 50%;
+            background: var(--accent); border: none; font-size: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5); cursor: pointer;
         }
     </style>
 </head>
 <body>
+
     <div class="header">
         <h1>⚓ Sunu Blue Tech</h1>
-        <div id="status" class="status">Chargement des balises...</div>
+        <div id="status" class="status-bar">Synchronisation...</div>
     </div>
-    
-    <div id="data-list"></div>
-    
-    <button class="refresh-btn" onclick="loadData()" aria-label="Actualiser">🔄</button>
+
+    <div id="data-list">
+        </div>
+
+    <button class="refresh-fab" onclick="fetchData()">🔄</button>
 
     <script>
-        async function loadData() {
-            const statusEl = document.getElementById('status');
-            const dataList = document.getElementById('data-list');
+        async function fetchData() {
+            const list = document.getElementById('data-list');
+            const status = document.getElementById('status');
             
-            // ANTI-CACHE : On génère un nombre unique pour forcer GitHub à envoyer le vrai fichier
-            const cacheBuster = new Date().getTime();
-            const url = `public/data.json?t=${cacheBuster}`;
+            // SYSTEME ANTI-CACHE : Le timestamp ?t= force la lecture du dernier JSON sur GitHub
+            const url = `public/data.json?t=${new Date().getTime()}`;
 
             try {
                 const response = await fetch(url);
-                if (!response.ok) throw new Error(`Signal perdu (${response.status})`);
+                if (!response.ok) throw new Error("Fichier absent (404)");
                 
                 const data = await response.json();
-                dataList.innerHTML = '';
+                list.innerHTML = '';
 
                 data.forEach(item => {
-                    const statusClass = item.vagues > 2.0 ? 'danger' : item.vagues > 1.2 ? 'warning' : 'safe';
-                    const div = document.createElement('div');
-                    div.className = `zone ${statusClass}`;
-                    div.innerHTML = `
-                        <div class="nom">${item.zone}</div>
-                        <div class="stats">
-                            <div class="stat">
-                                <span class="stat-val">${item.vagues}m</span>
-                                <span class="stat-label">Vagues</span>
+                    const level = item.vagues > 2.0 ? 'danger' : (item.vagues > 1.2 ? 'warning' : 'safe');
+                    
+                    list.innerHTML += `
+                        <div class="zone-card ${level}">
+                            <div class="nom-zone">${item.zone}</div>
+                            <div class="grid-info">
+                                <div class="info-box">
+                                    <span class="val">${item.vagues}m</span>
+                                    <span class="label">Vagues</span>
+                                </div>
+                                <div class="info-box">
+                                    <span class="val">${item.temp}°</span>
+                                    <span class="label">Temp.</span>
+                                </div>
+                                <div class="info-box">
+                                    <span class="val">${item.courant}</span>
+                                    <span class="label">Courant</span>
+                                </div>
                             </div>
-                            <div class="stat">
-                                <span class="stat
+                            <a href="${item.carte}" class="btn-gps" target="_blank">OUVRIR GPS</a>
+                        </div>
+                    `;
+                });
+
+                status.innerText = `Mis à jour à ${new Date().toLocaleTimeString()}`;
+
+            } catch (err) {
+                status.innerText = "❌ Erreur de connexion";
+                list.innerHTML = `<div style="text-align:center; padding:2rem; opacity:0.5;">
+                    Données indisponibles.<br><small>${err.message}</small>
+                </div>`;
+            }
+        }
+
+        // Charger les données au démarrage
+        fetchData();
+
+        // Service Worker pour l'installation PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('public/sw.js').catch(() => {});
+        }
+    </script>
+</body>
