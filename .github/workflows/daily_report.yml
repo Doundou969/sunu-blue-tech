@@ -19,18 +19,15 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Installer TOUTES les dépendances (ROBUSTE)
+      - name: Installer TOUTES les dépendances
         run: |
-          echo "📦 Mise à jour pip..."
-          pip install --upgrade pip setuptools wheel
-          
-          echo "📋 Vérification requirements.txt..."
-          ls -la requirements.txt || { echo "❌ requirements.txt MANQUANT !"; exit 1; }
-          
-          echo "🔧 Installation dépendances..."
+          pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Exécuter le script principal
-        run: |
-          echo "🚀 Lancement du script quotidien..."
-          python main.py  # Remplacez par votre script principal
+      - name: Lancer le script de pêche
+        env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_ID: ${{ secrets.TG_ID }}
+          COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
+          COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
+        run: python script_peche.py
