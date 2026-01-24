@@ -3,50 +3,50 @@
     "zone": "SAINT-LOUIS",
     "lat": 14.7,
     "lon": -17.4,
-    "vagues": 2.03,
-    "temp": 21.9,
-    "courant": "0.4 km/h",
+    "vagues": 1.64,
+    "temp": 23.9,
+    "courant": "0.3 km/h",
     "poissons": "Sardinelles",
-    "date": "24/01/2026 | 03:37"
+    "date": "24/01/2026 | 03:43"
   },
   {
     "zone": "KAYAR",
     "lat": 14.7,
     "lon": -17.4,
-    "vagues": 1.77,
-    "temp": 19.8,
-    "courant": "0.1 km/h",
-    "poissons": "Sardinelles",
-    "date": "24/01/2026 | 03:37"
+    "vagues": 1.04,
+    "temp": 18.2,
+    "courant": "0.6 km/h",
+    "poissons": "Thiof",
+    "date": "24/01/2026 | 03:43"
   },
   {
     "zone": "DAKAR",
     "lat": 14.7,
     "lon": -17.4,
-    "vagues": 1.49,
-    "temp": 19.0,
-    "courant": "0.6 km/h",
+    "vagues": 1.29,
+    "temp": 20.4,
+    "courant": "0.3 km/h",
     "poissons": "Thiof",
-    "date": "24/01/2026 | 03:37"
+    "date": "24/01/2026 | 03:43"
   },
   {
     "zone": "MBOUR",
     "lat": 14.7,
     "lon": -17.4,
-    "vagues": 0.66,
-    "temp": 18.6,
+    "vagues": 1.79,
+    "temp": 22.4,
     "courant": "0.4 km/h",
-    "poissons": "Thiof",
-    "date": "24/01/2026 | 03:37"
+    "poissons": "Sardinelles",
+    "date": "24/01/2026 | 03:43"
   },
   {
     "zone": "CASAMANCE",
     "lat": 14.7,
     "lon": -17.4,
-    "vagues": 2.32,
-    "temp": 20.8,
-    "courant": "0.3 km/h",
-    "poissons": "Sardinelles",
-    "date": "24/01/2026 | 03:37"
+    "vagues": 1.4,
+    "temp": 23.8,
+    "courant": "0.2 km/h",
+    "poissons": "Thiof",
+    "date": "24/01/2026 | 03:43"
   }
 ]
