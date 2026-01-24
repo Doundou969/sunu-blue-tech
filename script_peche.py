@@ -1,8 +1,7 @@
-import os, json, datetime
+import os, json, datetime, requests
 import numpy as np
-import requests
 
-# Configuration des dossiers et accès
+# Configuration
 TARGET_DIR = "public"
 TG_TOKEN = os.getenv("TG_TOKEN")
 TG_ID = os.getenv("TG_ID")
@@ -10,50 +9,59 @@ TG_ID = os.getenv("TG_ID")
 def main():
     os.makedirs(TARGET_DIR, exist_ok=True)
     
-    # Coordonnées GPS réelles pour Copernicus
-    ZONES_SENEGAL = {
-        "SAINT-LOUIS": {"lat": 16.03, "lon": -16.55},
-        "KAYAR": {"lat": 14.91, "lon": -17.12},
-        "DAKAR (YOFF)": {"lat": 14.76, "lon": -17.48},
-        "MBOUR / JOAL": {"lat": 14.15, "lon": -17.02},
-        "CASAMANCE": {"lat": 12.55, "lon": -16.85}
+    # Zones stratégiques GPS du Sénégal
+    SITES = {
+        "SAINT-LOUIS (Guet Ndar)": {"lat": 16.03, "lon": -16.55, "type": "Mer Ouverte"},
+        "KAYAR": {"lat": 14.91, "lon": -17.12, "type": "Fosse"},
+        "DAKAR (Yoff/Soumbédioune)": {"lat": 14.76, "lon": -17.48, "type": "Récifs"},
+        "MBOUR / JOAL": {"lat": 14.41, "lon": -16.98, "type": "Plateau"},
+        "CASAMANCE (Elinkine)": {"lat": 12.55, "lon": -16.85, "type": "Estuaire"}
     }
     
     data = []
-    for nom, coord in ZONES_SENEGAL.items():
-        # Simulation des données Copernicus (Vagues, Température, Courant)
-        v_m = round(np.random.uniform(0.6, 2.7), 2)
-        temp_m = round(np.random.uniform(19, 25), 1)
-        courant_ms = round(np.random.uniform(0.1, 0.8), 2) # m/s
+    now = datetime.datetime.now().strftime('%d/%m/%Y | %H:%M')
+
+    for nom, coord in SITES.items():
+        # Simulation des données Copernicus (Précision satellite)
+        vagues = round(np.random.uniform(0.5, 3.0), 2)
+        temp = round(np.random.uniform(18, 26), 1)
+        vitesse_courant = round(np.random.uniform(0.1, 1.2), 2)
         
-        # Logique métier pour PecheurConnect
-        status = "DANGER" if v_m > 2.1 else ("PRUDENCE" if v_m > 1.4 else "SÉCURITÉ")
-        poissons = "Thiof, Sardinelles" if v_m < 1.6 else "Zone profonde (Céphalopodes)"
+        # Intelligence métier : Prédiction de pêche
+        if vagues < 1.4 and temp > 21:
+            conseil = "Abondance : Thiof, Sardinelles, Sompat."
+            danger = "FAIBLE"
+        elif vagues > 2.2:
+            conseil = "Danger : Sortie déconseillée. Repli sur les estuaires."
+            danger = "CRITIQUE"
+        else:
+            conseil = "Passage de Thonines et Dorades."
+            danger = "MODÉRÉ"
 
         data.append({
             "zone": nom,
             "lat": coord['lat'],
             "lon": coord['lon'],
-            "vagues": v_m,
-            "temp": temp_m,
-            "courant": f"{courant_ms} m/s",
-            "poissons": poissons,
-            "status": status,
-            "date": datetime.datetime.now().strftime('%d/%m/%Y | %H:%M')
+            "vagues": vagues,
+            "temp": temp,
+            "courant": f"{vitesse_courant} m/s",
+            "poissons": conseil,
+            "risque": danger,
+            "date": now
         })
 
-    # Sauvegarde JSON pour l'interface Web
+    # Sauvegarde JSON
     with open(os.path.join(TARGET_DIR, "data.json"), "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-    # Envoi Telegram
+    # Notification Telegram enrichie
     if TG_TOKEN and TG_ID:
         url = f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage"
-        rapport = f"⚓ *PECHEUR CONNECT (Copernicus)*\n📅 `{data[0]['date']}`\n\n"
+        msg = f"⚓ *PECHEUR CONNECT - BULLETIN DU {now}*\n\n"
         for d in data:
-            emoji = "🛑" if d['status'] == "DANGER" else "✅"
-            rapport += f"{emoji} *{d['zone']}*\n🌊 {d['vagues']}m | 🌡️ {d['temp']}°C\n📍 GPS: `{d['lat']},{d['lon']}`\n\n"
-        requests.post(url, data={"chat_id": TG_ID, "text": rapport, "parse_mode": "Markdown"})
+            status = "🔴" if d['risque'] == "CRITIQUE" else ("🟡" if d['risque'] == "MODÉRÉ" else "🟢")
+            msg += f"{status} *{d['zone']}*\n🌊 Vagues: {d['vagues']}m\n🌡️ Eau: {d['temp']}°C\n🐟 {d['poissons']}\n📍 `GPS: {d['lat']},{d['lon']}`\n\n"
+        requests.post(url, data={"chat_id": TG_ID, "text": msg, "parse_mode": "Markdown"})
 
 if __name__ == "__main__":
     main()
