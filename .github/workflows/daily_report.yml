@@ -1,44 +1,31 @@
 name: Sunu-Blue-Tech Auto
 on:
   schedule:
-    - cron: '0 5 * * *'
-    - cron: '0 15 * * *'
+    - cron: '0 5,15 * * *'
   workflow_dispatch:
 
 jobs:
   run-script:
     runs-on: ubuntu-latest
-    # Autorise le bot à modifier les fichiers de votre dépôt
     permissions:
-      contents: write
-    
+      contents: write # Critique pour éviter l'erreur 1
     steps:
-      - name: Récupérer le code
-        uses: actions/checkout@v4
-
-      - name: Installer Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      
+      - name: Installation
+        run: pip install numpy matplotlib requests
 
-      - name: Installer les bibliothèques
-        run: |
-          pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
-      - name: Lancer le script de pêche
-        env:
-          TG_TOKEN: ${{ secrets.TG_TOKEN }}
-          TG_ID: ${{ secrets.TG_ID }}
-          COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
-          COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
+      - name: Execution
         run: python script_peche.py
 
-      - name: Sauvegarder et Publier data.json
+      - name: Nettoyage et Publication
         run: |
           git config --global user.name "SunuBlue-Bot"
           git config --global user.email "bot@sunubluetech.sn"
-          # On s'assure d'ajouter le fichier généré dans le dossier public
-          git add public/data.json
-          git commit -m "Mise à jour météo automatique $(date +'%d/%m/%Y %H:%M')" || exit 0
+          # On s'assure que seul le dossier public est suivi
+          git add public/data.json public/bulletin_gps.png
+          git commit -m "Mise à jour météo $(date +'%d/%m/%Y')" || exit 0
           git push
