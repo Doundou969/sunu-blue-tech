@@ -1,7 +1,42 @@
 [
-  {"zone": "SAINT-LOUIS", "status": "⚠️", "lat": 16.03, "lon": -16.55, "vagues": 2.24, "temp": 17.5, "courant": 0.3, "carte": "https://www.google.com/maps?q=16.03,-16.55", "date": "23/01/2026 | 17:39"},
-  {"zone": "LOMPOUL", "status": "⚠️", "lat": 15.42, "lon": -16.82, "vagues": 2.29, "temp": 17.8, "courant": 0.5, "carte": "https://www.google.com/maps?q=15.42,-16.82", "date": "23/01/2026 | 17:39"},
-  {"zone": "DAKAR / KAYAR", "status": "⚠️", "lat": 14.85, "lon": -17.45, "vagues": 2.48, "temp": 19.0, "courant": 0.5, "carte": "https://www.google.com/maps?q=14.85,-17.45", "date": "23/01/2026 | 17:39"},
-  {"zone": "MBOUR / JOAL", "status": "✅", "lat": 14.15, "lon": -17.02, "vagues": 1.08, "temp": 20.0, "courant": 0.2, "carte": "https://www.google.com/maps?q=14.15,-17.02", "date": "23/01/2026 | 17:39"},
-  {"zone": "CASAMANCE", "status": "✅", "lat": 12.55, "lon": -16.85, "vagues": 0.66, "temp": 23.1, "courant": 0.2, "carte": "https://www.google.com/maps?q=12.55,-16.85", "date": "23/01/2026 | 17:39"}
+  {
+    "zone": "Kayar (Fosse)",
+    "date": "24/01/2026",
+    "lat": 14.9125,
+    "lon": -17.1235,
+    "vagues": 0.8,
+    "temp": 22,
+    "courant": "12",
+    "carte": "https://www.google.com/maps?q=14.9125,-17.1235"
+  },
+  {
+    "zone": "Saint-Louis (Embouchure)",
+    "date": "24/01/2026",
+    "lat": 15.0194,
+    "lon": -16.5058,
+    "vagues": 2.5,
+    "temp": 19,
+    "courant": "28",
+    "carte": "https://www.google.com/maps?q=15.0194,-16.5058"
+  },
+  {
+    "zone": "Soumbédioune",
+    "date": "24/01/2026",
+    "lat": 14.6782,
+    "lon": -17.4589,
+    "vagues": 1.4,
+    "temp": 24,
+    "courant": "15",
+    "carte": "https://www.google.com/maps?q=14.6782,-17.4589"
+  },
+  {
+    "zone": "Mbour (Côte)",
+    "date": "24/01/2026",
+    "lat": 14.4122,
+    "lon": -16.9634,
+    "vagues": 0.5,
+    "temp": 25,
+    "courant": "08",
+    "carte": "https://www.google.com/maps?q=14.4122,-16.9634"
+  }
 ]
