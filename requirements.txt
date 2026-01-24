@@ -1,10 +1,19 @@
-copernicusmarine
-numpy
-matplotlib
-requests
-xarray
-netcdf4
-cftime
-flask
-flask-sqlalchemy
-waitress
+# Copernicus Marine (données océan)
+copernicusmarine>=1.0.4
+
+# Data Science
+numpy>=1.24.0
+xarray>=2024.1.0
+netcdf4>=1.6.5
+cftime>=1.6.0
+
+# Visualisation
+matplotlib>=3.7.0
+
+# Web/API
+flask>=3.0.0
+flask-sqlalchemy>=3.1.1
+waitress>=3.0.0
+
+# HTTP
+requests>=2.31.0
