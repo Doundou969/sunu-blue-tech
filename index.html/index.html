@@ -9,117 +9,152 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white; min-height: 100vh; 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            color: white; min-height: 100vh; line-height: 1.5;
         }
         .header { 
-            text-align: center; padding: 2rem; 
-            background: rgba(0,0,0,0.3);
+            text-align: center; padding: 2rem 1rem; 
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        .header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .header h1 { font-size: 2.2rem; letter-spacing: 1px; }
+        
         .status { 
-            font-size: 1.2rem; padding: 1rem; 
-            background: rgba(255,255,255,0.1); border-radius: 10px; margin: 1rem auto; max-width: 400px;
+            font-size: 1.1rem; padding: 1rem; font-weight: 500;
+            background: rgba(255,255,255,0.1); border-radius: 12px; 
+            margin: 1.5rem auto 0; max-width: 450px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
         }
-        #data-list { max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
+
+        #data-list { max-width: 650px; margin: 1.5rem auto; padding: 0 1rem 5rem; }
+        
         .zone { 
-            background: rgba(255,255, refresh255,0.15); 
-            margin: 1rem 0; padding: 1.5rem; border-radius: 15px; 
-            border-left: 5px solid #00d4ff;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            background: rgba(255, 255, 255, 0.08); 
+            margin-bottom: 1.5rem; padding: 1.5rem; border-radius: 18px; 
+            border-left: 6px solid #00d4ff;
+            transition: transform 0.2s;
         }
-        .zone.danger { border-left-color: #ff4444; }
-        .zone.warning { border-left-color: #ffaa00; }
-        .zone.safe { border-left-color: #44ff44; }
-        .nom { font-size: 1.4rem; font-weight: bold; margin-bottom: 0.5rem; }
-        .gps { color: #00d4ff; font-family: monospace; }
-        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
-        .stat { background: rgba(0,212,255,0.2); padding: 0.8rem; border-radius: 8px; text-align: center; }
+        .zone.danger { border-left-color: #ff4b2b; background: rgba(255, 75, 43, 0.1); }
+        .zone.warning { border-left-color: #f9d423; background: rgba(249, 212, 35, 0.1); }
+        .zone.safe { border-left-color: #00f260; background: rgba(0, 242, 96, 0.1); }
+
+        .nom { font-size: 1.5rem; font-weight: 800; display: flex; justify-content: space-between; }
+        .gps { 
+            display: inline-block; background: rgba(0,0,0,0.3);
+            padding: 0.3rem 0.6rem; border-radius: 5px;
+            color: #00d4ff; font-family: 'Courier New', monospace; font-size: 0.9rem; margin: 0.5rem 0;
+        }
+
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin: 1rem 0; }
+        .stat { background: rgba(255,255,255,0.1); padding: 0.7rem; border-radius: 10px; text-align: center; }
+        .stat-val { display: block; font-size: 1.2rem; font-weight: bold; }
+        .stat-label { font-size: 0.7rem; text-transform: uppercase; opacity: 0.8; }
+
         .carte-btn { 
             display: block; width: 100%; margin-top: 1rem;
-            background: #00d4ff; color: #1e3c72; padding: 0.8rem; 
-            text-decoration: none; border-radius: 8px; font-weight: bold;
-            text-align: center; transition: all 0.3s;
+            background: #ffffff; color: #1e3c72; padding: 1rem; 
+            text-decoration: none; border-radius: 12px; font-weight: bold;
+            text-align: center; transition: background 0.3s;
         }
-        .carte-btn:hover { background: #00b8d4; transform: translateY(-2px); }
+        .carte-btn:active { transform: scale(0.98); }
+
         .refresh-btn { 
-            position: fixed; bottom: 20px; right: 20px;
-            width: 60px; height: 60px; border-radius: 50%; 
-            background: #44ff44; color: white; border: none; font-size: 1.5rem;
-            box-shadow: 0 5px 20px rgba(68,255,68,0.4);
+            position: fixed; bottom: 25px; right: 25px;
+            width: 65px; height: 65px; border-radius: 50%; 
+            background: #00f260; color: #000; border: none; font-size: 1.8rem;
+            box-shadow: 0 8px 25px rgba(0, 242, 96, 0.4); cursor: pointer;
+            z-index: 100;
         }
-        @media (max-width: 600px) { 
-            .header h1 { font-size: 2rem; }
+        .refresh-btn:active { transform: rotate(180deg) scale(0.9); transition: 0.3s; }
+
+        @media (max-width: 400px) {
             .stats { grid-template-columns: 1fr; }
+            .header h1 { font-size: 1.8rem; }
         }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>⚓ Sunu Blue Tech</h1>
-        <div id="status" class="status">Chargement des données...</div>
+        <div id="status" class="status">Connexion aux balises...</div>
     </div>
     
     <div id="data-list"></div>
     
-    <button class="refresh-btn" onclick="loadData()">🔄</button>
+    <button class="refresh-btn" onclick="loadData()" title="Actualiser">🔄</button>
 
     <script>
-        let lastUpdate = '';
-        
         async function loadData() {
+            const dataList = document.getElementById('data-list');
+            const statusEl = document.getElementById('status');
+            
             try {
                 const response = await fetch('/public/data.json');
-                const data = await response.json();
+                if (!response.ok) throw new Error("Fichier introuvable");
                 
-                const dataList = document.getElementById('data-list');
-                const statusEl = document.getElementById('status');
+                const data = await response.json();
+                if (!data || data.length === 0) throw new Error("Données vides");
+
                 dataList.innerHTML = '';
                 
-                // Status global
-                const vaguesMax = Math.max(...data.map(z => z.vagues));
-                const statusText = vaguesMax > 2 ? '⚠️ MER FORMÉE - PRUDENCE' : 
-                                  vaguesMax > 1 ? '⚠️ VAGUES MODÉRÉES' : '✅ CONDITIONS FAVORABLES';
-                statusEl.textContent = `📅 ${data[0]?.date || '---'} | ${statusText}`;
-                
-                // Zones Sénégal
+                // Analyse météo globale
+                const vaguesMax = Math.max(...data.map(z => z.vagues || 0));
+                let globalStatus = '✅ MER CALME';
+                if (vaguesMax > 2.0) globalStatus = '🔴 DANGER : MER TRÈS FORTE';
+                else if (vaguesMax > 1.2) globalStatus = '⚠️ ATTENTION : MER AGITÉE';
+
+                statusEl.innerHTML = `📅 ${data[0].date || 'Aujourd\'hui'} <br> ${globalStatus}`;
+
                 data.forEach(item => {
-                    const statusClass = item.vagues > 2 ? 'danger' : 
-                                       item.vagues > 1 ? 'warning' : 'safe';
+                    const statusClass = item.vagues > 2.0 ? 'danger' : item.vagues > 1.2 ? 'warning' : 'safe';
                     
                     const div = document.createElement('div');
                     div.className = `zone ${statusClass}`;
                     div.innerHTML = `
-                        <div class="nom">${item.status || ''} ${item.zone}</div>
-                        <div class="gps">🌐 GPS: ${item.lat.toFixed(2)}, ${item.lon.toFixed(2)}</div>
-                        <div class="stats">
-                            <div class="stat">🌊 ${item.vagues.toFixed(2)}m</div>
-                            <div class="stat">🌡 ${item.temp}°C</div>
-                            <div class="stat">🚩 ${item.courant} km/h</div>
+                        <div class="nom">
+                            <span>${item.zone}</span>
+                            <span>${item.vagues > 2.0 ? '🚩' : ''}</span>
                         </div>
-                        <a href="${item.carte}" target="_blank" class="carte-btn">🗺️ Voir sur Google Maps</a>
+                        <div class="gps">📍 ${item.lat.toFixed(3)}°N , ${item.lon.toFixed(3)}°W</div>
+                        <div class="stats">
+                            <div class="stat">
+                                <span class="stat-label">Vagues</span>
+                                <span class="stat-val">🌊 ${item.vagues.toFixed(1)}m</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Temp.</span>
+                                <span class="stat-val">🌡 ${item.temp}°C</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Courant</span>
+                                <span class="stat-val">🚩 ${item.courant}</span>
+                            </div>
+                        </div>
+                        <a href="${item.carte || '#'}" target="_blank" class="carte-btn">🗺️ VOIR LA CARTE</a>
                     `;
                     dataList.appendChild(div);
                 });
                 
-                lastUpdate = new Date().toLocaleString('fr-FR');
-                console.log('✅ Données chargées:', data.length, 'zones');
-                
             } catch(e) {
-                document.getElementById('data-list').innerHTML = 
-                    '<div class="zone danger"><strong>❌ Données indisponibles</strong><br>Actualisez ou vérifiez la connexion.</div>';
-                console.error('Erreur données:', e);
+                statusEl.textContent = "❌ Mode Hors-ligne ou Erreur";
+                dataList.innerHTML = `
+                    <div class="zone danger">
+                        <strong>Erreur de chargement</strong><br>
+                        Vérifiez votre connexion ou les paramètres du serveur.<br>
+                        <small>${e.message}</small>
+                    </div>`;
             }
         }
+
+        // Initialisation
+        loadData();
         
-        // Auto-refresh 5min + PWA
-        setInterval(loadData, 5*60*1000);
-        loadData(); // Premier chargement
-        
-        // Service Worker
+        // Auto-refresh toutes les 5 minutes
+        setInterval(loadData, 300000);
+
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/public/sw.js');
+            navigator.serviceWorker.register('/public/sw.js').catch(() => {});
         }
     </script>
 </body>
