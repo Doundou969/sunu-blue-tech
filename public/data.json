@@ -3,55 +3,50 @@
     "zone": "SAINT-LOUIS",
     "lat": 16.03,
     "lon": -16.55,
-    "vagues": 1.72,
-    "temp": 23.9,
-    "courant": "4.2 km/h",
-    "poissons": "Espadons, Thonines",
-    "date": "24/01/2026",
-    "carte": "https://www.google.com/maps?q=16.03,-16.55"
+    "vagues": 0.62,
+    "temp": 20.4,
+    "courant": "6.6 km/h",
+    "poissons": "Thiof, Sardinelles, Sompat",
+    "date": "24/01/2026 à 03:02"
   },
   {
     "zone": "KAYAR",
     "lat": 14.91,
     "lon": -17.12,
-    "vagues": 1.8,
-    "temp": 26.0,
-    "courant": "13.9 km/h",
-    "poissons": "Espadons, Thonines",
-    "date": "24/01/2026",
-    "carte": "https://www.google.com/maps?q=14.91,-17.12"
+    "vagues": 1.87,
+    "temp": 21.6,
+    "courant": "10.4 km/h",
+    "poissons": "Thonines, Dorades",
+    "date": "24/01/2026 à 03:02"
   },
   {
     "zone": "DAKAR (YOFF)",
     "lat": 14.76,
     "lon": -17.48,
-    "vagues": 1.97,
-    "temp": 22.1,
-    "courant": "11.6 km/h",
-    "poissons": "Espadons, Thonines",
-    "date": "24/01/2026",
-    "carte": "https://www.google.com/maps?q=14.76,-17.48"
+    "vagues": 1.5,
+    "temp": 25.2,
+    "courant": "2.5 km/h",
+    "poissons": "Thonines, Dorades",
+    "date": "24/01/2026 à 03:02"
   },
   {
     "zone": "MBOUR / JOAL",
     "lat": 14.15,
     "lon": -17.02,
-    "vagues": 1.44,
-    "temp": 21.1,
-    "courant": "14.1 km/h",
-    "poissons": "Espadons, Thonines",
-    "date": "24/01/2026",
-    "carte": "https://www.google.com/maps?q=14.15,-17.02"
+    "vagues": 2.47,
+    "temp": 20.8,
+    "courant": "11.1 km/h",
+    "poissons": "Céphalopodes, Poulpes",
+    "date": "24/01/2026 à 03:02"
   },
   {
     "zone": "CASAMANCE",
     "lat": 12.55,
     "lon": -16.85,
-    "vagues": 1.33,
-    "temp": 25.5,
-    "courant": "4.6 km/h",
-    "poissons": "Espadons, Thonines",
-    "date": "24/01/2026",
-    "carte": "https://www.google.com/maps?q=12.55,-16.85"
+    "vagues": 1.06,
+    "temp": 20.4,
+    "courant": "21.2 km/h",
+    "poissons": "Thiof, Sardinelles, Sompat",
+    "date": "24/01/2026 à 03:02"
   }
 ]
