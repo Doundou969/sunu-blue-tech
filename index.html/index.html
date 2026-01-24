@@ -15,44 +15,46 @@
         }
         .header { 
             text-align: center; padding: 2rem 1rem; 
-            background: rgba(0,0,0,0.4); backdrop-filter: blur(8px);
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
         .status { 
-            font-size: 1rem; padding: 0.8rem; border-radius: 10px;
+            font-size: 0.9rem; padding: 0.8rem; border-radius: 10px;
             background: rgba(255,255,255,0.1); margin: 1rem auto; max-width: 400px;
         }
-        #data-list { max-width: 600px; margin: 2rem auto; padding: 0 1rem 5rem; }
+        #data-list { max-width: 600px; margin: 1.5rem auto; padding: 0 1rem 5rem; }
         .zone { 
-            background: rgba(255, 255, 255, 0.1); margin-bottom: 1.2rem;
-            padding: 1.5rem; border-radius: 15px; border-left: 6px solid #00d4ff;
+            background: rgba(255, 255, 255, 0.1); margin-bottom: 1rem;
+            padding: 1.2rem; border-radius: 15px; border-left: 6px solid #44ff44;
         }
-        .zone.danger { border-left-color: #ff4444; background: rgba(255, 0, 0, 0.1); }
-        .zone.warning { border-left-color: #ffaa00; background: rgba(255, 170, 0, 0.1); }
-        .zone.safe { border-left-color: #44ff44; background: rgba(68, 255, 68, 0.1); }
-        .nom { font-size: 1.4rem; font-weight: bold; margin-bottom: 0.5rem; }
-        .gps { color: #00d4ff; font-family: monospace; font-size: 0.9rem; margin-bottom: 1rem; display: block; }
+        .zone.danger { border-left-color: #ff4444; background: rgba(255, 0, 0, 0.15); }
+        .zone.warning { border-left-color: #ffaa00; background: rgba(255, 170, 0, 0.15); }
+        
+        .nom { font-size: 1.3rem; font-weight: bold; }
+        .gps { color: #00d4ff; font-family: monospace; font-size: 0.85rem; display: block; margin: 5px 0 15px; }
+        
         .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .stat { background: rgba(0,0,0,0.2); padding: 0.8rem; border-radius: 8px; text-align: center; }
-        .stat-val { display: block; font-weight: bold; font-size: 1.1rem; }
-        .stat-label { font-size: 0.7rem; opacity: 0.7; text-transform: uppercase; }
+        .stat { background: rgba(0,0,0,0.3); padding: 0.6rem; border-radius: 8px; text-align: center; }
+        .stat-val { display: block; font-weight: bold; font-size: 1rem; }
+        .stat-label { font-size: 0.65rem; opacity: 0.7; text-transform: uppercase; }
+
         .carte-btn { 
             display: block; width: 100%; margin-top: 1rem;
-            background: #00d4ff; color: #1e3c72; padding: 0.8rem; 
+            background: #ffffff; color: #1e3c72; padding: 0.8rem; 
             text-decoration: none; border-radius: 8px; font-weight: bold; text-align: center;
         }
         .refresh-btn { 
-            position: fixed; bottom: 20px; right: 20px;
+            position: fixed; bottom: 25px; right: 25px;
             width: 60px; height: 60px; border-radius: 50%; 
-            background: #44ff44; border: none; font-size: 1.5rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor: pointer; z-index: 100;
+            background: #00d4ff; border: none; font-size: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5); cursor: pointer;
         }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>⚓ Sunu Blue Tech</h1>
-        <div id="status" class="status">Chargement...</div>
+        <div id="status" class="status">Initialisation...</div>
     </div>
     
     <div id="data-list"></div>
@@ -63,17 +65,19 @@
         async function loadData() {
             const statusEl = document.getElementById('status');
             const dataList = document.getElementById('data-list');
+            
+            // On ajoute un timestamp pour éviter le cache navigateur agressif sur GitHub
+            const url = `public/data.json?t=${new Date().getTime()}`;
 
             try {
-                // Chemin relatif sans "/" au début pour GitHub Pages
-                const response = await fetch('public/data.json');
-                if (!response.ok) throw new Error(`Erreur ${response.status}: Fichier non trouvé`);
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`Fichier introuvable (${response.status})`);
                 
                 const data = await response.json();
                 dataList.innerHTML = '';
 
-                const vaguesMax = Math.max(...data.map(z => z.vagues));
-                statusEl.innerHTML = `📅 ${data[0].date} | ${vaguesMax > 2 ? '⚠️ MER FORTE' : '✅ MER CALME'}`;
+                const vaguesMax = Math.max(...data.map(z => z.vagues || 0));
+                statusEl.innerHTML = `📅 ${data[0].date} | ${vaguesMax > 2 ? '⚠️ MER TRÈS FORTE' : '✅ MER PRATICABLE'}`;
 
                 data.forEach(item => {
                     const statusClass = item.vagues > 2 ? 'danger' : item.vagues > 1.2 ? 'warning' : 'safe';
@@ -87,20 +91,24 @@
                             <div class="stat"><span class="stat-label">Temp.</span><span class="stat-val">${item.temp}°C</span></div>
                             <div class="stat"><span class="stat-label">Courant</span><span class="stat-val">${item.courant}</span></div>
                         </div>
-                        <a href="${item.carte}" target="_blank" class="carte-btn">VOIR LA CARTE</a>
+                        <a href="${item.carte}" target="_blank" class="carte-btn">🗺️ VOIR LA CARTE</a>
                     `;
                     dataList.appendChild(div);
                 });
             } catch (error) {
-                console.error(error);
-                statusEl.innerHTML = "❌ Erreur de données";
-                dataList.innerHTML = `<div class="zone danger"><strong>Erreur :</strong> ${error.message}<br>Vérifiez que le dossier 'public' contient 'data.json'.</div>`;
+                statusEl.innerHTML = "❌ Erreur de connexion";
+                dataList.innerHTML = `<div class="zone danger">Erreur : ${error.message}</div>`;
             }
         }
 
         loadData();
+
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('public/sw.js').catch(err => console.log("SW error:", err));
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('public/sw.js')
+                    .then(reg => console.log('SW enregistré !'))
+                    .catch(err => console.log('Erreur SW', err));
+            });
         }
     </script>
 </body>
