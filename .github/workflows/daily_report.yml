@@ -20,17 +20,21 @@ jobs:
       
       - run: pip install numpy matplotlib requests
 
-      - name: Lancer Script
+      - name: Lancer Script Python
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_ID: ${{ secrets.TG_ID }}
         run: python script_peche.py
 
-      - name: Publication
+      - name: Publication Forcee
         run: |
           git config --global user.name "PecheurConnect-Bot"
           git config --global user.email "bot@pecheurconnect.sn"
-          git add public/data.json public/bulletin_gps.png
-          git commit -m "Update Météo Pêche $(date +'%d/%m/%Y')" || exit 0
+          
+          # On s'assure que le dossier public est pris en compte
+          mkdir -p public
+          git add public/data.json public/bulletin_gps.png || true
+          
+          git commit -m "Mise à jour PecheurConnect $(date +'%d/%m/%Y')" || exit 0
           git pull --rebase origin main
           git push origin main
