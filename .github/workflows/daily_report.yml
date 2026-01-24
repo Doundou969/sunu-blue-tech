@@ -1,41 +1,33 @@
-name: PecheurConnect-Copernicus
+name: Sunu-Blue-Tech Auto
+
 on:
   schedule:
-    - cron: '0 5,15 * * *' # 5h et 15h UTC
+    - cron: '0 5 * * *'   # 10h Dakar
+    - cron: '0 15 * * *'  # 20h Dakar
   workflow_dispatch:
 
 jobs:
-  build:
+  run-script:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - name: Récupérer le code
+        uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Installer Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
-      - name: Install dependencies
-        run: pip install numpy requests
+      - name: Installer les dépendances
+        run: |
+          pip install --upgrade pip
+          pip install copernicusmarine requests numpy matplotlib
 
-      - name: Run Copernicus Script
+      - name: Lancer le script de pêche
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_ID: ${{ secrets.TG_ID }}
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
         run: python script_peche.py
-
-      - name: Deploy to GitHub Pages
-        run: |
-          git config --global user.name "PecheurConnect-Bot"
-          git config --global user.email "bot@pecheurconnect.sn"
-          mkdir -p public
-          git add public/data.json
-          git commit -m "Update Marine Data $(date +'%d/%m/%Y')" || exit 0
-          git pull --rebase origin main
-          git push origin main
