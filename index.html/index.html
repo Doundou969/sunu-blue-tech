@@ -3,116 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PecheurConnect 🇸🇳 | Radar & GPS</title>
+    <title>PecheurConnect 🇸🇳</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         body { background-color: #0f172a; color: white; }
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        #map { height: 400px; border-radius: 1.5rem; border: 2px solid #0ea5e9; }
-        .wind-arrow { display: inline-block; transition: transform 0.5s ease-in-out; color: #38bdf8; }
-        
-        /* Rotation des flèches selon la direction */
-        .dir-N { transform: rotate(0deg); }
-        .dir-NE { transform: rotate(45deg); }
-        .dir-E { transform: rotate(90deg); }
-        .dir-SE { transform: rotate(135deg); }
-        .dir-S { transform: rotate(180deg); }
-        .dir-SO { transform: rotate(225deg); }
-        .dir-O { transform: rotate(270deg); }
-        .dir-NO { transform: rotate(315deg); }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.1); }
+        #map { height: 400px; border-radius: 1rem; border: 2px solid #0ea5e9; }
+        .wind-arrow { display: inline-block; transition: transform 0.5s; color: #38bdf8; }
+        .dir-N { transform: rotate(0deg); } .dir-NE { transform: rotate(45deg); }
+        .dir-E { transform: rotate(90deg); } .dir-SE { transform: rotate(135deg); }
+        .dir-S { transform: rotate(180deg); } .dir-SO { transform: rotate(225deg); }
+        .dir-O { transform: rotate(270deg); } .dir-NO { transform: rotate(315deg); }
     </style>
 </head>
 <body class="p-4 md:p-8">
-
     <header class="max-w-6xl mx-auto mb-6 text-center">
-        <h1 class="text-3xl font-bold text-sky-400">PECHEUR CONNECT 🇸🇳</h1>
-        <p id="clock" class="text-slate-500 text-sm"></p>
+        <h1 class="text-3xl font-extrabold text-sky-400">PECHEUR CONNECT 🇸🇳</h1>
+        <p id="clock" class="text-slate-500 text-xs mt-1 uppercase tracking-widest"></p>
     </header>
 
     <div class="max-w-6xl mx-auto mb-6 flex justify-center">
-        <button onclick="getUserLocation()" class="bg-sky-600 p-4 rounded-full shadow-lg hover:bg-sky-500 transition flex items-center gap-2">
-            <i class="fas fa-location-arrow"></i> MA POSITION GPS
+        <button onclick="getUserLocation()" class="bg-sky-600 px-6 py-3 rounded-full font-bold shadow-lg hover:bg-sky-500 flex items-center gap-2 transition">
+            <i class="fas fa-location-arrow"></i> TROUVER LE POISSON PROCHE
         </button>
     </div>
 
-    <div class="max-w-6xl mx-auto mb-8">
-        <div id="map"></div>
-    </div>
+    <div class="max-w-6xl mx-auto mb-8"><div id="map"></div></div>
 
-    <div id="dashboard" class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        </div>
+    <div id="dashboard" class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
 
     <script>
         const map = L.map('map').setView([14.497, -15.5], 7);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+        const coords = {"SAINT-LOUIS": [16.03, -16.50], "DAKAR-YOFF": [14.75, -17.48], "MBOUR-JOAL": [14.41, -16.96], "CASAMANCE": [12.50, -16.70]};
 
-        const coordsZones = {
-            "SAINT-LOUIS": [16.03, -16.50],
-            "DAKAR-YOFF":  [14.75, -17.48],
-            "MBOUR-JOAL":  [14.41, -16.96],
-            "CASAMANCE":   [12.50, -16.70]
-        };
+        async function init() {
+            const res = await fetch('data.json?t=' + new Date().getTime());
+            const data = await res.json();
+            const container = document.getElementById('dashboard');
+            container.innerHTML = '';
 
-        // Mapping des directions pour CSS
-        const dirMap = { "N": "N", "N-E": "NE", "E": "E", "S-E": "SE", "S": "S", "S-O": "SO", "O": "O", "N-O": "NO" };
-
-        async function updateUI() {
-            try {
-                const res = await fetch('data.json?t=' + new Date().getTime());
-                const data = await res.json();
-                const container = document.getElementById('dashboard');
-                container.innerHTML = '';
-
-                data.forEach(item => {
-                    const dirClass = "dir-" + dirMap[item.wind_dir];
-                    const card = document.createElement('div');
-                    card.className = 'glass p-5 rounded-2xl border-b-4 ' + (item.sst < 21 ? 'border-sky-500' : 'border-orange-500');
-                    
-                    card.innerHTML = `
-                        <div class="flex justify-between items-start mb-4">
-                            <h3 class="font-bold text-lg">${item.zone} ${item.alert}</h3>
-                            <div class="text-right">
-                                <i class="fas fa-long-arrow-up wind-arrow ${dirClass} text-xl"></i>
-                                <p class="text-[10px] text-slate-500 uppercase font-bold">${item.wind_dir}</p>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2 mb-4">
-                            <div>
-                                <p class="text-2xl font-mono">${item.sst}°C</p>
-                                <p class="text-[10px] text-slate-500 uppercase">Température</p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-2xl font-mono">${item.wind_speed}</p>
-                                <p class="text-[10px] text-slate-500 uppercase">Vent km/h</p>
-                            </div>
-                        </div>
-                        <div class="pt-3 border-t border-slate-700">
-                            <p class="text-xs italic text-sky-300"><i class="fas fa-fish mr-1"></i> ${item.target}</p>
-                        </div>
-                    `;
-                    container.appendChild(card);
-                    
-                    // Ajouter marqueur carte
-                    L.circleMarker(coordsZones[item.zone], {radius:8, color: (item.sst < 21 ? '#0ea5e9':'#f59e0b')}).addTo(map)
-                     .bindPopup(`<b>${item.zone}</b><br>Vent: ${item.wind_speed}km/h ${item.wind_dir}`);
-                });
-            } catch (e) { console.log(e); }
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'glass p-5 rounded-2xl border-t-4 ' + (item.temp < 21 ? 'border-sky-500' : 'border-orange-500');
+                card.innerHTML = `
+                    <div class="flex justify-between mb-2">
+                        <span class="font-bold">${item.zone} ${item.alert}</span>
+                        <i class="fas fa-long-arrow-up wind-arrow dir-${item.wind_dir.replace('-','')}"></i>
+                    </div>
+                    <div class="text-3xl font-mono mb-1">${item.temp}°C ${item.trend}</div>
+                    <div class="text-xs text-slate-400 mb-4 uppercase">Mer | Vent: ${item.wind_speed}km/h</div>
+                    <div class="text-sm text-sky-300 font-medium italic"><i class="fas fa-fish mr-2"></i>${item.target}</div>
+                    ${item.fuel ? '<div class="mt-2 text-[10px] text-orange-400 font-bold">⛽ PREVOIR CARBURANT</div>' : ''}
+                `;
+                container.appendChild(card);
+                L.circleMarker(coords[item.zone], {radius:10, color: (item.temp < 21 ? '#0ea5e9':'#f59e0b'), fillOpacity:0.6}).addTo(map).bindPopup(item.zone);
+            });
         }
 
         function getUserLocation() {
             navigator.geolocation.getCurrentPosition(p => {
-                const lat = p.coords.latitude;
-                const lng = p.coords.longitude;
-                L.marker([lat, lng], {icon: L.divIcon({html: '🚤', className:'text-2xl'})}).addTo(map);
-                map.setView([lat, lng], 10);
+                const u = [p.coords.latitude, p.coords.longitude];
+                L.marker(u, {icon: L.divIcon({html:'🚤', className:'text-2xl'})}).addTo(map);
+                map.setView(u, 9);
             });
         }
 
-        updateUI();
-        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleString(); }, 1000);
+        init();
+        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleString('fr-FR'); }, 1000);
     </script>
 </body>
 </html>
