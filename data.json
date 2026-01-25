@@ -1,29 +1,29 @@
 [
     {
         "zone": "SAINT-LOUIS",
-        "target": "🐟 THIOF / SARDINELLE (UPWELLING) ⭐⭐⭐",
-        "temp": 21.5,
+        "target": "🐟 DENTÉ / POISSONS DE ROCHE ⭐",
+        "temp": 22.2,
         "status": "safe",
         "status_fr": "Optimale"
     },
     {
         "zone": "DAKAR-YOFF",
-        "target": "🐟 THIOF / SARDINELLE (UPWELLING) ⭐⭐⭐",
-        "temp": 21.5,
+        "target": "🐟 DENTÉ / POISSONS DE ROCHE ⭐",
+        "temp": 22.2,
         "status": "safe",
         "status_fr": "Optimale"
     },
     {
         "zone": "MBOUR-JOAL",
-        "target": "🐟 THIOF / SARDINELLE (UPWELLING) ⭐⭐⭐",
-        "temp": 21.5,
+        "target": "🐟 DENTÉ / POISSONS DE ROCHE ⭐",
+        "temp": 22.2,
         "status": "safe",
         "status_fr": "Optimale"
     },
     {
         "zone": "CASAMANCE",
-        "target": "🐟 THIOF / SARDINELLE (UPWELLING) ⭐⭐⭐",
-        "temp": 21.5,
+        "target": "🐟 DENTÉ / POISSONS DE ROCHE ⭐",
+        "temp": 22.2,
         "status": "safe",
         "status_fr": "Optimale"
     }
