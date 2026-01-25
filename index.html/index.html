@@ -3,74 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PecheurConnect 🇸🇳</title>
+    <title>PecheurConnect 🇸🇳 | Radar de Pêche</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        body { background: #020617; color: white; }
-        .card-danger { border: 2px solid #ef4444; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        body { background: #020617; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .glass-card { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(51, 65, 85, 0.5); border-radius: 1.5rem; transition: transform 0.3s ease; }
+        .glass-card:hover { transform: translateY(-5px); border-color: #0ea5e9; }
+        #map { height: 350px; border-radius: 1.5rem; border: 2px solid #1e293b; z-index: 10; }
+        .danger-pulse { border: 2px solid #ef4444; animation: pulse-red 2s infinite; }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
     </style>
 </head>
-<body class="p-4">
-    <header class="text-center mb-6">
-        <h1 class="text-3xl font-black text-sky-400 italic">PECHEUR CONNECT</h1>
-        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Sécurité & Upwelling Sénégal</p>
+<body class="p-4 max-w-4xl mx-auto">
+
+    <header class="text-center mb-8 pt-4">
+        <h1 class="text-3xl font-black text-sky-400 italic tracking-tighter">PECHEUR CONNECT 🇸🇳</h1>
+        <p class="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">Satellite Copernicus en Temps Réel</p>
     </header>
 
-    <div id="map" class="h-64 w-full rounded-3xl mb-6 border-2 border-sky-900"></div>
+    <div id="map" class="mb-8 shadow-2xl"></div>
 
-    <div class="flex flex-col gap-3 mb-8">
-        <button onclick="getUserLocation()" class="bg-sky-600 p-4 rounded-2xl font-bold flex items-center justify-center gap-3"><i class="fas fa-location-crosshairs"></i> DISTANCE AU POISSON</button>
-        <button onclick="window.open('sms:+221?body=Alerte PecheurConnect : Mer agitée prévue demain.')" class="bg-red-600 p-4 rounded-2xl font-bold flex items-center justify-center gap-3"><i class="fas fa-sms"></i> SIGNALER UN DANGER (SMS)</button>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
+        <button onclick="getUserLocation()" class="bg-sky-600 hover:bg-sky-500 p-4 rounded-2xl font-bold flex items-center justify-center gap-3 shadow-lg transition-all active:scale-95">
+            <i class="fas fa-location-arrow"></i> MA POSITION GPS
+        </button>
+        <button onclick="window.open('sms:+221?body=Alerte PecheurConnect : Danger météo détecté en mer !')" class="bg-red-600 hover:bg-red-500 p-4 rounded-2xl font-bold flex items-center justify-center gap-3 shadow-lg transition-all active:scale-95">
+            <i class="fas fa-broadcast-tower"></i> SIGNALER DANGER (SMS)
+        </button>
     </div>
 
-    <div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    <div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        </div>
+
+    <footer class="mt-12 text-center text-slate-600 text-[10px] pb-10">
+        <p>&copy; 2026 PecheurConnect - Données Marines Sénégal</p>
+    </footer>
 
     <script>
-        const map = L.map('map').setView([14.5, -16.5], 7);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
-        
-        async function loadData() {
-            const res = await fetch('data.json?v=' + Date.now());
-            const data = await res.json();
-            const container = document.getElementById('dashboard');
-            
-            data.forEach(item => {
-                const isDanger = item.vhm0 >= 2.3;
-                const card = document.createElement('div');
-                card.className = `p-5 rounded-3xl bg-slate-900 border border-slate-800 ${isDanger ? 'card-danger' : ''}`;
-                card.innerHTML = `
-                    <div class="flex justify-between items-start mb-4">
-                        <h2 class="text-xl font-bold">${item.zone} ${item.alert}</h2>
-                        <span class="text-xs bg-sky-900/50 text-sky-400 px-2 py-1 rounded">${item.wind_dir}</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-3xl font-mono">${item.temp}°C ${item.trend}</span>
-                        <div class="text-right">
-                            <p class="text-xs text-slate-500">HOULE</p>
-                            <p class="font-bold ${isDanger ? 'text-red-500' : 'text-emerald-500'}">${item.vhm0}m</p>
+        // Initialisation de la carte sur le Sénégal
+        const map = L.map('map').setView([14.5, -17.0], 7);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        // Coordonnées pour les marqueurs
+        const zonesCoords = {
+            "SAINT-LOUIS": [16.03, -16.50], "LOUGA-POTOU": [15.48, -16.75],
+            "KAYAR": [14.92, -17.20], "DAKAR-YOFF": [14.75, -17.48],
+            "MBOUR-JOAL": [14.41, -16.96], "CASAMANCE": [12.50, -16.70]
+        };
+
+        async function updateDashboard() {
+            try {
+                const response = await fetch('data.json?v=' + Date.now());
+                const data = await response.json();
+                const container = document.getElementById('dashboard');
+                container.innerHTML = '';
+
+                data.forEach(item => {
+                    const isDanger = item.vhm0 >= 2.2;
+                    const card = document.createElement('div');
+                    card.className = `glass-card p-6 ${isDanger ? 'danger-pulse' : ''}`;
+                    
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold text-white">${item.zone}</h3>
+                                <p class="text-[10px] text-sky-400 font-bold uppercase">${item.temp < 21 ? '❄️ Zone Upwelling' : '🔥 Zone Chaude'}</p>
+                            </div>
+                            <span class="text-2xl">${item.alert}</span>
                         </div>
-                    </div>
-                    <div class="mt-4 pt-4 border-t border-slate-800 text-[10px] text-sky-500 font-bold uppercase">
-                        🔮 PRÉVISION : ${item.next_vhm}m demain
-                    </div>
-                `;
-                container.appendChild(card);
-            });
+                        
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <span class="text-4xl font-mono font-bold">${item.temp}°C</span>
+                                <span class="text-lg ml-1">${item.trend}</span>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[10px] text-slate-500 font-bold">MER (HOULE)</p>
+                                <p class="text-xl font-bold ${isDanger ? 'text-red-500' : 'text-emerald-400'}">${item.vhm0}m</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-4 border-t border-slate-800 flex justify-between items-center text-[10px]">
+                            <span class="text-slate-400 italic">🌬️ Vent: ${item.wind_speed}km/h ${item.wind_dir}</span>
+                            <span class="font-bold text-sky-500 uppercase tracking-tighter">Demain: ${item.next_vhm}m</span>
+                        </div>
+                    `;
+                    container.appendChild(card);
+
+                    // Ajouter un point sur la carte
+                    const markerColor = isDanger ? '#ef4444' : (item.temp < 21 ? '#0ea5e9' : '#f59e0b');
+                    L.circleMarker(zonesCoords[item.zone] || [14, -17], {
+                        radius: 10,
+                        fillColor: markerColor,
+                        color: "#fff",
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 0.8
+                    }).addTo(map).bindPopup(`<b>${item.zone}</b><br>Temp: ${item.temp}°C<br>Houle: ${item.vhm0}m`);
+                });
+            } catch (error) {
+                console.error("Erreur de chargement:", error);
+                document.getElementById('dashboard').innerHTML = '<p class="text-red-500 text-center col-span-2">Erreur de mise à jour des données...</p>';
+            }
         }
 
         function getUserLocation() {
-            navigator.geolocation.getCurrentPosition(p => {
-                const u = [p.coords.latitude, p.coords.longitude];
-                L.marker(u, {icon: L.divIcon({html:'🚤', className:'text-2xl'})}).addTo(map);
-                map.setView(u, 9);
+            if (!navigator.geolocation) return alert("GPS non supporté");
+            navigator.geolocation.getCurrentPosition(position => {
+                const { latitude, longitude } = position.coords;
+                L.marker([latitude, longitude]).addTo(map).bindPopup("<b>Ma Pirogue</b>").openPopup();
+                map.setView([latitude, longitude], 10);
             });
         }
 
-        loadData();
+        updateDashboard();
+        // Rafraîchir toutes les 10 minutes
+        setInterval(updateDashboard, 600000);
     </script>
 </body>
 </html>
