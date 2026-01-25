@@ -1,56 +1,44 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Sunu Blue Tech - Pêche Automatisée</title>
-  <meta name="viewport" content="width=device-width">
-  <style>
-    body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; }
-    .status { padding: 20px; border-radius: 8px; margin: 20px 0; }
-    .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-    .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
-    .running { background: #fff3cd; color: #856404; }
-    .failed { background: #f8d7da; color: #721c24; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PecheurConnect - Tableau de Bord Sénégal</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #121212; color: white; text-align: center; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: #1e1e1e; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        h1 { color: #3b82f6; }
+        .status { background: #2d2d2d; padding: 10px; border-radius: 10px; margin: 20px 0; border-left: 5px solid #10b981; }
+        img { max-width: 100%; height: auto; border-radius: 10px; border: 2px solid #333; }
+        .footer { margin-top: 30px; font-size: 0.8em; color: #777; }
+        .btn { display: inline-block; padding: 10px 20px; background: #3b82f6; color: white; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+    </style>
 </head>
 <body>
-  <h1>🐟 Sunu Blue Tech</h1>
-  <p><strong>Pêche Automatisée & Monitoring en Temps Réel</strong></p>
-  
-  <div class="status success">
-    <h3>🚀 Statut GitHub Actions</h3>
-    <p><span class="badge failed">Run #238: ÉCHEC</span> <span class="badge running">Debug en cours</span></p>
-    <p><a href="https://github.com/Doundou969/sunu-blue-tech/actions">Voir les runs</a></p>
-  </div>
-  
-  <h3>📋 Workflow</h3>
-  <ul>
-    <li>✅ Checkout code</li>
-    <li>✅ Setup Python 3.11</li>
-    <li>✅ pip install -r requirements.txt</li>
-    <li>❌ Lancer le script de pêche</li>
-  </ul>
-  
-  <h3>🔧 Debug Step 5 (Remplacement)</h3>
-  <pre><code>- name: Lancer le script (debug)
-  run: |
-    echo "🐛 DEBUG $(pwd)"
-    python --version
-    ls -la *.py
-    python main.py || echo "ERREUR: $?"
-  timeout-minutes: 5</code></pre>
-  
-  <h3>📊 Prochaines Étapes</h3>
-  <ol>
-    <li>Push le <strong>debug step 5</strong></li>
-    <li>Copier les <strong>logs d'erreur exacts</strong></li>
-    <li>Correction définitive en 30s</li>
-    <li><strong>Status vert ✅</strong></li>
-  </ol>
-  
-  <footer>
-    <p><small>Commit: <code>67adf60</code> | Run: #238 | <a href="https://github.com/Doundou969/sunu-blue-tech">Repo</a></small></p>
-  </footer>
+    <div class="container">
+        <h1>🇸🇳 PecheurConnect</h1>
+        <p>Analyse Océanographique en Temps Réel</p>
+        
+        <div class="status">
+            <strong>Dernière mise à jour :</strong> 
+            <span id="update-time">Chargement...</span>
+        </div>
+
+        <h3>📊 Température de Surface & Zones</h3>
+        <img src="pecheur_national.png" alt="Graphique National">
+
+        <p><i>Ce graphique montre la température de l'eau de Saint-Louis à la Casamance. Utilisez ces données pour localiser les zones de pêche favorables.</i></p>
+
+        <a href="https://t.me/VOTRE_LIEN_BOT" class="btn">Rejoindre l'alerte Telegram</a>
+
+        <div class="footer">
+            Données fournies par Copernicus Marine Service • PecheurConnect 2026
+        </div>
+    </div>
+
+    <script>
+        // Affiche la date du jour si aucune date n'est trouvée
+        document.getElementById('update-time').innerText = new Date().toLocaleString('fr-FR');
+    </script>
 </body>
 </html>
