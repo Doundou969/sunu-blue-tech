@@ -1,34 +1,34 @@
 [
     {
         "zone": "SAINT-LOUIS",
-        "target": "🐟 THIOF / SARDINELLE ⭐⭐⭐",
-        "temp": 17.9,
-        "status": "safe",
-        "status_fr": "Optimale",
-        "vhm": 1.2
+        "alert": "\ud83d\udfe2",
+        "sst": 17.9,
+        "vhm0": 1.1,
+        "wind_speed": 15,
+        "wind_dir": "N"
     },
     {
         "zone": "DAKAR-YOFF",
-        "target": "🐟 THIOF / SARDINELLE ⭐⭐⭐",
-        "temp": 19.7,
-        "status": "safe",
-        "status_fr": "Optimale",
-        "vhm": 1.2
+        "alert": "\ud83d\udfe2",
+        "sst": 19.7,
+        "vhm0": 1.1,
+        "wind_speed": 15,
+        "wind_dir": "N"
     },
     {
         "zone": "MBOUR-JOAL",
-        "target": "🐟 THIOF / SARDINELLE ⭐⭐⭐",
-        "temp": 20.3,
-        "status": "safe",
-        "status_fr": "Optimale",
-        "vhm": 1.2
+        "alert": "\ud83d\udfe2",
+        "sst": 20.3,
+        "vhm0": 1.1,
+        "wind_speed": 15,
+        "wind_dir": "N"
     },
     {
         "zone": "CASAMANCE",
-        "target": "🐟 THON / ESPADON ⭐⭐⭐",
-        "temp": 24.0,
-        "status": "safe",
-        "status_fr": "Optimale",
-        "vhm": 1.2
+        "alert": "\ud83d\udfe2",
+        "sst": 24.0,
+        "vhm0": 1.1,
+        "wind_speed": 15,
+        "wind_dir": "N"
     }
 ]
