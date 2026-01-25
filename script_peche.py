@@ -15,14 +15,17 @@ except ImportError:
     from datetime import timezone
     UTC = timezone.utc
 
-# 🔐 SECRETS GITHUB
+# 🔐 CONFIGURATION SECRETS
 TG_TOKEN = os.getenv('TG_TOKEN', '').strip()
 TG_ID = os.getenv('TG_ID', '').strip()
 COP_USER = os.getenv('COPERNICUS_USERNAME', '').strip()
 COP_PASS = os.getenv('COPERNICUS_PASSWORD', '').strip()
 
+# 📍 6 ZONES STRATÉGIQUES SÉNÉGAL
 ZONES = {
     "SAINT-LOUIS": {"bounds": [15.8, -16.7, 16.2, -16.3]},
+    "LOUGA-POTOU": {"bounds": [15.3, -16.9, 15.6, -16.6]},
+    "KAYAR":       {"bounds": [14.8, -17.3, 15.1, -17.1]},
     "DAKAR-YOFF":  {"bounds": [14.6, -17.6, 14.8, -17.4]},
     "MBOUR-JOAL":  {"bounds": [14.0, -17.1, 14.4, -16.7]},
     "CASAMANCE":   {"bounds": [12.2, -16.9, 12.7, -16.5]}
@@ -34,22 +37,23 @@ def get_wind_dir(u, v):
     return dirs[int((deg + 22.5) / 45) % 8]
 
 def get_data(name, b):
-    print(f"📡 Analyse : {name}...")
-    res = {'sst': 21.0, 'vhm0': 1.1, 'wind_speed': 12, 'wind_dir': 'N'}
+    print(f"📡 Analyse & Prévision : {name}...")
+    res = {'sst': 20.5, 'vhm0': 1.1, 'wind_speed': 15, 'wind_dir': 'N', 'next_vhm': 1.1}
     try:
-        # Température (SST)
+        # 1. TEMPÉRATURE (SST)
         ds = open_dataset(dataset_id="cmems_mod_glo_phy-thetao_anfc_0.083deg_P1D-m",
                           minimum_latitude=b[0], maximum_latitude=b[2],
                           minimum_longitude=b[1], maximum_longitude=b[3], variables=["thetao"])
         res['sst'] = round(float(ds["thetao"].isel(time=-1, depth=0).mean()), 1)
         
-        # Vagues (Houle)
+        # 2. HOULE (Aujourd'hui vs Demain)
         ds_w = open_dataset(dataset_id="global-analysis-forecast-wav-001-027",
                             minimum_latitude=b[0], maximum_latitude=b[2],
                             minimum_longitude=b[1], maximum_longitude=b[3], variables=["VHM0"])
-        res['vhm0'] = round(float(ds_w["VHM0"].isel(time=-1).mean()), 1)
+        res['vhm0'] = round(float(ds_w["VHM0"].isel(time=-2).mean()), 1)
+        res['next_vhm'] = round(float(ds_w["VHM0"].isel(time=-1).mean()), 1)
 
-        # Vent (Vitesse & Direction)
+        # 3. VENT
         ds_v = open_dataset(dataset_id="cmems_mod_glo_phy-cur_anfc_0.083deg_P1D-m",
                             minimum_latitude=b[0], maximum_latitude=b[2],
                             minimum_longitude=b[1], maximum_longitude=b[3], variables=["uo", "vo"])
@@ -80,25 +84,29 @@ def main():
     for name, config in ZONES.items():
         data = get_data(name, config['bounds'])
         
-        # Comparaison Température
+        # Tendance & Sécurité
         prev_t = old_data.get(name, data['sst'])
         diff = round(data['sst'] - prev_t, 1)
         trend = "📉" if diff <= -0.4 else "📈" if diff >= 0.4 else "➡️"
-        
-        # Sécurité & Conseils
         alert = "🟢" if data['vhm0'] < 1.4 else "🟡" if data['vhm0'] < 2.1 else "🔴"
-        advice = "✅ Mer calme" if alert == "🟢" else "⚠️ Vigilance" if alert == "🟡" else "🚫 Danger"
-        fuel = "\n⛽ <i>Prévoyez surplus carburant (Vent fort)</i>" if data['wind_speed'] > 22 else ""
+        
+        # Prévision
+        forecast = "✅ Stable"
+        if data['next_vhm'] > data['vhm0'] + 0.4: forecast = f"⚠️ Hausse ({data['next_vhm']}m)"
+        
+        advice = "Mer belle" if alert == "🟢" else "Prudence" if alert == "🟡" else "DANGER"
+        fuel = "\n⛽ <b>Vent de face :</b> surplus carburant conseillé" if data['wind_speed'] > 22 else ""
         target = "🐟 THIOF ⭐⭐⭐" if data['sst'] < 21 else "🐟 THON / ESPADON ⭐⭐"
 
         report += f"📍 <b>{name}</b> {alert}\n"
-        report += f"🌡️ Mer: <b>{data['sst']}°C</b> {trend}\n"
-        report += f"🌊 Houle: <b>{data['vhm0']}m</b> | 🌬️ <b>{data['wind_speed']}km/h</b> ({data['wind_dir']})\n"
+        report += f"🌡️ {data['sst']}°C {trend} | 🌊 {data['vhm0']}m\n"
+        report += f"🌬️ {data['wind_speed']}km/h ({data['wind_dir']})\n"
+        report += f"🔮 <i>Demain: {forecast}</i>\n"
         report += f"🎣 {target}\n<i>{advice}</i>{fuel}\n\n"
         
-        web_json.append({**{"zone": name, "temp": data['sst'], "trend": trend, "alert": alert, "advice": advice, "fuel": fuel != ""}, **data})
+        web_json.append({**{"zone": name, "trend": trend, "alert": alert, "advice": advice, "forecast": forecast}, **data})
 
-    report += f"───────────────────\n📱 <b>Carte GPS :</b> https://doundou969.github.io/sunu-blue-tech/"
+    report += f"───────────────────\n📱 <b>GPS :</b> https://doundou969.github.io/sunu-blue-tech/"
     
     with open('data.json', 'w') as f: json.dump(web_json, f, indent=4)
     if TG_TOKEN and TG_ID:
