@@ -40,7 +40,6 @@ def fish_prediction(sst, chl):
 def get_data(name, b):
     print(f"📡 Scan en cours : {name}...")
     try:
-        # 1. Température (Dataset Physique)
         ds_sst = open_dataset(
             dataset_id="cmems_mod_glo_phy_anfc_0.083deg_P1D-m",
             minimum_latitude=b[0], minimum_longitude=b[1],
@@ -48,7 +47,6 @@ def get_data(name, b):
         )
         sst = float(ds_sst['thetao'].isel(time=-1, depth=0).mean())
 
-        # 2. Chlorophylle
         ds_chl = open_dataset(
             dataset_id="cmems_obs-oc_gsw_bgc-my_l4-chl-nereo-4km_P1D-m",
             minimum_latitude=b[0], minimum_longitude=b[1],
@@ -56,7 +54,6 @@ def get_data(name, b):
         )
         chl = float(ds_chl['CHL'].isel(time=-1).mean())
 
-        # 3. Vagues
         ds_wave = open_dataset(
             dataset_id="cmems_mod_glo_phy-wave_my_0.083deg_PT1H-m",
             minimum_latitude=b[0], minimum_longitude=b[1],
@@ -106,8 +103,24 @@ def main():
     with open('data.json', 'w', encoding='utf-8') as f:
         json.dump(web_json, f, ensure_ascii=False, indent=4)
 
-    # --- SECTION TELEGRAM DEBUG ---
+    # --- SECTION TELEGRAM (CORRIGÉE) ---
     print(f"🛠 DEBUG TELEGRAM : Token trouvé ? {bool(TG_TOKEN)} | ID trouvé ? {bool(TG_ID)}")
     
     if TG_TOKEN and TG_ID:
         try:
+            url = f"https://api.telegram.org/bot{TG_TOKEN}/sendPhoto"
+            payload = {"chat_id": TG_ID, "caption": report, "parse_mode": "HTML"}
+            with open('pecheur_national.png', 'rb') as photo:
+                response = requests.post(url, data=payload, files={"photo": photo})
+            
+            if response.status_code == 200:
+                print("📲 Rapport Telegram envoyé avec succès !")
+            else:
+                print(f"❌ Échec Telegram : {response.status_code} - {response.text}")
+        except Exception as e:
+            print(f"❌ Erreur Telegram : {e}")
+    else:
+        print("⚠️ Envoi annulé : TG_TOKEN ou TG_ID manquant.")
+
+if __name__ == "__main__":
+    main()
