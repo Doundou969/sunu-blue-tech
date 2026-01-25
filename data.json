@@ -1,30 +1,30 @@
 [
     {
         "zone": "SAINT-LOUIS",
-        "target": "🐟 THIOF / DENTÉ ⭐",
-        "temp": 21.8,
-        "status": "warning",
-        "status_fr": "Prudence"
+        "target": "🐟 THIOF / SARDINELLE (UPWELLING) ⭐⭐⭐",
+        "temp": 21.5,
+        "status": "safe",
+        "status_fr": "Optimale"
     },
     {
         "zone": "DAKAR-YOFF",
-        "target": "🐟 THIOF / DENTÉ ⭐",
-        "temp": 21.8,
-        "status": "warning",
-        "status_fr": "Prudence"
+        "target": "🐟 THIOF / SARDINELLE (UPWELLING) ⭐⭐⭐",
+        "temp": 21.5,
+        "status": "safe",
+        "status_fr": "Optimale"
     },
     {
         "zone": "MBOUR-JOAL",
-        "target": "🐟 THIOF / DENTÉ ⭐",
-        "temp": 21.8,
-        "status": "warning",
-        "status_fr": "Prudence"
+        "target": "🐟 THIOF / SARDINELLE (UPWELLING) ⭐⭐⭐",
+        "temp": 21.5,
+        "status": "safe",
+        "status_fr": "Optimale"
     },
     {
         "zone": "CASAMANCE",
-        "target": "🐟 THIOF / DENTÉ ⭐",
-        "temp": 21.8,
-        "status": "warning",
-        "status_fr": "Prudence"
+        "target": "🐟 THIOF / SARDINELLE (UPWELLING) ⭐⭐⭐",
+        "temp": 21.5,
+        "status": "safe",
+        "status_fr": "Optimale"
     }
 ]
