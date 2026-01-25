@@ -1,50 +1,74 @@
 [
     {
         "zone": "SAINT-LOUIS",
-        "temp": 17.9,
         "trend": "\u27a1\ufe0f",
         "alert": "\ud83d\udfe2",
-        "advice": "\u2705 Mer calme",
-        "fuel": false,
+        "advice": "Mer belle",
+        "forecast": "\u2705 Stable",
         "sst": 17.9,
         "vhm0": 1.1,
-        "wind_speed": 12,
-        "wind_dir": "N"
+        "wind_speed": 15,
+        "wind_dir": "N",
+        "next_vhm": 1.1
+    },
+    {
+        "zone": "LOUGA-POTOU",
+        "trend": "\u27a1\ufe0f",
+        "alert": "\ud83d\udfe2",
+        "advice": "Mer belle",
+        "forecast": "\u2705 Stable",
+        "sst": 18.1,
+        "vhm0": 1.1,
+        "wind_speed": 15,
+        "wind_dir": "N",
+        "next_vhm": 1.1
+    },
+    {
+        "zone": "KAYAR",
+        "trend": "\u27a1\ufe0f",
+        "alert": "\ud83d\udfe2",
+        "advice": "Mer belle",
+        "forecast": "\u2705 Stable",
+        "sst": 19.2,
+        "vhm0": 1.1,
+        "wind_speed": 15,
+        "wind_dir": "N",
+        "next_vhm": 1.1
     },
     {
         "zone": "DAKAR-YOFF",
-        "temp": 19.7,
         "trend": "\u27a1\ufe0f",
         "alert": "\ud83d\udfe2",
-        "advice": "\u2705 Mer calme",
-        "fuel": false,
+        "advice": "Mer belle",
+        "forecast": "\u2705 Stable",
         "sst": 19.7,
         "vhm0": 1.1,
-        "wind_speed": 12,
-        "wind_dir": "N"
+        "wind_speed": 15,
+        "wind_dir": "N",
+        "next_vhm": 1.1
     },
     {
         "zone": "MBOUR-JOAL",
-        "temp": 20.3,
         "trend": "\u27a1\ufe0f",
         "alert": "\ud83d\udfe2",
-        "advice": "\u2705 Mer calme",
-        "fuel": false,
+        "advice": "Mer belle",
+        "forecast": "\u2705 Stable",
         "sst": 20.3,
         "vhm0": 1.1,
-        "wind_speed": 12,
-        "wind_dir": "N"
+        "wind_speed": 15,
+        "wind_dir": "N",
+        "next_vhm": 1.1
     },
     {
         "zone": "CASAMANCE",
-        "temp": 24.0,
         "trend": "\u27a1\ufe0f",
         "alert": "\ud83d\udfe2",
-        "advice": "\u2705 Mer calme",
-        "fuel": false,
+        "advice": "Mer belle",
+        "forecast": "\u2705 Stable",
         "sst": 24.0,
         "vhm0": 1.1,
-        "wind_speed": 12,
-        "wind_dir": "N"
+        "wind_speed": 15,
+        "wind_dir": "N",
+        "next_vhm": 1.1
     }
 ]
