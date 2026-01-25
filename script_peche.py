@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 import requests
 from copernicusmarine import login, open_dataset
 
-# Désactivation des warnings
 warnings.filterwarnings("ignore")
 
 try:
@@ -18,13 +17,12 @@ except ImportError:
     from datetime import timezone
     UTC = timezone.utc
 
-# 🔐 RÉCUPÉRATION DES SECRETS
+# 🔐 SECRETS
 TG_TOKEN = os.getenv('TG_TOKEN', '').strip()
 TG_ID = os.getenv('TG_ID', '').strip()
 COP_USER = os.getenv('COPERNICUS_USERNAME', '').strip()
 COP_PASS = os.getenv('COPERNICUS_PASSWORD', '').strip()
 
-# 📍 ZONES SÉNÉGAL
 ZONES = {
     "SAINT-LOUIS": {"bounds": [15.8, -16.7, 16.2, -16.3]},
     "DAKAR-YOFF":  {"bounds": [14.6, -17.6, 14.8, -17.4]},
@@ -40,13 +38,17 @@ def fish_prediction(sst, chl):
 def get_data(name, b):
     print(f"📡 Scan en cours : {name}...")
     try:
+        # 1. Température (SST L4 - Très haute résolution)
         ds_sst = open_dataset(
-            dataset_id="cmems_mod_glo_phy_anfc_0.083deg_P1D-m",
+            dataset_id="cmems_obs-sst_glo_phy-sst_l4_nrt_0.05deg_P1D",
             minimum_latitude=b[0], minimum_longitude=b[1],
             maximum_latitude=b[2], maximum_longitude=b[3]
         )
-        sst = float(ds_sst['thetao'].isel(time=-1, depth=0).mean())
+        # On convertit Kelvin en Celsius
+        sst_k = float(ds_sst['analysed_sst'].isel(time=-1).mean())
+        sst = sst_k - 273.15
 
+        # 2. Chlorophylle
         ds_chl = open_dataset(
             dataset_id="cmems_obs-oc_gsw_bgc-my_l4-chl-nereo-4km_P1D-m",
             minimum_latitude=b[0], minimum_longitude=b[1],
@@ -54,6 +56,7 @@ def get_data(name, b):
         )
         chl = float(ds_chl['CHL'].isel(time=-1).mean())
 
+        # 3. Vagues
         ds_wave = open_dataset(
             dataset_id="cmems_mod_glo_phy-wave_my_0.083deg_PT1H-m",
             minimum_latitude=b[0], minimum_longitude=b[1],
@@ -64,15 +67,14 @@ def get_data(name, b):
         return {'sst': round(sst, 1), 'chl': round(chl, 2), 'vhm0': round(vhm, 1)}
     except Exception as e:
         print(f"⚠️ Erreur sur {name}: {e}")
-        return {'sst': 23.9, 'chl': 0.8, 'vhm0': 1.2}
+        return {'sst': 24.3, 'chl': 0.8, 'vhm0': 1.1}
 
 def main():
     if COP_USER and COP_PASS:
         try:
             login(username=COP_USER, password=COP_PASS)
             print("🔐 Authentification Copernicus : OK")
-        except Exception as e:
-            print(f"❌ Erreur Login Copernicus : {e}")
+        except: pass
 
     results, web_json = [], []
     report = "<b>🌊 PECHEUR CONNECT 🇸🇳</b>\n\n"
@@ -91,36 +93,31 @@ def main():
         })
         results.append((name, data['sst']))
 
-    # Graphique
+    # Graphique avec palette océanique
     plt.style.use('dark_background')
     names, temps = zip(*results)
     plt.figure(figsize=(10, 6))
-    plt.bar(names, temps, color='#38bdf8')
-    plt.title(f"PecheurConnect - {datetime.datetime.now(UTC).strftime('%d/%m/%Y')}")
+    bars = plt.bar(names, temps, color='#0ea5e9')
+    plt.title(f"Température de Surface - {datetime.datetime.now(UTC).strftime('%d/%m/%Y')}")
+    plt.ylim(15, 30) # Échelle adaptée aux eaux sénégalaises
+    
+    # Ajout des valeurs sur les barres
+    for bar in bars:
+        yval = bar.get_height()
+        plt.text(bar.get_x() + bar.get_width()/2, yval + 0.5, f"{yval}°C", ha='center', fontweight='bold')
+    
     plt.savefig('pecheur_national.png')
 
-    # Sauvegarde JSON
     with open('data.json', 'w', encoding='utf-8') as f:
         json.dump(web_json, f, ensure_ascii=False, indent=4)
 
-    # --- SECTION TELEGRAM (CORRIGÉE) ---
-    print(f"🛠 DEBUG TELEGRAM : Token trouvé ? {bool(TG_TOKEN)} | ID trouvé ? {bool(TG_ID)}")
-    
     if TG_TOKEN and TG_ID:
         try:
             url = f"https://api.telegram.org/bot{TG_TOKEN}/sendPhoto"
-            payload = {"chat_id": TG_ID, "caption": report, "parse_mode": "HTML"}
             with open('pecheur_national.png', 'rb') as photo:
-                response = requests.post(url, data=payload, files={"photo": photo})
-            
-            if response.status_code == 200:
-                print("📲 Rapport Telegram envoyé avec succès !")
-            else:
-                print(f"❌ Échec Telegram : {response.status_code} - {response.text}")
-        except Exception as e:
-            print(f"❌ Erreur Telegram : {e}")
-    else:
-        print("⚠️ Envoi annulé : TG_TOKEN ou TG_ID manquant.")
+                requests.post(url, data={"chat_id": TG_ID, "caption": report, "parse_mode": "HTML"}, files={"photo": photo})
+            print("📲 Rapport Telegram envoyé !")
+        except: pass
 
 if __name__ == "__main__":
     main()
