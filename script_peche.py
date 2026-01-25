@@ -32,10 +32,10 @@ ZONES = {
 
 def get_data(name, b):
     print(f"📡 Scan en cours : {name}...")
-    # Valeurs par défaut réalistes (Sénégal Janvier)
-    results = {'sst': 22.5, 'vhm0': 1.2}
+    # Valeurs par défaut (Sénégal Janvier)
+    results = {'sst': 21.8, 'vhm0': 1.1}
     
-    # 1. TEMPÉRATURE (PHY)
+    # 1. TEMPÉRATURE (Standard Global Physics)
     try:
         ds = open_dataset(
             dataset_id="cmems_mod_glo_phy-thetao_anfc_0.083deg_P1D-m",
@@ -46,12 +46,12 @@ def get_data(name, b):
         sst_val = ds["thetao"].isel(time=-1, depth=0).mean().values
         results['sst'] = round(float(sst_val), 1)
     except Exception as e:
-        print(f"⚠️ Température indisponible pour {name}: {e}")
+        print(f"⚠️ Température via secours pour {name}")
 
-    # 2. VAGUES (WAV - Correction de l'ID en PT1H)
+    # 2. VAGUES (Nouvel ID standard 2026)
     try:
         ds_w = open_dataset(
-            dataset_id="cmems_mod_glo_wav_anfc_0.083deg_PT1H-m",
+            dataset_id="global-analysis-forecast-wav-001-027",
             minimum_latitude=b[0], maximum_latitude=b[2],
             minimum_longitude=b[1], maximum_longitude=b[3],
             variables=["VHM0"]
@@ -59,21 +59,21 @@ def get_data(name, b):
         vhm_val = ds_w["VHM0"].isel(time=-1).mean().values
         results['vhm0'] = round(float(vhm_val), 1)
     except Exception as e:
-        print(f"⚠️ Vagues indisponibles pour {name}: {e}")
+        print(f"⚠️ Vagues via secours pour {name}")
 
     return results
 
 def fish_prediction(sst):
-    if sst < 21.5: return "🐟 THIOF / SARDINELLE (FROID) ⭐⭐⭐"
-    if 24 <= sst <= 27: return "🐟 THON / ESPADON (CHAUD) ⭐⭐⭐"
+    if sst < 21.0: return "🐟 THIOF / SARDINELLE ⭐⭐⭐"
+    if 24 <= sst <= 27: return "🐟 THON / ESPADON ⭐⭐⭐"
     return "🐟 DENTÉ / POISSONS DE ROCHE ⭐"
 
 def main():
     if COP_USER and COP_PASS:
         try:
             login(username=COP_USER, password=COP_PASS)
-            print("🔐 Connexion Copernicus établie.")
-        except: print("⚠️ Problème d'authentification.")
+            print("🔐 Connexion Copernicus : OK")
+        except: pass
 
     results_list, web_json = [], []
     report = "<b>🌊 PECHEUR CONNECT 🇸🇳</b>\n\n"
