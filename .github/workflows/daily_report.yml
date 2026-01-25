@@ -1,39 +1,46 @@
 name: PecheurConnect-Runner
+
 on:
   schedule:
-    - cron: '0 0,12 * * *'
-  workflow_dispatch:
+    - cron: '0 0,12 * * *' # S'exécute à minuit et midi UTC
+  workflow_dispatch:      # Permet le lancement manuel pour test
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write     # Obligatoire pour sauvegarder data.json et l'image
+
     steps:
-      - uses: actions/checkout@v3
-      
-      - name: Configuration Python
+      - name: 📂 Récupération du code
+        uses: actions/checkout@v3
+
+      - name: 🐍 Installation de Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-          
-      - name: Installation Librairies
+
+      - name: 📦 Installation des dépendances (Moteurs Cloud)
         run: |
-          pip install numpy matplotlib requests xarray netCDF4 dask
+          python -m pip install --upgrade pip
+          # Installation des librairies pour la manipulation de données satellites
+          pip install numpy matplotlib requests xarray dask netCDF4
           pip install copernicusmarine --upgrade
-          
-      - name: Exécution PecheurConnect
+
+      - name: 🚀 Exécution de PecheurConnect
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_ID: ${{ secrets.TG_ID }}
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
         run: python script_peche.py
-        
-      - name: Déploiement des données
+
+      - name: 🌐 Déploiement vers GitHub Pages
         run: |
           git config --global user.name "PecheurConnect-Bot"
           git config --global user.email "bot@pecheurconnect.sn"
+          # On ajoute les fichiers générés
           git add data.json pecheur_national.png
-          git commit -m "🌐 Données du $(date +'%d-%m-%Y')" || echo "Rien à commiter"
+          # On commit seulement s'il y a du nouveau
+          git commit -m "📊 Mise à jour océanographique : $(date +'%d-%m-%Y %H:%M')" || echo "Rien à commiter"
           git push origin main
