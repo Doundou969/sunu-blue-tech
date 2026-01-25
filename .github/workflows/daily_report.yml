@@ -3,6 +3,7 @@ on:
   schedule:
     - cron: '0 0,12 * * *'
   workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -10,22 +11,29 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      
+      - name: Configuration Python
+        uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      - name: Install
-        run: pip install numpy matplotlib requests copernicusmarine xarray netCDF4 dask
-      - name: Run
+          
+      - name: Installation Librairies
+        run: |
+          pip install numpy matplotlib requests xarray netCDF4 dask
+          pip install copernicusmarine --upgrade
+          
+      - name: Exécution PecheurConnect
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_ID: ${{ secrets.TG_ID }}
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
         run: python script_peche.py
-      - name: Deploy
+        
+      - name: Déploiement des données
         run: |
-          git config --global user.name "Bot"
+          git config --global user.name "PecheurConnect-Bot"
           git config --global user.email "bot@pecheurconnect.sn"
-          git add .
-          git commit -m "🌐 Update Data" || echo "No changes"
-          git push
+          git add data.json pecheur_national.png
+          git commit -m "🌐 Données du $(date +'%d-%m-%Y')" || echo "Rien à commiter"
+          git push origin main
