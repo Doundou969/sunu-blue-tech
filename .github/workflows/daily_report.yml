@@ -1,14 +1,14 @@
-name: PecheurConnect Coastal Tracker
+name: PecheurConnect Auto-Tracker
 
 on:
   schedule:
-    - cron: '0 0,12 * * *' # S'exécute à Minuit et Midi UTC
+    - cron: '0 0,12 * * *' # S'exécute à 00:00 et 12:00 UTC
   workflow_dispatch:      # Permet de lancer manuellement pour tester
 
 jobs:
-  build-and-run:
+  run-tracker:
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: 📂 Checkout du code
         uses: actions/checkout@v3
@@ -18,11 +18,13 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: 📦 Installation des dépendances scientifiques
+      - name: 📦 Installation des dépendances
         run: |
           python -m pip install --upgrade pip
-          # On installe les bibliothèques de calcul en plus des vôtres
           pip install numpy matplotlib requests copernicusmarine xarray netCDF4 dask
+
+      - name: 🔍 Vérification de la présence du fichier
+        run: ls -la
 
       - name: 🚀 Exécution du script PecheurConnect
         env:
@@ -30,13 +32,12 @@ jobs:
           TG_ID: ${{ secrets.TG_ID }}
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
-        run: python ton_nom_de_script.py  # <-- Remplace par le nom exact de ton fichier .py
+        run: python script_peche.py
 
-      - name: 📊 Sauvegarde de l'historique CSV
+      - name: 📊 Archivage de l'historique CSV
         run: |
           git config --global user.name "PecheurConnect-Bot"
           git config --global user.email "bot@pecheurconnect.sn"
           git add pecheur_coast_history.csv
-          # On commit seulement s'il y a des changements pour éviter les erreurs
-          git commit -m "📊 Update Coast Data: $(date +'%Y-%m-%d %H:%M')" || echo "No changes to commit"
+          git commit -m "📊 Mise à jour historique côte Sénégal [skip ci]" || echo "Aucune modification à commiter"
           git push
