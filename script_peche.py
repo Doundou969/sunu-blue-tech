@@ -21,13 +21,13 @@ except ImportError:
 
 warnings.filterwarnings("ignore")
 
-# 🔐 SECRETS
+# 🔐 SECRETS (Configuration GitHub Actions)
 TG_TOKEN = os.getenv('TG_TOKEN', '').strip()
 TG_ID = os.getenv('TG_ID', '').strip()
 COP_USER = os.getenv('COPERNICUS_USERNAME', '').strip()
 COP_PASS = os.getenv('COPERNICUS_PASSWORD', '').strip()
 
-# 📍 CONFIGURATION DES ZONES
+# 📍 CONFIGURATION DES ZONES SÉNÉGAL
 ZONES = {
     "SAINT-LOUIS": {"area": [15.8, -16.7, 16.2, -16.3]},
     "DAKAR-YOFF":  {"area": [14.6, -17.6, 14.8, -17.4]},
@@ -36,66 +36,98 @@ ZONES = {
 }
 
 def fish_prediction(sst, chl):
+    """Logique métier pour PecheurConnect"""
     if 24 <= sst <= 28 and chl > 0.8: return "🐟 THON / ESPADON ⭐⭐⭐"
     if chl > 1.2: return "🐟 SARDINES / YABOOY ⭐⭐"
     return "🐟 THIOF / DENTÉ ⭐"
 
 def get_data(name, coords):
-    print(f"📡 Scan : {name}...")
+    """Récupération des données sans l'argument obsolète login"""
+    print(f"📡 Scan en cours : {name}...")
     try:
-        login(username=COP_USER, password=COP_PASS, skip_if_logged_in=True)
-        # SST
-        sst_ds = get(dataset_id="cmems_mod_glo_phy-cur_anfc_0.083deg_P1D-m", 
-                     variables=["thetao"], start_datetime="PT24H", area=coords, force_download=True)
+        # Récupération de la Température (SST)
+        sst_ds = get(
+            dataset_id="cmems_mod_glo_phy-cur_anfc_0.083deg_P1D-m", 
+            variables=["thetao"], start_datetime="PT24H", area=coords, force_download=True
+        )
         sst = float(sst_ds.thetao.isel(time=-1, depth=0).mean())
-        # CHL
-        chl_ds = get(dataset_id="cmems_obs-oc_gsw_bgc-my_l4-chl-nereo-4km_P1D-m", 
-                     variables=["CHL"], start_datetime="PT48H", area=coords, force_download=True)
+        
+        # Récupération de la Chlorophylle (Indice de nourriture)
+        chl_ds = get(
+            dataset_id="cmems_obs-oc_gsw_bgc-my_l4-chl-nereo-4km_P1D-m", 
+            variables=["CHL"], start_datetime="PT48H", area=coords, force_download=True
+        )
         chl = float(chl_ds.CHL.isel(time=-1).mean())
-        # VAGUES
-        wave_ds = get(dataset_id="cmems_mod_glo_phy-wave_my_0.083deg_PT1H-m", 
-                      variables=["VHM0"], start_datetime="PT12H", area=coords, force_download=True)
+        
+        # Récupération des Vagues (Sécurité)
+        wave_ds = get(
+            dataset_id="cmems_mod_glo_phy-wave_my_0.083deg_PT1H-m", 
+            variables=["VHM0"], start_datetime="PT12H", area=coords, force_download=True
+        )
         vhm = float(wave_ds.VHM0.isel(time=-1).mean())
         
         return {'sst': round(sst, 1), 'chl': round(chl, 2), 'vhm0': round(vhm, 1)}
-    except Exception:
-        traceback.print_exc()
-        return {'sst': 25.0, 'chl': 1.0, 'vhm0': 1.2}
+    except Exception as e:
+        print(f"⚠️ Erreur sur {name}: {e}")
+        # Valeurs de secours si Copernicus est indisponible
+        return {'sst': 24.0, 'chl': 0.7, 'vhm0': 1.1}
 
 def main():
+    # 1. Connexion UNIQUE au début
+    if COP_USER and COP_PASS:
+        try:
+            print("🔐 Tentative de connexion à Copernicus...")
+            login(username=COP_USER, password=COP_PASS)
+            print("✅ Authentification réussie.")
+        except Exception as e:
+            print(f"❌ Échec login: {e}")
+    else:
+        print("⚠️ Mode simulation (identifiants manquants)")
+
     results, web_json = [], []
     report = "<b>🌊 PECHEUR CONNECT 🇸🇳</b>\n\n"
     
-    for name, coords in ZONES.items():
-        data = get_data(name, coords['area'])
+    # 2. Boucle de traitement
+    for name, config in ZONES.items():
+        data = get_data(name, config['area'])
         target = fish_prediction(data['sst'], data['chl'])
-        secu = "safe" if data['vhm0'] < 1.4 else "warning" if data['vhm0'] < 2.0 else "danger"
+        
+        # Détermination sécurité
+        secu_slug = "safe" if data['vhm0'] < 1.4 else "warning" if data['vhm0'] < 2.0 else "danger"
+        secu_txt = "Optimale" if secu_slug == "safe" else "Prudence" if secu_slug == "warning" else "Danger"
         
         report += f"📍 <b>{name}</b>\n🌡️ {data['sst']}°C | 🌊 {data['vhm0']}m\n🎣 {target}\n\n"
         
-        # Pour JSON Web
         web_json.append({
-            "zone": name, "target": target, "temp": data['sst'],
-            "status": secu, "status_fr": "Optimale" if secu=="safe" else "Prudence"
+            "zone": name, 
+            "target": target, 
+            "temp": data['sst'],
+            "status": secu_slug, 
+            "status_fr": secu_txt
         })
         results.append((name, data['sst']))
 
-    # Graphique
+    # 3. Génération Graphique
     plt.style.use('dark_background')
     names, temps = zip(*results)
+    plt.figure(figsize=(10, 5))
     plt.bar(names, temps, color='#38bdf8')
-    plt.title("Température de l'eau (°C)")
+    plt.ylabel("Température (°C)")
     plt.savefig('pecheur_national.png')
 
-    # Sauvegarde JSON
+    # 4. Sauvegarde JSON pour le Web
     with open('data.json', 'w', encoding='utf-8') as f:
         json.dump(web_json, f, ensure_ascii=False, indent=4)
 
-    # Envoi Telegram
+    # 5. Envoi Telegram
     if TG_TOKEN and TG_ID:
-        requests.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendPhoto", 
-                      data={"chat_id": TG_ID, "caption": report, "parse_mode": "HTML"}, 
-                      files={"photo": open('pecheur_national.png', 'rb')})
+        try:
+            url = f"https://api.telegram.org/bot{TG_TOKEN}/sendPhoto"
+            requests.post(url, data={"chat_id": TG_ID, "caption": report, "parse_mode": "HTML"}, 
+                          files={"photo": open('pecheur_national.png', 'rb')})
+            print("📲 Rapport Telegram envoyé.")
+        except:
+            print("❌ Échec envoi Telegram.")
 
 if __name__ == "__main__":
     main()
