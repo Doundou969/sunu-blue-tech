@@ -3,93 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PecheurConnect 🇸🇳 | Tableau de Bord</title>
+    <title>PecheurConnect 🇸🇳 | Carte Interactive</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         body { background-color: #0f172a; color: white; }
+        #map { height: 400px; border-radius: 1rem; z-index: 10; }
         .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        .status-safe { color: #22c55e; }
-        .status-warning { color: #f59e0b; }
-        .status-danger { color: #ef4444; }
     </style>
 </head>
 <body class="p-4 md:p-8">
-    <header class="max-w-6xl mx-auto mb-8 flex justify-between items-center">
-        <div>
-            <h1 class="text-3xl font-bold text-sky-400">PECHEUR CONNECT</h1>
-            <p class="text-slate-400">Données Satellites Copernicus en Direct 🇸🇳</p>
-        </div>
-        <div id="last-update" class="text-right text-xs text-slate-500"></div>
+    <header class="max-w-6xl mx-auto mb-6">
+        <h1 class="text-3xl font-bold text-sky-400 text-center">PECHEUR CONNECT 🇸🇳</h1>
+        <p class="text-slate-400 text-center">Localisation précise des zones de pêche</p>
     </header>
 
-    <div id="dashboard" class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="col-span-full text-center py-20">
-            <i class="fas fa-spinner fa-spin text-4xl text-sky-500"></i>
-            <p class="mt-4">Chargement des données océaniques...</p>
-        </div>
+    <div class="max-w-6xl mx-auto mb-8">
+        <div id="map" class="shadow-2xl border border-sky-500/30"></div>
     </div>
 
-    <footer class="max-w-6xl mx-auto mt-12 pt-8 border-t border-slate-800 text-center text-slate-500 text-sm">
-        <p>&copy; 2026 PecheurConnect - Remplacement officiel de SunuBlueTech.</p>
-        <p>Expertise Halieutique au service des pêcheurs sénégalais.</p>
-    </footer>
+    <div id="dashboard" class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        </div>
 
     <script>
+        // Coordonnées des zones (Centre du Sénégal pour la vue initiale)
+        const map = L.map('map').setView([14.497, -14.452], 7);
+
+        // Fond de carte style Océan/Sombre
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
         async function loadData() {
             try {
-                // On ajoute un timestamp pour éviter le cache du navigateur
                 const response = await fetch('data.json?t=' + new Date().getTime());
                 const data = await response.json();
                 
+                // Coordonnées réelles pour les marqueurs
+                const coords = {
+                    "SAINT-LOUIS": [16.03, -16.50],
+                    "DAKAR-YOFF": [14.75, -17.48],
+                    "MBOUR-JOAL": [14.41, -16.96],
+                    "CASAMANCE": [12.50, -16.70]
+                };
+
                 const dashboard = document.getElementById('dashboard');
                 dashboard.innerHTML = '';
 
                 data.forEach(item => {
+                    const latlng = coords[item.zone];
+                    
+                    // 1. Ajouter le marqueur sur la carte
+                    const markerColor = item.temp < 21 ? 'blue' : 'orange';
+                    const marker = L.marker(latlng).addTo(map);
+                    marker.bindPopup(`
+                        <div style="color:black">
+                            <b>${item.zone}</b><br>
+                            🌡️ ${item.temp}°C | 🌊 ${item.vhm}m<br>
+                            🎣 ${item.target}
+                        </div>
+                    `);
+
+                    // 2. Ajouter la carte d'info en bas
                     const card = document.createElement('div');
-                    card.className = 'glass p-6 rounded-2xl shadow-xl transition hover:scale-105';
-                    
-                    const statusClass = `status-${item.status}`;
-                    
+                    card.className = 'glass p-4 rounded-xl border-l-4 ' + (item.temp < 21 ? 'border-blue-500' : 'border-orange-500');
                     card.innerHTML = `
-                        <div class="flex justify-between items-start mb-4">
-                            <h2 class="text-xl font-bold">${item.zone}</h2>
-                            <i class="fas fa-anchor text-slate-600"></i>
-                        </div>
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between">
-                                <span class="text-slate-400"><i class="fas fa-thermometer-half mr-2"></i> Mer</span>
-                                <span class="text-2xl font-mono">${item.temp}°C</span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-slate-400"><i class="fas fa-water mr-2"></i> Vagues</span>
-                                <span class="text-xl font-mono">${item.vhm}m</span>
-                            </div>
-                            <div class="pt-4 border-t border-slate-700">
-                                <p class="text-sm font-semibold mb-1">Prédiction :</p>
-                                <p class="text-sky-300">${item.target}</p>
-                            </div>
-                            <div class="flex items-center mt-2">
-                                <span class="text-xs uppercase tracking-wider font-bold ${statusClass}">
-                                    ● Sortie ${item.status_fr}
-                                </span>
-                            </div>
-                        </div>
+                        <h3 class="font-bold text-lg">${item.zone}</h3>
+                        <p class="text-2xl font-mono text-sky-300">${item.temp}°C</p>
+                        <p class="text-xs text-slate-400">${item.target}</p>
                     `;
                     dashboard.appendChild(card);
                 });
 
-                document.getElementById('last-update').innerText = "Mis à jour le : " + new Date().toLocaleString('fr-FR');
-
-            } catch (error) {
-                console.error("Erreur de chargement:", error);
-                document.getElementById('dashboard').innerHTML = `<p class="col-span-full text-red-400 text-center">Erreur de connexion aux données.</p>`;
-            }
+            } catch (e) { console.error(e); }
         }
 
         loadData();
-        // Rafraîchir toutes les 5 minutes
-        setInterval(loadData, 300000);
     </script>
 </body>
 </html>
