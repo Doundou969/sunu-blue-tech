@@ -1,14 +1,8 @@
 #!/usr/bin/env python3
-import os
-import json
-import datetime
-import warnings
-import math
-import requests
+import os, json, datetime, math, requests, warnings
 from copernicusmarine import login, open_dataset
 
 warnings.filterwarnings("ignore")
-
 try:
     from datetime import UTC
 except ImportError:
@@ -21,7 +15,7 @@ TG_ID = os.getenv('TG_ID', '').strip()
 COP_USER = os.getenv('COPERNICUS_USERNAME', '').strip()
 COP_PASS = os.getenv('COPERNICUS_PASSWORD', '').strip()
 
-# 📍 6 ZONES STRATÉGIQUES SÉNÉGAL
+# 📍 LES 6 ZONES STRATÉGIQUES DU SÉNÉGAL
 ZONES = {
     "SAINT-LOUIS": {"bounds": [15.8, -16.7, 16.2, -16.3]},
     "LOUGA-POTOU": {"bounds": [15.3, -16.9, 15.6, -16.6]},
@@ -84,34 +78,13 @@ def main():
     for name, config in ZONES.items():
         data = get_data(name, config['bounds'])
         
-        # Tendance & Sécurité
+        # Tendance Température
         prev_t = old_data.get(name, data['sst'])
         diff = round(data['sst'] - prev_t, 1)
         trend = "📉" if diff <= -0.4 else "📈" if diff >= 0.4 else "➡️"
+        
+        # Sécurité
         alert = "🟢" if data['vhm0'] < 1.4 else "🟡" if data['vhm0'] < 2.1 else "🔴"
-        
-        # Prévision
-        forecast = "✅ Stable"
-        if data['next_vhm'] > data['vhm0'] + 0.4: forecast = f"⚠️ Hausse ({data['next_vhm']}m)"
-        
         advice = "Mer belle" if alert == "🟢" else "Prudence" if alert == "🟡" else "DANGER"
-        fuel = "\n⛽ <b>Vent de face :</b> surplus carburant conseillé" if data['wind_speed'] > 22 else ""
-        target = "🐟 THIOF ⭐⭐⭐" if data['sst'] < 21 else "🐟 THON / ESPADON ⭐⭐"
-
-        report += f"📍 <b>{name}</b> {alert}\n"
-        report += f"🌡️ {data['sst']}°C {trend} | 🌊 {data['vhm0']}m\n"
-        report += f"🌬️ {data['wind_speed']}km/h ({data['wind_dir']})\n"
-        report += f"🔮 <i>Demain: {forecast}</i>\n"
-        report += f"🎣 {target}\n<i>{advice}</i>{fuel}\n\n"
         
-        web_json.append({**{"zone": name, "trend": trend, "alert": alert, "advice": advice, "forecast": forecast}, **data})
-
-    report += f"───────────────────\n📱 <b>GPS :</b> https://doundou969.github.io/sunu-blue-tech/"
-    
-    with open('data.json', 'w') as f: json.dump(web_json, f, indent=4)
-    if TG_TOKEN and TG_ID:
-        requests.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage", 
-                      data={"chat_id": TG_ID, "text": report, "parse_mode": "HTML", "disable_web_page_preview": "true"})
-
-if __name__ == "__main__":
-    main()
+        # Pré
