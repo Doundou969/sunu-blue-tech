@@ -3,42 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PecheurConnect - Tableau de Bord Sénégal</title>
+    <title>PecheurConnect - Dashboard Sénégal</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #121212; color: white; text-align: center; padding: 20px; }
-        .container { max-width: 800px; margin: auto; background: #1e1e1e; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        h1 { color: #3b82f6; }
-        .status { background: #2d2d2d; padding: 10px; border-radius: 10px; margin: 20px 0; border-left: 5px solid #10b981; }
-        img { max-width: 100%; height: auto; border-radius: 10px; border: 2px solid #333; }
-        .footer { margin-top: 30px; font-size: 0.8em; color: #777; }
-        .btn { display: inline-block; padding: 10px 20px; background: #3b82f6; color: white; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; background: #1e293b; padding: 25px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+        h1 { color: #38bdf8; text-align: center; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #94a3b8; margin-bottom: 25px; }
+        .status { background: #334155; padding: 12px; border-radius: 8px; text-align: center; margin-bottom: 25px; border-bottom: 4px solid #38bdf8; }
+        .chart-box { text-align: center; margin-bottom: 30px; }
+        img { max-width: 100%; border-radius: 10px; border: 1px solid #475569; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #1e293b; border-radius: 10px; overflow: hidden; }
+        th { background-color: #38bdf8; color: #0f172a; padding: 12px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #334155; }
+        tr:hover { background-color: #2d3748; }
+        
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.85em; font-weight: bold; }
+        .safe { background: #22c55e; color: white; }
+        .warning { background: #eab308; color: #0f172a; }
+        .danger { background: #ef4444; color: white; }
+        
+        .footer { text-align: center; margin-top: 40px; font-size: 0.8em; color: #64748b; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🇸🇳 PecheurConnect</h1>
-        <p>Analyse Océanographique en Temps Réel</p>
+        <p class="subtitle">Analyse Océanographique & Prédictions Halieutiques</p>
         
         <div class="status">
-            <strong>Dernière mise à jour :</strong> 
-            <span id="update-time">Chargement...</span>
+            <strong>Mise à jour :</strong> <span id="date-now">--/--/--</span> | 
+            <strong>Source :</strong> Copernicus Marine Service
         </div>
 
-        <h3>📊 Température de Surface & Zones</h3>
-        <img src="pecheur_national.png" alt="Graphique National">
+        <div class="chart-box">
+            <h3>📈 Températures de Surface (SST)</h3>
+            <img src="pecheur_national.png" alt="Graphique des températures Sénégal">
+        </div>
 
-        <p><i>Ce graphique montre la température de l'eau de Saint-Louis à la Casamance. Utilisez ces données pour localiser les zones de pêche favorables.</i></p>
-
-        <a href="https://t.me/VOTRE_LIEN_BOT" class="btn">Rejoindre l'alerte Telegram</a>
+        <h3>📍 Prédictions par Zone</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Zone</th>
+                    <th>Espèce Cible</th>
+                    <th>Sécurité</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Saint-Louis</td>
+                    <td>🐟 Thiof / Denté</td>
+                    <td><span class="badge warning">Prudence</span></td>
+                </tr>
+                <tr>
+                    <td>Dakar-Yoff</td>
+                    <td>🐟 Thon / Espadon</td>
+                    <td><span class="badge safe">Optimale</span></td>
+                </tr>
+                <tr>
+                    <td>Mbour-Joal</td>
+                    <td>🐟 Sardines / Ethmalose</td>
+                    <td><span class="badge safe">Optimale</span></td>
+                </tr>
+                <tr>
+                    <td>Casamance</td>
+                    <td>🐟 Capitaine / Crevette</td>
+                    <td><span class="badge safe">Optimale</span></td>
+                </tr>
+            </tbody>
+        </table>
 
         <div class="footer">
-            Données fournies par Copernicus Marine Service • PecheurConnect 2026
+            © 2026 PecheurConnect - Données satellites traitées pour la pêche artisanale.
         </div>
     </div>
 
     <script>
-        // Affiche la date du jour si aucune date n'est trouvée
-        document.getElementById('update-time').innerText = new Date().toLocaleString('fr-FR');
+        document.getElementById('date-now').innerText = new Date().toLocaleDateString('fr-FR', {
+            day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
     </script>
 </body>
 </html>
