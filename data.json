@@ -2,29 +2,29 @@
     {
         "zone": "SAINT-LOUIS",
         "target": "🐟 THIOF / DENTÉ ⭐",
-        "temp": 22.1,
-        "status": "safe",
-        "status_fr": "Optimale"
+        "temp": 21.8,
+        "status": "warning",
+        "status_fr": "Prudence"
     },
     {
         "zone": "DAKAR-YOFF",
         "target": "🐟 THIOF / DENTÉ ⭐",
-        "temp": 22.1,
-        "status": "safe",
-        "status_fr": "Optimale"
+        "temp": 21.8,
+        "status": "warning",
+        "status_fr": "Prudence"
     },
     {
         "zone": "MBOUR-JOAL",
         "target": "🐟 THIOF / DENTÉ ⭐",
-        "temp": 22.1,
-        "status": "safe",
-        "status_fr": "Optimale"
+        "temp": 21.8,
+        "status": "warning",
+        "status_fr": "Prudence"
     },
     {
         "zone": "CASAMANCE",
         "target": "🐟 THIOF / DENTÉ ⭐",
-        "temp": 22.1,
-        "status": "safe",
-        "status_fr": "Optimale"
+        "temp": 21.8,
+        "status": "warning",
+        "status_fr": "Prudence"
     }
 ]
