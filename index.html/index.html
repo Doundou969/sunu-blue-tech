@@ -3,103 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PecheurConnect - Direct Sénégal</title>
+    <title>PecheurConnect 🇸🇳 | Tableau de Bord</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --bg: #0f172a; --card: #1e293b; --accent: #38bdf8; --text: #f8fafc; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; }
-        .container { max-width: 600px; margin: auto; background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        h1 { color: var(--accent); margin: 0; font-size: 1.6rem; text-align: center; }
-        .subtitle { text-align: center; color: #94a3b8; font-size: 0.9rem; margin-bottom: 20px; }
-        
-        .update-box { font-size: 0.8rem; color: #38bdf8; text-align: center; padding: 10px; background: rgba(56, 189, 248, 0.1); border-radius: 8px; margin-bottom: 20px; }
-        
-        .chart-container { margin-bottom: 25px; border-radius: 12px; overflow: hidden; border: 1px solid #334155; }
-        img { width: 100%; display: block; height: auto; background: #000; }
-        
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; padding: 10px; border-bottom: 1px solid #334155; }
-        td { padding: 15px 10px; border-bottom: 1px solid #334155; font-size: 0.95rem; }
-        
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
-        .safe { background: #16a34a; color: white; }
-        .warning { background: #eab308; color: #000; }
-        .danger { background: #dc2626; color: white; }
-
-        .loading { text-align: center; padding: 30px; color: #64748b; font-style: italic; }
+        body { background-color: #0f172a; color: white; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .status-safe { color: #22c55e; }
+        .status-warning { color: #f59e0b; }
+        .status-danger { color: #ef4444; }
     </style>
 </head>
-<body>
+<body class="p-4 md:p-8">
+    <header class="max-w-6xl mx-auto mb-8 flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold text-sky-400">PECHEUR CONNECT</h1>
+            <p class="text-slate-400">Données Satellites Copernicus en Direct 🇸🇳</p>
+        </div>
+        <div id="last-update" class="text-right text-xs text-slate-500"></div>
+    </header>
 
-<div class="container">
-    <h1>🇸🇳 PecheurConnect</h1>
-    <p class="subtitle">Analyse des côtes sénégalaises</p>
-
-    <div class="update-box">
-        🔄 Mis à jour le : <span id="timestamp">Chargement...</span>
+    <div id="dashboard" class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="col-span-full text-center py-20">
+            <i class="fas fa-spinner fa-spin text-4xl text-sky-500"></i>
+            <p class="mt-4">Chargement des données océaniques...</p>
+        </div>
     </div>
 
-    <div class="chart-container">
-        <img id="main-chart" src="pecheur_national.png" alt="Graphique National">
-    </div>
+    <footer class="max-w-6xl mx-auto mt-12 pt-8 border-t border-slate-800 text-center text-slate-500 text-sm">
+        <p>&copy; 2026 PecheurConnect - Remplacement officiel de SunuBlueTech.</p>
+        <p>Expertise Halieutique au service des pêcheurs sénégalais.</p>
+    </footer>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Zone</th>
-                <th>Prédiction (T°)</th>
-                <th>Mer</th>
-            </tr>
-        </thead>
-        <tbody id="data-table">
-            <tr><td colspan="3" class="loading">📡 Synchronisation avec Copernicus...</td></tr>
-        </tbody>
-    </table>
-
-    <p style="font-size: 0.7rem; color: #64748b; text-align: center; margin-top: 20px;">
-        Données : Copernicus Marine Service | Plateforme : PecheurConnect
-    </p>
-</div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const tableBody = document.getElementById('data-table');
-        const timestampElement = document.getElementById('timestamp');
-        const mainChart = document.getElementById('main-chart');
-        
-        // On génère un identifiant unique pour forcer le rafraîchissement (Cache Busting)
-        const version = Math.floor(Math.random() * 100000);
-
-        // Mise à jour de l'image
-        mainChart.src = "pecheur_national.png?v=" + version;
-
-        // Récupération des données JSON
-        fetch('data.json?v=' + version)
-            .then(response => {
-                if (!response.ok) throw new Error("Erreur de chargement");
-                return response.json();
-            })
-            .then(data => {
-                tableBody.innerHTML = ""; // On vide le message de chargement
-                timestampElement.innerText = new Date().toLocaleString('fr-FR', {
-                    day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
-                });
+    <script>
+        async function loadData() {
+            try {
+                // On ajoute un timestamp pour éviter le cache du navigateur
+                const response = await fetch('data.json?t=' + new Date().getTime());
+                const data = await response.json();
+                
+                const dashboard = document.getElementById('dashboard');
+                dashboard.innerHTML = '';
 
                 data.forEach(item => {
-                    const row = `
-                        <tr>
-                            <td><strong>${item.zone}</strong></td>
-                            <td>${item.target}<br><small>${item.temp}°C</small></td>
-                            <td><span class="badge ${item.status}">${item.status_fr}</span></td>
-                        </tr>`;
-                    tableBody.innerHTML += row;
+                    const card = document.createElement('div');
+                    card.className = 'glass p-6 rounded-2xl shadow-xl transition hover:scale-105';
+                    
+                    const statusClass = `status-${item.status}`;
+                    
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-4">
+                            <h2 class="text-xl font-bold">${item.zone}</h2>
+                            <i class="fas fa-anchor text-slate-600"></i>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-400"><i class="fas fa-thermometer-half mr-2"></i> Mer</span>
+                                <span class="text-2xl font-mono">${item.temp}°C</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-slate-400"><i class="fas fa-water mr-2"></i> Vagues</span>
+                                <span class="text-xl font-mono">${item.vhm}m</span>
+                            </div>
+                            <div class="pt-4 border-t border-slate-700">
+                                <p class="text-sm font-semibold mb-1">Prédiction :</p>
+                                <p class="text-sky-300">${item.target}</p>
+                            </div>
+                            <div class="flex items-center mt-2">
+                                <span class="text-xs uppercase tracking-wider font-bold ${statusClass}">
+                                    ● Sortie ${item.status_fr}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                    dashboard.appendChild(card);
                 });
-            })
-            .catch(err => {
-                console.error(err);
-                tableBody.innerHTML = "<tr><td colspan='3' style='color:#ef4444; text-align:center;'>⚠️ Données temporairement indisponibles</td></tr>";
-            });
-    });
-</script>
 
+                document.getElementById('last-update').innerText = "Mis à jour le : " + new Date().toLocaleString('fr-FR');
+
+            } catch (error) {
+                console.error("Erreur de chargement:", error);
+                document.getElementById('dashboard').innerHTML = `<p class="col-span-full text-red-400 text-center">Erreur de connexion aux données.</p>`;
+            }
+        }
+
+        loadData();
+        // Rafraîchir toutes les 5 minutes
+        setInterval(loadData, 300000);
+    </script>
 </body>
 </html>
