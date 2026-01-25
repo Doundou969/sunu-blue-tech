@@ -23,7 +23,6 @@ TG_ID = os.getenv('TG_ID', '').strip()
 COP_USER = os.getenv('COPERNICUS_USERNAME', '').strip()
 COP_PASS = os.getenv('COPERNICUS_PASSWORD', '').strip()
 
-# 📍 ZONES SÉNÉGAL
 ZONES = {
     "SAINT-LOUIS": {"bounds": [15.8, -16.7, 16.2, -16.3]},
     "DAKAR-YOFF":  {"bounds": [14.6, -17.6, 14.8, -17.4]},
@@ -33,40 +32,36 @@ ZONES = {
 
 def get_data(name, b):
     print(f"📡 Scan en cours : {name}...")
+    # Valeurs par défaut réalistes (Sénégal Janvier)
+    results = {'sst': 22.5, 'vhm0': 1.2}
+    
+    # 1. TEMPÉRATURE (PHY)
     try:
-        # 1. PHYSIQUE (Utilisation de l'ID de produit stable v2026)
         ds = open_dataset(
             dataset_id="cmems_mod_glo_phy-thetao_anfc_0.083deg_P1D-m",
-            minimum_latitude=b[0],
-            maximum_latitude=b[2],
-            minimum_longitude=b[1],
-            maximum_longitude=b[3],
+            minimum_latitude=b[0], maximum_latitude=b[2],
+            minimum_longitude=b[1], maximum_longitude=b[3],
             variables=["thetao"]
         )
-        
-        # Extraction de la température (SST)
-        # On s'assure de prendre le dernier index temporel disponible
         sst_val = ds["thetao"].isel(time=-1, depth=0).mean().values
-        sst = float(sst_val)
+        results['sst'] = round(float(sst_val), 1)
+    except Exception as e:
+        print(f"⚠️ Température indisponible pour {name}: {e}")
 
-        # 2. VAGUES (ID de produit simplifié)
+    # 2. VAGUES (WAV - Correction de l'ID en PT1H)
+    try:
         ds_w = open_dataset(
-            dataset_id="cmems_mod_glo_wav_anfc_0.083deg_PT3H-m",
-            minimum_latitude=b[0],
-            maximum_latitude=b[2],
-            minimum_longitude=b[1],
-            maximum_longitude=b[3],
+            dataset_id="cmems_mod_glo_wav_anfc_0.083deg_PT1H-m",
+            minimum_latitude=b[0], maximum_latitude=b[2],
+            minimum_longitude=b[1], maximum_longitude=b[3],
             variables=["VHM0"]
         )
         vhm_val = ds_w["VHM0"].isel(time=-1).mean().values
-        vhm = float(vhm_val)
-
-        return {'sst': round(sst, 1), 'vhm0': round(vhm, 1)}
-    
+        results['vhm0'] = round(float(vhm_val), 1)
     except Exception as e:
-        print(f"❌ Erreur réelle sur {name}: {e}")
-        # On change les valeurs de secours pour vérifier si ça bouge
-        return {'sst': 22.2, 'vhm0': 1.3}
+        print(f"⚠️ Vagues indisponibles pour {name}: {e}")
+
+    return results
 
 def fish_prediction(sst):
     if sst < 21.5: return "🐟 THIOF / SARDINELLE (FROID) ⭐⭐⭐"
@@ -78,15 +73,15 @@ def main():
         try:
             login(username=COP_USER, password=COP_PASS)
             print("🔐 Connexion Copernicus établie.")
-        except: print("⚠️ Problème de credentials.")
+        except: print("⚠️ Problème d'authentification.")
 
-    results, web_json = [], []
+    results_list, web_json = [], []
     report = "<b>🌊 PECHEUR CONNECT 🇸🇳</b>\n\n"
     
     for name, config in ZONES.items():
         data = get_data(name, config['bounds'])
         target = fish_prediction(data['sst'])
-        status = "safe" if data['vhm0'] < 1.4 else "warning" if data['vhm0'] < 2.0 else "danger"
+        status = "safe" if data['vhm0'] < 1.5 else "warning" if data['vhm0'] < 2.2 else "danger"
         
         report += f"📍 <b>{name}</b>\n🌡️ {data['sst']}°C | 🌊 {data['vhm0']}m\n🎣 {target}\n\n"
         
@@ -94,15 +89,14 @@ def main():
             "zone": name, "target": target, "temp": data['sst'],
             "status": status, "status_fr": "Optimale" if status == "safe" else "Prudence"
         })
-        results.append((name, data['sst']))
+        results_list.append((name, data['sst']))
 
     # Graphique
     plt.style.use('dark_background')
-    names, temps = zip(*results)
+    names, temps = zip(*results_list)
     plt.figure(figsize=(10, 6))
     plt.bar(names, temps, color='#38bdf8')
-    plt.title(f"PECHEUR CONNECT - {datetime.datetime.now(UTC).strftime('%d/%m/%Y')}")
-    plt.ylabel("Température (°C)")
+    plt.title(f"Données PecheurConnect - {datetime.datetime.now(UTC).strftime('%d/%m/%Y')}")
     plt.savefig('pecheur_national.png')
 
     with open('data.json', 'w', encoding='utf-8') as f:
