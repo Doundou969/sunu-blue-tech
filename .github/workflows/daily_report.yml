@@ -2,14 +2,14 @@ name: PecheurConnect-Runner
 
 on:
   schedule:
-    - cron: '0 0,12 * * *' # S'exécute à minuit et midi UTC
-  workflow_dispatch:      # Permet le lancement manuel pour test
+    - cron: '0 */6 * * *' # Je l'ai passé à toutes les 6h pour plus de précision pour les pêcheurs
+  workflow_dispatch:      # Permet le lancement manuel
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write     # Obligatoire pour sauvegarder data.json et l'image
+      contents: write     # TRÈS IMPORTANT : Autorise GitHub à enregistrer data.json
 
     steps:
       - name: 📂 Récupération du code
@@ -20,12 +20,10 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: 📦 Installation des dépendances (Moteurs Cloud)
+      - name: 📦 Installation des dépendances
         run: |
           python -m pip install --upgrade pip
-          # Installation des librairies pour la manipulation de données satellites
-          pip install numpy matplotlib requests xarray dask netCDF4
-          pip install copernicusmarine --upgrade
+          pip install numpy matplotlib requests xarray dask netCDF4 copernicusmarine --upgrade
 
       - name: 🚀 Exécution de PecheurConnect
         env:
@@ -35,12 +33,15 @@ jobs:
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
         run: python script_peche.py
 
-      - name: 🌐 Déploiement vers GitHub Pages
+      - name: 🌐 Déploiement des données
         run: |
           git config --global user.name "PecheurConnect-Bot"
           git config --global user.email "bot@pecheurconnect.sn"
-          # On ajoute les fichiers générés
-          git add data.json pecheur_national.png
-          # On commit seulement s'il y a du nouveau
-          git commit -m "📊 Mise à jour océanographique : $(date +'%d-%m-%Y %H:%M')" || echo "Rien à commiter"
-          git push origin main
+          git add data.json
+          # On vérifie s'il y a des changements avant de pousser
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "📊 Mise à jour : $(date +'%d-%m-%Y %H:%M')"
+            git push origin main
+          else
+            echo "Aucun changement détecté."
+          fi
