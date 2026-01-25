@@ -1,34 +1,50 @@
 [
     {
         "zone": "SAINT-LOUIS",
+        "temp": 17.9,
+        "trend": "\u27a1\ufe0f",
         "alert": "\ud83d\udfe2",
+        "advice": "\u2705 Mer calme",
+        "fuel": false,
         "sst": 17.9,
         "vhm0": 1.1,
-        "wind_speed": 15,
+        "wind_speed": 12,
         "wind_dir": "N"
     },
     {
         "zone": "DAKAR-YOFF",
+        "temp": 19.7,
+        "trend": "\u27a1\ufe0f",
         "alert": "\ud83d\udfe2",
+        "advice": "\u2705 Mer calme",
+        "fuel": false,
         "sst": 19.7,
         "vhm0": 1.1,
-        "wind_speed": 15,
+        "wind_speed": 12,
         "wind_dir": "N"
     },
     {
         "zone": "MBOUR-JOAL",
+        "temp": 20.3,
+        "trend": "\u27a1\ufe0f",
         "alert": "\ud83d\udfe2",
+        "advice": "\u2705 Mer calme",
+        "fuel": false,
         "sst": 20.3,
         "vhm0": 1.1,
-        "wind_speed": 15,
+        "wind_speed": 12,
         "wind_dir": "N"
     },
     {
         "zone": "CASAMANCE",
+        "temp": 24.0,
+        "trend": "\u27a1\ufe0f",
         "alert": "\ud83d\udfe2",
+        "advice": "\u2705 Mer calme",
+        "fuel": false,
         "sst": 24.0,
         "vhm0": 1.1,
-        "wind_speed": 15,
+        "wind_speed": 12,
         "wind_dir": "N"
     }
 ]
