@@ -9,10 +9,9 @@ import matplotlib.pyplot as plt
 import requests
 from copernicusmarine import login, open_dataset
 
-# Désactivation des warnings inutiles
+# Désactivation des warnings
 warnings.filterwarnings("ignore")
 
-# Gestion du fuseau horaire UTC pour 2026
 try:
     from datetime import UTC
 except ImportError:
@@ -25,7 +24,7 @@ TG_ID = os.getenv('TG_ID', '').strip()
 COP_USER = os.getenv('COPERNICUS_USERNAME', '').strip()
 COP_PASS = os.getenv('COPERNICUS_PASSWORD', '').strip()
 
-# 📍 ZONES SÉNÉGAL (Lat/Lon)
+# 📍 ZONES SÉNÉGAL
 ZONES = {
     "SAINT-LOUIS": {"bounds": [15.8, -16.7, 16.2, -16.3]},
     "DAKAR-YOFF":  {"bounds": [14.6, -17.6, 14.8, -17.4]},
@@ -34,7 +33,6 @@ ZONES = {
 }
 
 def fish_prediction(sst, chl):
-    """Logique d'aide à la décision halieutique"""
     if 24 <= sst <= 27 and chl > 0.8: return "🐟 THON / ESPADON ⭐⭐⭐"
     if chl > 1.2: return "🐟 SARDINES / YABOOY ⭐⭐"
     return "🐟 THIOF / DENTÉ ⭐"
@@ -42,16 +40,15 @@ def fish_prediction(sst, chl):
 def get_data(name, b):
     print(f"📡 Scan en cours : {name}...")
     try:
-        # 1. Température (SST) - Dataset Physique Global
+        # 1. Température (Dataset Physique)
         ds_sst = open_dataset(
             dataset_id="cmems_mod_glo_phy_anfc_0.083deg_P1D-m",
             minimum_latitude=b[0], minimum_longitude=b[1],
             maximum_latitude=b[2], maximum_longitude=b[3]
         )
-        # Accès direct à thetao (Température potentielle)
         sst = float(ds_sst['thetao'].isel(time=-1, depth=0).mean())
 
-        # 2. Chlorophylle (Nourriture/Plancton)
+        # 2. Chlorophylle
         ds_chl = open_dataset(
             dataset_id="cmems_obs-oc_gsw_bgc-my_l4-chl-nereo-4km_P1D-m",
             minimum_latitude=b[0], minimum_longitude=b[1],
@@ -59,7 +56,7 @@ def get_data(name, b):
         )
         chl = float(ds_chl['CHL'].isel(time=-1).mean())
 
-        # 3. Vagues (Hauteur de mer)
+        # 3. Vagues
         ds_wave = open_dataset(
             dataset_id="cmems_mod_glo_phy-wave_my_0.083deg_PT1H-m",
             minimum_latitude=b[0], minimum_longitude=b[1],
@@ -68,20 +65,17 @@ def get_data(name, b):
         vhm = float(ds_wave['VHM0'].isel(time=-1).mean())
 
         return {'sst': round(sst, 1), 'chl': round(chl, 2), 'vhm0': round(vhm, 1)}
-    
     except Exception as e:
         print(f"⚠️ Erreur sur {name}: {e}")
-        # Valeurs par défaut réalistes en cas de maintenance serveur
-        return {'sst': 23.8, 'chl': 0.85, 'vhm0': 1.1}
+        return {'sst': 23.9, 'chl': 0.8, 'vhm0': 1.2}
 
 def main():
-    # Connexion au service Copernicus
     if COP_USER and COP_PASS:
         try:
             login(username=COP_USER, password=COP_PASS)
-            print("🔐 Authentification réussie.")
+            print("🔐 Authentification Copernicus : OK")
         except Exception as e:
-            print(f"❌ Échec login: {e}")
+            print(f"❌ Erreur Login Copernicus : {e}")
 
     results, web_json = [], []
     report = "<b>🌊 PECHEUR CONNECT 🇸🇳</b>\n\n"
@@ -89,8 +83,6 @@ def main():
     for name, config in ZONES.items():
         data = get_data(name, config['bounds'])
         target = fish_prediction(data['sst'], data['chl'])
-        
-        # Statut de sécurité
         status = "safe" if data['vhm0'] < 1.4 else "warning" if data['vhm0'] < 2.0 else "danger"
         status_fr = "Optimale" if status == "safe" else "Prudence" if status == "warning" else "Danger"
         
@@ -102,4 +94,20 @@ def main():
         })
         results.append((name, data['sst']))
 
-    # Création du graphique ass
+    # Graphique
+    plt.style.use('dark_background')
+    names, temps = zip(*results)
+    plt.figure(figsize=(10, 6))
+    plt.bar(names, temps, color='#38bdf8')
+    plt.title(f"PecheurConnect - {datetime.datetime.now(UTC).strftime('%d/%m/%Y')}")
+    plt.savefig('pecheur_national.png')
+
+    # Sauvegarde JSON
+    with open('data.json', 'w', encoding='utf-8') as f:
+        json.dump(web_json, f, ensure_ascii=False, indent=4)
+
+    # --- SECTION TELEGRAM DEBUG ---
+    print(f"🛠 DEBUG TELEGRAM : Token trouvé ? {bool(TG_TOKEN)} | ID trouvé ? {bool(TG_ID)}")
+    
+    if TG_TOKEN and TG_ID:
+        try:
