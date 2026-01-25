@@ -9,23 +9,23 @@ import matplotlib.pyplot as plt
 import requests
 from copernicusmarine import login, open_dataset
 
-# Désactiver les avertissements pour une console propre
+# Désactivation des warnings inutiles
 warnings.filterwarnings("ignore")
 
-# Compatibilité UTC
+# Gestion du fuseau horaire UTC pour 2026
 try:
     from datetime import UTC
 except ImportError:
     from datetime import timezone
     UTC = timezone.utc
 
-# 🔐 SECRETS (GitHub Actions)
+# 🔐 RÉCUPÉRATION DES SECRETS
 TG_TOKEN = os.getenv('TG_TOKEN', '').strip()
 TG_ID = os.getenv('TG_ID', '').strip()
 COP_USER = os.getenv('COPERNICUS_USERNAME', '').strip()
 COP_PASS = os.getenv('COPERNICUS_PASSWORD', '').strip()
 
-# 📍 ZONES DE PÊCHE (Sénégal)
+# 📍 ZONES SÉNÉGAL (Lat/Lon)
 ZONES = {
     "SAINT-LOUIS": {"bounds": [15.8, -16.7, 16.2, -16.3]},
     "DAKAR-YOFF":  {"bounds": [14.6, -17.6, 14.8, -17.4]},
@@ -34,24 +34,24 @@ ZONES = {
 }
 
 def fish_prediction(sst, chl):
-    """Logique d'aide à la décision pour PecheurConnect"""
-    if 24 <= sst <= 28 and chl > 0.8: return "🐟 THON / ESPADON ⭐⭐⭐"
+    """Logique d'aide à la décision halieutique"""
+    if 24 <= sst <= 27 and chl > 0.8: return "🐟 THON / ESPADON ⭐⭐⭐"
     if chl > 1.2: return "🐟 SARDINES / YABOOY ⭐⭐"
     return "🐟 THIOF / DENTÉ ⭐"
 
 def get_data(name, b):
     print(f"📡 Scan en cours : {name}...")
     try:
-        # 1. Température (SST) - Utilisation de la syntaxe par clé ['thetao']
+        # 1. Température (SST) - Dataset Physique Global
         ds_sst = open_dataset(
-            dataset_id="cmems_mod_glo_phy-cur_anfc_0.083deg_P1D-m",
+            dataset_id="cmems_mod_glo_phy_anfc_0.083deg_P1D-m",
             minimum_latitude=b[0], minimum_longitude=b[1],
             maximum_latitude=b[2], maximum_longitude=b[3]
         )
-        # On sélectionne le dernier pas de temps et la surface (depth=0)
+        # Accès direct à thetao (Température potentielle)
         sst = float(ds_sst['thetao'].isel(time=-1, depth=0).mean())
 
-        # 2. Chlorophylle (Nourriture des poissons)
+        # 2. Chlorophylle (Nourriture/Plancton)
         ds_chl = open_dataset(
             dataset_id="cmems_obs-oc_gsw_bgc-my_l4-chl-nereo-4km_P1D-m",
             minimum_latitude=b[0], minimum_longitude=b[1],
@@ -59,7 +59,7 @@ def get_data(name, b):
         )
         chl = float(ds_chl['CHL'].isel(time=-1).mean())
 
-        # 3. Vagues (Hauteur significative en mètres)
+        # 3. Vagues (Hauteur de mer)
         ds_wave = open_dataset(
             dataset_id="cmems_mod_glo_phy-wave_my_0.083deg_PT1H-m",
             minimum_latitude=b[0], minimum_longitude=b[1],
@@ -71,11 +71,11 @@ def get_data(name, b):
     
     except Exception as e:
         print(f"⚠️ Erreur sur {name}: {e}")
-        # Valeur de secours si la variable n'est pas encore publiée pour aujourd'hui
-        return {'sst': 24.2, 'chl': 0.78, 'vhm0': 1.1}
+        # Valeurs par défaut réalistes en cas de maintenance serveur
+        return {'sst': 23.8, 'chl': 0.85, 'vhm0': 1.1}
 
 def main():
-    # Authentification Copernicus
+    # Connexion au service Copernicus
     if COP_USER and COP_PASS:
         try:
             login(username=COP_USER, password=COP_PASS)
@@ -90,7 +90,7 @@ def main():
         data = get_data(name, config['bounds'])
         target = fish_prediction(data['sst'], data['chl'])
         
-        # Statut de sécurité mer
+        # Statut de sécurité
         status = "safe" if data['vhm0'] < 1.4 else "warning" if data['vhm0'] < 2.0 else "danger"
         status_fr = "Optimale" if status == "safe" else "Prudence" if status == "warning" else "Danger"
         
@@ -102,29 +102,4 @@ def main():
         })
         results.append((name, data['sst']))
 
-    # Création du graphique national
-    plt.style.use('dark_background')
-    names, temps = zip(*results)
-    plt.figure(figsize=(10, 6))
-    plt.bar(names, temps, color='#38bdf8')
-    plt.axhline(y=25, color='red', linestyle='--', alpha=0.3, label='Seuil Thon')
-    plt.title(f"Températures de Surface - {datetime.datetime.now(UTC).strftime('%d/%m/%Y')}")
-    plt.legend()
-    plt.savefig('pecheur_national.png')
-
-    # Export des données JSON pour index.html
-    with open('data.json', 'w', encoding='utf-8') as f:
-        json.dump(web_json, f, ensure_ascii=False, indent=4)
-
-    # Notification Telegram
-    if TG_TOKEN and TG_ID:
-        try:
-            url = f"https://api.telegram.org/bot{TG_TOKEN}/sendPhoto"
-            requests.post(url, data={"chat_id": TG_ID, "caption": report, "parse_mode": "HTML"}, 
-                          files={"photo": open('pecheur_national.png', 'rb')})
-            print("📲 Notification Telegram envoyée.")
-        except:
-            print("❌ Erreur d'envoi Telegram.")
-
-if __name__ == "__main__":
-    main()
+    # Création du graphique ass
