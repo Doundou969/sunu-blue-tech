@@ -7,101 +7,96 @@
     <style>
         :root { --bg: #0f172a; --card: #1e293b; --accent: #38bdf8; --text: #f8fafc; }
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 15px; }
-        .container { max-width: 800px; margin: auto; background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        h1 { color: var(--accent); margin-top: 0; font-size: 1.5rem; text-align: center; }
+        .container { max-width: 600px; margin: auto; background: var(--card); padding: 20px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        h1 { color: var(--accent); margin: 0; font-size: 1.6rem; text-align: center; }
+        .subtitle { text-align: center; color: #94a3b8; font-size: 0.9rem; margin-bottom: 20px; }
         
-        .update-box { font-size: 0.85rem; color: #94a3b8; text-align: center; margin-bottom: 20px; padding: 8px; background: rgba(255,255,255,0.05); border-radius: 8px; }
+        .update-box { font-size: 0.8rem; color: #38bdf8; text-align: center; padding: 10px; background: rgba(56, 189, 248, 0.1); border-radius: 8px; margin-bottom: 20px; }
         
-        .chart-container { margin: 20px 0; border: 1px solid #334155; border-radius: 12px; overflow: hidden; background: #000; }
-        img { width: 100%; display: block; height: auto; }
+        .chart-container { margin-bottom: 25px; border-radius: 12px; overflow: hidden; border: 1px solid #334155; }
+        img { width: 100%; display: block; height: auto; background: #000; }
         
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { text-align: left; font-size: 0.8rem; text-transform: uppercase; color: var(--accent); padding: 10px; border-bottom: 2px solid #334155; }
-        td { padding: 12px 10px; border-bottom: 1px solid #334155; font-size: 0.95rem; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; padding: 10px; border-bottom: 1px solid #334155; }
+        td { padding: 15px 10px; border-bottom: 1px solid #334155; font-size: 0.95rem; }
         
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
         .safe { background: #16a34a; color: white; }
-        .warning { background: #ca8a04; color: white; }
+        .warning { background: #eab308; color: #000; }
         .danger { background: #dc2626; color: white; }
-        
-        .loading { text-align: center; padding: 20px; color: var(--accent); font-style: italic; }
-        .error-msg { color: #ef4444; background: rgba(239, 68, 68, 0.1); padding: 10px; border-radius: 8px; display: none; }
+
+        .loading { text-align: center; padding: 30px; color: #64748b; font-style: italic; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>🇸🇳 PecheurConnect</h1>
+    <p class="subtitle">Analyse des côtes sénégalaises</p>
+
     <div class="update-box">
-        Données Satellites Copernicus <br>
-        Mise à jour : <span id="timestamp">En attente...</span>
+        🔄 Mis à jour le : <span id="timestamp">Chargement...</span>
     </div>
 
-    <div id="error-banner" class="error-msg"></div>
-
     <div class="chart-container">
-        <img id="main-chart" src="pecheur_national.png" alt="Graphique de la côte">
+        <img id="main-chart" src="pecheur_national.png" alt="Graphique National">
     </div>
 
     <table>
         <thead>
             <tr>
                 <th>Zone</th>
-                <th>Prédiction</th>
+                <th>Prédiction (T°)</th>
                 <th>Mer</th>
             </tr>
         </thead>
         <tbody id="data-table">
-            <tr><td colspan="3" class="loading">📡 Connexion aux serveurs Copernicus...</td></tr>
+            <tr><td colspan="3" class="loading">📡 Synchronisation avec Copernicus...</td></tr>
         </tbody>
     </table>
 
-    <div style="text-align: center; margin-top: 25px;">
-        <a href="https://t.me/VOTRE_BOT" style="color: var(--accent); text-decoration: none; font-size: 0.9rem;">📱 Recevoir les alertes sur Telegram</a>
-    </div>
+    <p style="font-size: 0.7rem; color: #64748b; text-align: center; margin-top: 20px;">
+        Données : Copernicus Marine Service | Plateforme : PecheurConnect
+    </p>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const timestampElement = document.getElementById('timestamp');
         const tableBody = document.getElementById('data-table');
-        const errorBanner = document.getElementById('error-banner');
+        const timestampElement = document.getElementById('timestamp');
         const mainChart = document.getElementById('main-chart');
+        
+        // On génère un identifiant unique pour forcer le rafraîchissement (Cache Busting)
+        const version = Math.floor(Math.random() * 100000);
 
-        // 1. Rafraîchir l'image (évite le cache GitHub)
-        const cacheBuster = "?t=" + new Date().getTime();
-        mainChart.src = mainChart.src + cacheBuster;
+        // Mise à jour de l'image
+        mainChart.src = "pecheur_national.png?v=" + version;
 
-        // 2. Charger les données JSON
-        fetch('data.json' + cacheBuster)
+        // Récupération des données JSON
+        fetch('data.json?v=' + version)
             .then(response => {
-                if (!response.ok) throw new Error("Le fichier de données est introuvable (404).");
+                if (!response.ok) throw new Error("Erreur de chargement");
                 return response.json();
             })
             .then(data => {
-                tableBody.innerHTML = ""; // Vider le message de chargement
-                timestampElement.innerText = new Date().toLocaleString('fr-FR');
-
-                if (data.length === 0) {
-                    tableBody.innerHTML = "<tr><td colspan='3'>Aucune donnée disponible.</td></tr>";
-                    return;
-                }
+                tableBody.innerHTML = ""; // On vide le message de chargement
+                timestampElement.innerText = new Date().toLocaleString('fr-FR', {
+                    day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+                });
 
                 data.forEach(item => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td><strong>${item.zone}</strong></td>
-                        <td>${item.target}<br><small>${item.temp}°C</small></td>
-                        <td><span class="badge ${item.status}">${item.status_fr}</span></td>
-                    `;
-                    tableBody.innerHTML += row.outerHTML;
+                    const row = `
+                        <tr>
+                            <td><strong>${item.zone}</strong></td>
+                            <td>${item.target}<br><small>${item.temp}°C</small></td>
+                            <td><span class="badge ${item.status}">${item.status_fr}</span></td>
+                        </tr>`;
+                    tableBody.innerHTML += row;
                 });
             })
             .catch(err => {
                 console.error(err);
-                tableBody.innerHTML = "<tr><td colspan='3'>❌ Erreur de données</td></tr>";
-                errorBanner.style.display = "block";
-                errorBanner.innerText = "⚠️ Impossible de charger les prédictions. Vérifiez que GitHub Actions a bien tourné.";
+                tableBody.innerHTML = "<tr><td colspan='3' style='color:#ef4444; text-align:center;'>⚠️ Données temporairement indisponibles</td></tr>";
             });
     });
 </script>
