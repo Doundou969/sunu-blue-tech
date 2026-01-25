@@ -4,27 +4,31 @@
         "target": "🐟 THIOF / SARDINELLE ⭐⭐⭐",
         "temp": 17.9,
         "status": "safe",
-        "status_fr": "Optimale"
+        "status_fr": "Optimale",
+        "vhm": 1.2
     },
     {
         "zone": "DAKAR-YOFF",
         "target": "🐟 THIOF / SARDINELLE ⭐⭐⭐",
         "temp": 19.7,
         "status": "safe",
-        "status_fr": "Optimale"
+        "status_fr": "Optimale",
+        "vhm": 1.2
     },
     {
         "zone": "MBOUR-JOAL",
         "target": "🐟 THIOF / SARDINELLE ⭐⭐⭐",
         "temp": 20.3,
         "status": "safe",
-        "status_fr": "Optimale"
+        "status_fr": "Optimale",
+        "vhm": 1.2
     },
     {
         "zone": "CASAMANCE",
         "target": "🐟 THON / ESPADON ⭐⭐⭐",
         "temp": 24.0,
         "status": "safe",
-        "status_fr": "Optimale"
+        "status_fr": "Optimale",
+        "vhm": 1.2
     }
 ]
