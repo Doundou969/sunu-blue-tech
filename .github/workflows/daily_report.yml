@@ -1,36 +1,42 @@
-name: Sunu-Blue-Tech Auto
+name: PecheurConnect Coastal Tracker
 
 on:
   schedule:
-    # 5h00 UTC (10h Dakar) et 15h00 UTC (20h Dakar)
-    - cron: '0 5 * * *'
-    - cron: '0 15 * * *'
-  workflow_dispatch:  # Manuel
+    - cron: '0 0,12 * * *' # S'exécute à Minuit et Midi UTC
+  workflow_dispatch:      # Permet de lancer manuellement pour tester
 
 jobs:
-  run-script:
+  build-and-run:
     runs-on: ubuntu-latest
-    
+
     steps:
-      - name: Récupérer le code
-        uses: actions/checkout@v4
+      - name: 📂 Checkout du code
+        uses: actions/checkout@v3
 
-      - name: Installer Python
-        uses: actions/setup-python@v5
+      - name: 🐍 Installation de Python
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.12'
+          python-version: '3.10'
 
-      - name: Installer les bibliothèques
+      - name: 📦 Installation des dépendances scientifiques
         run: |
-          pip install --upgrade pip
-          if [ -f requirements.txt ]; then
-            pip install -r requirements.txt
-          fi
+          python -m pip install --upgrade pip
+          # On installe les bibliothèques de calcul en plus des vôtres
+          pip install numpy matplotlib requests copernicusmarine xarray netCDF4 dask
 
-      - name: Lancer le script de pêche
+      - name: 🚀 Exécution du script PecheurConnect
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_ID: ${{ secrets.TG_ID }}
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
-        run: python script_peche.py
+        run: python ton_nom_de_script.py  # <-- Remplace par le nom exact de ton fichier .py
+
+      - name: 📊 Sauvegarde de l'historique CSV
+        run: |
+          git config --global user.name "PecheurConnect-Bot"
+          git config --global user.email "bot@pecheurconnect.sn"
+          git add pecheur_coast_history.csv
+          # On commit seulement s'il y a des changements pour éviter les erreurs
+          git commit -m "📊 Update Coast Data: $(date +'%Y-%m-%d %H:%M')" || echo "No changes to commit"
+          git push
