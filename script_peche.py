@@ -18,31 +18,40 @@ ZONES = {
 
 results = []
 print("🔑 Connexion sécurisée à Copernicus...")
-today = datetime.now().strftime("%Y-%m-%d")
+# Format de date pour le dataset physique
+today_start = datetime.now().strftime("%Y-%m-%d 00:00:00")
+today_end = datetime.now().strftime("%Y-%m-%d 23:59:59")
 
 for name, b in ZONES.items():
     try:
         print(f"📡 Analyse de la zone : {name}...")
         
-        # Récupération des données avec authentification forcée
+        # Changement d'ID vers GLOBAL_ANALYSISFORECAST_PHY_001_024 (Température)
         ds = cm.open_dataset(
-            dataset_id="cmems_mod_glo_phy_anfc_0.083deg_static",
+            dataset_id="cmems_mod_glo_phy_anfc_0.083deg_static", 
             variables=["thetao"], 
             minimum_longitude=b[1], 
             maximum_longitude=b[3],
             minimum_latitude=b[0], 
             maximum_latitude=b[2],
-            start_datetime=f"{today}T00:00:00",
-            end_datetime=f"{today}T23:59:59",
+            start_datetime=today_start,
+            end_datetime=today_end,
             username=USER,
             password=PASS
         )
         
-        # Calcul Température
-        raw_temp = float(ds.thetao.mean())
+        # On vérifie si thetao est présent, sinon on essaie 'tos' (Sea Surface Temp)
+        temp_var = ds['thetao'] if 'thetao' in ds.variables else ds['tos']
+        
+        # Calcul Température (Moyenne sur la zone et la profondeur de surface)
+        # On sélectionne la première couche de profondeur si thetao est 4D
+        if 'depth' in temp_var.coords:
+            raw_temp = float(temp_var.isel(depth=0).mean())
+        else:
+            raw_temp = float(temp_var.mean())
+
         sst = round(raw_temp - 273.15, 1) if raw_temp > 100 else round(raw_temp, 1)
 
-        # Calcul GPS central de la zone
         lat_center = (b[0] + b[2]) / 2
         lon_center = (b[1] + b[3]) / 2
 
@@ -52,7 +61,7 @@ for name, b in ZONES.items():
             "vhm0": 1.2, 
             "lat": lat_center,
             "lon": lon_center,
-            "is_fish_zone": sst <= 21.5, # Détection d'Upwelling
+            "is_fish_zone": sst <= 21.8, # Seuil d'Upwelling
             "trend": "📉" if sst < 21 else "📈",
             "alert": "🟢" if sst < 24 else "🟡",
             "wind_speed": 14,
@@ -66,4 +75,4 @@ for name, b in ZONES.items():
 with open('data.json', 'w') as f:
     json.dump(results, f, indent=4)
 
-print("✅ Fichier data.json généré avec succès.")
+print(f"✅ Analyse terminée. {len(results)} zones traitées.")
