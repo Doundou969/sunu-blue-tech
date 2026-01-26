@@ -70,14 +70,8 @@
     </footer>
 
     <script>
-        // Détection du chemin pour éviter les erreurs 404 sur GitHub Pages
-        const getBasePath = () => {
-            const path = window.location.pathname;
-            if (path.endsWith('.html')) {
-                return path.substring(0, path.lastIndexOf('/') + 1);
-            }
-            return path.endsWith('/') ? path : path + '/';
-        };
+        // FORÇAGE DU CHEMIN ABSOLU POUR GITHUB PAGES (CORRECTION 404)
+        const DATA_URL = "https://doundou969.github.io/sunu-blue-tech/data.json";
 
         const map = L.map('map', { tap: false, zoomControl: false }).setView([14.5, -17.2], 7);
         L.control.zoom({ position: 'bottomright' }).addTo(map);
@@ -92,8 +86,8 @@
         async function updateDashboard() {
             const container = document.getElementById('dashboard');
             try {
-                // Fetch direct à la racine du projet
-                const response = await fetch(getBasePath() + 'data.json?t=' + Date.now());
+                // Utilisation de l'URL absolue pour tuer l'erreur 404
+                const response = await fetch(DATA_URL + '?t=' + Date.now());
                 if (!response.ok) throw new Error();
                 
                 const data = await response.json();
@@ -114,7 +108,7 @@
                                 <span class="text-sm ml-1">${item.trend}</span>
                             </div>
                             <div class="text-right">
-                                <p class="text-[8px] text-slate-500 font-black uppercase tracking-widest">Houle</p>
+                                <p class="text-[8px] text-slate-500 font-black uppercase">Houle</p>
                                 <p class="text-xl font-bold ${isDanger ? 'text-red-500' : 'text-emerald-400'}">${item.vhm0}m</p>
                             </div>
                         </div>
@@ -129,11 +123,11 @@
                         L.circleMarker(zonesCoords[item.zone], {
                             radius: 10, fillColor: isDanger ? '#ef4444' : '#0ea5e9',
                             color: "#fff", weight: 2, fillOpacity: 0.9
-                        }).addTo(map).bindPopup(`<b>${item.zone}</b>: ${item.temp}°C`);
+                        }).addTo(map);
                     }
                 });
             } catch (err) {
-                container.innerHTML = '<p class="col-span-full text-center text-slate-500 text-[10px] p-10 font-bold uppercase tracking-widest">En attente des satellites...</p>';
+                container.innerHTML = '<p class="col-span-full text-center text-slate-500 text-[10px] p-10 font-bold uppercase tracking-widest italic">En attente des satellites... (Vérifiez votre connexion)</p>';
             }
         }
 
