@@ -26,36 +26,32 @@ def send_telegram(message):
     except: pass
 
 results = []
-print(f"🚀 Démarrage PecheurConnect - {datetime.now()}")
+print(f"🚀 Démarrage PecheurConnect IBI - {datetime.now()}")
 
-# ID SPÉCIFIQUE POUR LA TEMPÉRATURE (GLOBAL OCEAN ANALYSIS FORECAST)
-DATASET_ID = "cmems_mod_glo_phy_anfc_0.083deg_PT1H-m"
-
-# On récupère la date d'hier pour être sûr que les données sont déjà traitées
-date_target = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+# NOUVEL ID : Spécifique zone Atlantique (Pas de conflit Bathy)
+DATASET_ID = "cmems_mod_ibi_phy_anfc_0.027deg-3D_static"
 
 for name, b in ZONES.items():
     try:
-        print(f"📡 Analyse Thermique : {name}...")
+        print(f"📡 Analyse Thermique IBI : {name}...")
         
-        # Ouverture du dataset PHYSIQUE uniquement
+        # On utilise une sélection directe par variable pour forcer Copernicus
         ds = cm.open_dataset(
             dataset_id=DATASET_ID,
-            minimum_longitude=b[1],
-            maximum_longitude=b[3],
-            minimum_latitude=b[0],
-            maximum_latitude=b[2],
-            start_datetime=f"{date_target}T12:00:00",
-            end_datetime=f"{date_target}T12:00:00",
+            variables=["thetao"],
             username=USER,
             password=PASS
         )
         
-        # Extraction de thetao (Température)
-        # On prend la première couche (surface)
-        temp_val = ds['thetao'].isel(depth=0).mean().values
-        
-        raw_temp = float(temp_val)
+        # Découpage précis
+        subset = ds.sel(
+            longitude=slice(b[1], b[3]), 
+            latitude=slice(b[0], b[2]),
+            depth=0,
+            method="nearest"
+        )
+            
+        raw_temp = float(subset['thetao'].mean())
         sst = round(raw_temp - 273.15, 1) if raw_temp > 100 else round(raw_temp, 1)
         
         lat_c = (b[0] + b[2]) / 2
@@ -68,14 +64,14 @@ for name, b in ZONES.items():
         })
 
         if is_fish:
-            msg = f"🐟 <b>ZONE DE POISSON DÉTECTÉE !</b>\n📍 Secteur: {name}\n🌡️ Temp: {sst}°C\n⚓ Coordonnées: {lat_c:.3f}, {lon_c:.3f}\n\n<i>Logiciel PecheurConnect 🇸🇳</i>"
+            msg = f"🐟 <b>POISSON DÉTECTÉ à {name} !</b>\n🌡️ Temp: {sst}°C\n📍 GPS: {lat_c:.3f}, {lon_c:.3f}"
             send_telegram(msg)
-            print(f"✅ Alerte envoyée pour {name}")
+            print(f"✅ Telegram envoyé pour {name}")
 
     except Exception as e:
-        print(f"❌ Erreur {name}: {e}")
+        print(f"❌ Erreur sur {name}: {e}")
 
-# Sauvegarde pour le site
+# Sauvegarde forcée
 with open('data.json', 'w') as f:
     json.dump(results, f, indent=4)
 
