@@ -16,14 +16,14 @@ jobs:
       - name: Install Tools
         run: pip install copernicusmarine xarray netCDF4 requests
 
-      - name: Download Data
+      - name: Download Data via Subset
         env:
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
         run: |
-          copernicusmarine get \
+          copernicusmarine subset \
             --dataset-id cmems_mod_glo_phy_anfc_0.083deg_static \
-            --variables thetao \
+            -v thetao \
             --longitude-min -18 --longitude-max -16 \
             --latitude-min 12 --latitude-max 17 \
             --output-directory . --output-filename data.nc \
@@ -42,5 +42,5 @@ jobs:
           git config --global user.name "Bot"
           git config --global user.email "bot@pecheurconnect.sn"
           git add data.json
-          git commit -m "Update" || exit 0
+          git commit -m "Update satellite data" || exit 0
           git push
