@@ -2,7 +2,7 @@ import copernicusmarine as cm
 import json
 import os
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Secrets GitHub
 USER = os.getenv('COPERNICUS_USERNAME')
@@ -10,7 +10,6 @@ PASS = os.getenv('COPERNICUS_PASSWORD')
 TEL_TOKEN = os.getenv('TELEGRAM_TOKEN')
 TEL_ID = os.getenv('TELEGRAM_CHAT_ID')
 
-# Zones Sénégal
 ZONES = {
     "SAINT-LOUIS": [15.8, -17.2, 16.5, -16.3],
     "KAYAR": [14.7, -17.5, 15.2, -16.9],
@@ -29,32 +28,33 @@ def send_telegram(message):
 results = []
 print(f"🚀 Démarrage PecheurConnect - {datetime.now()}")
 
-# ID CORRECT : Analyse Physique Globale (Mise à jour quotidienne)
-DATASET_ID = "cmems_mod_glo_phy_anfc_0.083deg_static"
+# ID SPÉCIFIQUE POUR LA TEMPÉRATURE (GLOBAL OCEAN ANALYSIS FORECAST)
+DATASET_ID = "cmems_mod_glo_phy_anfc_0.083deg_PT1H-m"
+
+# On récupère la date d'hier pour être sûr que les données sont déjà traitées
+date_target = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
 
 for name, b in ZONES.items():
     try:
-        print(f"📡 Analyse Satellite : {name}...")
+        print(f"📡 Analyse Thermique : {name}...")
         
-        # On force la sélection des coordonnées avant de charger les variables
+        # Ouverture du dataset PHYSIQUE uniquement
         ds = cm.open_dataset(
             dataset_id=DATASET_ID,
+            minimum_longitude=b[1],
+            maximum_longitude=b[3],
+            minimum_latitude=b[0],
+            maximum_latitude=b[2],
+            start_datetime=f"{date_target}T12:00:00",
+            end_datetime=f"{date_target}T12:00:00",
             username=USER,
             password=PASS
         )
         
-        # On découpe la zone et on cherche spécifiquement la Température Potentielle
-        # On essaie d'abord 'thetao' (3D) puis 'tos' (2D Surface)
-        subset = ds.sel(longitude=slice(b[1], b[3]), latitude=slice(b[0], b[2]))
+        # Extraction de thetao (Température)
+        # On prend la première couche (surface)
+        temp_val = ds['thetao'].isel(depth=0).mean().values
         
-        if 'thetao' in subset.variables:
-            # On prend la surface (profondeur la plus proche de 0)
-            temp_val = subset['thetao'].isel(depth=0).mean().values
-        elif 'tos' in subset.variables:
-            temp_val = subset['tos'].mean().values
-        else:
-            raise ValueError(f"Variables disponibles: {list(subset.variables)}")
-
         raw_temp = float(temp_val)
         sst = round(raw_temp - 273.15, 1) if raw_temp > 100 else round(raw_temp, 1)
         
@@ -68,8 +68,9 @@ for name, b in ZONES.items():
         })
 
         if is_fish:
-            msg = f"🐟 <b>POISSON DÉTECTÉ à {name} !</b>\n🌡️ Temp: {sst}°C\n📍 GPS: {lat_c:.3f}, {lon_c:.3f}"
+            msg = f"🐟 <b>ZONE DE POISSON DÉTECTÉE !</b>\n📍 Secteur: {name}\n🌡️ Temp: {sst}°C\n⚓ Coordonnées: {lat_c:.3f}, {lon_c:.3f}\n\n<i>Logiciel PecheurConnect 🇸🇳</i>"
             send_telegram(msg)
+            print(f"✅ Alerte envoyée pour {name}")
 
     except Exception as e:
         print(f"❌ Erreur {name}: {e}")
