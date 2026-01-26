@@ -23,7 +23,7 @@ jobs:
         run: |
           copernicusmarine get \
             --dataset-id cmems_mod_glo_phy_anfc_0.083deg_static \
-            --variable thetao \
+            --variables thetao \
             --longitude-min -18 --longitude-max -16 \
             --latitude-min 12 --latitude-max 17 \
             --output-directory . --output-filename data.nc \
