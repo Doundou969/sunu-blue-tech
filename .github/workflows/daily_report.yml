@@ -2,34 +2,44 @@ name: Mise à jour PecheurConnect
 
 on:
   schedule:
-    - cron: '0 */6 * * *' # S'exécute toutes les 6h
-  workflow_dispatch: # Permet de lancer manuellement
+    - cron: '0 */6 * * *' # S'exécute automatiquement toutes les 6 heures
+  workflow_dispatch:      # Permet de lancer la mise à jour manuellement (bouton "Run workflow")
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    
+    # Autorise l'Action à modifier les fichiers (indispensable pour mettre à jour data.json)
+    permissions:
+      contents: write
+
     steps:
-      - name: Checkout code
+      - name: 📥 Récupération du code
         uses: actions/checkout@v3
 
-      - name: Setup Python
+      - name: 🐍 Installation de Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
-        run: pip install copernicusmarine
+      - name: 📦 Installation des dépendances
+        run: |
+          pip install copernicusmarine requests pandas
 
-      - name: Run script
+      - name: 📡 Exécution du Radar Satellite & Alertes
         env:
+          # Injection des secrets configurés dans GitHub Settings
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python script_peche.py
 
-      - name: Commit and Push
+      - name: 🔄 Mise à jour du site (Push data.json)
         run: |
-          git config --global user.name "Github Action"
-          git config --global user.email "action@github.com"
+          git config --global user.name "PecheurConnect-Bot"
+          git config --global user.email "bot@pecheurconnect.sn"
           git add data.json
-          git commit -m "Update marine data" || exit 0
+          # Commit seulement s'il y a des changements pour éviter les erreurs
+          git commit -m "Mise à jour des zones de pêche : $(date +'%Y-%m-%d %H:%M')" || exit 0
           git push
