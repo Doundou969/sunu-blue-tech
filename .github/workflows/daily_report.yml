@@ -1,33 +1,47 @@
-name: Mise à jour PecheurConnect
+name: PecheurConnect-Runner
 
 on:
-  workflow_dispatch:
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '0 */6 * * *' # Je l'ai passé à toutes les 6h pour plus de précision pour les pêcheurs
+  workflow_dispatch:      # Permet le lancement manuel
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write     # TRÈS IMPORTANT : Autorise GitHub à enregistrer data.json
+
     steps:
-      - uses: actions/checkout@v3
+      - name: 📂 Récupération du code
+        uses: actions/checkout@v3
 
-      - name: Installation
-        run: pip install copernicusmarine requests xarray netCDF4
+      - name: 🐍 Installation de Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
 
-      - name: Radar Satellite
+      - name: 📦 Installation des dépendances
+        run: |
+          python -m pip install --upgrade pip
+          pip install numpy matplotlib requests xarray dask netCDF4 copernicusmarine --upgrade
+
+      - name: 🚀 Exécution de PecheurConnect
         env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_ID: ${{ secrets.TG_ID }}
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
-          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python script_peche.py
 
-      - name: Mise à jour Site
+      - name: 🌐 Déploiement des données
         run: |
-          git config --global user.name "Bot-Peche"
+          git config --global user.name "PecheurConnect-Bot"
           git config --global user.email "bot@pecheurconnect.sn"
           git add data.json
-          git commit -m "Update PecheurConnect $(date)" || exit 0
-          git push
+          # On vérifie s'il y a des changements avant de pousser
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "📊 Mise à jour : $(date +'%d-%m-%Y %H:%M')"
+            git push origin main
+          else
+            echo "Aucun changement détecté."
+          fi
