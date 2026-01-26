@@ -2,69 +2,50 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PecheurConnect 🇸🇳</title>
-    <link rel="icon" href="https://img.icons8.com/fluency/48/fish.png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        body { background: #020617; color: white; font-family: sans-serif; }
-        .glass-card { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.4); border-radius: 1.5rem; }
-        #map { height: 350px; border-radius: 1.5rem; border: 2px solid #1e293b; z-index: 10; }
-        .fish-marker { font-size: 24px; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); filter: drop-shadow(0 0 0px #0ea5e9); } 50% { transform: scale(1.2); filter: drop-shadow(0 0 10px #0ea5e9); } 100% { transform: scale(1); } }
+        #map { height: 400px; border-radius: 1rem; margin-bottom: 20px; }
+        .fish-icon { font-size: 24px; text-shadow: 0 0 10px rgba(14, 165, 233, 0.8); }
     </style>
 </head>
-<body class="p-4 max-w-4xl mx-auto">
-
-    <header class="text-center mb-6">
-        <h1 class="text-3xl font-black text-sky-400 italic">PECHEUR CONNECT 🇸🇳</h1>
-        <p class="text-[10px] text-slate-500 font-bold uppercase mt-1">Radar Satellite Copernicus</p>
-    </header>
-
-    <div id="map" class="mb-6 shadow-2xl"></div>
-
-    <div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-
-    <div class="mt-10 p-6 glass-card text-center bg-white/5 border-dashed border-sky-500/40">
-        <p class="text-[10px] font-black text-sky-400 mb-4 uppercase">Scannez pour partager</p>
-        <div class="flex justify-center bg-white p-2 rounded-2xl w-32 mx-auto">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://doundou969.github.io/sunu-blue-tech/" alt="QR">
-        </div>
-    </div>
+<body class="bg-slate-900 text-white p-4">
+    <h1 class="text-2xl font-bold text-sky-400 text-center mb-4">RADAR PECHE SÉNÉGAL 🇸🇳</h1>
+    <div id="map"></div>
+    <div id="cards" class="grid grid-cols-1 gap-4"></div>
 
     <script>
-        const DATA_URL = "https://doundou969.github.io/sunu-blue-tech/data.json";
-        const map = L.map('map', { tap: false, zoomControl: false }).setView([14.5, -17.2], 7);
+        const map = L.map('map').setView([14.5, -17.5], 7);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
-        async function update() {
-            try {
-                const res = await fetch(DATA_URL + '?v=' + Date.now());
-                const data = await res.json();
-                const container = document.getElementById('dashboard');
-                container.innerHTML = '';
+        async function loadData() {
+            const res = await fetch('data.json');
+            const data = await res.json();
+            const container = document.getElementById('cards');
 
-                data.forEach(item => {
-                    if (item.is_fish_zone) {
-                        const icon = L.divIcon({ html: '<div class="fish-marker">🐟</div>', className: 'd' });
-                        L.marker([item.lat, item.lon], { icon }).addTo(map).bindPopup(`<b>Zone de Pêche: ${item.zone}</b>`);
-                    }
+            data.forEach(item => {
+                // Ajouter sur la carte
+                if(item.is_fish_zone) {
+                    L.marker([item.lat, item.lon], {
+                        icon: L.divIcon({ html: '<div class="fish-icon">🐟</div>', className: 'none' })
+                    }).addTo(map).bindPopup(`Zone de pêche : ${item.zone}`);
+                }
 
-                    const card = document.createElement('div');
-                    card.className = 'glass-card p-5';
-                    card.innerHTML = `
-                        <div class="flex justify-between"><b>${item.zone}</b> <span>${item.is_fish_zone ? '🐟' : ''} ${item.alert}</span></div>
-                        <div class="text-3xl font-bold text-sky-400 mt-2">${item.temp}°C</div>
-                        <div class="text-[9px] text-slate-500 mt-1 uppercase font-bold">GPS: ${item.lat.toFixed(2)}, ${item.lon.toFixed(2)}</div>
-                    `;
-                    container.appendChild(card);
-                });
-            } catch (e) { console.error("Data pending..."); }
+                // Ajouter la carte d'info
+                container.innerHTML += `
+                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+                        <div class="flex justify-between font-bold">
+                            <span>${item.zone}</span>
+                            <span>${item.is_fish_zone ? '🐟' : ''} ${item.alert}</span>
+                        </div>
+                        <div class="text-3xl text-sky-400">${item.temp}°C</div>
+                    </div>
+                `;
+            });
         }
-        window.onload = update;
+        loadData();
     </script>
 </body>
 </html>
