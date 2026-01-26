@@ -1,43 +1,46 @@
 name: Mise à jour PecheurConnect
 
 on:
+  workflow_dispatch:
   schedule:
-    - cron: '0 */6 * * *' # S'exécute toutes les 6h
-  workflow_dispatch:      # Permet le lancement manuel
+    - cron: '0 */6 * * *'
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
-    # TRÈS IMPORTANT : Autorise la mise à jour de data.json sur ton dépôt
     permissions:
       contents: write
-
     steps:
-      - name: 📥 Récupération du code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: 🐍 Installation de Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
+      - name: Install Tools
+        run: pip install copernicusmarine xarray netCDF4 requests
 
-      - name: 📦 Installation des bibliothèques
-        run: |
-          pip install copernicusmarine requests
-
-      - name: 📡 Lancement du Script (Radar & Telegram)
+      - name: Download Data
         env:
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
+        run: |
+          copernicusmarine get \
+            --dataset-id cmems_mod_glo_phy_anfc_0.083deg_static \
+            --variable thetao \
+            --longitude-min -18 --longitude-max -16 \
+            --latitude-min 12 --latitude-max 17 \
+            --output-directory . --output-filename data.nc \
+            --username "$COPERNICUS_USERNAME" \
+            --password "$COPERNICUS_PASSWORD" \
+            --force-download
+
+      - name: Process and Alert
+        env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python script_peche.py
 
-      - name: 🔄 Publication des données sur le site
+      - name: Deploy
         run: |
-          git config --global user.name "PecheurConnect-Bot"
+          git config --global user.name "Bot"
           git config --global user.email "bot@pecheurconnect.sn"
           git add data.json
-          # Ne fait un commit que s'il y a des changements réels
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Mise à jour satellite : $(date +'%Y-%m-%d %H:%M')" && git push)
+          git commit -m "Update" || exit 0
+          git push
