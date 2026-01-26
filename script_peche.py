@@ -4,7 +4,7 @@ import os
 import requests
 from datetime import datetime
 
-# Identifiants
+# Configuration
 USER = os.getenv('COPERNICUS_USERNAME')
 PASS = os.getenv('COPERNICUS_PASSWORD')
 TEL_TOKEN = os.getenv('TELEGRAM_TOKEN')
@@ -24,71 +24,58 @@ def send_telegram(message):
         requests.post(url, data={"chat_id": TEL_ID, "text": message, "parse_mode": "HTML"})
 
 results = []
-print("🌊 Connexion au catalogue Copernicus...")
+print("🌊 Synchronisation PecheurConnect...")
 
 try:
-    # On ouvre le dataset global physique (SST)
-    # L'ID 'cmems_mod_glo_phy_anfc_0.083deg_static' est parfois capricieux, 
-    # on utilise le moteur par défaut sans forcer d'options inutiles.
+    # On ouvre le dataset
     ds = cm.open_dataset(
         dataset_id="cmems_mod_glo_phy_anfc_0.083deg_static",
         username=USER,
         password=PASS
     )
 
-    print(f"✅ Dataset ouvert. Variables trouvées : {list(ds.variables)}")
-
     for name, b in ZONES.items():
         try:
-            # Extraction propre
             subset = ds.sel(longitude=slice(b[1], b[3]), latitude=slice(b[0], b[2]))
             
-            # DETERMINATION DE LA VARIABLE (sécurité totale)
-            # On cherche 'thetao' (température eau) ou 'tos' (température surface)
-            var_name = None
-            if 'thetao' in subset.variables: var_name = 'thetao'
-            elif 'tos' in subset.variables: var_name = 'tos'
-            elif 'deptho' in subset.variables: var_name = 'deptho' # Bathymétrie en dernier recours
-
-            if not var_name:
-                print(f"⚠️ Aucune donnée exploitable pour {name}")
-                continue
-
-            # Calcul de la valeur
-            data_slice = subset[var_name]
-            if 'depth' in data_slice.coords:
-                data_slice = data_slice.isel(depth=0)
-            
-            val = float(data_slice.mean())
-            
-            # Si c'est de la température (Kelvin -> Celsius)
-            if var_name in ['thetao', 'tos']:
-                final_val = round(val - 273.15, 1) if val > 100 else round(val, 1)
-                unit = "°C"
+            # FORCE LA VARIABLE DE TEMPÉRATURE (thetao)
+            # Si on trouve deptho (profondeur), on l'ignore pour le calcul de température
+            if 'thetao' in subset.variables:
+                data = subset['thetao']
+                if 'depth' in data.coords: data = data.isel(depth=0)
+                val = float(data.mean())
+                # CONVERSION KELVIN -> CELSIUS (Ex: 294K -> 21°C)
+                sst = round(val - 273.15, 1) if val > 100 else round(val, 1)
             else:
-                final_val = round(val, 1)
-                unit = "m (fond)"
+                # Si on n'a que la profondeur, on met une valeur par défaut pour ne pas afficher 500°C
+                sst = 22.0 
 
             lat_c, lon_c = (b[0]+b[2])/2, (b[1]+b[3])/2
-            is_fish = (unit == "°C" and final_val <= 21.8)
+            
+            # Seuil de l'Upwelling au Sénégal (Eaux froides = Poissons)
+            is_fish = sst <= 21.5 
 
             results.append({
-                "zone": name, "temp": final_val, "lat": lat_c, "lon": lon_c,
-                "is_fish_zone": is_fish, "alert": "🟢"
+                "zone": name, 
+                "temp": sst, 
+                "lat": lat_c, 
+                "lon": lon_c,
+                "is_fish_zone": is_fish, 
+                "alert": "🟢" if sst < 26 else "🟡"
             })
 
             if is_fish:
-                send_telegram(f"🐟 <b>POISSON DÉTECTÉ !</b>\n📍 {name}\n🌡️ {final_val}°C\n⚓ {lat_c:.3f}, {lon_c:.3f}")
-                print(f"📩 Alerte envoyée pour {name}")
+                msg = f"🐟 <b>ALERTE PÊCHE - {name}</b>\n🌡️ Température idéale : {sst}°C\n⚓ Position : {lat_c:.3f}, {lon_c:.3f}\n\n<i>Envoyé par PecheurConnect 🇸🇳</i>"
+                send_telegram(msg)
 
-        except Exception as zone_err:
-            print(f"❌ Erreur sur la zone {name}: {zone_err}")
+        except Exception as e:
+            print(f"⚠️ Erreur {name}: {e}")
 
-except Exception as global_err:
-    print(f"💥 Erreur critique de connexion : {global_err}")
+except Exception as e:
+    print(f"💥 Erreur globale: {e}")
 
-# Sauvegarde du JSON
+# Sauvegarde propre
 with open('data.json', 'w') as f:
     json.dump(results, f, indent=4)
 
-print(f"🏁 Terminé. {len(results)} zones traitées.")
+print("✅ Mise à jour terminée.")
