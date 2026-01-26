@@ -29,5 +29,5 @@ jobs:
           git config --global user.name "Bot-Peche"
           git config --global user.email "bot@pecheurconnect.sn"
           git add data.json
-          git commit -m "Update $(date)" || exit 0
+          git commit -m "Update PecheurConnect $(date)" || exit 0
           git push
