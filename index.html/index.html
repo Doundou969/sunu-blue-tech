@@ -3,120 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PecheurConnect 🇸🇳 | Radar de Pêche</title>
-    
+    <title>PecheurConnect 🇸🇳</title>
     <link rel="icon" href="https://img.icons8.com/fluency/48/fish.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
     <style>
-        body { background: #020617; color: white; font-family: system-ui, sans-serif; }
+        body { background: #020617; color: white; font-family: sans-serif; }
         .glass-card { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.4); border-radius: 1.5rem; }
         #map { height: 350px; border-radius: 1.5rem; border: 2px solid #1e293b; z-index: 10; }
-        .fish-marker { font-size: 24px; animation: bounce 2s infinite; filter: drop-shadow(0 0 8px #0ea5e9); }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        .fish-marker { font-size: 24px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); filter: drop-shadow(0 0 0px #0ea5e9); } 50% { transform: scale(1.2); filter: drop-shadow(0 0 10px #0ea5e9); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body class="p-4 max-w-4xl mx-auto">
 
     <header class="text-center mb-6">
         <h1 class="text-3xl font-black text-sky-400 italic">PECHEUR CONNECT 🇸🇳</h1>
-        <p class="text-[10px] text-slate-500 font-bold uppercase mt-1 tracking-widest">Zones de Pêche par Satellite</p>
+        <p class="text-[10px] text-slate-500 font-bold uppercase mt-1">Radar Satellite Copernicus</p>
     </header>
 
-    <div id="map" class="mb-6 shadow-2xl shadow-sky-900/20"></div>
+    <div id="map" class="mb-6 shadow-2xl"></div>
 
-    <div class="glass-card p-4 mb-6 bg-sky-900/10 border-sky-500/20">
-        <h4 class="text-sky-400 font-bold text-xs mb-3 flex items-center gap-2">
-            <i class="fas fa-fish"></i> NJANGATU GÉEJ GI (Guide de Pêche)
-        </h4>
-        <div class="grid grid-cols-2 gap-3 text-[11px] font-medium">
-            <div class="flex items-center gap-2"><span>🐟</span> <span class="text-slate-300">Zone de Poisson (Upwelling)</span></div>
-            <div class="flex items-center gap-2"><span>🟢</span> <span class="text-emerald-400 font-bold">Sécurité OK</span></div>
-            <div class="flex items-center gap-2"><span>📉</span> <span class="text-slate-300">Eau se refroidit</span></div>
-            <div class="flex items-center gap-2"><span>📈</span> <span class="text-slate-300">Eau se réchauffe</span></div>
-        </div>
-    </div>
-
-    <div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="col-span-full text-center py-10 opacity-50">
-            <i class="fas fa-sync fa-spin text-2xl mb-2"></i>
-            <p class="text-xs uppercase font-bold tracking-tighter">Synchronisation satellite...</p>
-        </div>
-    </div>
+    <div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
 
     <div class="mt-10 p-6 glass-card text-center bg-white/5 border-dashed border-sky-500/40">
-        <p class="text-[10px] font-black text-sky-400 mb-4 uppercase">Partager avec les capitaines</p>
+        <p class="text-[10px] font-black text-sky-400 mb-4 uppercase">Scannez pour partager</p>
         <div class="flex justify-center bg-white p-2 rounded-2xl w-32 mx-auto">
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=https://doundou969.github.io/sunu-blue-tech/" alt="QR">
         </div>
     </div>
 
-    <footer class="mt-10 text-center text-slate-600 text-[9px] pb-10 uppercase font-bold">
-        <p>&copy; 2026 PecheurConnect - Marine Analytics Senegal</p>
-    </footer>
-
     <script>
         const DATA_URL = "https://doundou969.github.io/sunu-blue-tech/data.json";
         const map = L.map('map', { tap: false, zoomControl: false }).setView([14.5, -17.2], 7);
-        
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '© Copernicus'
-        }).addTo(map);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
-        async function loadData() {
+        async function update() {
             try {
-                const response = await fetch(DATA_URL + '?v=' + Date.now());
-                const data = await response.json();
+                const res = await fetch(DATA_URL + '?v=' + Date.now());
+                const data = await res.json();
                 const container = document.getElementById('dashboard');
                 container.innerHTML = '';
 
                 data.forEach(item => {
-                    // 1. Placement du POISSON sur la carte si zone riche
                     if (item.is_fish_zone) {
-                        const fishIcon = L.divIcon({
-                            html: '<div class="fish-marker">🐟</div>',
-                            className: 'custom-div-icon'
-                        });
-                        L.marker([item.lat, item.lon], { icon: fishIcon })
-                         .addTo(map)
-                         .bindPopup(`<b>Zone de Poisson détectée</b><br>Température idéale: ${item.temp}°C`);
+                        const icon = L.divIcon({ html: '<div class="fish-marker">🐟</div>', className: 'd' });
+                        L.marker([item.lat, item.lon], { icon }).addTo(map).bindPopup(`<b>Zone de Pêche: ${item.zone}</b>`);
                     }
 
-                    // 2. Zone de sécurité (Cercle)
-                    L.circleMarker([item.lat, item.lon], {
-                        radius: 12, fillColor: item.temp < 22 ? '#0ea5e9' : '#f59e0b',
-                        color: "#fff", weight: 1, fillOpacity: 0.3
-                    }).addTo(map);
-
-                    // 3. Carte Dashboard
                     const card = document.createElement('div');
-                    card.className = `glass-card p-5 border-l-4 ${item.is_fish_zone ? 'border-sky-500' : 'border-slate-700'}`;
+                    card.className = 'glass-card p-5';
                     card.innerHTML = `
-                        <div class="flex justify-between items-start mb-2">
-                            <h3 class="font-bold text-lg">${item.zone}</h3>
-                            <span class="text-xl">${item.is_fish_zone ? '🐟' : ''} ${item.alert}</span>
-                        </div>
-                        <div class="flex justify-between items-end">
-                            <div>
-                                <p class="text-3xl font-mono font-bold text-sky-400">${item.temp}°C</p>
-                                <p class="text-[10px] text-slate-500 mt-1 uppercase font-bold">GPS: ${item.lat.toFixed(2)}, ${item.lon.toFixed(2)}</p>
-                            </div>
-                            <div class="text-right text-[10px] font-bold text-slate-400 uppercase">
-                                Tendance: ${item.trend}
-                            </div>
-                        </div>
+                        <div class="flex justify-between"><b>${item.zone}</b> <span>${item.is_fish_zone ? '🐟' : ''} ${item.alert}</span></div>
+                        <div class="text-3xl font-bold text-sky-400 mt-2">${item.temp}°C</div>
+                        <div class="text-[9px] text-slate-500 mt-1 uppercase font-bold">GPS: ${item.lat.toFixed(2)}, ${item.lon.toFixed(2)}</div>
                     `;
                     container.appendChild(card);
                 });
-            } catch (err) {
-                console.error("Erreur de chargement des données.");
-            }
+            } catch (e) { console.error("Data pending..."); }
         }
-
-        window.onload = loadData;
+        window.onload = update;
     </script>
 </body>
 </html>
