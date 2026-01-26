@@ -1,130 +1,50 @@
-import os, json, datetime, math, requests, warnings
-import copernicusmarine
+import json
+import os
+import requests
+import xarray as xr
+from datetime import datetime
 
-# Silence les alertes de connexion
-warnings.filterwarnings("ignore")
+TEL_TOKEN = os.getenv('TELEGRAM_TOKEN')
+TEL_ID = os.getenv('TELEGRAM_CHAT_ID')
 
-# 🔐 RÉCUPÉRATION DES SECRETS GITHUB
-TG_TOKEN = os.getenv('TG_TOKEN', '').strip()
-TG_ID = os.getenv('TG_ID', '').strip()
-COP_USER = os.getenv('COPERNICUS_USERNAME', '').strip()
-COP_PASS = os.getenv('COPERNICUS_PASSWORD', '').strip()
+def send_telegram(message):
+    if not TEL_TOKEN or not TEL_ID: return
+    url = f"https://api.telegram.org/bot{TEL_TOKEN}/sendMessage"
+    requests.post(url, data={"chat_id": TEL_ID, "text": message, "parse_mode": "HTML"})
 
-# 📍 LES 6 ZONES CLÉS DU SÉNÉGAL
-ZONES = {
-    "SAINT-LOUIS": [15.8, -16.7, 16.2, -16.3],
-    "LOUGA-POTOU": [15.3, -16.9, 15.6, -16.6],
-    "KAYAR":       [14.8, -17.3, 15.1, -17.1],
-    "DAKAR-YOFF":  [14.6, -17.6, 14.8, -17.4],
-    "MBOUR-JOAL":  [14.0, -17.1, 14.4, -16.7],
-    "CASAMANCE":   [12.2, -16.9, 12.7, -16.5]
-}
+results = []
+try:
+    # On ouvre le fichier extrait par le workflow
+    ds = xr.open_dataset("data.nc")
+    
+    ZONES = {
+        "SAINT-LOUIS": [15.8, -17.2, 16.5, -16.3],
+        "KAYAR": [14.7, -17.5, 15.2, -16.9],
+        "DAKAR-YOFF": [14.6, -17.8, 14.9, -17.3],
+        "MBOUR-JOAL": [14.0, -17.3, 14.5, -16.7],
+        "CASAMANCE": [12.3, -17.5, 12.8, -16.5]
+    }
 
-def get_wind_dir(u, v):
-    """Calcule la direction rose des vents"""
-    deg = (math.atan2(u, v) * 180 / math.pi + 180) % 360
-    dirs = ["N", "N-E", "E", "S-E", "S", "S-O", "O", "N-O"]
-    return dirs[int((deg + 22.5) / 45) % 8]
-
-def main():
-    try:
-        print("🔑 Connexion au service Copernicus...")
-        copernicusmarine.login(username=COP_USER, password=COP_PASS)
+    for name, b in ZONES.items():
+        subset = ds.sel(longitude=slice(b[1], b[3]), latitude=slice(b[0], b[2]))
+        # On force la recherche de la température dans les variables disponibles
+        temp_var = "thetao" if "thetao" in ds.variables else "tos"
+        raw_temp = float(subset[temp_var].mean())
+        sst = round(raw_temp - 273.15, 1) if raw_temp > 100 else round(raw_temp, 1)
         
-        # 1. Chargement de l'historique pour la tendance (Upwelling)
-        old_temp = {}
-        if os.path.exists('data.json'):
-            try:
-                with open('data.json', 'r') as f:
-                    history = json.load(f)
-                    old_temp = {item['zone']: item['temp'] for item in history if item['temp'] > 0}
-            except: pass
+        lat_c, lon_c = (b[0]+b[2])/2, (b[1]+b[3])/2
+        is_fish = sst <= 21.8
 
-        results = []
-        now = datetime.datetime.now().strftime('%d/%m/%Y %H:%M')
-        report = f"🌊 <b>PECHEUR CONNECT 🇸🇳</b>\n📅 {now} GMT\n───────────────────\n\n"
-        alertes_critiques = []
+        results.append({
+            "zone": name, "temp": sst, "lat": lat_c, "lon": lon_c,
+            "is_fish_zone": is_fish, "alert": "🟢"
+        })
 
-        for name, b in ZONES.items():
-            print(f"📡 Analyse satellite : {name}...")
-            try:
-                # --- TEMPÉRATURE (SST) ---
-                ds_t = copernicusmarine.open_dataset(
-                    dataset_id="cmems_mod_glo_phy-thetao_anfc_0.083deg_P1D-m",
-                    minimum_latitude=b[0], maximum_latitude=b[2],
-                    minimum_longitude=b[1], maximum_longitude=b[3],
-                    variables=["thetao"]
-                )
-                raw_t = float(ds_t["thetao"].isel(time=-1, depth=0).mean())
-                # Correction automatique Kelvin/Celsius
-                sst = round(raw_t - 273.15, 1) if raw_t > 100 else round(raw_t, 1)
-                
-                # --- HOULE (VHM0) ---
-                ds_w = copernicusmarine.open_dataset(
-                    dataset_id="cmems_mod_glo_wav_anfc_0.083deg_PT3H-i",
-                    minimum_latitude=b[0], maximum_latitude=b[2],
-                    minimum_longitude=b[1], maximum_longitude=b[3],
-                    variables=["VHM0"]
-                )
-                vhm0 = round(float(ds_w["VHM0"].isel(time=-8).mean()), 1)
-                next_v = round(float(ds_w["VHM0"].isel(time=-1).mean()), 1)
+        if is_fish:
+            send_telegram(f"🐟 <b>POISSON !</b>\n📍 {name}\n🌡️ {sst}°C\n⚓ {lat_c:.3f}, {lon_center:.3f}")
 
-                # --- VENT (Courants/Vecteurs) ---
-                ds_v = copernicusmarine.open_dataset(
-                    dataset_id="cmems_mod_glo_phy-cur_anfc_0.083deg_P1D-m",
-                    minimum_latitude=b[0], maximum_latitude=b[2],
-                    minimum_longitude=b[1], maximum_longitude=b[3],
-                    variables=["uo", "vo"]
-                )
-                u = float(ds_v["uo"].isel(time=-1, depth=0).mean())
-                v = float(ds_v["vo"].isel(time=-1, depth=0).mean())
-                w_speed = round(math.sqrt(u**2 + v**2) * 3.6, 1)
-                w_dir = get_wind_dir(u, v)
+except Exception as e:
+    print(f"❌ Erreur lecture: {e}")
 
-            except Exception as e:
-                print(f"⚠️ Erreur zone {name}: {e}")
-                sst, vhm0, next_v, w_speed, w_dir = 20.0, 1.0, 1.0, 10.0, "N"
-
-            # Logique d'affichage
-            trend = "📉" if sst < old_temp.get(name, sst) - 0.2 else "📈" if sst > old_temp.get(name, sst) + 0.2 else "➡️"
-            alert_emoji = "🟢" if vhm0 < 1.4 else "🟡" if vhm0 < 2.2 else "🔴"
-            
-            if vhm0 >= 2.3:
-                alertes_critiques.append(f"⚠️ DANGER {name}: Houle {vhm0}m !")
-
-            report += f"📍 <b>{name}</b> {alert_emoji}\n"
-            report += f"🌡️ {sst}°C {trend} | 🌊 {vhm0}m\n"
-            report += f"🌬️ {w_speed}km/h ({w_dir})\n\n"
-            
-            results.append({
-                "zone": name, "temp": sst, "trend": trend, "vhm0": vhm0, 
-                "next_vhm": next_v, "wind_speed": w_speed, "wind_dir": w_dir, "alert": alert_emoji
-            })
-
-        # Conseil Économie (Zone d'Upwelling la plus froide)
-        best_zone = min(results, key=lambda x: x['temp'])
-        report += f"⛽ <b>CONSEIL ÉCO :</b> Zone {best_zone['zone']} ({best_zone['temp']}°C)\n"
-        report += "───────────────────\n"
-        report += "📱 https://doundou969.github.io/sunu-blue-tech/"
-
-        # Insertion des alertes en tête de message si nécessaire
-        if alertes_critiques:
-            header_alert = "🚨 <b>ALERTE SÉCURITÉ MER</b> 🚨\n" + "\n".join(alertes_critiques) + "\n\n"
-            report = header_alert + report
-
-        # 2. SAUVEGARDE JSON
-        with open('data.json', 'w') as f:
-            json.dump(results, f, indent=4)
-        
-        # 3. ENVOI TELEGRAM
-        print(f"📤 Envoi du rapport vers Telegram...")
-        requests.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage", 
-                      data={"chat_id": TG_ID, "text": report, "parse_mode": "HTML"})
-        
-        print("✅ Opération terminée avec succès.")
-
-    except Exception as e:
-        print(f"💥 CRASH DU SCRIPT : {e}")
-
-if __name__ == "__main__":
-    main()
+with open('data.json', 'w') as f:
+    json.dump(results, f, indent=4)
