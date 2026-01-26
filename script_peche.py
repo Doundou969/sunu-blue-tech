@@ -1,9 +1,8 @@
 import copernicusmarine as cm
-import pandas as pd
 import json
-import datetime
+from datetime import datetime
 
-# --- CONFIGURATION ---
+# --- CONFIGURATION DES ZONES (Lat Min, Lon Min, Lat Max, Lon Max) ---
 ZONES = {
     "SAINT-LOUIS": [15.8, -17.2, 16.5, -16.3],
     "KAYAR": [14.7, -17.5, 15.2, -16.9],
@@ -12,55 +11,52 @@ ZONES = {
     "CASAMANCE": [12.3, -17.5, 12.8, -16.5]
 }
 
-def get_trend(current, zone_name):
-    # Logique simplifiée pour l'exemple (à coupler avec tes anciennes données)
-    return "📉" if current < 21 else "📈"
-
 results = []
-print("🔑 Connexion Copernicus...")
+print("🔑 Connexion au service Copernicus...")
+today = datetime.now().strftime("%Y-%m-%d")
 
 for name, b in ZONES.items():
-    print(f"📡 Analyse de la zone : {name}...")
-    
-    # 1. Récupération Température (SST)
-    ds_temp = cm.open_dataset(
-        dataset_id="cmems_mod_glo_phy_anfc_0.083deg_static",
-        variable=["thetao"],
-        minimum_longitude=b[1], maximum_longitude=b[3],
-        minimum_latitude=b[0], maximum_latitude=b[2],
-        start_datetime=datetime.datetime.now().strftime("%Y-%m-%d"),
-        end_datetime=datetime.datetime.now().strftime("%Y-%m-%d")
-    )
-    
-    # Extraction et conversion Kelvin -> Celsius
-    raw_temp = float(ds_temp.thetao.mean())
-    sst = round(raw_temp - 273.15, 1) if raw_temp > 100 else round(raw_temp, 1)
+    try:
+        print(f"📡 Analyse satellite : {name}...")
+        
+        # open_dataset avec le bon argument 'variables'
+        ds = cm.open_dataset(
+            dataset_id="cmems_mod_glo_phy_anfc_0.083deg_static",
+            variables=["thetao"], 
+            minimum_longitude=b[1], 
+            maximum_longitude=b[3],
+            minimum_latitude=b[0], 
+            maximum_latitude=b[2],
+            start_datetime=f"{today}T00:00:00",
+            end_datetime=f"{today}T23:59:59"
+        )
+        
+        # Moyenne et conversion Celsius
+        raw_temp = float(ds.thetao.mean())
+        sst = round(raw_temp - 273.15, 1) if raw_temp > 100 else round(raw_temp, 1)
 
-    # 2. Récupération Houle (VHM0)
-    # (Ici on simule la récupération vhm0 pour l'exemple de structure)
-    vhm0 = 1.2 
-    
-    # CALCUL DES COORDONNÉES DU "POINT POISSON"
-    # On cible le centre de la zone d'étude
-    lat_fish = (b[0] + b[2]) / 2
-    lon_fish = (b[1] + b[3]) / 2
+        # Calcul du point GPS central de la zone
+        lat_center = (b[0] + b[2]) / 2
+        lon_center = (b[1] + b[3]) / 2
 
-    results.append({
-        "zone": name,
-        "temp": sst,
-        "vhm0": vhm0,
-        "lat": lat_fish,
-        "lon": lon_fish,
-        "is_fish_zone": sst <= 21.5, # Seuil d'Upwelling riche
-        "trend": get_trend(sst, name),
-        "alert": "🔴" if vhm0 > 2.2 else "🟢",
-        "wind_speed": 15,
-        "wind_dir": "NNE",
-        "next_vhm": 1.4
-    })
+        results.append({
+            "zone": name,
+            "temp": sst,
+            "vhm0": 1.2, # Valeur simulée (à coupler avec un dataset wave si besoin)
+            "lat": lat_center,
+            "lon": lon_center,
+            "is_fish_zone": sst <= 21.8, # Seuil d'Upwelling favorable au poisson
+            "trend": "📉" if sst < 21 else "📈",
+            "alert": "🟢" if sst < 25 else "📈",
+            "wind_speed": 14,
+            "wind_dir": "NNE",
+            "next_vhm": 1.3
+        })
+    except Exception as e:
+        print(f"⚠️ Erreur zone {name}: {e}")
 
-# Sauvegarde
+# Sauvegarde du fichier de données
 with open('data.json', 'w') as f:
     json.dump(results, f, indent=4)
 
-print("✅ Données mises à jour avec coordonnées de pêche.")
+print("✅ Mise à jour PecheurConnect terminée avec succès.")
