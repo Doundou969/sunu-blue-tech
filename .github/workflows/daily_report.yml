@@ -13,34 +13,21 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install Tools
-        run: pip install copernicusmarine xarray netCDF4 requests
+      - name: Installation
+        run: pip install copernicusmarine requests xarray netCDF4
 
-      - name: Download Data via Subset
+      - name: Radar Satellite
         env:
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
-        run: |
-          copernicusmarine subset \
-            --dataset-id cmems_mod_glo_phy_anfc_0.083deg_static \
-            -v thetao \
-            --longitude-min -18 --longitude-max -16 \
-            --latitude-min 12 --latitude-max 17 \
-            --output-directory . --output-filename data.nc \
-            --username "$COPERNICUS_USERNAME" \
-            --password "$COPERNICUS_PASSWORD" \
-            --force-download
-
-      - name: Process and Alert
-        env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python script_peche.py
 
-      - name: Deploy
+      - name: Mise à jour Site
         run: |
-          git config --global user.name "Bot"
+          git config --global user.name "Bot-Peche"
           git config --global user.email "bot@pecheurconnect.sn"
           git add data.json
-          git commit -m "Update satellite data" || exit 0
+          git commit -m "Update $(date)" || exit 0
           git push
