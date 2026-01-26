@@ -1,47 +1,35 @@
-name: PecheurConnect-Runner
+name: Mise à jour PecheurConnect
 
 on:
   schedule:
-    - cron: '0 */6 * * *' # Je l'ai passé à toutes les 6h pour plus de précision pour les pêcheurs
-  workflow_dispatch:      # Permet le lancement manuel
+    - cron: '0 */6 * * *' # S'exécute toutes les 6h
+  workflow_dispatch: # Permet de lancer manuellement
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write     # TRÈS IMPORTANT : Autorise GitHub à enregistrer data.json
-
     steps:
-      - name: 📂 Récupération du code
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: 🐍 Installation de Python
+      - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      - name: 📦 Installation des dépendances
-        run: |
-          python -m pip install --upgrade pip
-          pip install numpy matplotlib requests xarray dask netCDF4 copernicusmarine --upgrade
+      - name: Install dependencies
+        run: pip install copernicusmarine
 
-      - name: 🚀 Exécution de PecheurConnect
+      - name: Run script
         env:
-          TG_TOKEN: ${{ secrets.TG_TOKEN }}
-          TG_ID: ${{ secrets.TG_ID }}
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
         run: python script_peche.py
 
-      - name: 🌐 Déploiement des données
+      - name: Commit and Push
         run: |
-          git config --global user.name "PecheurConnect-Bot"
-          git config --global user.email "bot@pecheurconnect.sn"
+          git config --global user.name "Github Action"
+          git config --global user.email "action@github.com"
           git add data.json
-          # On vérifie s'il y a des changements avant de pousser
-          if [ -n "$(git status --porcelain)" ]; then
-            git commit -m "📊 Mise à jour : $(date +'%d-%m-%Y %H:%M')"
-            git push origin main
-          else
-            echo "Aucun changement détecté."
-          fi
+          git commit -m "Update marine data" || exit 0
+          git push
