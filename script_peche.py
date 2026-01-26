@@ -4,7 +4,7 @@ import os
 import requests
 from datetime import datetime
 
-# Configuration
+# Identifiants
 USER = os.getenv('COPERNICUS_USERNAME')
 PASS = os.getenv('COPERNICUS_PASSWORD')
 TEL_TOKEN = os.getenv('TELEGRAM_TOKEN')
@@ -19,15 +19,24 @@ ZONES = {
 }
 
 def send_telegram(message):
-    if TEL_TOKEN and TEL_ID:
-        url = f"https://api.telegram.org/bot{TEL_TOKEN}/sendMessage"
-        requests.post(url, data={"chat_id": TEL_ID, "text": message, "parse_mode": "HTML"})
+    if not TEL_TOKEN or not TEL_ID:
+        print("⚠️ Telegram non configuré dans les Secrets GitHub.")
+        return
+    url = f"https://api.telegram.org/bot{TEL_TOKEN}/sendMessage"
+    try:
+        r = requests.post(url, data={"chat_id": TEL_ID, "text": message, "parse_mode": "HTML"})
+        if r.status_code == 200:
+            print("✅ Notification Telegram envoyée !")
+        else:
+            print(f"❌ Erreur Telegram {r.status_code}: {r.text}")
+    except Exception as e:
+        print(f"💥 Erreur réseau Telegram: {e}")
 
 results = []
-print("🌊 Synchronisation PecheurConnect...")
+print("🌊 Connexion au Radar Copernicus...")
 
 try:
-    # On ouvre le dataset
+    # On force l'ouverture du dataset physique
     ds = cm.open_dataset(
         dataset_id="cmems_mod_glo_phy_anfc_0.083deg_static",
         username=USER,
@@ -38,44 +47,41 @@ try:
         try:
             subset = ds.sel(longitude=slice(b[1], b[3]), latitude=slice(b[0], b[2]))
             
-            # FORCE LA VARIABLE DE TEMPÉRATURE (thetao)
-            # Si on trouve deptho (profondeur), on l'ignore pour le calcul de température
-            if 'thetao' in subset.variables:
-                data = subset['thetao']
-                if 'depth' in data.coords: data = data.isel(depth=0)
-                val = float(data.mean())
-                # CONVERSION KELVIN -> CELSIUS (Ex: 294K -> 21°C)
-                sst = round(val - 273.15, 1) if val > 100 else round(val, 1)
+            # Détection de la meilleure variable
+            var_name = 'thetao' if 'thetao' in subset.variables else 'tos'
+            
+            data_slice = subset[var_name]
+            if 'depth' in data_slice.coords:
+                data_slice = data_slice.isel(depth=0)
+            
+            # Calcul et conversion Kelvin vers Celsius
+            val_kelvin = float(data_slice.mean())
+            if val_kelvin > 100:
+                sst = round(val_kelvin - 273.15, 1)
             else:
-                # Si on n'a que la profondeur, on met une valeur par défaut pour ne pas afficher 500°C
-                sst = 22.0 
+                sst = round(val_kelvin, 1)
 
             lat_c, lon_c = (b[0]+b[2])/2, (b[1]+b[3])/2
             
-            # Seuil de l'Upwelling au Sénégal (Eaux froides = Poissons)
-            is_fish = sst <= 21.5 
+            # CONDITION DE PÊCHE (Upwelling : eau froide = poisson)
+            is_fish = sst <= 21.8 
 
             results.append({
-                "zone": name, 
-                "temp": sst, 
-                "lat": lat_c, 
-                "lon": lon_c,
-                "is_fish_zone": is_fish, 
-                "alert": "🟢" if sst < 26 else "🟡"
+                "zone": name, "temp": sst, "lat": lat_c, "lon": lon_c,
+                "is_fish_zone": is_fish, "alert": "🟢" if sst < 25 else "🟡"
             })
 
             if is_fish:
-                msg = f"🐟 <b>ALERTE PÊCHE - {name}</b>\n🌡️ Température idéale : {sst}°C\n⚓ Position : {lat_c:.3f}, {lon_c:.3f}\n\n<i>Envoyé par PecheurConnect 🇸🇳</i>"
+                msg = f"🐟 <b>ZONE DE POISSON DÉTECTÉE !</b>\n📍 Secteur: {name}\n🌡️ Température: {sst}°C\n⚓ GPS: {lat_c:.2f}, {lon_c:.2f}\n\n🇸🇳 PecheurConnect"
                 send_telegram(msg)
 
         except Exception as e:
-            print(f"⚠️ Erreur {name}: {e}")
+            print(f"⚠️ Erreur zone {name}: {e}")
 
 except Exception as e:
     print(f"💥 Erreur globale: {e}")
 
-# Sauvegarde propre
 with open('data.json', 'w') as f:
     json.dump(results, f, indent=4)
 
-print("✅ Mise à jour terminée.")
+print(f"🏁 Terminé. {len(results)} zones dans data.json.")
