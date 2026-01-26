@@ -1,1 +1,42 @@
-[]
+[
+    {
+        "zone": "SAINT-LOUIS",
+        "temp": 18.3,
+        "lat": 16.15,
+        "lon": -16.75,
+        "is_fish_zone": true,
+        "alert": "\ud83d\udfe2"
+    },
+    {
+        "zone": "KAYAR",
+        "temp": 18.0,
+        "lat": 14.95,
+        "lon": -17.2,
+        "is_fish_zone": true,
+        "alert": "\ud83d\udfe2"
+    },
+    {
+        "zone": "DAKAR-YOFF",
+        "temp": 18.4,
+        "lat": 14.75,
+        "lon": -17.55,
+        "is_fish_zone": true,
+        "alert": "\ud83d\udfe2"
+    },
+    {
+        "zone": "MBOUR-JOAL",
+        "temp": 19.3,
+        "lat": 14.25,
+        "lon": -17.0,
+        "is_fish_zone": true,
+        "alert": "\ud83d\udfe2"
+    },
+    {
+        "zone": "CASAMANCE",
+        "temp": 21.4,
+        "lat": 12.55,
+        "lon": -17.0,
+        "is_fish_zone": true,
+        "alert": "\ud83d\udfe2"
+    }
+]
