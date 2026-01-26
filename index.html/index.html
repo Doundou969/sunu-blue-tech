@@ -2,63 +2,151 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PecheurConnect 🇸🇳 | Radar de Pêche</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PecheurConnect 🇸🇳 | Sécurité & Upwelling</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <style>
-        body { background: #020617; color: white; font-family: ui-sans-serif, system-ui; }
-        .glass-card { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(51, 65, 85, 0.4); border-radius: 1.5rem; }
-        #map { height: 300px; border-radius: 1.5rem; border: 2px solid #1e293b; z-index: 1; }
+        body { background: #020617; color: white; font-family: system-ui, -apple-system, sans-serif; overflow-x: hidden; }
+        .glass-card { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.4); border-radius: 1.5rem; transition: all 0.3s ease; }
+        #map { height: 320px; border-radius: 1.5rem; border: 2px solid #1e293b; z-index: 10; shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
         .danger-pulse { border: 2px solid #ef4444; animation: pulse-red 2s infinite; }
-        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); } 70% { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        .btn-action { transition: transform 0.1s active; }
+        .btn-action:active { transform: scale(0.95); }
     </style>
 </head>
 <body class="p-4 max-w-4xl mx-auto">
 
     <header class="text-center mb-6 pt-2">
-        <h1 class="text-3xl font-black text-sky-400 italic">PECHEUR CONNECT 🇸🇳</h1>
-        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Données Satellitaires Copernicus</p>
+        <h1 class="text-3xl font-black text-sky-400 italic tracking-tight">PECHEUR CONNECT 🇸🇳</h1>
+        <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Surveillance Océanique par Satellite</p>
     </header>
 
     <div id="map" class="mb-6 shadow-2xl"></div>
 
-    <div class="glass-card p-4 mb-6 bg-sky-900/20 border-sky-500/30">
+    <div class="glass-card p-4 mb-6 bg-sky-900/10 border-sky-500/20">
         <h4 class="text-sky-400 font-bold text-xs mb-3 flex items-center gap-2">
             <i class="fas fa-info-circle"></i> NJANGATU GÉEJ GI (Légende)
         </h4>
-        <div class="grid grid-cols-2 gap-3 text-[11px] font-medium">
-            <div class="flex items-center gap-2"><span>📉</span> <span class="text-slate-300">Upwelling (Jën yi mi ngi fi)</span></div>
-            <div class="flex items-center gap-2"><span>🔴</span> <span class="text-red-400 font-bold">Danger (Buleen dugg)</span></div>
-            <div class="flex items-center gap-2"><span>📈</span> <span class="text-slate-300">Ndox mu tàggat (Chaleur)</span></div>
-            <div class="flex items-center gap-2"><span>🟢</span> <span class="text-emerald-400 font-bold">Jàmm (Mën ngen liggéey)</span></div>
+        <div class="grid grid-cols-2 gap-3 text-[11px] font-medium italic">
+            <div class="flex items-center gap-2"><span>📉</span> <span class="text-slate-300">Upwelling (Ndox mu nànd)</span></div>
+            <div class="flex items-center gap-2"><span>🔴</span> <span class="text-red-400 font-bold">Danger (Mër bi agitée)</span></div>
+            <div class="flex items-center gap-2"><span>📈</span> <span class="text-slate-300">Ndox mu tàggat</span></div>
+            <div class="flex items-center gap-2"><span>🟢</span> <span class="text-emerald-400 font-bold">Jàmm (Neex na liggéey)</span></div>
         </div>
     </div>
 
     <div class="grid grid-cols-2 gap-3 mb-8">
-        <button onclick="getUserLocation()" class="bg-sky-600 p-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg">
-            <i class="fas fa-location-arrow"></i> MA POSITION
+        <button onclick="getUserLocation()" class="btn-action bg-sky-600 p-4 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-sky-900/20">
+            <i class="fas fa-compass"></i> GPS POSITION
         </button>
-        <button onclick="window.open('sms:+221?body=Alerte PecheurConnect : Danger météo détecté en mer !')" class="bg-red-600 p-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg">
-            <i class="fas fa-sms"></i> ALERTE SMS
+        <button onclick="window.open('sms:+221?body=Alerte PecheurConnect : Danger détecté en mer !')" class="btn-action bg-red-600 p-4 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-red-900/20">
+            <i class="fas fa-exclamation-triangle"></i> ALERTE SMS
         </button>
     </div>
 
-    <div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-
-    <div class="mt-10 p-6 glass-card text-center bg-white/5 border-dashed border-sky-500/50">
-        <p class="text-xs font-bold text-sky-400 mb-4 uppercase tracking-tighter">Partagez l'application avec les collègues</p>
-        <div class="flex justify-center bg-white p-3 rounded-2xl w-40 mx-auto shadow-2xl">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://doundou969.github.io/sunu-blue-tech/" alt="QR Code PecheurConnect">
+    <div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="col-span-full text-center py-12">
+            <i class="fas fa-circle-notch fa-spin text-sky-500 text-3xl mb-4"></i>
+            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Récupération des données Copernicus...</p>
         </div>
-        <p class="mt-4 text-[10px] text-slate-500 italic">Scannez pour ouvrir PecheurConnect sur votre téléphone</p>
     </div>
 
-    <footer class="mt-12 text-center text-slate-600 text-[10px] pb-10">
-        <p>&copy; 2026 PecheurConnect - Sécurité & Performance de la Pêche Artisanale</p>
+    <div class="mt-10 p-6 glass-card text-center bg-white/5 border-dashed border-sky-500/40">
+        <p class="text-[10px] font-black text-sky-400 mb-4 uppercase tracking-widest">Partagez l'application sur les quais</p>
+        <div class="flex justify-center bg-white p-2 rounded-2xl w-36 mx-auto shadow-2xl">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=https://doundou969.github.io/sunu-blue-tech/" alt="QR Code" class="rounded-lg">
+        </div>
+        <p class="mt-4 text-[9px] text-slate-500 italic uppercase">Scannez pour ouvrir PecheurConnect</p>
+    </div>
+
+    <footer class="mt-12 text-center text-slate-600 text-[9px] pb-10 uppercase font-bold tracking-widest">
+        <p>&copy; 2026 PecheurConnect - Données Marines Sénégal</p>
     </footer>
 
     <script>
-        const
+        // Initialisation Carte
+        const map = L.map('map', { tap: false, zoomControl: false }).setView([14.5, -17.2], 7);
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '© Copernicus'
+        }).addTo(map);
+
+        const zonesCoords = {
+            "SAINT-LOUIS": [16.03, -16.50], "LOUGA-POTOU": [15.48, -16.75],
+            "KAYAR": [14.92, -17.20], "DAKAR-YOFF": [14.75, -17.48],
+            "MBOUR-JOAL": [14.41, -16.96], "CASAMANCE": [12.50, -16.70]
+        };
+
+        async function updateDashboard(retry = 0) {
+            const container = document.getElementById('dashboard');
+            try {
+                // Fetch avec prévention de cache agressif
+                const response = await fetch('./data.json?v=' + Date.now());
+                if (!response.ok) throw new Error("Fichier absent");
+                
+                const data = await response.json();
+                container.innerHTML = '';
+
+                data.forEach(item => {
+                    const isDanger = item.vhm0 >= 2.2;
+                    const card = document.createElement('div');
+                    card.className = `glass-card p-5 ${isDanger ? 'danger-pulse' : ''}`;
+                    
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-3">
+                            <h3 class="text-base font-black tracking-tight">${item.zone}</h3>
+                            <span class="text-xl">${item.alert}</span>
+                        </div>
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <span class="text-3xl font-mono font-bold">${item.temp}°C</span>
+                                <span class="text-sm ml-1">${item.trend}</span>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[8px] text-slate-500 font-black uppercase tracking-widest">Houle</p>
+                                <p class="text-xl font-bold ${isDanger ? 'text-red-500' : 'text-emerald-400'}">${item.vhm0}m</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-slate-800/50 flex justify-between text-[10px] text-slate-400 font-bold">
+                            <span>🌬️ ${item.wind_speed}km/h ${item.wind_dir}</span>
+                            <span class="text-sky-500 uppercase">Demain: ${item.next_vhm}m</span>
+                        </div>
+                    `;
+                    container.appendChild(card);
+
+                    if(zonesCoords[item.zone]) {
+                        L.circleMarker(zonesCoords[item.zone], {
+                            radius: 10, fillColor: isDanger ? '#ef4444' : '#0ea5e9',
+                            color: "#fff", weight: 2, fillOpacity: 0.9
+                        }).addTo(map).bindPopup(`<b>${item.zone}</b><br>${item.temp}°C | ${item.vhm0}m`);
+                    }
+                });
+            } catch (err) {
+                if (retry < 5) {
+                    setTimeout(() => updateDashboard(retry + 1), 3000);
+                } else {
+                    container.innerHTML = '<p class="col-span-full text-center text-slate-500 text-[10px] uppercase font-bold p-10 tracking-widest">Synchronisation satellite en cours...</p>';
+                }
+            }
+        }
+
+        function getUserLocation() {
+            navigator.geolocation.getCurrentPosition(p => {
+                const loc = [p.coords.latitude, p.coords.longitude];
+                L.marker(loc).addTo(map).bindPopup("<b>Ma Position</b>").openPopup();
+                map.setView(loc, 10);
+            }, () => alert("Activez votre GPS"));
+        }
+
+        // Lancement au chargement complet
+        window.onload = () => updateDashboard();
+    </script>
+</body>
+</html>
