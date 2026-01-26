@@ -4,7 +4,7 @@ import os
 import requests
 from datetime import datetime
 
-# Secrets GitHub
+# Configuration Telegram & Copernicus
 USER = os.getenv('COPERNICUS_USERNAME')
 PASS = os.getenv('COPERNICUS_PASSWORD')
 TEL_TOKEN = os.getenv('TELEGRAM_TOKEN')
@@ -19,27 +19,34 @@ ZONES = {
 }
 
 def send_telegram(message):
-    if TEL_TOKEN and TEL_ID:
-        url = f"https://api.telegram.org/bot{TEL_TOKEN}/sendMessage"
-        requests.post(url, data={"chat_id": TEL_ID, "text": message, "parse_mode": "HTML"})
+    if not TEL_TOKEN or not TEL_ID:
+        print("⚠️ Telegram non configuré dans les Secrets.")
+        return
+    url = f"https://api.telegram.org/bot{TEL_TOKEN}/sendMessage"
+    try:
+        r = requests.post(url, data={"chat_id": TEL_ID, "text": message, "parse_mode": "HTML"})
+        print(f"📡 Statut Telegram: {r.status_code}")
+    except Exception as e:
+        print(f"❌ Erreur envoi Telegram: {e}")
 
 results = []
-print("🔑 Connexion Copernicus...")
-today = datetime.now().strftime("%Y-%m-%d")
+print(f"🚀 Démarrage PecheurConnect - {datetime.now()}")
 
 for name, b in ZONES.items():
     try:
-        print(f"📡 Analyse : {name}...")
-        # Utilisation de l'ID statique pour éviter les erreurs de variables manquantes
+        print(f"📡 Tentative sur {name}...")
+        # On utilise le dataset 'tos' (Sea Surface Temp) qui est plus léger et stable
         ds = cm.open_dataset(
             dataset_id="cmems_mod_glo_phy_anfc_0.083deg_static",
-            variables=["thetao"],
-            minimum_longitude=b[1], maximum_longitude=b[3],
-            minimum_latitude=b[0], maximum_latitude=b[2],
-            username=USER, password=PASS
-        )
+            username=USER,
+            password=PASS
+        ).sel(longitude=slice(b[1], b[3]), latitude=slice(b[0], b[2]))
         
-        raw_temp = float(ds.thetao.mean())
+        # On cherche la température (soit thetao, soit tos)
+        temp_var = ds['thetao'] if 'thetao' in ds.variables else ds['tos']
+        raw_temp = float(temp_var.mean())
+        
+        # Conversion Kelvin -> Celsius
         sst = round(raw_temp - 273.15, 1) if raw_temp > 100 else round(raw_temp, 1)
         
         lat_c = (b[0] + b[2]) / 2
@@ -47,16 +54,19 @@ for name, b in ZONES.items():
         is_fish = sst <= 21.8
 
         results.append({
-            "zone": name, "temp": sst, "lat": lat_c, "lon": lon_center,
+            "zone": name, "temp": sst, "lat": lat_c, "lon": lon_c,
             "is_fish_zone": is_fish, "alert": "🟢"
         })
 
         if is_fish:
-            msg = f"🐟 <b>ZONE DE POISSON DÉTECTÉE !</b>\n📍 Secteur: {name}\n🌡️ Temp: {sst}°C\n⚓ Coordonnées: {lat_c:.3f}, {lon_c:.3f}\n\n<i>Logiciel PecheurConnect 🇸🇳</i>"
+            print(f"🐟 Poisson trouvé à {name}!")
+            msg = f"🐟 <b>ZONE DE POISSON !</b>\n📍 Secteur: {name}\n🌡️ Temp: {sst}°C\n⚓ GPS: {lat_c:.3f}, {lon_c:.3f}"
             send_telegram(msg)
 
     except Exception as e:
-        print(f"❌ Erreur {name}: {e}")
+        print(f"❌ Erreur zone {name}: {e}")
 
+# Sauvegarde forcée du fichier
 with open('data.json', 'w') as f:
     json.dump(results, f, indent=4)
+print(f"✅ data.json mis à jour avec {len(results)} zones.")
