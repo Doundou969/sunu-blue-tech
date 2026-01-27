@@ -3,8 +3,8 @@
         "zone": "SAINT-LOUIS",
         "temp": 17.7,
         "trend": "\u27a1\ufe0f",
-        "vhm0": 1.5,
-        "next_vhm": 2.0,
+        "vhm0": 1.6,
+        "next_vhm": 1.7,
         "wind_speed": 0.9,
         "wind_dir": "N-E",
         "alert": "\ud83d\udfe1"
@@ -13,8 +13,8 @@
         "zone": "LOUGA-POTOU",
         "temp": 18.1,
         "trend": "\u27a1\ufe0f",
-        "vhm0": 1.5,
-        "next_vhm": 2.0,
+        "vhm0": 1.7,
+        "next_vhm": 1.7,
         "wind_speed": 0.8,
         "wind_dir": "N-E",
         "alert": "\ud83d\udfe1"
@@ -22,9 +22,9 @@
     {
         "zone": "KAYAR",
         "temp": 18.3,
-        "trend": "\ud83d\udcc9",
-        "vhm0": 1.6,
-        "next_vhm": 2.2,
+        "trend": "\u27a1\ufe0f",
+        "vhm0": 1.9,
+        "next_vhm": 1.8,
         "wind_speed": 0.8,
         "wind_dir": "N-E",
         "alert": "\ud83d\udfe1"
@@ -32,9 +32,9 @@
     {
         "zone": "DAKAR-YOFF",
         "temp": 18.3,
-        "trend": "\ud83d\udcc9",
-        "vhm0": 1.5,
-        "next_vhm": 1.9,
+        "trend": "\u27a1\ufe0f",
+        "vhm0": 1.7,
+        "next_vhm": 1.7,
         "wind_speed": 0.7,
         "wind_dir": "N",
         "alert": "\ud83d\udfe1"
@@ -42,7 +42,7 @@
     {
         "zone": "MBOUR-JOAL",
         "temp": 20.0,
-        "trend": "\ud83d\udcc9",
+        "trend": "\u27a1\ufe0f",
         "vhm0": 0.7,
         "next_vhm": 0.8,
         "wind_speed": 0.4,
@@ -52,8 +52,8 @@
     {
         "zone": "CASAMANCE",
         "temp": 23.2,
-        "trend": "\ud83d\udcc9",
-        "vhm0": 0.5,
+        "trend": "\u27a1\ufe0f",
+        "vhm0": 0.4,
         "next_vhm": 0.5,
         "wind_speed": 0.4,
         "wind_dir": "N",
