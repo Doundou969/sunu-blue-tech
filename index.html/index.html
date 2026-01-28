@@ -4,14 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PecheurConnect 🇸🇳 | Radar de Pêche</title>
-    
     <link rel="icon" href="https://img.icons8.com/fluency/48/fish.png">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
     <style>
         body { background: #020617; color: white; font-family: system-ui, -apple-system, sans-serif; }
         .glass-card { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.4); border-radius: 1.5rem; }
@@ -29,7 +26,8 @@
 
     <div id="map" class="mb-6 shadow-2xl"></div>
 
-    <div class="glass-card p-4 mb-6 bg-sky-900/10 border-sky-500/20">
+    <div class="glass-card p-4 mb-4">
+        <p id="alert-header" class="text-red-400 font-bold text-xs mb-2 hidden">🚨 Danger en mer détecté !</p>
         <h4 class="text-sky-400 font-bold text-xs mb-3 flex items-center gap-2">
             <i class="fas fa-info-circle"></i> NJANGATU GÉEJ GI (Légende)
         </h4>
@@ -50,7 +48,7 @@
         </button>
     </div>
 
-    <div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div class="col-span-full text-center py-12">
             <i class="fas fa-circle-notch fa-spin text-sky-500 text-3xl mb-4"></i>
             <p class="text-slate-400 text-xs font-bold uppercase">Lecture des données satellites...</p>
@@ -70,7 +68,6 @@
     </footer>
 
     <script>
-        // FORÇAGE DU CHEMIN ABSOLU POUR GITHUB PAGES (CORRECTION 404)
         const DATA_URL = "https://doundou969.github.io/sunu-blue-tech/data.json";
 
         const map = L.map('map', { tap: false, zoomControl: false }).setView([14.5, -17.2], 7);
@@ -85,21 +82,31 @@
 
         async function updateDashboard() {
             const container = document.getElementById('dashboard');
+            const alertHeader = document.getElementById('alert-header');
+
             try {
-                // Utilisation de l'URL absolue pour tuer l'erreur 404
                 const response = await fetch(DATA_URL + '?t=' + Date.now());
                 if (!response.ok) throw new Error();
-                
                 const data = await response.json();
+
+                // Tri par danger (houle décroissante)
+                data.sort((a,b) => b.vhm0 - a.vhm0);
+
                 container.innerHTML = '';
+
+                // Vérifier alertes
+                if(data.some(item => item.vhm0 >= 2.2)) alertHeader.classList.remove('hidden');
+                else alertHeader.classList.add('hidden');
 
                 data.forEach(item => {
                     const isDanger = item.vhm0 >= 2.2;
+                    const tempColor = item.temp < 19 ? '#0ea5e9' : '#facc15';
+
                     const card = document.createElement('div');
                     card.className = `glass-card p-5 ${isDanger ? 'danger-pulse' : ''}`;
                     card.innerHTML = `
                         <div class="flex justify-between items-start mb-3">
-                            <h3 class="text-base font-black uppercase tracking-tight">${item.zone}</h3>
+                            <h3 class="text-base font-black uppercase tracking-tight" style="color:${tempColor}">${item.zone}</h3>
                             <span class="text-xl">${item.alert}</span>
                         </div>
                         <div class="flex justify-between items-end">
@@ -119,6 +126,7 @@
                     `;
                     container.appendChild(card);
 
+                    // Carte
                     if(zonesCoords[item.zone]) {
                         L.circleMarker(zonesCoords[item.zone], {
                             radius: 10, fillColor: isDanger ? '#ef4444' : '#0ea5e9',
@@ -128,6 +136,7 @@
                 });
             } catch (err) {
                 container.innerHTML = '<p class="col-span-full text-center text-slate-500 text-[10px] p-10 font-bold uppercase tracking-widest italic">En attente des satellites... (Vérifiez votre connexion)</p>';
+                alertHeader.classList.add('hidden');
             }
         }
 
@@ -139,7 +148,10 @@
             }, () => alert("Activez le GPS"));
         }
 
-        window.onload = updateDashboard;
+        window.onload = () => {
+            updateDashboard();
+            setInterval(updateDashboard, 1000*60*10); // refresh toutes les 10 minutes
+        }
     </script>
 </body>
 </html>
