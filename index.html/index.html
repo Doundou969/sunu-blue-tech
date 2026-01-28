@@ -2,107 +2,76 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PecheurConnect 🇸🇳 | Radar Satellite</title>
-  <link rel="icon" href="https://img.icons8.com/fluency/48/fish.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>PecheurConnect 🇸🇳 | Radar de Pêche</title>
+
+  <!-- Manifest & PWA -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#0ea5e9">
+  <link rel="icon" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <!-- Tailwind & FontAwesome -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
   <style>
     body { background: #020617; color: white; font-family: system-ui, -apple-system, sans-serif; }
     .glass-card { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.4); border-radius: 1.5rem; }
     #map { height: 320px; border-radius: 1.5rem; border: 2px solid #1e293b; z-index: 10; }
     .danger-pulse { border: 2px solid #ef4444; animation: pulse-red 2s infinite; }
-    @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); } 70% { box-shadow: 0 0 0 12px rgba(239,68,68,0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); } }
+    @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); } 70% { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
   </style>
 </head>
 <body class="p-4 max-w-4xl mx-auto">
 
-<header class="text-center mb-6 pt-2">
-  <h1 class="text-3xl font-black text-sky-400 italic">PECHEUR CONNECT 🇸🇳</h1>
-  <p class="text-[10px] text-slate-500 font-bold uppercase mt-1">Radar Satellite Copernicus</p>
-</header>
+  <!-- Header -->
+  <header class="text-center mb-6 pt-2">
+    <h1 class="text-3xl font-black text-sky-400 italic">PECHEUR CONNECT 🇸🇳</h1>
+    <p class="text-[10px] text-slate-500 font-bold uppercase mt-1">Satellite Copernicus Temps Réel</p>
+  </header>
 
-<div id="map" class="mb-6 shadow-2xl"></div>
+  <!-- Carte -->
+  <div id="map" class="mb-6 shadow-2xl"></div>
 
-<div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-  <div class="col-span-full text-center py-12">
-    <i class="fas fa-circle-notch fa-spin text-sky-500 text-3xl mb-4"></i>
-    <p class="text-slate-400 text-xs font-bold uppercase">Lecture des données satellites...</p>
+  <!-- Légende -->
+  <div class="glass-card p-4 mb-6 bg-sky-900/10 border-sky-500/20">
+    <h4 class="text-sky-400 font-bold text-xs mb-3 flex items-center gap-2">
+      <i class="fas fa-info-circle"></i> NJANGATU GÉEJ GI (Légende)
+    </h4>
+    <div class="grid grid-cols-2 gap-3 text-[11px] font-medium italic">
+      <div class="flex items-center gap-2"><span>📉</span> <span class="text-slate-300">Upwelling (Ndox mu nànd)</span></div>
+      <div class="flex items-center gap-2"><span>🔴</span> <span class="text-red-400 font-bold">Danger (Buleen dugg)</span></div>
+      <div class="flex items-center gap-2"><span>📈</span> <span class="text-slate-300">Ndox mu tàggat</span></div>
+      <div class="flex items-center gap-2"><span>🟢</span> <span class="text-emerald-400 font-bold">Jàmm (Baax na liggéey)</span></div>
+    </div>
   </div>
-</div>
 
-<footer class="mt-12 text-center text-slate-600 text-[9px] pb-10 uppercase font-bold tracking-widest">
-  <p>&copy; 2026 PecheurConnect - Marine Data Senegal</p>
-</footer>
+  <!-- Boutons GPS / Alerte -->
+  <div class="grid grid-cols-2 gap-3 mb-8">
+    <button onclick="getUserLocation()" class="bg-sky-600 p-4 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-lg">
+      <i class="fas fa-compass"></i> GPS POSITION
+    </button>
+    <button onclick="window.open('sms:+221?body=Alerte PecheurConnect : Danger détecté en mer !')" class="bg-red-600 p-4 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-lg">
+      <i class="fas fa-exclamation-triangle"></i> ALERTE SMS
+    </button>
+  </div>
 
-<script>
-const DATA_URL = "./data.json";
+  <!-- Dashboard -->
+  <div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="col-span-full text-center py-12">
+      <i class="fas fa-circle-notch fa-spin text-sky-500 text-3xl mb-4"></i>
+      <p class="text-slate-400 text-xs font-bold uppercase">Lecture des données satellites...</p>
+    </div>
+  </div>
 
-const zonesCoords = {
-  "SAINT-LOUIS": [16.03, -16.50],
-  "LOUGA-POTOU": [15.48, -16.75],
-  "KAYAR": [14.92, -17.20],
-  "DAKAR-YOFF": [14.75, -17.48],
-  "MBOUR-JOAL": [14.41, -16.96],
-  "CASAMANCE": [12.50, -16.70]
-};
-
-const map = L.map('map', { tap: false }).setView([14.5, -17.2], 7);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
-L.control.zoom({ position: 'bottomright' }).addTo(map);
-
-async function updateDashboard() {
-  const dash = document.getElementById("dashboard");
-  try {
-    const res = await fetch(DATA_URL + "?t=" + Date.now());
-    if(!res.ok) throw new Error("Impossible de charger data.json");
-    const data = await res.json();
-    dash.innerHTML = "";
-
-    data.forEach(item => {
-      const isDanger = item.houle >= 2.2;
-
-      // Carte
-      if(zonesCoords[item.zone]){
-        L.circleMarker(zonesCoords[item.zone], {
-          radius: 10,
-          fillColor: isDanger ? "#ef4444" : "#0ea5e9",
-          color: "#fff",
-          weight: 2,
-          fillOpacity: 0.9
-        }).addTo(map);
-      }
-
-      // Dashboard
-      const card = document.createElement("div");
-      card.className = `glass-card p-5 ${isDanger ? 'danger-pulse' : ''}`;
-      card.innerHTML = `
-        <h3 class="text-lg font-bold uppercase">${item.zone}</h3>
-        <p>🌡️ SST : ${item.sst ?? "—"} °C</p>
-        <p>🌊 Houle : ${item.houle ?? "—"} m</p>
-        <p>🌀 Courant : ${item.courant ?? "—"} m/s</p>
-        <p class="text-xs text-slate-400 mt-1">Dernière MAJ : ${item.timestamp ?? "—"}</p>
-      `;
-      dash.appendChild(card);
-    });
-
-  } catch(err){
-    dash.innerHTML = `<p class="col-span-full text-center text-red-400 font-bold p-10">Erreur : ${err.message}</p>`;
-  }
-}
-
-// Position GPS
-function getUserLocation(){
-  navigator.geolocation.getCurrentPosition(pos => {
-    const loc = [pos.coords.latitude, pos.coords.longitude];
-    L.marker(loc).addTo(map).bindPopup("Ma Pirogue").openPopup();
-    map.setView(loc, 10);
-  }, () => alert("Activez le GPS"));
-}
-
-window.onload = updateDashboard;
-</script>
-
-</body>
-</html>
+  <!-- Partage QR -->
+  <div class="mt-10 p-6 glass-card text-center bg-white/5 border-dashed border-sky-500/40">
+    <p class="text-[10px] font-black text-sky-400 mb-4 uppercase">Partager l'application</p>
+    <div c
