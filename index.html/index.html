@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🌊 PêcheurConnect</title>
 
   <!-- PWA -->
@@ -14,54 +13,71 @@
   <!-- Icons -->
   <link rel="icon" href="/sunu-blue-tech/icon-192.png">
 
+  <!-- Tailwind CDN (dev only, tu peux compiler pour prod) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
-    body { font-family: system-ui,sans-serif; margin:0; background:#f4f7fb; color:#111 }
-    header { background:#0B5ED7; color:#fff; padding:1rem; text-align:center }
-    main { max-width:600px; margin:auto; padding:1rem }
-    .card { background:#fff; padding:1rem; margin-bottom:1rem; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,.1) }
-    button { width:100%; padding:.8rem; border-radius:10px; border:none; background:#0B5ED7; color:white; font-weight:bold; cursor:pointer }
+    body { background:#020617; color:white; font-family:system-ui,sans-serif; margin:0; }
+    header { text-align:center; padding:1rem; }
+    #dashboard { max-width:600px; margin:auto; padding:1rem; }
+    .card { background:rgba(15,23,42,0.8); padding:1rem; margin-bottom:1rem; border-radius:12px; border:1px solid rgba(51,65,85,0.4); }
+    .danger { border:2px solid #ef4444; animation:pulse-red 2s infinite; }
+    @keyframes pulse-red { 0% { box-shadow:0 0 0 0 rgba(239,68,68,0.6); } 70% { box-shadow:0 0 0 12px rgba(239,68,68,0); } 100% { box-shadow:0 0 0 0 rgba(239,68,68,0); } }
   </style>
 </head>
 
 <body>
 
 <header>
-  <h1>🌊 PêcheurConnect</h1>
-  <p>Ta sécurité en mer</p>
+  <h1 class="text-3xl font-black text-sky-400">🌊 PêcheurConnect</h1>
+  <p class="text-slate-400 text-xs uppercase">Données satellites temps réel</p>
 </header>
 
-<main>
-
-  <div class="card">
-    <h2>📡 Météo Marine</h2>
-    <p>Données satellites en temps réel</p>
-    <button onclick="alert('Météo bientôt disponible')">Voir météo</button>
-  </div>
-
-  <div class="card">
-    <h2>🐟 Zones de pêche</h2>
-    <p>Repère les zones favorables</p>
-    <button onclick="alert('Zones bientôt disponibles')">Voir zones</button>
-  </div>
-
-  <div class="card">
-    <h2>🆘 Urgence</h2>
-    <p>Envoie une alerte rapide</p>
-    <button onclick="alert('Fonction SOS bientôt disponible')">SOS</button>
-  </div>
-
+<main id="dashboard">
+  <p class="text-center text-slate-500 uppercase font-bold mt-10">Lecture des données satellites...</p>
 </main>
 
-<footer style="text-align:center; font-size:.8rem; color:#666; margin:2rem 0 1rem;">
-  © 2026 – PêcheurConnect • Sunu Blue Tech
+<footer class="text-center text-slate-600 text-[9px] pb-10 uppercase font-bold tracking-widest">
+  © 2026 PecheurConnect - Marine Data Senegal
 </footer>
 
 <script>
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register("/sunu-blue-tech/sw.js")
-    .then(()=>console.log("✅ Service Worker OK"))
-    .catch(err=>console.error("❌ SW erreur:", err));
-}
+  const DATA_URL = "/sunu-blue-tech/data.json";
+
+  async function updateDashboard() {
+    const container = document.getElementById("dashboard");
+    try {
+      const res = await fetch(DATA_URL + "?t=" + Date.now());
+      if(!res.ok) throw new Error();
+      const data = await res.json();
+      container.innerHTML = "";
+
+      data.forEach(item => {
+        const isDanger = item.houle >= 2.2;
+        const card = document.createElement("div");
+        card.className = "card " + (isDanger ? "danger" : "");
+        card.innerHTML = `
+          <h2 class="font-bold text-lg">${item.zone} ${isDanger ? "⚠️" : ""}</h2>
+          <p>🌡️ Température: <b>${item.sst}°C</b></p>
+          <p>🌊 Houle: <b>${item.houle}m</b></p>
+          <p>🌬️ Courant: <b>${item.courant}m/s</b></p>
+        `;
+        container.appendChild(card);
+      });
+
+    } catch(e) {
+      container.innerHTML = '<p class="text-center text-red-500 mt-10 font-bold">Erreur lecture données</p>';
+    }
+  }
+
+  window.onload = updateDashboard;
+
+  // Service Worker
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register("/sunu-blue-tech/sw.js")
+      .then(()=>console.log("✅ SW OK"))
+      .catch(err=>console.error("❌ SW erreur:", err));
+  }
 </script>
 
 </body>
