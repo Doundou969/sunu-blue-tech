@@ -4,66 +4,51 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>🌊 PêcheurConnect – Sécurité & Pêche Intelligente</title>
-  <meta name="description" content="PêcheurConnect : météo marine, sécurité en mer et infos pêche pour pêcheurs artisanaux sénégalais. Fonctionne même hors ligne." />
+  <title>🌊 PêcheurConnect</title>
 
   <!-- PWA -->
-  <link rel="manifest" href="./manifest.json">
+  <link rel="manifest" href="/sunu-blue-tech/manifest.json">
   <meta name="theme-color" content="#0B5ED7">
 
-  <!-- iOS support -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <!-- Mobile -->
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="PêcheurConnect">
 
-  <!-- Favicon -->
-  <link rel="icon" href="./icon-192.png">
+  <!-- Icon -->
+  <link rel="icon" href="/sunu-blue-tech/icon-192.png">
 
   <style>
     body {
-      margin: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: system-ui, sans-serif;
       background: #f4f7fb;
-      color: #111;
+      margin: 0;
     }
     header {
       background: #0B5ED7;
-      color: #fff;
+      color: white;
       padding: 1rem;
       text-align: center;
     }
     main {
-      padding: 1rem;
       max-width: 600px;
       margin: auto;
+      padding: 1rem;
     }
     .card {
-      background: #fff;
-      border-radius: 12px;
+      background: white;
       padding: 1rem;
       margin-bottom: 1rem;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,.1);
     }
-    .btn {
-      display: block;
+    button {
       width: 100%;
       padding: 0.8rem;
       border-radius: 10px;
       border: none;
       background: #0B5ED7;
       color: white;
-      font-size: 1rem;
       font-weight: bold;
-      cursor: pointer;
-    }
-    .btn.secondary {
-      background: #198754;
-    }
-    footer {
-      text-align: center;
-      font-size: 0.8rem;
-      color: #666;
-      margin: 2rem 0 1rem;
     }
   </style>
 </head>
@@ -72,45 +57,27 @@
 
 <header>
   <h1>🌊 PêcheurConnect</h1>
-  <p>Ta sécurité, ta réussite</p>
+  <p>Ta sécurité en mer</p>
 </header>
 
 <main>
-
   <div class="card">
-    <h2>📡 Météo & Sécurité</h2>
-    <p>Consulte les conditions marines avant de sortir en mer.</p>
-    <button class="btn">Voir la météo</button>
-  </div>
-
-  <div class="card">
-    <h2>🐟 Zones de pêche</h2>
-    <p>Repère les zones favorables grâce aux données satellites.</p>
-    <button class="btn secondary">Voir les zones</button>
+    <h2>📡 Météo Marine</h2>
+    <button>Voir météo</button>
   </div>
 
   <div class="card">
     <h2>🆘 Urgence</h2>
-    <p>En cas de danger, partage rapidement ta position.</p>
-    <button class="btn" onclick="alert('Fonction SOS bientôt disponible')">
-      Bouton SOS
-    </button>
+    <button>SOS</button>
   </div>
-
 </main>
 
-<footer>
-  © 2026 – PêcheurConnect • Sunu Blue Tech
-</footer>
-
-<!-- Service Worker -->
+<!-- SERVICE WORKER -->
 <script>
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js")
-      .then(() => console.log("Service Worker enregistré"))
-      .catch(err => console.error("SW erreur:", err));
-  });
+  navigator.serviceWorker.register("/sunu-blue-tech/sw.js")
+    .then(() => console.log("✅ Service Worker OK"))
+    .catch(err => console.error("❌ SW erreur:", err));
 }
 </script>
 
