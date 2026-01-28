@@ -1,47 +1,73 @@
-name: PecheurConnect-Runner
+name: PecheurConnect-Runner-Pro
 
 on:
   schedule:
-    - cron: '0 */6 * * *' # Je l'ai passé à toutes les 6h pour plus de précision pour les pêcheurs
-  workflow_dispatch:      # Permet le lancement manuel
+    - cron: '0 */6 * * *'  # Toutes les 6h
+  workflow_dispatch:        # Lancement manuel
 
 jobs:
-  build:
+  run-pecheurconnect:
     runs-on: ubuntu-latest
     permissions:
-      contents: write     # TRÈS IMPORTANT : Autorise GitHub à enregistrer data.json
+      contents: write
 
     steps:
-      - name: 📂 Récupération du code
+      # ------------------------------
+      - name: 📂 Checkout du code
         uses: actions/checkout@v3
 
-      - name: 🐍 Installation de Python
+      # ------------------------------
+      - name: 🐍 Installer Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      - name: 📦 Installation des dépendances
+      # ------------------------------
+      - name: 📦 Installer dépendances
         run: |
           python -m pip install --upgrade pip
-          pip install numpy matplotlib requests xarray dask netCDF4 copernicusmarine --upgrade
+          pip install --upgrade numpy requests copernicusmarine
 
-      - name: 🚀 Exécution de PecheurConnect
+      # ------------------------------
+      - name: 🚀 Exécuter PecheurConnect avec logs détaillés
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_ID: ${{ secrets.TG_ID }}
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
-        run: python script_peche.py
+        run: |
+          echo "📌 Début script PecheurConnect"
+          LOG_FILE="pecheurconnect_$(date +'%Y%m%d_%H%M%S').log"
+          set -o pipefail
 
-      - name: 🌐 Déploiement des données
+          # Exécution script avec log + capture erreurs
+          python script_peche.py 2>&1 | tee "$LOG_FILE" || {
+            echo "⚠️ Erreur détectée dans le script !"
+            curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+              -d chat_id="${TG_ID}" \
+              -d text="🚨 CRASH PecheurConnect ! Vérifie GitHub Actions."
+            exit 0  # Workflow continue
+          }
+
+          echo "✅ Script terminé, log sauvegardé : $LOG_FILE"
+
+      # ------------------------------
+      - name: 🌐 Sauvegarde et versioning de data.json
         run: |
           git config --global user.name "PecheurConnect-Bot"
           git config --global user.email "bot@pecheurconnect.sn"
-          git add data.json
-          # On vérifie s'il y a des changements avant de pousser
-          if [ -n "$(git status --porcelain)" ]; then
-            git commit -m "📊 Mise à jour : $(date +'%d-%m-%Y %H:%M')"
-            git push origin main
+
+          if [ -f "data.json" ]; then
+            TIMESTAMP=$(date +'%Y%m%d_%H%M%S')
+            cp data.json "data_backup_$TIMESTAMP.json"   # Versionning historique
+
+            git add data.json data_backup_*.json
+            if [ -n "$(git status --porcelain)" ]; then
+              git commit -m "📊 Update PecheurConnect : $TIMESTAMP"
+              git push origin main
+              echo "✅ data.json pushé et versionné"
+            else
+              echo "ℹ️ Aucun changement détecté dans data.json"
+            fi
           else
-            echo "Aucun changement détecté."
-          fi
+            echo "⚠️ data.json non trouvé"
