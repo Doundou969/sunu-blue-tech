@@ -1,62 +1,32 @@
 [
-    {
-        "zone": "SAINT-LOUIS",
-        "temp": 17.7,
-        "trend": "\u27a1\ufe0f",
-        "vhm0": 1.9,
-        "next_vhm": 1.8,
-        "wind_speed": 0.9,
-        "wind_dir": "N-E",
-        "alert": "\ud83d\udfe1"
-    },
-    {
-        "zone": "LOUGA-POTOU",
-        "temp": 18.1,
-        "trend": "\u27a1\ufe0f",
-        "vhm0": 2.0,
-        "next_vhm": 1.8,
-        "wind_speed": 0.8,
-        "wind_dir": "N-E",
-        "alert": "\ud83d\udfe1"
-    },
-    {
-        "zone": "KAYAR",
-        "temp": 18.3,
-        "trend": "\u27a1\ufe0f",
-        "vhm0": 2.2,
-        "next_vhm": 2.0,
-        "wind_speed": 0.8,
-        "wind_dir": "N-E",
-        "alert": "\ud83d\udd34"
-    },
-    {
-        "zone": "DAKAR-YOFF",
-        "temp": 18.3,
-        "trend": "\u27a1\ufe0f",
-        "vhm0": 2.0,
-        "next_vhm": 1.8,
-        "wind_speed": 0.7,
-        "wind_dir": "N",
-        "alert": "\ud83d\udfe1"
-    },
-    {
-        "zone": "MBOUR-JOAL",
-        "temp": 20.0,
-        "trend": "\u27a1\ufe0f",
-        "vhm0": 0.7,
-        "next_vhm": 0.8,
-        "wind_speed": 0.4,
-        "wind_dir": "N",
-        "alert": "\ud83d\udfe2"
-    },
-    {
-        "zone": "CASAMANCE",
-        "temp": 23.2,
-        "trend": "\u27a1\ufe0f",
-        "vhm0": 0.5,
-        "next_vhm": 0.5,
-        "wind_speed": 0.4,
-        "wind_dir": "N",
-        "alert": "\ud83d\udfe2"
-    }
+  {
+    "zone": "SAINT-LOUIS",
+    "sst": 18.0,
+    "houle": 1.8,
+    "courant": 0.6
+  },
+  {
+    "zone": "KAYAR",
+    "sst": 19.2,
+    "houle": 2.0,
+    "courant": 0.9
+  },
+  {
+    "zone": "DAKAR-YOFF",
+    "sst": 19.4,
+    "houle": 1.8,
+    "courant": 0.7
+  },
+  {
+    "zone": "MBOUR-JOAL",
+    "sst": 20.4,
+    "houle": 0.8,
+    "courant": 0.3
+  },
+  {
+    "zone": "CASAMANCE",
+    "sst": 23.8,
+    "houle": 0.5,
+    "courant": 0.4
+  }
 ]
