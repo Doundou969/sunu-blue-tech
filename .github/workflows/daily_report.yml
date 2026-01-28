@@ -1,46 +1,37 @@
-name: PecheurConnect-Runner
+name: PecheurConnect-Copernicus
 
 on:
   schedule:
-    - cron: '0 */6 * * *' # toutes les 6h
-  workflow_dispatch:      # lancement manuel
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
 
 jobs:
-  build:
+  update:
     runs-on: ubuntu-latest
     permissions:
       contents: write
 
     steps:
-      - name: 📂 Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: 🐍 Setup Python
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
-      - name: 📦 Install dependencies
+      - name: Install deps
         run: |
-          python -m pip install --upgrade pip
-          pip install requests copernicusmarine --upgrade
+          pip install -r requirements.txt
 
-      - name: 🚀 Run PecheurConnect
+      - name: Run Copernicus
         env:
-          TG_TOKEN: ${{ secrets.TG_TOKEN }}
-          TG_ID: ${{ secrets.TG_ID }}
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
         run: python script_peche.py
 
-      - name: 🌐 Push data.json
+      - name: Commit data.json
         run: |
-          git config --global user.name "PecheurConnect-Bot"
-          git config --global user.email "bot@pecheurconnect.sn"
+          git config user.name "PecheurConnect-Bot"
+          git config user.email "bot@pecheurconnect.sn"
           git add data.json
-          if [ -n "$(git status --porcelain)" ]; then
-            git commit -m "📊 Update data.json $(date +'%d-%m-%Y %H:%M')"
-            git push
-          else
-            echo "Aucun changement détecté."
-          fi
+          git commit -m "📡 Update Copernicus data" || echo "No changes"
+          git push
