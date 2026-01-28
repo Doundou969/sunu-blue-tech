@@ -33,14 +33,15 @@ jobs:
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
         run: python script_peche.py
 
-      - name: 🌐 Commit & Push data.json
+      - name: 🌐 Commit & Push data.json only if changed
         run: |
           git config --global user.name "PecheurConnect-Bot"
           git config --global user.email "bot@pecheurconnect.sn"
           git add data.json
-          if [ -n "$(git status --porcelain)" ]; then
+          CHANGES=$(git status --porcelain)
+          echo "Changements détectés : $CHANGES"
+          if [ -n "$CHANGES" ]; then
             git commit -m "📊 Mise à jour data.json $(date +'%d-%m-%Y %H:%M')"
             git push origin main
           else
-            echo "Aucun changement détecté."
-          fi
+            echo "✅ Aucun changement détecté. Pas de commit nécessaire."
