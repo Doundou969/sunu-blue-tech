@@ -1,30 +1,22 @@
 # ============================================================
 # PECHEUR CONNECT 🇸🇳
-# Script Copernicus PRO – Génération data.json FRONT-COMPATIBLE
+# Script Copernicus PRO – data.json FRONT-COMPATIBLE
 # ============================================================
 
-import os
-import json
-import math
-import datetime
-import warnings
-import requests
+import os, json, math, datetime, warnings
 import copernicusmarine
 import numpy as np
 
 warnings.filterwarnings("ignore")
 
 # ============================================================
-# 🔐 SECRETS (GitHub Actions / ENV)
+# 🔐 SECRETS
 # ============================================================
-TG_TOKEN = os.getenv("TG_TOKEN", "")
-TG_ID = os.getenv("TG_ID", "")
 COP_USER = os.getenv("COPERNICUS_USERNAME", "")
 COP_PASS = os.getenv("COPERNICUS_PASSWORD", "")
 
 # ============================================================
 # 📍 ZONES CÔTIÈRES DU SÉNÉGAL
-# lat_min, lon_min, lat_max, lon_max
 # ============================================================
 ZONES = {
     "SAINT-LOUIS":  [15.8, -16.7, 16.2, -16.3],
@@ -36,12 +28,34 @@ ZONES = {
 }
 
 # ============================================================
-# 🧭 Direction vent (rose des vents)
+# 🧭 Direction du vent
 # ============================================================
 def wind_direction(u, v):
     deg = (math.atan2(u, v) * 180 / math.pi + 180) % 360
     dirs = ["N","NE","E","SE","S","SW","W","NW"]
     return dirs[int((deg + 22.5) / 45) % 8]
+
+# ============================================================
+# 🌊 Évaluation risque mer
+# ============================================================
+def sea_risk(wind_speed):
+    if wind_speed < 6:
+        return "VERT"
+    elif wind_speed < 10:
+        return "ORANGE"
+    else:
+        return "ROUGE"
+
+# ============================================================
+# 🐟 Potentiel pêche (proxy plancton)
+# ============================================================
+def fishing_potential(temp, wind_speed):
+    if 22 <= temp <= 27 and wind_speed < 8:
+        return "EXCELLENT"
+    elif 20 <= temp <= 29:
+        return "BON"
+    else:
+        return "FAIBLE"
 
 # ============================================================
 # 🚀 MAIN
@@ -50,128 +64,65 @@ def main():
     print("🔑 Connexion Copernicus Marine...")
     copernicusmarine.login(username=COP_USER, password=COP_PASS)
 
-    # Historique SST (pour calcul tendance 📉📈)
+    now = datetime.datetime.utcnow()
+    date_str = now.strftime("%d/%m/%Y %H:%M UTC")
+    day = now.strftime("%Y-%m-%d")
+
+    # Historique température
     old_temp = {}
     if os.path.exists("data.json"):
         try:
             with open("data.json", "r") as f:
-                old_data = json.load(f)
-                for item in old_data:
-                    old_temp[item["zone"]] = item["temp"]
+                for z in json.load(f):
+                    old_temp[z["zone"]] = z["sst"]
         except:
             pass
 
     results = []
-    now = datetime.datetime.utcnow().strftime("%d/%m/%Y %H:%M UTC")
-    telegram_report = f"🌊 <b>PECHEUR CONNECT 🇸🇳</b>\n📅 {now}\n\n"
 
-    for zone, b in ZONES.items():
-        print(f"📡 Analyse satellite : {zone}")
+    for zone, box in ZONES.items():
+        lat_min, lon_min, lat_max, lon_max = box
 
-        try:
-            # =========================
-            # 🌡️ TEMPÉRATURE DE SURFACE
-            # =========================
-            ds_t = copernicusmarine.open_dataset(
-                dataset_id="cmems_mod_glo_phy-thetao_anfc_0.083deg_P1D-m",
-                minimum_latitude=b[0], maximum_latitude=b[2],
-                minimum_longitude=b[1], maximum_longitude=b[3],
-                variables=["thetao"]
-            )
-            raw = float(ds_t["thetao"].isel(time=-1, depth=0).mean())
-            temp = round(raw - 273.15, 1) if raw > 100 else round(raw, 1)
+        data = copernicusmarine.open_dataset(
+            dataset_id="cmems_mod_glo_phy_my_0.083_P1D-m",
+            variables=["thetao", "uo", "vo"],
+            minimum_longitude=lon_min,
+            maximum_longitude=lon_max,
+            minimum_latitude=lat_min,
+            maximum_latitude=lat_max,
+            start_datetime=f"{day}T00:00:00",
+            end_datetime=f"{day}T23:59:59"
+        )
 
-            # =========================
-            # 🌊 HOULE SIGNIFICATIVE
-            # =========================
-            ds_w = copernicusmarine.open_dataset(
-                dataset_id="cmems_mod_glo_wav_anfc_0.083deg_PT3H-i",
-                minimum_latitude=b[0], maximum_latitude=b[2],
-                minimum_longitude=b[1], maximum_longitude=b[3],
-                variables=["VHM0"]
-            )
-            vhm0 = round(float(ds_w["VHM0"].isel(time=-1).mean()), 1)
-            next_vhm = round(float(ds_w["VHM0"].isel(time=-8).mean()), 1)
+        temp = float(np.nanmean(data["thetao"].values))
+        u = float(np.nanmean(data["uo"].values))
+        v = float(np.nanmean(data["vo"].values))
 
-            # =========================
-            # 🌬️ COURANTS (vent marin)
-            # =========================
-            ds_c = copernicusmarine.open_dataset(
-                dataset_id="cmems_mod_glo_phy-cur_anfc_0.083deg_P1D-m",
-                minimum_latitude=b[0], maximum_latitude=b[2],
-                minimum_longitude=b[1], maximum_longitude=b[3],
-                variables=["uo", "vo"]
-            )
-            u = float(ds_c["uo"].isel(time=-1, depth=0).mean())
-            v = float(ds_c["vo"].isel(time=-1, depth=0).mean())
-            wind_speed = round(math.sqrt(u*u + v*v) * 3.6, 1)
-            wind_dir = wind_direction(u, v)
+        wind_speed = round(math.sqrt(u**2 + v**2) * 3.6, 1)  # m/s → km/h
+        direction = wind_direction(u, v)
 
-        except Exception as e:
-            print(f"⚠️ Erreur {zone} → fallback")
-            temp = 20.0
-            vhm0 = 1.0
-            next_vhm = 1.1
-            wind_speed = 10.0
-            wind_dir = "N"
+        trend = "STABLE"
+        if zone in old_temp:
+            if temp > old_temp[zone] + 0.3:
+                trend = "📈 CHAUD"
+            elif temp < old_temp[zone] - 0.3:
+                trend = "📉 FROID"
 
-        # =========================
-        # 📉📈 TENDANCE (Upwelling)
-        # =========================
-        prev = old_temp.get(zone, temp)
-        if temp < prev - 0.2:
-            trend = "📉"
-        elif temp > prev + 0.2:
-            trend = "📈"
-        else:
-            trend = "➡️"
-
-        # =========================
-        # 🚨 ALERTE MER
-        # =========================
-        if vhm0 >= 2.3:
-            alert = "🔴"
-        elif vhm0 >= 1.5:
-            alert = "🟡"
-        else:
-            alert = "🟢"
-
-        # =========================
-        # JSON FINAL (FRONT READY)
-        # =========================
         results.append({
             "zone": zone,
-            "temp": temp,
-            "vhm0": vhm0,
-            "trend": trend,
-            "alert": alert,
-            "wind_speed": wind_speed,
-            "wind_dir": wind_dir,
-            "next_vhm": next_vhm
+            "date": date_str,
+            "sst": round(temp, 1),
+            "tendance": trend,
+            "vent_kmh": wind_speed,
+            "vent_direction": direction,
+            "risque_mer": sea_risk(wind_speed),
+            "potentiel_peche": fishing_potential(temp, wind_speed)
         })
 
-        telegram_report += (
-            f"📍 <b>{zone}</b> {alert}\n"
-            f"🌡️ {temp}°C {trend}\n"
-            f"🌊 {vhm0} m | 🌬️ {wind_speed} km/h {wind_dir}\n\n"
-        )
-
-    # ============================================================
-    # 💾 SAUVEGARDE JSON (pour le site)
-    # ============================================================
-    with open("data.json", "w") as f:
-        json.dump(results, f, indent=2)
+    with open("data.json", "w", encoding="utf-8") as f:
+        json.dump(results, f, indent=2, ensure_ascii=False)
 
     print("✅ data.json généré avec succès")
-
-    # ============================================================
-    # 📤 TELEGRAM (optionnel)
-    # ============================================================
-    if TG_TOKEN and TG_ID:
-        requests.post(
-            f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage",
-            data={"chat_id": TG_ID, "text": telegram_report, "parse_mode": "HTML"}
-        )
 
 # ============================================================
 if __name__ == "__main__":
