@@ -1,25 +1,13 @@
 {
-  "short_name": "SunuBlue",
-  "name": "Sunu Blue Tech - Navigation Pêche",
-  "description": "Données météo et zones de pêche en temps réel au Sénégal.",
-  "icons": [
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/1042/1042611.png",
-      "type": "image/png",
-      "sizes": "192x192",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/1042/1042611.png",
-      "type": "image/png",
-      "sizes": "512x512",
-      "purpose": "any maskable"
-    }
-  ],
-  "start_url": "../index.html",
-  "background_color": "#1e3c72",
+  "name": "PecheurConnect 🇸🇳",
+  "short_name": "PecheurConnect",
+  "description": "Radar de pêche temps réel Sénégal - Satellites Copernicus",
+  "start_url": "./index.html",
   "display": "standalone",
-  "scope": "/",
-  "theme_color": "#1e3c72",
-  "orientation": "portrait"
+  "background_color": "#020617",
+  "theme_color": "#0ea5e9",
+  "icons": [
+    { "src": "https://img.icons8.com/fluency/48/fish.png", "sizes": "48x48", "type": "image/png" },
+    { "src": "https://img.icons8.com/fluency/192/fish.png", "sizes": "192x192", "type": "image/png" }
+  ]
 }
