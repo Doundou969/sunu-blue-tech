@@ -2,19 +2,20 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PecheurConnect 🇸🇳 | Radar de Pêche</title>
 <link rel="icon" href="https://img.icons8.com/fluency/48/fish.png">
+<link rel="manifest" href="manifest.json">
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
-body { background: #020617; color: white; font-family: system-ui, -apple-system, sans-serif; }
-.glass-card { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(51, 65, 85, 0.4); border-radius: 1.5rem; }
-#map { height: 320px; border-radius: 1.5rem; border: 2px solid #1e293b; z-index: 10; }
-.danger-pulse { border: 2px solid #ef4444; animation: pulse-red 2s infinite; }
-@keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); } 70% { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+body { background:#020617;color:white;font-family:system-ui,-apple-system,sans-serif }
+.glass-card { background:rgba(15,23,42,0.8);backdrop-filter:blur(12px);border:1px solid rgba(51,65,85,0.4);border-radius:1.5rem; }
+#map { height:320px;border-radius:1.5rem;border:2px solid #1e293b;z-index:10; }
+.danger-pulse { border:2px solid #ef4444; animation:pulse-red 2s infinite; }
+@keyframes pulse-red { 0% {box-shadow:0 0 0 0 rgba(239,68,68,0.6);}70% {box-shadow:0 0 0 12px rgba(239,68,68,0);}100% {box-shadow:0 0 0 0 rgba(239,68,68,0);} }
 </style>
 </head>
 <body class="p-4 max-w-4xl mx-auto">
@@ -26,8 +27,7 @@ body { background: #020617; color: white; font-family: system-ui, -apple-system,
 
 <div id="map" class="mb-6 shadow-2xl"></div>
 
-<div class="glass-card p-4 mb-4">
-<p id="alert-header" class="text-red-400 font-bold text-xs mb-2 hidden">🚨 Danger en mer détecté !</p>
+<div class="glass-card p-4 mb-6 bg-sky-900/10 border-sky-500/20">
 <h4 class="text-sky-400 font-bold text-xs mb-3 flex items-center gap-2">
 <i class="fas fa-info-circle"></i> NJANGATU GÉEJ GI (Légende)
 </h4>
@@ -48,7 +48,7 @@ body { background: #020617; color: white; font-family: system-ui, -apple-system,
 </button>
 </div>
 
-<div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+<div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 gap-4">
 <div class="col-span-full text-center py-12">
 <i class="fas fa-circle-notch fa-spin text-sky-500 text-3xl mb-4"></i>
 <p class="text-slate-400 text-xs font-bold uppercase">Lecture des données satellites...</p>
@@ -68,130 +68,68 @@ body { background: #020617; color: white; font-family: system-ui, -apple-system,
 </footer>
 
 <script>
-const DATA_URL = "https://doundou969.github.io/sunu-blue-tech/data.json";
+const DATA_URL = "data.json";
 
-const map = L.map('map', { tap: false, zoomControl: false }).setView([14.5, -17.2], 7);
-L.control.zoom({ position: 'bottomright' }).addTo(map);
+const map = L.map('map',{tap:false,zoomControl:false}).setView([14.5,-17.2],7);
+L.control.zoom({position:'bottomright'}).addTo(map);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
-const zonesCoords = {
-"SAINT-LOUIS": [16.03, -16.50], "LOUGA-POTOU": [15.48, -16.75],
-"KAYAR": [14.92, -17.20], "DAKAR-YOFF": [14.75, -17.48],
-"MBOUR-JOAL": [14.41, -16.96], "CASAMANCE": [12.50, -16.70]
-};
+const zonesCoords={"SAINT-LOUIS":[16.03,-16.50],"LOUGA-POTOU":[15.48,-16.75],"KAYAR":[14.92,-17.20],"DAKAR-YOFF":[14.75,-17.48],"MBOUR-JOAL":[14.41,-16.96],"CASAMANCE":[12.50,-16.70]};
 
-// DEMANDE PERMISSION NOTIF PUSH
-if ("Notification" in window && Notification.permission !== "granted") {
-    Notification.requestPermission().then(p => console.log("Notification permission:", p));
+async function updateDashboard(){
+const container=document.getElementById('dashboard');
+try{
+const response=await fetch(DATA_URL+'?t='+Date.now());
+if(!response.ok)throw new Error();
+const data=await response.json();
+container.innerHTML='';
+data.forEach(item=>{
+const isDanger=item.vhm0>=2.2;
+const card=document.createElement('div');
+card.className=`glass-card p-5 ${isDanger?'danger-pulse':''}`;
+card.innerHTML=`
+<div class="flex justify-between items-start mb-3">
+<h3 class="text-base font-black uppercase tracking-tight">${item.zone}</h3>
+<span class="text-xl">${item.alert}</span>
+</div>
+<div class="flex justify-between items-end">
+<div>
+<span class="text-3xl font-mono font-bold">${item.temp}°C</span>
+<span class="text-sm ml-1">${item.trend}</span>
+</div>
+<div class="text-right">
+<p class="text-[8px] text-slate-500 font-black uppercase">Houle</p>
+<p class="text-xl font-bold ${isDanger?'text-red-500':'text-emerald-400'}">${item.vhm0}m</p>
+</div>
+</div>
+<div class="mt-4 pt-3 border-t border-slate-800/50 flex justify-between text-[10px] text-slate-400 font-bold uppercase">
+<span>🌬️ ${item.wind_speed}km/h ${item.wind_dir}</span>
+<span class="text-sky-500">Demain: ${item.next_vhm}m</span>
+</div>
+`;
+container.appendChild(card);
+
+if(zonesCoords[item.zone]){
+L.circleMarker(zonesCoords[item.zone],{
+radius:10,fillColor:isDanger?'#ef4444':'#0ea5e9',color:"#fff",weight:2,fillOpacity:0.9
+}).addTo(map);
+}
+});
+}catch(err){
+container.innerHTML='<p class="col-span-full text-center text-slate-500 text-[10px] p-10 font-bold uppercase tracking-widest italic">En attente des satellites... (Vérifiez votre connexion)</p>';
+}
 }
 
-// ALERTES VOCALES
-function speakAlert(zones) {
-    if (!window.speechSynthesis) return;
-    const zonesCritiques = zones.filter(item => item.vhm0 >= 2.2);
-    if(zonesCritiques.length === 0) return;
-
-    // Français
-    const texteFr = "Attention, danger en mer à " + zonesCritiques.map(z => `${z.zone} (${z.vhm0} m)`).join(", ");
-    const utterFr = new SpeechSynthesisUtterance(texteFr);
-    utterFr.lang = 'fr-FR'; utterFr.rate = 1;
-    window.speechSynthesis.speak(utterFr);
-
-    // Wolof
-    const texteWo = "Xam naa, danger ci mer ci " + zonesCritiques.map(z => `${z.zone} (${z.vhm0} m)`).join(", ");
-    const utterWo = new SpeechSynthesisUtterance(texteWo);
-    utterWo.lang = 'wo-SN'; utterWo.rate = 1;
-    window.speechSynthesis.speak(utterWo);
+function getUserLocation(){
+navigator.geolocation.getCurrentPosition(p=>{
+const loc=[p.coords.latitude,p.coords.longitude];
+L.marker(loc).addTo(map).bindPopup("Ma Pirogue").openPopup();
+map.setView(loc,10);
+},()=>alert("Activez le GPS"));
 }
 
-// ALERTES PUSH + VIBRATION
-function pushAlert(zones) {
-    const zonesCritiques = zones.filter(item => item.vhm0 >= 2.2);
-    if(zonesCritiques.length === 0) return;
-
-    const msgText = "⚠ Danger mer : " + zonesCritiques.map(z => `${z.zone} (${z.vhm0} m)`).join(", ");
-    if(navigator.vibrate) navigator.vibrate([500,200,500]);
-
-    if("Notification" in window && Notification.permission === "granted") {
-        new Notification("PecheurConnect ⚓", {
-            body: msgText,
-            icon: "https://img.icons8.com/fluency/48/fish.png",
-            vibrate: [500,200,500]
-        });
-    }
-}
-
-async function updateDashboard() {
-    const container = document.getElementById('dashboard');
-    const alertHeader = document.getElementById('alert-header');
-
-    try {
-        const response = await fetch(DATA_URL + '?t=' + Date.now());
-        if (!response.ok) throw new Error();
-        const data = await response.json();
-        data.sort((a,b) => b.vhm0 - a.vhm0);
-
-        container.innerHTML = '';
-        if(data.some(item => item.vhm0 >= 2.2)) alertHeader.classList.remove('hidden');
-        else alertHeader.classList.add('hidden');
-
-        // VOIX + PUSH
-        speakAlert(data);
-        pushAlert(data);
-
-        data.forEach(item => {
-            const isDanger = item.vhm0 >= 2.2;
-            const tempColor = item.temp < 19 ? '#0ea5e9' : '#facc15';
-
-            const card = document.createElement('div');
-            card.className = `glass-card p-5 ${isDanger ? 'danger-pulse' : ''}`;
-            card.innerHTML = `
-                <div class="flex justify-between items-start mb-3">
-                    <h3 class="text-base font-black uppercase tracking-tight" style="color:${tempColor}">${item.zone}</h3>
-                    <span class="text-xl">${item.alert}</span>
-                </div>
-                <div class="flex justify-between items-end">
-                    <div>
-                        <span class="text-3xl font-mono font-bold">${item.temp}°C</span>
-                        <span class="text-sm ml-1">${item.trend}</span>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-[8px] text-slate-500 font-black uppercase">Houle</p>
-                        <p class="text-xl font-bold ${isDanger ? 'text-red-500' : 'text-emerald-400'}">${item.vhm0}m</p>
-                    </div>
-                </div>
-                <div class="mt-4 pt-3 border-t border-slate-800/50 flex justify-between text-[10px] text-slate-400 font-bold uppercase">
-                    <span>🌬️ ${item.wind_speed}km/h ${item.wind_dir}</span>
-                    <span class="text-sky-500">Demain: ${item.next_vhm}m</span>
-                </div>
-            `;
-            container.appendChild(card);
-
-            if(zonesCoords[item.zone]) {
-                L.circleMarker(zonesCoords[item.zone], {
-                    radius: 10, fillColor: isDanger ? '#ef4444' : '#0ea5e9',
-                    color: "#fff", weight: 2, fillOpacity: 0.9
-                }).addTo(map);
-            }
-        });
-    } catch (err) {
-        container.innerHTML = '<p class="col-span-full text-center text-slate-500 text-[10px] p-10 font-bold uppercase tracking-widest italic">En attente des satellites... (Vérifiez votre connexion)</p>';
-        alertHeader.classList.add('hidden');
-    }
-}
-
-function getUserLocation() {
-    navigator.geolocation.getCurrentPosition(p => {
-        const loc = [p.coords.latitude, p.coords.longitude];
-        L.marker(loc).addTo(map).bindPopup("Ma Pirogue").openPopup();
-        map.setView(loc, 10);
-    }, () => alert("Activez le GPS"));
-}
-
-window.onload = () => {
-    updateDashboard();
-    setInterval(updateDashboard, 1000*60*10); // rafraîchissement 10 min
-}
+window.onload=updateDashboard;
 </script>
+
 </body>
 </html>
