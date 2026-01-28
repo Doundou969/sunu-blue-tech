@@ -1,50 +1,62 @@
 [
-    {
-        "zone": "SAINT-LOUIS",
-        "sst": 18.0,
-        "houle": 2.3,
-        "courant": 0.18,
-        "wind_dir": "N-E",
-        "alert": "\ud83d\udd34"
-    },
-    {
-        "zone": "LOUGA-POTOU",
-        "sst": 18.4,
-        "houle": 2.3,
-        "courant": 0.13,
-        "wind_dir": "N-E",
-        "alert": "\ud83d\udd34"
-    },
-    {
-        "zone": "KAYAR",
-        "sst": 19.2,
-        "houle": 2.3,
-        "courant": 0.25,
-        "wind_dir": "N-E",
-        "alert": "\ud83d\udd34"
-    },
-    {
-        "zone": "DAKAR-YOFF",
-        "sst": 19.4,
-        "houle": 2.1,
-        "courant": 0.18,
-        "wind_dir": "N-O",
-        "alert": "\ud83d\udfe2"
-    },
-    {
-        "zone": "MBOUR-JOAL",
-        "sst": 20.4,
-        "houle": 1.1,
-        "courant": 0.08,
-        "wind_dir": "N",
-        "alert": "\ud83d\udfe2"
-    },
-    {
-        "zone": "CASAMANCE",
-        "sst": 23.8,
-        "houle": 0.6,
-        "courant": 0.12,
-        "wind_dir": "N",
-        "alert": "\ud83d\udfe2"
-    }
+  {
+    "zone": "SAINT-LOUIS",
+    "temp": 18.0,
+    "vhm0": 2.4,
+    "trend": "\u27a1\ufe0f",
+    "alert": "\ud83d\udd34",
+    "wind_speed": 0.6,
+    "wind_dir": "NE",
+    "next_vhm": 1.8
+  },
+  {
+    "zone": "LOUGA-POTOU",
+    "temp": 18.4,
+    "vhm0": 2.3,
+    "trend": "\u27a1\ufe0f",
+    "alert": "\ud83d\udd34",
+    "wind_speed": 0.5,
+    "wind_dir": "NE",
+    "next_vhm": 1.8
+  },
+  {
+    "zone": "KAYAR",
+    "temp": 19.2,
+    "vhm0": 2.4,
+    "trend": "\u27a1\ufe0f",
+    "alert": "\ud83d\udd34",
+    "wind_speed": 0.9,
+    "wind_dir": "NE",
+    "next_vhm": 2.0
+  },
+  {
+    "zone": "DAKAR-YOFF",
+    "temp": 19.4,
+    "vhm0": 2.1,
+    "trend": "\u27a1\ufe0f",
+    "alert": "\ud83d\udfe1",
+    "wind_speed": 0.7,
+    "wind_dir": "NW",
+    "next_vhm": 1.8
+  },
+  {
+    "zone": "MBOUR-JOAL",
+    "temp": 20.4,
+    "vhm0": 1.2,
+    "trend": "\u27a1\ufe0f",
+    "alert": "\ud83d\udfe2",
+    "wind_speed": 0.3,
+    "wind_dir": "N",
+    "next_vhm": 0.8
+  },
+  {
+    "zone": "CASAMANCE",
+    "temp": 23.8,
+    "vhm0": 0.7,
+    "trend": "\u27a1\ufe0f",
+    "alert": "\ud83d\udfe2",
+    "wind_speed": 0.4,
+    "wind_dir": "N",
+    "next_vhm": 0.5
+  }
 ]
