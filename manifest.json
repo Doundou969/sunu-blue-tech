@@ -1,11 +1,23 @@
 {
-  "name": "PecheurConnect",
-  "short_name": "PêcheurConnect",
-  "start_url": "./index.html",
+  "name": "PecheurConnect 🇸🇳",
+  "short_name": "PecheurConnect",
+  "description": "Radar Satellite Copernicus en temps réel pour les pêcheurs sénégalais.",
+  "start_url": "/sunu-blue-tech/index.html",
+  "scope": "/sunu-blue-tech/",
   "display": "standalone",
   "background_color": "#020617",
   "theme_color": "#0ea5e9",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
   "icons": [
     {
-     
+      "src": "/sunu-blue-tech/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/sunu-blue-tech/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
