@@ -1,44 +1,50 @@
 [
-  {
-    "zone": "SAINT-LOUIS",
-    "sst": -255.2,
-    "houle": 2.3,
-    "courant": 0.18,
-    "timestamp": "2026-01-28 19:03 UTC"
-  },
-  {
-    "zone": "LOUGA-POTOU",
-    "sst": -254.8,
-    "houle": 2.3,
-    "courant": 0.13,
-    "timestamp": "2026-01-28 19:03 UTC"
-  },
-  {
-    "zone": "KAYAR",
-    "sst": -254.0,
-    "houle": 2.3,
-    "courant": 0.25,
-    "timestamp": "2026-01-28 19:03 UTC"
-  },
-  {
-    "zone": "DAKAR-YOFF",
-    "sst": -253.7,
-    "houle": 2.1,
-    "courant": 0.18,
-    "timestamp": "2026-01-28 19:03 UTC"
-  },
-  {
-    "zone": "MBOUR-JOAL",
-    "sst": -252.8,
-    "houle": 1.1,
-    "courant": 0.08,
-    "timestamp": "2026-01-28 19:03 UTC"
-  },
-  {
-    "zone": "CASAMANCE",
-    "sst": -249.3,
-    "houle": 0.6,
-    "courant": 0.12,
-    "timestamp": "2026-01-28 19:03 UTC"
-  }
+    {
+        "zone": "SAINT-LOUIS",
+        "sst": 18.0,
+        "houle": 2.3,
+        "courant": 0.18,
+        "wind_dir": "N-E",
+        "alert": "\ud83d\udd34"
+    },
+    {
+        "zone": "LOUGA-POTOU",
+        "sst": 18.4,
+        "houle": 2.3,
+        "courant": 0.13,
+        "wind_dir": "N-E",
+        "alert": "\ud83d\udd34"
+    },
+    {
+        "zone": "KAYAR",
+        "sst": 19.2,
+        "houle": 2.3,
+        "courant": 0.25,
+        "wind_dir": "N-E",
+        "alert": "\ud83d\udd34"
+    },
+    {
+        "zone": "DAKAR-YOFF",
+        "sst": 19.4,
+        "houle": 2.1,
+        "courant": 0.18,
+        "wind_dir": "N-O",
+        "alert": "\ud83d\udfe2"
+    },
+    {
+        "zone": "MBOUR-JOAL",
+        "sst": 20.4,
+        "houle": 1.1,
+        "courant": 0.08,
+        "wind_dir": "N",
+        "alert": "\ud83d\udfe2"
+    },
+    {
+        "zone": "CASAMANCE",
+        "sst": 23.8,
+        "houle": 0.6,
+        "courant": 0.12,
+        "wind_dir": "N",
+        "alert": "\ud83d\udfe2"
+    }
 ]
