@@ -2,31 +2,31 @@
   {
     "zone": "SAINT-LOUIS",
     "sst": 18.0,
-    "houle": 1.8,
+    "houle": 2.3,
     "courant": 0.6
   },
   {
     "zone": "KAYAR",
     "sst": 19.2,
-    "houle": 2.0,
+    "houle": 2.3,
     "courant": 0.9
   },
   {
     "zone": "DAKAR-YOFF",
     "sst": 19.4,
-    "houle": 1.8,
+    "houle": 2.1,
     "courant": 0.7
   },
   {
     "zone": "MBOUR-JOAL",
     "sst": 20.4,
-    "houle": 0.8,
+    "houle": 1.1,
     "courant": 0.3
   },
   {
     "zone": "CASAMANCE",
     "sst": 23.8,
-    "houle": 0.5,
+    "houle": 0.6,
     "courant": 0.4
   }
 ]
