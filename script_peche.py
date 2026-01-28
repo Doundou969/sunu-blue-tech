@@ -1,22 +1,28 @@
 # ============================================================
-# PECHEUR CONNECT 🇸🇳
-# Script Copernicus PRO – data.json FRONT-COMPATIBLE
+# PECHEUR CONNECT 🇸🇳 - Script Copernicus PRO
+# Génération data.json FRONT-COMPATIBLE (SST, Houle, Vent)
 # ============================================================
 
-import os, json, math, datetime, warnings
+import os
+import json
+import math
+import datetime
+import warnings
 import copernicusmarine
 import numpy as np
 
 warnings.filterwarnings("ignore")
 
 # ============================================================
-# 🔐 SECRETS
+# 🔐 SECRETS (GitHub Actions / ENV)
 # ============================================================
+TG_TOKEN = os.getenv("TG_TOKEN", "")
+TG_ID = os.getenv("TG_ID", "")
 COP_USER = os.getenv("COPERNICUS_USERNAME", "")
 COP_PASS = os.getenv("COPERNICUS_PASSWORD", "")
 
 # ============================================================
-# 📍 ZONES CÔTIÈRES DU SÉNÉGAL
+# 📍 ZONES CÔTIÈRES DU SÉNÉGAL (lat_min, lon_min, lat_max, lon_max)
 # ============================================================
 ZONES = {
     "SAINT-LOUIS":  [15.8, -16.7, 16.2, -16.3],
@@ -28,7 +34,7 @@ ZONES = {
 }
 
 # ============================================================
-# 🧭 Direction du vent
+# 🧭 Rose des vents
 # ============================================================
 def wind_direction(u, v):
     deg = (math.atan2(u, v) * 180 / math.pi + 180) % 360
@@ -36,94 +42,123 @@ def wind_direction(u, v):
     return dirs[int((deg + 22.5) / 45) % 8]
 
 # ============================================================
-# 🌊 Évaluation risque mer
-# ============================================================
-def sea_risk(wind_speed):
-    if wind_speed < 6:
-        return "VERT"
-    elif wind_speed < 10:
-        return "ORANGE"
-    else:
-        return "ROUGE"
-
-# ============================================================
-# 🐟 Potentiel pêche (proxy plancton)
-# ============================================================
-def fishing_potential(temp, wind_speed):
-    if 22 <= temp <= 27 and wind_speed < 8:
-        return "EXCELLENT"
-    elif 20 <= temp <= 29:
-        return "BON"
-    else:
-        return "FAIBLE"
-
-# ============================================================
-# 🚀 MAIN
+# 🔹 MAIN
 # ============================================================
 def main():
     print("🔑 Connexion Copernicus Marine...")
     copernicusmarine.login(username=COP_USER, password=COP_PASS)
 
-    now = datetime.datetime.utcnow()
-    date_str = now.strftime("%d/%m/%Y %H:%M UTC")
-    day = now.strftime("%Y-%m-%d")
-
-    # Historique température
+    # Historique SST pour tendance
     old_temp = {}
     if os.path.exists("data.json"):
         try:
             with open("data.json", "r") as f:
-                for z in json.load(f):
-                    old_temp[z["zone"]] = z["sst"]
+                old_data = json.load(f)
+                for item in old_data:
+                    old_temp[item["zone"]] = item["temp"]
         except:
             pass
 
     results = []
+    now = datetime.datetime.utcnow().strftime("%d/%m/%Y %H:%M UTC")
+    day = datetime.datetime.utcnow().strftime("%Y-%m-%d")
 
-    for zone, box in ZONES.items():
-        lat_min, lon_min, lat_max, lon_max = box
+    for zone, coords in ZONES.items():
+        lat_min, lon_min, lat_max, lon_max = coords
 
-        data = copernicusmarine.open_dataset(
-            dataset_id="cmems_mod_glo_phy_my_0.083_P1D-m",
-            variables=["thetao", "uo", "vo"],
-            minimum_longitude=lon_min,
-            maximum_longitude=lon_max,
-            minimum_latitude=lat_min,
-            maximum_latitude=lat_max,
-            start_datetime=f"{day}T00:00:00",
-            end_datetime=f"{day}T23:59:59"
-        )
+        # ------------------------------
+        # SST + Courants (thetao, uo, vo)
+        # ------------------------------
+        try:
+            sst_data = copernicusmarine.open_dataset(
+                dataset_id="cmems_mod_glo_phy-anfc_0.083deg_P1D-m",
+                variables=["thetao","uo","vo"],
+                minimum_longitude=lon_min,
+                maximum_longitude=lon_max,
+                minimum_latitude=lat_min,
+                maximum_latitude=lat_max,
+                start_datetime=f"{day}T00:00:00Z",
+                end_datetime=f"{day}T23:59:59Z"
+            )
+            temp = float(np.mean(sst_data["thetao"]))
+            wind_u = float(np.mean(sst_data["uo"]))
+            wind_v = float(np.mean(sst_data["vo"]))
+            wind_speed = round(math.sqrt(wind_u**2 + wind_v**2),1)
+            wind_dir = wind_direction(wind_u, wind_v)
+        except Exception as e:
+            print(f"⚠️ Erreur SST/Vent pour {zone} : {e}")
+            temp = 0.0
+            wind_speed = 0.0
+            wind_dir = "N"
 
-        temp = float(np.nanmean(data["thetao"].values))
-        u = float(np.nanmean(data["uo"].values))
-        v = float(np.nanmean(data["vo"].values))
+        # ------------------------------
+        # Houle / VHM0
+        # ------------------------------
+        try:
+            wave_data = copernicusmarine.open_dataset(
+                dataset_id="cmems_mod_glo_wav_anfc_0.083deg_PT3H-i",
+                variables=["VHM0"],
+                minimum_longitude=lon_min,
+                maximum_longitude=lon_max,
+                minimum_latitude=lat_min,
+                maximum_latitude=lat_max,
+                start_datetime=f"{day}T00:00:00Z",
+                end_datetime=f"{day}T23:59:59Z"
+            )
+            vhm0 = round(float(np.mean(wave_data["VHM0"])),1)
+        except Exception as e:
+            print(f"⚠️ Erreur Houle pour {zone} : {e}")
+            vhm0 = 0.0
 
-        wind_speed = round(math.sqrt(u**2 + v**2) * 3.6, 1)  # m/s → km/h
-        direction = wind_direction(u, v)
-
-        trend = "STABLE"
+        # ------------------------------
+        # Tendance SST
+        # ------------------------------
+        trend = "➡️"
         if zone in old_temp:
-            if temp > old_temp[zone] + 0.3:
-                trend = "📈 CHAUD"
-            elif temp < old_temp[zone] - 0.3:
-                trend = "📉 FROID"
+            if temp > old_temp[zone] + 0.2:
+                trend = "📈"
+            elif temp < old_temp[zone] - 0.2:
+                trend = "📉"
 
+        # ------------------------------
+        # Alertes houle
+        # ------------------------------
+        if vhm0 >= 2.2:
+            alert = "🔴"
+        elif vhm0 >= 1.5:
+            alert = "🟠"
+        else:
+            alert = "🟢"
+
+        # ------------------------------
+        # Prévision simple (demain) – estimation locale
+        # ------------------------------
+        next_vhm = round(vhm0 * 0.8,1)  # simple facteur correctif
+
+        # ------------------------------
+        # Résultat final pour la zone
+        # ------------------------------
         results.append({
             "zone": zone,
-            "date": date_str,
-            "sst": round(temp, 1),
-            "tendance": trend,
-            "vent_kmh": wind_speed,
-            "vent_direction": direction,
-            "risque_mer": sea_risk(wind_speed),
-            "potentiel_peche": fishing_potential(temp, wind_speed)
+            "temp": round(temp,1),
+            "vhm0": vhm0,
+            "trend": trend,
+            "alert": alert,
+            "wind_speed": wind_speed,
+            "wind_dir": wind_dir,
+            "next_vhm": next_vhm
         })
 
-    with open("data.json", "w", encoding="utf-8") as f:
-        json.dump(results, f, indent=2, ensure_ascii=False)
+    # ------------------------------
+    # Écriture data.json
+    # ------------------------------
+    with open("data.json", "w") as f:
+        json.dump(results, f, ensure_ascii=False, indent=2)
 
-    print("✅ data.json généré avec succès")
+    print(f"✅ data.json mis à jour ({now})")
 
+# ============================================================
+# 🔹 EXECUTION
 # ============================================================
 if __name__ == "__main__":
     main()
