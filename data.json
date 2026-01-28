@@ -1,45 +1,46 @@
 {
-  "updated_at": "2026-01-28T06:00:00Z",
+  "updated_at": "2026-01-28T18:32:18.012690Z",
+  "source": "Copernicus Marine Service",
   "stations": [
     {
       "name": "SAINT-LOUIS",
       "lat": 16.04,
       "lon": -16.49,
-      "temperature": 18.0,
-      "wave": 1.8,
-      "wind": 12
+      "temperature": null,
+      "wave": 0.8,
+      "wind": 13
     },
     {
       "name": "KAYAR",
       "lat": 14.92,
       "lon": -17.12,
-      "temperature": 19.2,
-      "wave": 2.0,
-      "wind": 18
+      "temperature": null,
+      "wave": 0.9,
+      "wind": 14
     },
     {
       "name": "DAKAR-YOFF",
       "lat": 14.74,
       "lon": -17.49,
-      "temperature": 19.4,
-      "wave": 1.8,
-      "wind": 15
+      "temperature": null,
+      "wave": 0.7,
+      "wind": 14
     },
     {
       "name": "MBOUR-JOAL",
       "lat": 14.15,
       "lon": -16.83,
-      "temperature": 20.4,
-      "wave": 0.8,
-      "wind": 8
+      "temperature": null,
+      "wave": 1.4,
+      "wind": 14
     },
     {
       "name": "CASAMANCE",
       "lat": 12.56,
       "lon": -16.27,
-      "temperature": 23.8,
-      "wave": 0.5,
-      "wind": 10
+      "temperature": null,
+      "wave": 1.0,
+      "wind": 13
     }
   ]
 }
