@@ -1,106 +1,78 @@
-"""
-PecheurConnect 🇸🇳
-Script Copernicus Marine – SST (Sea Surface Temperature)
-
-- Télécharge les données SST Copernicus
-- Calcule la moyenne locale par zone de pêche
-- Génère data.json pour GitHub Pages
-"""
-
-import json
-from datetime import datetime, timedelta
-from statistics import mean
-
-from copernicusmarine import subset
+# script_peche.py
+import os, json, math, datetime
+import copernicusmarine
 import numpy as np
 
-# =========================
-# ZONES DE PÊCHE (SÉNÉGAL)
-# =========================
-ZONES = [
-    {"name": "SAINT-LOUIS", "lat": 16.04, "lon": -16.49},
-    {"name": "KAYAR", "lat": 14.92, "lon": -17.12},
-    {"name": "DAKAR-YOFF", "lat": 14.74, "lon": -17.49},
-    {"name": "MBOUR-JOAL", "lat": 14.15, "lon": -16.83},
-    {"name": "CASAMANCE", "lat": 12.56, "lon": -16.27},
-]
-
-# =========================
-# PARAMÈTRES COPERNICUS
-# =========================
-DATASET_ID = "cmems_mod_glo_phy_my_0.083deg_P1D-m"
-VARIABLE = "thetao"  # Sea Surface Temperature
-BOX = 0.25           # Rayon spatial (°)
-DAYS_BACK = 1        # Données J-1 (stables)
-
-# =========================
-# DATE
-# =========================
-end_date = datetime.utcnow().date()
-start_date = end_date - timedelta(days=DAYS_BACK)
-
-stations = []
-
-# =========================
-# EXTRACTION DES DONNÉES
-# =========================
-for zone in ZONES:
-    name = zone["name"]
-    lat = zone["lat"]
-    lon = zone["lon"]
-
-    print(f"📡 Traitement {name}")
-
-    try:
-        ds = subset(
-            dataset_id=DATASET_ID,
-            variables=[VARIABLE],
-            minimum_latitude=lat - BOX,
-            maximum_latitude=lat + BOX,
-            minimum_longitude=lon - BOX,
-            maximum_longitude=lon + BOX,
-            start_datetime=f"{start_date}T00:00:00",
-            end_datetime=f"{end_date}T00:00:00"
-        )
-
-        values = ds[VARIABLE].values.flatten()
-        values = values[~np.isnan(values)]
-
-        if len(values) == 0:
-            raise ValueError("Pas de données valides")
-
-        sst = round(mean(values), 1)
-
-    except Exception as e:
-        print(f"⚠️ Erreur {name} : {e}")
-        sst = None
-
-    # =========================
-    # RÈGLES MÉTIER SIMPLES
-    # =========================
-    # (houle & vent seront branchés plus tard à Copernicus Waves / Wind)
-    wave = round(0.4 + (abs(lat) % 1.2), 1)
-    wind = round(7 + (abs(lon) % 10))
-
-    stations.append({
-        "name": name,
-        "lat": lat,
-        "lon": lon,
-        "temperature": sst,
-        "wave": wave,
-        "wind": wind
-    })
-
-# =========================
-# EXPORT data.json
-# =========================
-output = {
-    "updated_at": datetime.utcnow().isoformat() + "Z",
-    "source": "Copernicus Marine Service",
-    "stations": stations
+# =====================
+# CONFIG
+# =====================
+ZONES = {
+    "SAINT-LOUIS":  [15.8, -16.7, 16.2, -16.3],
+    "LOUGA-POTOU":  [15.3, -16.9, 15.6, -16.6],
+    "KAYAR":        [14.8, -17.3, 15.1, -17.1],
+    "DAKAR-YOFF":   [14.6, -17.6, 14.8, -17.4],
+    "MBOUR-JOAL":   [14.0, -17.1, 14.4, -16.7],
+    "CASAMANCE":    [12.2, -16.9, 12.7, -16.5]
 }
 
-with open("data.json", "w", encoding="utf-8") as f:
-    json.dump(output, f, indent=2, ensure_ascii=False)
+copernicusmarine.login(
+    username=os.environ["COPERNICUS_USERNAME"],
+    password=os.environ["COPERNICUS_PASSWORD"]
+)
+
+results = []
+now = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
+
+for zone, b in ZONES.items():
+    try:
+        # 🌡️ SST
+        ds_sst = copernicusmarine.open_dataset(
+            dataset_id="cmems_mod_glo_phy-thetao_anfc_0.083deg_P1D-m",
+            minimum_latitude=b[0], maximum_latitude=b[2],
+            minimum_longitude=b[1], maximum_longitude=b[3],
+            variables=["thetao"]
+        )
+        sst_raw = float(ds_sst["thetao"].isel(time=-1, depth=0).mean())
+        sst = round(sst_raw - 273.15, 1)
+
+        # 🌊 Houle
+        ds_wave = copernicusmarine.open_dataset(
+            dataset_id="cmems_mod_glo_wav_anfc_0.083deg_PT3H-i",
+            minimum_latitude=b[0], maximum_latitude=b[2],
+            minimum_longitude=b[1], maximum_longitude=b[3],
+            variables=["VHM0"]
+        )
+        houle = round(float(ds_wave["VHM0"].isel(time=-1).mean()), 1)
+
+        # 🌀 Courant
+        ds_cur = copernicusmarine.open_dataset(
+            dataset_id="cmems_mod_glo_phy-cur_anfc_0.083deg_P1D-m",
+            minimum_latitude=b[0], maximum_latitude=b[2],
+            minimum_longitude=b[1], maximum_longitude=b[3],
+            variables=["uo", "vo"]
+        )
+        u = float(ds_cur["uo"].isel(time=-1, depth=0).mean())
+        v = float(ds_cur["vo"].isel(time=-1, depth=0).mean())
+        courant = round(math.sqrt(u*u + v*v), 2)
+
+        results.append({
+            "zone": zone,
+            "sst": sst,
+            "houle": houle,
+            "courant": courant,
+            "timestamp": now
+        })
+
+    except Exception as e:
+        results.append({
+            "zone": zone,
+            "sst": None,
+            "houle": None,
+            "courant": None,
+            "error": str(e)
+        })
+
+with open("data.json", "w") as f:
+    json.dump(results, f, indent=2)
 
 print("✅ data.json généré avec succès")
