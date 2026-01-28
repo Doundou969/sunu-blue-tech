@@ -1,14 +1,22 @@
-# 🐟 Sunu Blue Tech
+# PecheurConnect 🇸🇳
 
-[![Actions Status](https://github.com/Doundou969/sunu-blue-tech/actions/workflows/main.yml/badge.svg)](https://github.com/Doundou969/sunu-blue-tech/actions)
-[![GitHub Pages](https://github.com/Doundou969/sunu-blue-tech/actions/workflows/pages/pages-build-deployment/badge.svg)](https://doundou969.github.io/sunu-blue-tech/)
+## Description
+PecheurConnect est une Progressive Web App (PWA) qui fournit en temps réel les données satellites pour la pêche artisanale au Sénégal : température, houle, vent, alertes critiques.  
+Fonctionne offline et installable sur Android/iOS.
 
-**Pêche Automatisée & Monitoring en Temps Réel**
+---
 
-## 🚀 Status Live
-| Service | Statut | Détails |
-|---------|--------|---------|
-| [GitHub Actions](https://github.com/Doundou969/sunu-blue-tech/actions) | ![Status](https://github.com/Doundou969/sunu-blue-tech/actions/workflows/main.yml/badge.svg?branch=main) | Run #238: Debug en cours |
-| [Site Web](https://doundou969.github.io/sunu-blue-tech/) | 🟢 Live | [Visiter](https://doundou969.github.io/sunu-blue-tech/) |
+## Déploiement GitHub Pages
 
-## 📋 Workflow Actuel
+1. Crée un dépôt GitHub : `PecheurConnect`.
+2. Pousse les fichiers : `index.html`, `manifest.json`, `sw.js`.
+3. Active GitHub Pages dans les paramètres (`Settings > Pages > branch: main`).
+4. URL finale : `https://<username>.github.io/PecheurConnect/`
+5. Test : ouvrir sur mobile → bouton “Ajouter à l’écran d’accueil” pour installer la PWA.
+
+---
+
+## Mise à jour des données
+
+- `index.html` charge `data.json` depuis GitHub Pages.
+- Automatiser via **GitHub Actions** pour actualiser `data.json` toutes les 10 minutes ou 6h selon la configuration du script PecheurConnect Runner.
