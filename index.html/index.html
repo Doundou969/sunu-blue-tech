@@ -1,35 +1,30 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>PecheurConnect 🇸🇳 | Radar de Pêche</title>
+<title>PecheurConnect 🇸🇳</title>
 
-  <!-- PWA -->
-  <link rel="manifest" href="/sunu-blue-tech/manifest.json">
-  <meta name="theme-color" content="#0284c7">
-  <meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="/sunu-blue-tech/manifest.json">
+<meta name="theme-color" content="#0284c7">
+<link rel="icon" href="/sunu-blue-tech/icon-192.png">
 
-  <!-- Icons -->
-  <link rel="icon" href="/sunu-blue-tech/icon-192.png">
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- UI -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <style>
-    body { background:#020617; color:white; }
-    .glass { background:rgba(15,23,42,.85); backdrop-filter:blur(10px); border-radius:1.25rem; }
-    #map { height:320px; border-radius:1.25rem; }
-    .danger { border:2px solid #ef4444; animation:pulse 2s infinite; }
-    @keyframes pulse {
-      0%{box-shadow:0 0 0 0 rgba(239,68,68,.6)}
-      70%{box-shadow:0 0 0 14px rgba(239,68,68,0)}
-      100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}
-    }
-  </style>
+<style>
+body { background:#020617; color:white; }
+.glass { background:rgba(15,23,42,.85); backdrop-filter:blur(10px); border-radius:1.25rem; }
+#map { height:320px; border-radius:1.25rem; }
+.danger { border:2px solid #ef4444; animation:pulse 2s infinite; }
+@keyframes pulse {
+  0%{box-shadow:0 0 0 0 rgba(239,68,68,.6)}
+  70%{box-shadow:0 0 0 14px rgba(239,68,68,0)}
+  100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}
+}
+</style>
 </head>
 
 <body class="p-4 max-w-4xl mx-auto">
@@ -50,53 +45,65 @@
 </footer>
 
 <script>
-/* =====================
-   CONFIG
-===================== */
+/* ================= CONFIG ================= */
 const DATA_URL = "/sunu-blue-tech/data.json";
 
 const ZONES = {
   "SAINT-LOUIS":[16.03,-16.50],
+  "LOUGA-POTOU":[15.48,-16.75],
   "KAYAR":[14.92,-17.20],
   "DAKAR-YOFF":[14.75,-17.48],
   "MBOUR-JOAL":[14.41,-16.96],
   "CASAMANCE":[12.50,-16.70]
 };
 
-/* =====================
-   MAP
-===================== */
+/* ================= MAP ================= */
 const map = L.map("map",{zoomControl:false}).setView([14.5,-17.2],7);
 L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png").addTo(map);
 L.control.zoom({position:"bottomright"}).addTo(map);
 
-/* =====================
-   DASHBOARD
-===================== */
+/* ================= DASHBOARD ================= */
 async function loadData(){
   const container = document.getElementById("dashboard");
-  try{
+  try {
     const res = await fetch(DATA_URL + "?t=" + Date.now());
     if(!res.ok) throw new Error("404");
     const data = await res.json();
     container.innerHTML = "";
 
-    data.forEach(z=>{
-      const danger = z.houle >= 2.2;
+    data.forEach(z => {
+      const danger = z.vhm0 >= 2.2;
+
       const card = document.createElement("div");
-      card.className = `glass p-4 ${danger?"danger":""}`;
+      card.className = `glass p-4 ${danger ? "danger" : ""}`;
+
       card.innerHTML = `
-        <h3 class="font-black text-lg">${z.zone}</h3>
-        <p class="text-2xl font-mono">${z.sst}°C</p>
-        <p class="${danger?"text-red-400":"text-emerald-400"} font-bold">
-          🌊 ${z.houle} m | 🌀 ${z.courant}
-        </p>`;
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="font-black text-lg">${z.zone}</h3>
+          <span class="text-xl">${z.alert || "🟢"}</span>
+        </div>
+
+        <p class="text-3xl font-mono font-bold">${z.temp}°C</p>
+
+        <p class="mt-2 font-bold ${danger ? "text-red-400" : "text-emerald-400"}">
+          🌊 Houle : ${z.vhm0} m
+        </p>
+
+        <p class="text-sm text-slate-300 mt-1">
+          🌬️ Vent : ${z.wind_speed} km/h (${z.wind_dir})
+        </p>
+
+        <p class="text-xs text-sky-400 mt-2 font-bold">
+          ➜ Prochaine houle : ${z.next_vhm} m
+        </p>
+      `;
+
       container.appendChild(card);
 
       if(ZONES[z.zone]){
         L.circleMarker(ZONES[z.zone],{
           radius:10,
-          fillColor: danger?"#ef4444":"#0ea5e9",
+          fillColor: danger ? "#ef4444" : "#0ea5e9",
           color:"#fff",
           weight:2,
           fillOpacity:.9
@@ -104,16 +111,15 @@ async function loadData(){
       }
     });
 
-  }catch(e){
+  } catch(e){
     container.innerHTML =
       "<p class='text-center col-span-full text-slate-500'>Données indisponibles</p>";
   }
 }
+
 loadData();
 
-/* =====================
-   SERVICE WORKER
-===================== */
+/* ================= SERVICE WORKER ================= */
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("/sunu-blue-tech/sw.js")
     .then(()=>console.log("✅ SW actif"))
