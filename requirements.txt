@@ -1,32 +1,21 @@
-# requirements.txt - Sunu Blue Tech Pêche Automatisée
-# ==================================================
+# ================================
+# PecheurConnect 🇸🇳 - PRODUCTION
+# ================================
 
-# VISUALISATION (PROBLÈME RÉSOLU)
-matplotlib>=3.8.0
+# Copernicus Marine officiel
+copernicusmarine>=1.3.0
 
-# API & Web Scraping (obligatoire)
+# Data processing
+numpy>=1.24.0
+pandas>=2.1.0
+
+# HTTP / API
 requests>=2.31.0
-aiohttp>=3.9.0
 
-# Telegram Bot (vos secrets TG_TOKEN/TG_ID)
+# Telegram alerts (optionnel)
 python-telegram-bot>=20.7
 
-# Copernicus (vos secrets USER/PWD)
-earthaccess>=0.9.0
-pystac-client>=0.7.0
-
-# Parsing HTML/XML
-beautifulsoup4>=4.12.2
-lxml>=4.9.3
-html5lib>=1.1
-
-# Données & Traitement
-pandas>=2.1.4
-numpy>=1.24.0
-geopandas>=0.14.0
-
-# Logging & Utils
+# Utils
 python-dotenv>=1.0.0
 tqdm>=4.66.0
-schedule>=1.2.0
 rich>=13.7.0
