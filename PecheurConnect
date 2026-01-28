@@ -1,0 +1,11 @@
+PecheurConnect/
+│
+├─ index.html           ← (version HTML finale que je t’ai fournie)
+├─ data.json            ← [{"zone":"SAINT-LOUIS","sst":0,"houle":0,"courant":0}, ...] ou vide []
+├─ script_peche.py      ← (script Python Copernicus + Telegram)
+├─ manifest.json
+├─ sw.js
+├─ README.md
+└─ .github/
+    └─ workflows/
+        └─ pecheurconnect.yml
