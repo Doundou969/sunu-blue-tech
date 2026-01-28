@@ -1,120 +1,57 @@
-name: PecheurConnect-Full
+name: PecheurConnect-Runner
 
+# 🔄 Schedule toutes les 6 heures + possibilité de lancer manuellement
 on:
   schedule:
-    - cron: '0 */6 * * *'  # Toutes les 6h
-  workflow_dispatch:        # Lancement manuel
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
 
 jobs:
-  run-pecheurconnect:
+  build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write  # Important pour push de data.json
 
     steps:
-      # ------------------------------
-      - name: 📂 Checkout du code
+      # 1️⃣ Récupération du code
+      - name: 📂 Checkout repository
         uses: actions/checkout@v3
 
-      # ------------------------------
-      - name: 🐍 Installer Python
+      # 2️⃣ Installer Python
+      - name: 🐍 Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
 
-      # ------------------------------
-      - name: 📦 Installer dépendances
+      # 3️⃣ Installer dépendances Python
+      - name: 📦 Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install --upgrade numpy requests copernicusmarine
+          pip install numpy matplotlib requests xarray dask netCDF4 copernicusmarine --upgrade
 
-      # ------------------------------
-      - name: 🚀 Exécuter PecheurConnect + génération Telegram
+      # 4️⃣ Exécuter le script PecheurConnect
+      - name: 🚀 Run PecheurConnect
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_ID: ${{ secrets.TG_ID }}
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
+        run: python script_peche.py
+
+      # 5️⃣ Déployer les données vers le dépôt
+      - name: 🌐 Deploy data.json
         run: |
-          echo "📌 Début PecheurConnect"
-          LOG_FILE="pecheurconnect_$(date +'%Y%m%d_%H%M%S').log"
-          set -o pipefail
-
-          python - <<'EOF' 2>&1 | tee "$LOG_FILE" || (
-            echo "⚠️ Erreur détectée dans le script !"
-            curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
-                 -d chat_id="${TG_ID}" \
-                 -d text="🚨 CRASH PecheurConnect ! Vérifie GitHub Actions."
-            exit 0
-          )
-import json, datetime, requests
-
-# Charger données
-with open("data.json") as f:
-    data = json.load(f)
-
-now = datetime.datetime.utcnow().strftime("%d/%m/%Y %H:%M")
-report = f"🌊 <b>PÊCHEURCONNECT 🇸🇳 – Rapport mer</b>\n📅 {now} GMT\n───────────────────\n\n"
-alertes = []
-
-# Trier par danger : houle + courant
-data_sorted = sorted(data, key=lambda x: (x["houle"], x["courant"]), reverse=True)
-
-for zone in data_sorted:
-    houle = zone["houle"]
-    courant = zone["courant"]
-    if houle >= 2.3:
-        emoji = "🔴"
-        alert = "🚨 Danger !"
-    elif houle >= 1.4:
-        emoji = "🟡"
-        alert = "⚠️ Prudence"
-    else:
-        emoji = "🟢"
-        alert = "✅ Sortie OK"
-
-    report += f"📍 <b>{zone['zone']}</b> : Houle {houle} m, Courant {courant} km/h → {emoji} {alert}\n"
-
-    if emoji in ["🔴", "🟡"]:
-        alertes.append(f"{zone['zone']} ({houle} m)")
-
-# Zone plus froide pour conseil économique
-best_zone = min(data, key=lambda x: x["sst"])
-report += f"\n⛽ <b>Conseil économique :</b> Zone {best_zone['zone']} ({best_zone['sst']}°C) – potentiel poisson élevé\n"
-report += "───────────────────\nℹ️ Restez prudents et suivez les alertes\n"
-
-if alertes:
-    header = "🚨 <b>ALERTES MER</b> 🚨\n" + ", ".join(alertes) + "\n\n"
-    report = header + report
-
-# Envoi Telegram
-requests.post(
-    f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage",
-    data={"chat_id": TG_ID, "text": report, "parse_mode": "HTML"}
-)
-
-print(report)
-EOF
-
-          echo "✅ Script exécuté et message Telegram envoyé"
-
-      # ------------------------------
-      - name: 🌐 Sauvegarde et versioning data.json
-        run: |
+          # Configurer le bot Git
           git config --global user.name "PecheurConnect-Bot"
           git config --global user.email "bot@pecheurconnect.sn"
 
-          if [ -f "data.json" ]; then
-            TIMESTAMP=$(date +'%Y%m%d_%H%M%S')
-            cp data.json "data_backup_$TIMESTAMP.json"
+          # Ajouter les fichiers modifiés
+          git add data.json
 
-            git add data.json data_backup_*.json
-            if [ -n "$(git status --porcelain)" ]; then
-              git commit -m "📊 Mise à jour PecheurConnect : $TIMESTAMP"
-              git push origin main
-              echo "✅ data.json pushé et versionné"
-            else
-              echo "ℹ️ Aucun changement détecté dans data.json"
-            fi
+          # Commit + push seulement s'il y a des changements
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "📊 Mise à jour : $(date +'%d-%m-%Y %H:%M')"
+            git push origin main
           else
-            echo "⚠️ data.json non trouvé"
+            echo "✅ Aucun changement détecté, push annulé."
+          fi
