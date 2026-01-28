@@ -1,32 +1,59 @@
-[
-  {
-    "zone": "SAINT-LOUIS",
-    "sst": 18.0,
-    "houle": 1.8,
-    "courant": 0.6
-  },
-  {
-    "zone": "KAYAR",
-    "sst": 19.2,
-    "houle": 2.0,
-    "courant": 0.9
-  },
-  {
-    "zone": "DAKAR-YOFF",
-    "sst": 19.4,
-    "houle": 1.8,
-    "courant": 0.7
-  },
-  {
-    "zone": "MBOUR-JOAL",
-    "sst": 20.4,
-    "houle": 0.8,
-    "courant": 0.3
-  },
-  {
-    "zone": "CASAMANCE",
-    "sst": 23.8,
-    "houle": 0.5,
-    "courant": 0.4
-  }
-]
+import json
+import datetime
+
+# Charger les données
+with open("data.json", "r") as f:
+    data = json.load(f)
+
+# Préparer le message
+now = datetime.datetime.utcnow().strftime("%d/%m/%Y %H:%M")
+report = f"🌊 <b>PÊCHEURCONNECT 🇸🇳 – Rapport mer</b>\n📅 {now} GMT\n───────────────────\n\n"
+
+alertes = []
+
+# Trier par danger : houle + courant
+data_sorted = sorted(data, key=lambda x: (x["houle"], x["courant"]), reverse=True)
+
+for zone in data_sorted:
+    houle = zone["houle"]
+    courant = zone["courant"]
+    
+    # Définir l'alerte
+    if houle >= 2.3:
+        emoji = "🔴"
+        alert = "🚨 Danger !"
+    elif houle >= 1.4:
+        emoji = "🟡"
+        alert = "⚠️ Prudence"
+    else:
+        emoji = "🟢"
+        alert = "✅ Sortie OK"
+
+    report += f"📍 <b>{zone['zone']}</b> : Houle {houle} m, Courant {courant} km/h → {emoji} {alert}\n"
+
+    # Ajouter aux alertes critiques
+    if emoji in ["🔴", "🟡"]:
+        alertes.append(f"{zone['zone']} ({houle} m)")
+
+# Conseils économiques (zone eau la plus froide)
+best_zone = min(data, key=lambda x: x["sst"])
+report += f"\n⛽ <b>Conseil économique :</b> Zone {best_zone['zone']} ({best_zone['sst']}°C) – potentiel poisson élevé\n"
+report += "───────────────────\n"
+report += "ℹ️ Restez prudents et suivez les alertes\n"
+
+# Ajouter alertes en tête si existantes
+if alertes:
+    header = "🚨 <b>ALERTES MER</b> 🚨\n" + ", ".join(alertes) + "\n\n"
+    report = header + report
+
+# Afficher / envoyer
+print(report)
+
+# Optionnel : envoi Telegram si tu veux
+# import requests
+# TG_TOKEN = "TON_TOKEN"
+# TG_ID = "TON_CHAT_ID"
+# requests.post(
+#     f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage",
+#     data={"chat_id": TG_ID, "text": report, "parse_mode": "HTML"}
+# )
