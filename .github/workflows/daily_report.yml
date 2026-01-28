@@ -1,4 +1,4 @@
-name: PecheurConnect-Runner-Pro
+name: PecheurConnect-Full
 
 on:
   schedule:
@@ -29,41 +29,88 @@ jobs:
           pip install --upgrade numpy requests copernicusmarine
 
       # ------------------------------
-      - name: 🚀 Exécuter PecheurConnect avec logs détaillés
+      - name: 🚀 Exécuter PecheurConnect + génération Telegram
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_ID: ${{ secrets.TG_ID }}
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
         run: |
-          echo "📌 Début script PecheurConnect"
+          echo "📌 Début PecheurConnect"
           LOG_FILE="pecheurconnect_$(date +'%Y%m%d_%H%M%S').log"
           set -o pipefail
 
-          # Exécution script avec log + capture erreurs
-          python script_peche.py 2>&1 | tee "$LOG_FILE" || {
+          python - <<'EOF' 2>&1 | tee "$LOG_FILE" || (
             echo "⚠️ Erreur détectée dans le script !"
             curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
-              -d chat_id="${TG_ID}" \
-              -d text="🚨 CRASH PecheurConnect ! Vérifie GitHub Actions."
-            exit 0  # Workflow continue
-          }
+                 -d chat_id="${TG_ID}" \
+                 -d text="🚨 CRASH PecheurConnect ! Vérifie GitHub Actions."
+            exit 0
+          )
+import json, datetime, requests
 
-          echo "✅ Script terminé, log sauvegardé : $LOG_FILE"
+# Charger données
+with open("data.json") as f:
+    data = json.load(f)
+
+now = datetime.datetime.utcnow().strftime("%d/%m/%Y %H:%M")
+report = f"🌊 <b>PÊCHEURCONNECT 🇸🇳 – Rapport mer</b>\n📅 {now} GMT\n───────────────────\n\n"
+alertes = []
+
+# Trier par danger : houle + courant
+data_sorted = sorted(data, key=lambda x: (x["houle"], x["courant"]), reverse=True)
+
+for zone in data_sorted:
+    houle = zone["houle"]
+    courant = zone["courant"]
+    if houle >= 2.3:
+        emoji = "🔴"
+        alert = "🚨 Danger !"
+    elif houle >= 1.4:
+        emoji = "🟡"
+        alert = "⚠️ Prudence"
+    else:
+        emoji = "🟢"
+        alert = "✅ Sortie OK"
+
+    report += f"📍 <b>{zone['zone']}</b> : Houle {houle} m, Courant {courant} km/h → {emoji} {alert}\n"
+
+    if emoji in ["🔴", "🟡"]:
+        alertes.append(f"{zone['zone']} ({houle} m)")
+
+# Zone plus froide pour conseil économique
+best_zone = min(data, key=lambda x: x["sst"])
+report += f"\n⛽ <b>Conseil économique :</b> Zone {best_zone['zone']} ({best_zone['sst']}°C) – potentiel poisson élevé\n"
+report += "───────────────────\nℹ️ Restez prudents et suivez les alertes\n"
+
+if alertes:
+    header = "🚨 <b>ALERTES MER</b> 🚨\n" + ", ".join(alertes) + "\n\n"
+    report = header + report
+
+# Envoi Telegram
+requests.post(
+    f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage",
+    data={"chat_id": TG_ID, "text": report, "parse_mode": "HTML"}
+)
+
+print(report)
+EOF
+
+          echo "✅ Script exécuté et message Telegram envoyé"
 
       # ------------------------------
-      - name: 🌐 Sauvegarde et versioning de data.json
+      - name: 🌐 Sauvegarde et versioning data.json
         run: |
           git config --global user.name "PecheurConnect-Bot"
           git config --global user.email "bot@pecheurconnect.sn"
 
           if [ -f "data.json" ]; then
             TIMESTAMP=$(date +'%Y%m%d_%H%M%S')
-            cp data.json "data_backup_$TIMESTAMP.json"   # Versionning historique
+            cp data.json "data_backup_$TIMESTAMP.json"
 
             git add data.json data_backup_*.json
             if [ -n "$(git status --porcelain)" ]; then
-              git commit -m "📊 Update PecheurConnect : $TIMESTAMP"
+              git commit -m "📊 Mise à jour PecheurConnect : $TIMESTAMP"
               git push origin main
               echo "✅ data.json pushé et versionné"
             else
