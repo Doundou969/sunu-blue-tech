@@ -1,129 +1,96 @@
-import os
-import json
-import math
-import numpy as np
-from datetime import datetime, timedelta
+# ============================================================
+# 🌊 SUNU BLUE TECH – COPERNICUS MARINE PIPELINE (CORRIGÉ)
+# ============================================================
+
 import copernicusmarine
+import xarray as xr
+import json
+from datetime import datetime, timedelta
+import os
 
 # ============================================================
-# 🔐 AUTHENTIFICATION COPERNICUS (NON INTERACTIVE / CI SAFE)
+# 🔑 LOGIN COPERNICUS (SANS overwrite ❌)
 # ============================================================
-COP_USER = os.getenv("COPERNICUS_USERNAME")
-COP_PASS = os.getenv("COPERNICUS_PASSWORD")
-
-if not COP_USER or not COP_PASS:
-    raise RuntimeError("❌ Secrets Copernicus manquants (GitHub Actions)")
-
 print("🔑 Connexion Copernicus Marine...")
-copernicusmarine.login(username=COP_USER, password=COP_PASS)
+copernicusmarine.login()
 print("✅ Copernicus connecté")
 
 # ============================================================
-# 📍 ZONES CÔTIÈRES SÉNÉGAL
+# ⏳ GESTION DES DATES (ANTI-ERREUR 2026)
+# Les datasets MY ont du retard → on recule volontairement
+# ============================================================
+NOW = datetime.utcnow()
+SAFE_DATE = NOW - timedelta(days=30)
+
+START_DATE = (SAFE_DATE - timedelta(days=1)).strftime("%Y-%m-%d")
+END_DATE = SAFE_DATE.strftime("%Y-%m-%d")
+
+# ============================================================
+# 📡 DATASET VALIDE (MULTI-YEAR PHYSIQUE)
+# ============================================================
+DATASET_ID = "cmems_mod_glo_phy_my_0.083deg_P1D-m"
+
+# ============================================================
+# 📍 ZONES DE PÊCHE (SÉNÉGAL)
 # ============================================================
 ZONES = {
-    "SAINT-LOUIS":  (16.03, -16.50),
-    "LOUGA-POTOU":  (15.48, -16.75),
-    "KAYAR":        (14.92, -17.20),
-    "DAKAR-YOFF":   (14.75, -17.48),
-    "MBOUR-JOAL":   (14.41, -16.96),
-    "CASAMANCE":    (12.50, -16.70)
+    "SAINT-LOUIS": (-16.5, 16.0),
+    "KAYAR": (-17.1, 14.9),
+    "DAKAR-YOFF": (-17.5, 14.7),
+    "MBOUR-JOAL": (-16.9, 14.4),
+    "CASAMANCE": (-16.6, 12.6)
 }
 
 # ============================================================
-# 📡 DATASET STABLE (HISTORIQUE PHYSIQUE)
+# 🧠 RÉCUPÉRATION DONNÉES
 # ============================================================
-DATASET_PHY = "cmems_mod_glo_phy_my_0.083deg_P1D-m"
+results = {}
 
-NOW = datetime.utcnow()
-START = (NOW - timedelta(days=1)).strftime("%Y-%m-%d")
-END = NOW.strftime("%Y-%m-%d")
-
-results = []
-
-# ============================================================
-# 🧭 DIRECTION DU VENT
-# ============================================================
-def wind_direction(u, v):
-    deg = (math.atan2(u, v) * 180 / math.pi + 180) % 360
-    dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
-    return dirs[int((deg + 22.5) / 45) % 8]
-
-# ============================================================
-# 🚀 COLLECTE DONNÉES
-# ============================================================
-for zone, (lat, lon) in ZONES.items():
+for zone, (lon, lat) in ZONES.items():
     print(f"📡 Récupération données : {zone}")
-
-    temp = None
-    wind_speed = None
-    wind_dir = "N"
-
-    # ---------- TEMPÉRATURE MER (SST) ----------
     try:
-        ds_temp = copernicusmarine.open_dataset(
-            dataset_id=DATASET_PHY,
-            variables=["thetao"],
-            minimum_latitude=lat - 0.1,
-            maximum_latitude=lat + 0.1,
-            minimum_longitude=lon - 0.1,
-            maximum_longitude=lon + 0.1,
-            start_datetime=START,
-            end_datetime=END
+        ds = copernicusmarine.open_dataset(
+            dataset_id=DATASET_ID,
+            minimum_longitude=lon - 0.2,
+            maximum_longitude=lon + 0.2,
+            minimum_latitude=lat - 0.2,
+            maximum_latitude=lat + 0.2,
+            start_datetime=START_DATE,
+            end_datetime=END_DATE,
         )
-        temp = float(ds_temp["thetao"].mean().values)
+
+        # Variables standards
+        sst = float(ds["thetao"].isel(time=0, depth=0).mean().values)
+        uo = float(ds["uo"].isel(time=0, depth=0).mean().values)
+        vo = float(ds["vo"].isel(time=0, depth=0).mean().values)
+
+        results[zone] = {
+            "sst_celsius": round(sst, 2),
+            "courant_u": round(uo, 2),
+            "courant_v": round(vo, 2),
+            "source": "Copernicus Marine"
+        }
+
     except Exception as e:
-        print(f"⚠️ SST indisponible pour {zone}: {e}")
-
-    # ---------- VENT ----------
-    try:
-        ds_wind = copernicusmarine.open_dataset(
-            dataset_id=DATASET_PHY,
-            variables=["uo", "vo"],
-            minimum_latitude=lat - 0.1,
-            maximum_latitude=lat + 0.1,
-            minimum_longitude=lon - 0.1,
-            maximum_longitude=lon + 0.1,
-            start_datetime=START,
-            end_datetime=END
-        )
-        u = float(ds_wind["uo"].mean().values)
-        v = float(ds_wind["vo"].mean().values)
-        wind_speed = round(math.sqrt(u**2 + v**2) * 3.6, 1)  # km/h
-        wind_dir = wind_direction(u, v)
-    except Exception as e:
-        print(f"⚠️ Vent indisponible pour {zone}: {e}")
-
-    # ========================================================
-    # 🌊 HOULE (FALLBACK INTELLIGENT)
-    # ========================================================
-    vhm0 = round(np.random.uniform(0.6, 2.6), 1)
-
-    if vhm0 >= 2.2:
-        alert = "🔴"
-    elif vhm0 >= 1.8:
-        alert = "🟡"
-    else:
-        alert = "🟢"
-
-    # ========================================================
-    # 📦 STRUCTURE FRONT READY
-    # ========================================================
-    results.append({
-        "zone": zone,
-        "temp": round(temp, 1) if temp else None,
-        "vhm0": vhm0,
-        "trend": "➡️",
-        "alert": alert,
-        "wind_speed": wind_speed,
-        "wind_dir": wind_dir,
-        "next_vhm": round(max(vhm0 - 0.4, 0.4), 1)
-    })
+        print(f"⚠️ Erreur pour {zone} : {e}")
+        results[zone] = {
+            "sst_celsius": None,
+            "courant_u": None,
+            "courant_v": None,
+            "source": "fallback"
+        }
 
 # ============================================================
-# 💾 ÉCRITURE data.json
+# 💾 EXPORT JSON
 # ============================================================
+output = {
+    "updated_utc": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
+    "start_date": START_DATE,
+    "end_date": END_DATE,
+    "zones": results
+}
+
 with open("data.json", "w", encoding="utf-8") as f:
-    json.dump(results, f, ensure_ascii=False, indent=2)
+    json.dump(output, f, indent=2, ensure_ascii=False)
 
-print(f"✅ data.json mis à jour ({NOW.strftime('%d/%m/%Y %H:%M UTC')})")
+print(f"✅ data.json mis à jour ({output['updated_utc']})")
