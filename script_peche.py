@@ -1,136 +1,129 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+# ============================================================
+# PECHEUR CONNECT 🇸🇳
+# Script Copernicus PRO – data.json FRONT-COMPATIBLE
+# ============================================================
 
-import os
-import json
-import datetime
-import requests
+import os, json, math, datetime, warnings
+import copernicusmarine
+import numpy as np
 
-try:
-    import copernicusmarine
-except ImportError:
-    print("⚠️ CopernicusMarine non installé, fallback activé")
-    copernicusmarine = None
+warnings.filterwarnings("ignore")
 
-# -----------------------------
-# 🟦 CONFIG ZONES
-# -----------------------------
-zones = {
-    "SAINT-LOUIS": [16.03, -16.50],
-    "LOUGA-POTOU": [15.48, -16.75],
-    "KAYAR": [14.92, -17.20],
-    "DAKAR-YOFF": [14.75, -17.48],
-    "MBOUR-JOAL": [14.41, -16.96],
-    "CASAMANCE": [12.50, -16.70]
+# ============================================================
+# 🔐 SECRETS
+# ============================================================
+COP_USER = os.getenv("COPERNICUS_USERNAME", "")
+COP_PASS = os.getenv("COPERNICUS_PASSWORD", "")
+
+# ============================================================
+# 📍 ZONES CÔTIÈRES DU SÉNÉGAL
+# ============================================================
+ZONES = {
+    "SAINT-LOUIS":  [15.8, -16.7, 16.2, -16.3],
+    "LOUGA-POTOU":  [15.3, -16.9, 15.6, -16.6],
+    "KAYAR":        [14.8, -17.3, 15.1, -17.1],
+    "DAKAR-YOFF":   [14.6, -17.6, 14.8, -17.4],
+    "MBOUR-JOAL":   [14.0, -17.1, 14.4, -16.7],
+    "CASAMANCE":    [12.2, -16.9, 12.7, -16.5]
 }
 
-# -----------------------------
-# 🟦 FONCTIONS TELEGRAM
-# -----------------------------
-def send_telegram(message):
-    token = os.getenv("TELEGRAM_BOT_TOKEN")
-    chat_id = os.getenv("TELEGRAM_CHAT_ID")
-    if not token or not chat_id:
-        print("⚠️ Telegram non configuré")
-        return
-    url = f"https://api.telegram.org/bot{token}/sendMessage"
-    payload = {"chat_id": chat_id, "text": message, "parse_mode": "Markdown"}
-    try:
-        requests.post(url, json=payload, timeout=10)
-        print("📨 Notification Telegram envoyée")
-    except Exception as e:
-        print(f"⚠️ Telegram erreur : {e}")
+# ============================================================
+# 🧭 Direction du vent
+# ============================================================
+def wind_direction(u, v):
+    deg = (math.atan2(u, v) * 180 / math.pi + 180) % 360
+    dirs = ["N","NE","E","SE","S","SW","W","NW"]
+    return dirs[int((deg + 22.5) / 45) % 8]
 
-# -----------------------------
-# 🟦 DATES
-# -----------------------------
-END_DATE = datetime.datetime.utcnow()
-START_DATE = END_DATE - datetime.timedelta(days=1)
-DATE_STR = END_DATE.strftime("%d/%m/%Y %H:%M UTC")
-
-# -----------------------------
-# 🟦 RÉCUPÉRATION DONNÉES
-# -----------------------------
-results = {}
-
-for zone, coords in zones.items():
-    lat, lon = coords
-    data = {}
-    source = "fallback"
-
-    if copernicusmarine:
-        try:
-            # Connexion Copernicus
-            copernicusmarine.login(
-                username=os.getenv("COPERNICUS_USERNAME"),
-                password=os.getenv("COPERNICUS_PASSWORD")
-            )
-            print(f"📡 Récupération données : {zone}")
-
-            # Exemple dataset : ocean physical daily
-            ds = copernicusmarine.open_dataset(
-                dataset_id="cmems_mod_glo_phy_my_0.083_P1D-m",
-                time_range=(START_DATE, END_DATE),
-                latitude=lat,
-                longitude=lon
-            )
-
-            data["temp"] = round(float(ds.variables["thetao"][-1]), 2)
-            data["vhm0"] = round(float(ds.variables["vhm0"][-1]), 2)
-            data["trend"] = "📈" if data["vhm0"] > 0.5 else "📉"
-            source = "Copernicus Marine"
-
-        except Exception as e:
-            print(f"⚠️ SST/Vent indisponible pour {zone}: {e}")
-            # fallback simple : valeur par défaut
-            data["temp"] = 27.0
-            data["vhm0"] = 1.0
-            data["trend"] = "📉"
+# ============================================================
+# 🌊 Évaluation risque mer
+# ============================================================
+def sea_risk(wind_speed):
+    if wind_speed < 6:
+        return "VERT"
+    elif wind_speed < 10:
+        return "ORANGE"
     else:
-        # fallback si Copernicus absent
-        data["temp"] = 27.0
-        data["vhm0"] = 1.0
-        data["trend"] = "📉"
+        return "ROUGE"
 
-    data["alert"] = "🔴" if data["vhm0"] >= 2.2 else "🟢"
-    data["wind_speed"] = 15
-    data["wind_dir"] = "NE"
-    data["next_vhm"] = data["vhm0"] + 0.2
+# ============================================================
+# 🐟 Potentiel pêche (proxy plancton)
+# ============================================================
+def fishing_potential(temp, wind_speed):
+    if 22 <= temp <= 27 and wind_speed < 8:
+        return "EXCELLENT"
+    elif 20 <= temp <= 29:
+        return "BON"
+    else:
+        return "FAIBLE"
 
-    results[zone] = {"data": data, "source": source}
+# ============================================================
+# 🚀 MAIN
+# ============================================================
+def main():
+    print("🔑 Connexion Copernicus Marine...")
+    copernicusmarine.login(username=COP_USER, password=COP_PASS)
 
-# -----------------------------
-# 🟦 SAUVEGARDE DATA.JSON
-# -----------------------------
-output = {
-    "updated_utc": DATE_STR,
-    "zones": results
-}
+    now = datetime.datetime.utcnow()
+    date_str = now.strftime("%d/%m/%Y %H:%M UTC")
+    day = now.strftime("%Y-%m-%d")
 
-with open("data.json", "w") as f:
-    json.dump(output, f, indent=2)
-print(f"✅ data.json mis à jour ({DATE_STR})")
+    # Historique température
+    old_temp = {}
+    if os.path.exists("data.json"):
+        try:
+            with open("data.json", "r") as f:
+                for z in json.load(f):
+                    old_temp[z["zone"]] = z["sst"]
+        except:
+            pass
 
-# -----------------------------
-# 🟦 ENVOI TELEGRAM
-# -----------------------------
-ok_zones = [z for z, d in results.items() if d["source"] == "Copernicus Marine"]
-fallback_zones = [z for z, d in results.items() if d["source"] != "Copernicus Marine"]
+    results = []
 
-telegram_message = f"""
-🌊 *PÊCHEURCONNECT 🇸🇳*
-📡 *Mise à jour satellite*
+    for zone, box in ZONES.items():
+        lat_min, lon_min, lat_max, lon_max = box
 
-🕒 {DATE_STR}
+        data = copernicusmarine.open_dataset(
+            dataset_id="cmems_mod_glo_phy_my_0.083_P1D-m",
+            variables=["thetao", "uo", "vo"],
+            minimum_longitude=lon_min,
+            maximum_longitude=lon_max,
+            minimum_latitude=lat_min,
+            maximum_latitude=lat_max,
+            start_datetime=f"{day}T00:00:00",
+            end_datetime=f"{day}T23:59:59"
+        )
 
-✅ Données Copernicus :
-{', '.join(ok_zones) if ok_zones else 'Aucune'}
+        temp = float(np.nanmean(data["thetao"].values))
+        u = float(np.nanmean(data["uo"].values))
+        v = float(np.nanmean(data["vo"].values))
 
-⚠️ Mode fallback :
-{', '.join(fallback_zones) if fallback_zones else 'Aucune'}
+        wind_speed = round(math.sqrt(u**2 + v**2) * 3.6, 1)  # m/s → km/h
+        direction = wind_direction(u, v)
 
-📅 Fenêtre données :
-{START_DATE.strftime('%d/%m/%Y')} → {END_DATE.strftime('%d/%m/%Y')}
-"""
+        trend = "STABLE"
+        if zone in old_temp:
+            if temp > old_temp[zone] + 0.3:
+                trend = "📈 CHAUD"
+            elif temp < old_temp[zone] - 0.3:
+                trend = "📉 FROID"
 
-send_telegram(telegram_message)
+        results.append({
+            "zone": zone,
+            "date": date_str,
+            "sst": round(temp, 1),
+            "tendance": trend,
+            "vent_kmh": wind_speed,
+            "vent_direction": direction,
+            "risque_mer": sea_risk(wind_speed),
+            "potentiel_peche": fishing_potential(temp, wind_speed)
+        })
+
+    with open("data.json", "w", encoding="utf-8") as f:
+        json.dump(results, f, indent=2, ensure_ascii=False)
+
+    print("✅ data.json généré avec succès")
+
+# ============================================================
+if __name__ == "__main__":
+    main()
