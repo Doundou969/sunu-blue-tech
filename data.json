@@ -1,62 +1,62 @@
 [
   {
     "zone": "SAINT-LOUIS",
-    "temp": 0.0,
-    "vhm0": 2.5,
-    "trend": "📉",
-    "alert": "🔴",
-    "wind_speed": 0.0,
-    "wind_dir": "N",
-    "next_vhm": 2.0
+    "temp": 18.1,
+    "vhm0": 1.5,
+    "trend": "➡️",
+    "alert": "🟢",
+    "wind_speed": 5.8,
+    "wind_dir": "SW",
+    "next_vhm": 1.7
   },
   {
     "zone": "LOUGA-POTOU",
-    "temp": 0.0,
-    "vhm0": 2.6,
+    "temp": 23.7,
+    "vhm0": 1.8,
     "trend": "📉",
-    "alert": "🔴",
-    "wind_speed": 0.0,
-    "wind_dir": "N",
-    "next_vhm": 2.1
+    "alert": "🟠",
+    "wind_speed": 3.5,
+    "wind_dir": "E",
+    "next_vhm": 1.6
   },
   {
     "zone": "KAYAR",
-    "temp": 0.0,
-    "vhm0": 2.7,
-    "trend": "📉",
-    "alert": "🔴",
-    "wind_speed": 0.0,
-    "wind_dir": "N",
-    "next_vhm": 2.2
+    "temp": 21.2,
+    "vhm0": 1.1,
+    "trend": "📈",
+    "alert": "🟢",
+    "wind_speed": 2.7,
+    "wind_dir": "E",
+    "next_vhm": 0.9
   },
   {
     "zone": "DAKAR-YOFF",
-    "temp": 0.0,
-    "vhm0": 2.4,
-    "trend": "📉",
-    "alert": "🔴",
-    "wind_speed": 0.0,
-    "wind_dir": "N",
-    "next_vhm": 1.9
+    "temp": 21.5,
+    "vhm0": 1.2,
+    "trend": "📈",
+    "alert": "🟢",
+    "wind_speed": 1.1,
+    "wind_dir": "SE",
+    "next_vhm": 0.8
   },
   {
     "zone": "MBOUR-JOAL",
-    "temp": 0.0,
-    "vhm0": 0.8,
-    "trend": "📉",
-    "alert": "🟢",
-    "wind_speed": 0.0,
+    "temp": 19.6,
+    "vhm0": 2.3,
+    "trend": "➡️",
+    "alert": "🔴",
+    "wind_speed": 4.9,
     "wind_dir": "N",
-    "next_vhm": 0.6
+    "next_vhm": 2.3
   },
   {
     "zone": "CASAMANCE",
-    "temp": 0.0,
-    "vhm0": 0.5,
-    "trend": "📉",
-    "alert": "🟢",
-    "wind_speed": 0.0,
-    "wind_dir": "N",
-    "next_vhm": 0.4
+    "temp": 23.7,
+    "vhm0": 2.0,
+    "trend": "➡️",
+    "alert": "🟠",
+    "wind_speed": 5.4,
+    "wind_dir": "SE",
+    "next_vhm": 1.8
   }
 ]
