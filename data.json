@@ -1,51 +1,62 @@
-{
-  "generated_at": "2026-01-29T00:35:22.341883Z",
-  "source": "Copernicus Marine Service",
-  "zones": [
-    {
-      "name": "SAINT-LOUIS",
-      "lat": 16.05,
-      "lon": -16.5,
-      "sst_c": null,
-      "wind_ms": null,
-      "status": "NO_DATA",
-      "message": "⚠️ Données indisponibles"
-    },
-    {
-      "name": "KAYAR",
-      "lat": 14.92,
-      "lon": -17.12,
-      "sst_c": null,
-      "wind_ms": null,
-      "status": "NO_DATA",
-      "message": "⚠️ Données indisponibles"
-    },
-    {
-      "name": "DAKAR-YOFF",
-      "lat": 14.73,
-      "lon": -17.49,
-      "sst_c": null,
-      "wind_ms": null,
-      "status": "NO_DATA",
-      "message": "⚠️ Données indisponibles"
-    },
-    {
-      "name": "MBOUR-JOAL",
-      "lat": 14.15,
-      "lon": -16.85,
-      "sst_c": null,
-      "wind_ms": null,
-      "status": "NO_DATA",
-      "message": "⚠️ Données indisponibles"
-    },
-    {
-      "name": "CASAMANCE",
-      "lat": 12.55,
-      "lon": -16.75,
-      "sst_c": null,
-      "wind_ms": null,
-      "status": "NO_DATA",
-      "message": "⚠️ Données indisponibles"
-    }
-  ]
-}
+[
+  {
+    "zone": "SAINT-LOUIS",
+    "temp": null,
+    "vhm0": 1.1,
+    "trend": "➡️",
+    "alert": "🟢",
+    "wind_speed": null,
+    "wind_dir": "N",
+    "next_vhm": 0.7
+  },
+  {
+    "zone": "LOUGA-POTOU",
+    "temp": null,
+    "vhm0": 1.3,
+    "trend": "➡️",
+    "alert": "🟢",
+    "wind_speed": null,
+    "wind_dir": "N",
+    "next_vhm": 0.9
+  },
+  {
+    "zone": "KAYAR",
+    "temp": null,
+    "vhm0": 2.5,
+    "trend": "➡️",
+    "alert": "🔴",
+    "wind_speed": null,
+    "wind_dir": "N",
+    "next_vhm": 2.1
+  },
+  {
+    "zone": "DAKAR-YOFF",
+    "temp": null,
+    "vhm0": 2.5,
+    "trend": "➡️",
+    "alert": "🔴",
+    "wind_speed": null,
+    "wind_dir": "N",
+    "next_vhm": 2.1
+  },
+  {
+    "zone": "MBOUR-JOAL",
+    "temp": null,
+    "vhm0": 1.9,
+    "trend": "➡️",
+    "alert": "🟡",
+    "wind_speed": null,
+    "wind_dir": "N",
+    "next_vhm": 1.5
+  },
+  {
+    "zone": "CASAMANCE",
+    "temp": null,
+    "vhm0": 0.9,
+    "trend": "➡️",
+    "alert": "🟢",
+    "wind_speed": null,
+    "wind_dir": "N",
+    "next_vhm": 0.5
+  }
+]
