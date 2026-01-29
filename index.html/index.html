@@ -71,12 +71,10 @@ body { background: #020617; color: white; font-family: system-ui, -apple-system,
 </footer>
 
 <script>
-// 🔹 PWA - Service Worker
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').then(() => console.log('SW enregistré')).catch(e => console.log('SW erreur:', e));
 }
 
-// 🔹 Constantes et URL data
 const DATA_URL = "data.json";
 const map = L.map('map', { tap: false, zoomControl: false }).setView([14.5, -17.2], 7);
 L.control.zoom({ position: 'bottomright' }).addTo(map);
@@ -88,18 +86,6 @@ const zonesCoords = {
 "MBOUR-JOAL": [14.41, -16.96], "CASAMANCE": [12.50, -16.70]
 };
 
-const alertColorMap = {
-  "🔴": "#ef4444",
-  "🟡": "#facc15",
-  "🟢": "#22c55e"
-};
-
-const alertTextMap = {
-  "🔴": "DANGER",
-  "🟡": "PRUDENCE",
-  "🟢": "CALME"
-};
-
 async function updateDashboard() {
   const container = document.getElementById('dashboard');
   try {
@@ -109,16 +95,13 @@ async function updateDashboard() {
     container.innerHTML = '';
 
     data.forEach(item => {
-      // Conversion vent m/s -> km/h
-      const windKmh = (item.wind_speed * 3.6).toFixed(1);
       const isDanger = item.vhm0 >= 2.2;
-
       const card = document.createElement('div');
       card.className = `glass-card p-5 ${isDanger ? 'danger-pulse' : ''}`;
       card.innerHTML = `
         <div class="flex justify-between items-start mb-3">
           <h3 class="text-base font-black uppercase tracking-tight">${item.zone}</h3>
-          <span class="text-xl">${item.alert} ${alertTextMap[item.alert]}</span>
+          <span class="text-xl">${item.alert}</span>
         </div>
         <div class="flex justify-between items-end">
           <div>
@@ -127,21 +110,19 @@ async function updateDashboard() {
           </div>
           <div class="text-right">
             <p class="text-[8px] text-slate-500 font-black uppercase">Houle</p>
-            <p class="text-xl font-bold" style="color:${alertColorMap[item.alert]}">${item.vhm0}m</p>
+            <p class="text-xl font-bold ${isDanger ? 'text-red-500' : 'text-emerald-400'}">${item.vhm0}m</p>
           </div>
         </div>
         <div class="mt-4 pt-3 border-t border-slate-800/50 flex justify-between text-[10px] text-slate-400 font-bold uppercase">
-          <span>🌬️ ${windKmh} km/h ${item.wind_dir}</span>
+          <span>🌬️ ${item.wind_speed}km/h ${item.wind_dir}</span>
           <span class="text-sky-500">Demain: ${item.next_vhm}m</span>
         </div>
-        <p class="mt-2 text-[9px] italic text-slate-400">${isDanger ? "Buleen dugg tey" : "Baax na liggéey tey"}</p>
       `;
       container.appendChild(card);
 
       if (zonesCoords[item.zone]) {
         L.circleMarker(zonesCoords[item.zone], {
-          radius: 10,
-          fillColor: alertColorMap[item.alert] || '#0ea5e9',
+          radius: 10, fillColor: isDanger ? '#ef4444' : '#0ea5e9',
           color: "#fff", weight: 2, fillOpacity: 0.9
         }).addTo(map);
       }
@@ -161,6 +142,5 @@ function getUserLocation() {
 
 window.onload = updateDashboard;
 </script>
-
 </body>
 </html>
