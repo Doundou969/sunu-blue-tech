@@ -1,62 +1,9 @@
-[
-  {
-    "zone": "SAINT-LOUIS",
-    "temp": 18.0,
-    "vhm0": 2.4,
-    "trend": "➡️",
-    "alert": "🔴",
-    "wind_speed": 5.6,
-    "wind_dir": "NE",
-    "next_vhm": 1.9
-  },
-  {
-    "zone": "LOUGA-POTOU",
-    "temp": 18.5,
-    "vhm0": 2.3,
-    "trend": "📈",
-    "alert": "🔴",
-    "wind_speed": 4.8,
-    "wind_dir": "NE",
-    "next_vhm": 1.8
-  },
-  {
-    "zone": "KAYAR",
-    "temp": 19.2,
-    "vhm0": 2.1,
-    "trend": "➡️",
-    "alert": "🟠",
-    "wind_speed": 6.2,
-    "wind_dir": "NE",
-    "next_vhm": 1.7
-  },
-  {
-    "zone": "DAKAR-YOFF",
-    "temp": 19.5,
-    "vhm0": 1.9,
-    "trend": "📈",
-    "alert": "🟠",
-    "wind_speed": 5.0,
-    "wind_dir": "NW",
-    "next_vhm": 1.5
-  },
-  {
-    "zone": "MBOUR-JOAL",
-    "temp": 20.3,
-    "vhm0": 1.2,
-    "trend": "➡️",
-    "alert": "🟢",
-    "wind_speed": 3.4,
-    "wind_dir": "N",
-    "next_vhm": 0.9
-  },
-  {
-    "zone": "CASAMANCE",
-    "temp": 23.8,
-    "vhm0": 0.8,
-    "trend": "➡️",
-    "alert": "🟢",
-    "wind_speed": 2.5,
-    "wind_dir": "N",
-    "next_vhm": 0.6
-  }
-]
+{
+  "zone": "Grande Côte – Sénégal",
+  "date": "2026-01-29T16:00:00Z",
+  "chlorophylle_mg_m3": 0.84,
+  "sst_celsius": 24.6,
+  "courant_ms": 0.21,
+  "score_peche": 0.78,
+  "etat": "🟢 Favorable"
+}
