@@ -1,104 +1,71 @@
 import os
 import json
-import xarray as xr
 import numpy as np
 from datetime import datetime
 import copernicusmarine
-import sys
+from rich import print
 
-# -------------------------
-# CONFIG
-# -------------------------
-ZONE = "Grande Côte – Sénégal"
-OUT_FILE = "chl.nc"
+LAT = 14.7167   # Dakar
+LON = -17.4677
 
-DATASET_CHL = "cmems_obs-oc_glo_bgc-plankton_my_l4-multi-4km_P1D"
-
-# -------------------------
-def abort(msg):
-    print(f"❌ {msg}")
-    sys.exit(1)
-
-def normalize(value, vmin, vmax):
-    return max(0, min(1, (value - vmin) / (vmax - vmin)))
-
-def etat_zone(score):
-    if score >= 0.7:
-        return "🟢 Favorable"
-    elif score >= 0.4:
-        return "🟠 Moyen"
-    else:
-        return "🔴 Faible"
-
-# -------------------------
-def main():
-    print("🔑 Connexion Copernicus Marine (CI-safe mode)")
-
+def load_copernicus_chl():
     username = os.getenv("COPERNICUS_USERNAME")
     password = os.getenv("COPERNICUS_PASSWORD")
 
     if not username or not password:
-        abort("Secrets Copernicus absents")
+        raise RuntimeError("❌ Identifiants Copernicus manquants (secrets GitHub)")
 
-    # 🔒 Empêche TOUT prompt
-    os.environ["COPERNICUSMARINE_DISABLE_INTERACTIVE"] = "true"
-    os.environ["COPERNICUSMARINE_USERNAME"] = username
-    os.environ["COPERNICUSMARINE_PASSWORD"] = password
+    print("🔑 Connexion Copernicus Marine (non-interactive)...")
 
-    # -------------------------
-    # DOWNLOAD CHL VIA SUBSET
-    # -------------------------
-    print("⬇️ Téléchargement chlorophylle…")
+    try:
+        ds = copernicusmarine.open_dataset(
+            dataset_id="cmems_mod_glo_bgc_my_0.25deg_P1D-m",
+            variables=["CHL"],
+            longitude=LON,
+            latitude=LAT,
+            username=username,
+            password=password
+        )
+        return ds
+    except Exception as e:
+        print(f"❌ Erreur Copernicus Marine: {e}")
+        return None
 
-    copernicusmarine.subset(
-        dataset_id=DATASET_CHL,
-        variables=["CHL"],
-        minimum_longitude=-20,
-        maximum_longitude=-10,
-        minimum_latitude=10,
-        maximum_latitude=17,
-        start_datetime="2026-01-01",
-        end_datetime="2026-01-10",
-        output_filename=OUT_FILE,
-        output_directory="."
-    )
 
-    if not os.path.exists(OUT_FILE):
-        abort("Fichier NetCDF non généré")
+def compute_fishing_score(chl):
+    if chl < 0.1:
+        return 20
+    elif chl < 0.3:
+        return 50
+    elif chl < 1:
+        return 80
+    else:
+        return 95
 
-    # -------------------------
-    # LECTURE NETCDF
-    # -------------------------
-    ds = xr.open_dataset(OUT_FILE)
 
-    if "CHL" not in ds:
-        abort("Variable CHL absente")
+def main():
+    chl_ds = load_copernicus_chl()
 
-    chl = float(ds["CHL"].mean().values)
+    if chl_ds is None or "CHL" not in chl_ds:
+        raise RuntimeError("❌ Dataset CHL indisponible")
 
-    # -------------------------
-    # SCORE SIMPLE (CHL ONLY – STABLE)
-    # -------------------------
-    chl_n = normalize(chl, 0.1, 2.0)
-    score = round(chl_n, 2)
+    chl = float(chl_ds["CHL"].mean().values)
+    score = compute_fishing_score(chl)
 
-    result = {
-        "zone": ZONE,
-        "date": datetime.utcnow().isoformat() + "Z",
-        "chlorophylle_mg_m3": round(chl, 3),
-        "score_peche": score,
-        "etat": etat_zone(score)
+    data = {
+        "timestamp": datetime.utcnow().isoformat(),
+        "location": "Dakar",
+        "chlorophyll": round(chl, 3),
+        "fishing_score": score,
+        "advice": "Zone favorable à la pêche 🎣" if score > 60 else "Zone peu productive ⚠️"
     }
 
-    # -------------------------
-    # SAVE JSON
-    # -------------------------
     with open("data.json", "w", encoding="utf-8") as f:
-        json.dump(result, f, indent=2, ensure_ascii=False)
+        json.dump(data, f, indent=2, ensure_ascii=False)
 
-    print("✅ data.json généré")
-    print(result)
+    print("✅ data.json généré avec succès")
+    print(data)
 
-# -------------------------
+
 if __name__ == "__main__":
     main()
