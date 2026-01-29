@@ -2,8 +2,8 @@ name: PecheurConnect-Runner
 
 on:
   schedule:
-    - cron: '0 */6 * * *'  # toutes les 6h
-  workflow_dispatch:       # lancement manuel
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
 
 jobs:
   build:
@@ -31,22 +31,16 @@ jobs:
           TG_ID: ${{ secrets.TG_ID }}
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
-        run: |
-          python script_peche.py
+        run: python script_peche.py
 
       - name: 🌐 Commit & Push data.json only if changed
         run: |
           git config --global user.name "PecheurConnect-Bot"
           git config --global user.email "bot@pecheurconnect.sn"
-
           git add data.json
-
           CHANGES=$(git status --porcelain)
-          echo "Changements détectés : $CHANGES"
-
           if [ -n "$CHANGES" ]; then
             git commit -m "📊 Mise à jour data.json $(date +'%d-%m-%Y %H:%M')"
             git push origin main
           else
-            echo "✅ Aucun changement détecté. Pas de commit nécessaire."
-          fi
+            echo "✅ Aucun changement détecté"
