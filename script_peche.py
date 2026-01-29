@@ -18,11 +18,9 @@ ZONE = "Côte sénégalaise"
 DATA_FILE = "data.json"
 MAP_FILE = "templates/map_template.html"
 
-# Dataset BGC et physique
 DATASET_CHL = "cmems_mod_glo_bgc_my_0.25deg_P1D-m"
 DATASET_PHY = "cmems_mod_glo_phy_my_0.25deg_P1D-m"
 
-# Telegram
 TG_TOKEN = os.getenv("TG_TOKEN")
 TG_ID = os.getenv("TG_ID")
 
@@ -60,10 +58,6 @@ def send_telegram(data):
 # CHARGEMENT DATA COPERNICUS
 # -------------------------
 def load_copernicus(dataset_id, default_values=None):
-    """
-    Charge dataset Copernicus. Si erreur, retourne valeurs par défaut.
-    default_values: dict {variable_name: valeur_par_defaut}
-    """
     username = os.getenv("COPERNICUS_USERNAME")
     password = os.getenv("COPERNICUS_PASSWORD")
     if not username or not password:
@@ -171,6 +165,4 @@ def main():
         print(f"❌ ERREUR CRITIQUE: {e}")
         sys.exit(1)
 
-# -------------------------
-if __name__ == "__main__":
-    main()
+if __name__
