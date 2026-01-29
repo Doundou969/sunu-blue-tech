@@ -53,7 +53,7 @@ jobs:
 
       # 6️⃣ Publish Leaflet map to GitHub Pages
       - name: 🌊 Publish map to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v5.1.23
+        uses: peaceiris/actions-gh-pages@v5
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./templates
