@@ -1,11 +1,10 @@
 import os
 import json
-import numpy as np
 from datetime import datetime
 import copernicusmarine
 from rich import print
 
-LAT = 14.7167   # Dakar
+LAT = 14.7167    # Dakar
 LON = -17.4677
 
 def load_copernicus_chl():
@@ -13,7 +12,7 @@ def load_copernicus_chl():
     password = os.getenv("COPERNICUS_PASSWORD")
 
     if not username or not password:
-        raise RuntimeError("❌ Identifiants Copernicus manquants (secrets GitHub)")
+        raise RuntimeError("❌ Identifiants Copernicus manquants")
 
     print("🔑 Connexion Copernicus Marine (non-interactive)...")
 
@@ -21,12 +20,19 @@ def load_copernicus_chl():
         ds = copernicusmarine.open_dataset(
             dataset_id="cmems_mod_glo_bgc_my_0.25deg_P1D-m",
             variables=["CHL"],
-            longitude=LON,
-            latitude=LAT,
             username=username,
             password=password
         )
-        return ds
+
+        # Sélection géographique APRÈS ouverture
+        ds_point = ds.sel(
+            latitude=LAT,
+            longitude=LON,
+            method="nearest"
+        )
+
+        return ds_point
+
     except Exception as e:
         print(f"❌ Erreur Copernicus Marine: {e}")
         return None
@@ -37,7 +43,7 @@ def compute_fishing_score(chl):
         return 20
     elif chl < 0.3:
         return 50
-    elif chl < 1:
+    elif chl < 1.0:
         return 80
     else:
         return 95
@@ -55,9 +61,11 @@ def main():
     data = {
         "timestamp": datetime.utcnow().isoformat(),
         "location": "Dakar",
+        "latitude": LAT,
+        "longitude": LON,
         "chlorophyll": round(chl, 3),
         "fishing_score": score,
-        "advice": "Zone favorable à la pêche 🎣" if score > 60 else "Zone peu productive ⚠️"
+        "advice": "Zone favorable à la pêche 🎣" if score >= 60 else "Zone peu productive ⚠️"
     }
 
     with open("data.json", "w", encoding="utf-8") as f:
