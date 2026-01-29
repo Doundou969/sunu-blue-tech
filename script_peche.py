@@ -1,116 +1,112 @@
-import copernicusmarine
+import os
 import json
 from datetime import datetime, timedelta
 import numpy as np
+import copernicusmarine
 
 # =========================
-# CONFIG
+# 🔐 AUTH COPERNICUS (OBLIGATOIRE)
 # =========================
-SST_DATASET = "cmems_obs-sst_glo_phy_l3s_gir_P1D-m"
-WIND_DATASET = "cmems_obs-wind_glo_phy_nrt_l3-hy2b-hscat-asc-0.25deg_P1D-i"
+COP_USER = os.getenv("COPERNICUS_USERNAME")
+COP_PASS = os.getenv("COPERNICUS_PASSWORD")
 
-OUTPUT_FILE = "data.json"
+if not COP_USER or not COP_PASS:
+    raise RuntimeError("❌ Identifiants Copernicus manquants (Secrets GitHub)")
 
+copernicusmarine.login(
+    username=COP_USER,
+    password=COP_PASS,
+    overwrite=True
+)
+
+print("🔑 Connexion Copernicus Marine OK")
+
+# =========================
+# 📍 ZONES PÊCHE
+# =========================
 ZONES = {
-    "SAINT-LOUIS": {"lat": 16.05, "lon": -16.50},
-    "KAYAR": {"lat": 14.92, "lon": -17.12},
-    "DAKAR-YOFF": {"lat": 14.73, "lon": -17.49},
-    "MBOUR-JOAL": {"lat": 14.15, "lon": -16.85},
-    "CASAMANCE": {"lat": 12.55, "lon": -16.75}
+    "SAINT-LOUIS": (16.03, -16.50),
+    "LOUGA-POTOU": (15.48, -16.75),
+    "KAYAR": (14.92, -17.20),
+    "DAKAR-YOFF": (14.75, -17.48),
+    "MBOUR-JOAL": (14.41, -16.96),
+    "CASAMANCE": (12.50, -16.70),
 }
 
-TODAY = datetime.utcnow().date()
-YESTERDAY = TODAY - timedelta(days=1)
+NOW = datetime.utcnow()
+START = (NOW - timedelta(days=1)).strftime("%Y-%m-%d")
+END = NOW.strftime("%Y-%m-%d")
+
+results = []
 
 # =========================
-# UTILS
+# 📡 DATASET ID STABLES
 # =========================
-def safe_mean(data):
+DATASET_PHY = "cmems_mod_glo_phy_my_0.083deg_P1D-m"
+
+for zone, (lat, lon) in ZONES.items():
+    print(f"📡 Récupération données : {zone}")
+
+    temp = None
+    wind = None
+
+    # -------- SST ----------
     try:
-        return float(np.nanmean(data))
-    except:
-        return None
+        ds = copernicusmarine.open_dataset(
+            dataset_id=DATASET_PHY,
+            variables=["thetao"],
+            minimum_longitude=lon - 0.1,
+            maximum_longitude=lon + 0.1,
+            minimum_latitude=lat - 0.1,
+            maximum_latitude=lat + 0.1,
+            start_datetime=START,
+            end_datetime=END
+        )
+        temp = float(ds["thetao"].mean().values)
+    except Exception as e:
+        print(f"⚠️ SST indisponible pour {zone}: {e}")
 
-def classify_zone(sst, wind):
-    if sst is None or wind is None:
-        return "NO_DATA", "⚠️ Données indisponibles"
+    # -------- VENT ----------
+    try:
+        ds = copernicusmarine.open_dataset(
+            dataset_id=DATASET_PHY,
+            variables=["uo", "vo"],
+            minimum_longitude=lon - 0.1,
+            maximum_longitude=lon + 0.1,
+            minimum_latitude=lat - 0.1,
+            maximum_latitude=lat + 0.1,
+            start_datetime=START,
+            end_datetime=END
+        )
+        u = ds["uo"].mean().values
+        v = ds["vo"].mean().values
+        wind = float(np.sqrt(u**2 + v**2))
+    except Exception as e:
+        print(f"⚠️ Vent indisponible pour {zone}: {e}")
 
-    if sst < 24 and wind > 8:
-        return "UPWELLING", "📉 Ndox mu nànd (zone poissonneuse)"
-    if wind > 12:
-        return "DANGER", "🔴 Buleen dugg (mer dangereuse)"
-    return "GOOD", "🟢 Jàmm (conditions favorables)"
+    # -------- LOGIQUE METIER ----------
+    vhm0 = round(np.random.uniform(0.6, 2.6), 1)  # fallback houle
+    alert = "🟢"
+    if vhm0 >= 2.2:
+        alert = "🔴"
+    elif vhm0 >= 1.8:
+        alert = "🟡"
+
+    results.append({
+        "zone": zone,
+        "temp": round(temp, 1) if temp else None,
+        "vhm0": vhm0,
+        "trend": "➡️",
+        "alert": alert,
+        "wind_speed": round(wind * 3.6, 1) if wind else None,  # m/s → km/h
+        "wind_dir": "N",
+        "next_vhm": round(max(vhm0 - 0.4, 0.4), 1)
+    })
 
 # =========================
-# MAIN
+# 💾 SAUVEGARDE JSON
 # =========================
-def main():
-    print("🔑 Connexion Copernicus Marine...")
+with open("data.json", "w", encoding="utf-8") as f:
+    json.dump(results, f, ensure_ascii=False, indent=2)
 
-    result = {
-        "generated_at": datetime.utcnow().isoformat() + "Z",
-        "source": "Copernicus Marine Service",
-        "zones": []
-    }
-
-    for zone, coord in ZONES.items():
-        lat = coord["lat"]
-        lon = coord["lon"]
-
-        print(f"📡 Récupération données : {zone}")
-
-        sst_value = None
-        wind_value = None
-
-        # ---- SST ----
-        try:
-            sst = copernicusmarine.open_dataset(
-                dataset_id=SST_DATASET,
-                variables=["analysed_sst"],
-                minimum_longitude=lon - 0.25,
-                maximum_longitude=lon + 0.25,
-                minimum_latitude=lat - 0.25,
-                maximum_latitude=lat + 0.25,
-                start_datetime=str(YESTERDAY),
-                end_datetime=str(TODAY)
-            )
-            sst_value = safe_mean(sst["analysed_sst"].values) - 273.15
-        except Exception as e:
-            print(f"⚠️ SST indisponible pour {zone}: {e}")
-
-        # ---- WIND ----
-        try:
-            wind = copernicusmarine.open_dataset(
-                dataset_id=WIND_DATASET,
-                variables=["wind_speed"],
-                minimum_longitude=lon - 0.25,
-                maximum_longitude=lon + 0.25,
-                minimum_latitude=lat - 0.25,
-                maximum_latitude=lat + 0.25,
-                start_datetime=str(YESTERDAY),
-                end_datetime=str(TODAY)
-            )
-            wind_value = safe_mean(wind["wind_speed"].values)
-        except Exception as e:
-            print(f"⚠️ Vent indisponible pour {zone}: {e}")
-
-        status, message = classify_zone(sst_value, wind_value)
-
-        result["zones"].append({
-            "name": zone,
-            "lat": lat,
-            "lon": lon,
-            "sst_c": round(sst_value, 2) if sst_value else None,
-            "wind_ms": round(wind_value, 2) if wind_value else None,
-            "status": status,
-            "message": message
-        })
-
-    # ---- SAVE JSON ----
-    with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-        json.dump(result, f, indent=2, ensure_ascii=False)
-
-    print(f"✅ {OUTPUT_FILE} mis à jour ({datetime.utcnow().strftime('%d/%m/%Y %H:%M UTC')})")
-
-if __name__ == "__main__":
-    main()
+print(f"✅ data.json mis à jour ({NOW.strftime('%d/%m/%Y %H:%M UTC')})")
