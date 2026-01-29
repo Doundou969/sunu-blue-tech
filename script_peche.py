@@ -4,7 +4,7 @@ from datetime import datetime
 import copernicusmarine
 from rich import print
 
-LAT = 14.7167    # Dakar
+LAT = 14.7167
 LON = -17.4677
 
 def load_copernicus_chl():
@@ -16,26 +16,27 @@ def load_copernicus_chl():
 
     print("🔑 Connexion Copernicus Marine (non-interactive)...")
 
-    try:
-        ds = copernicusmarine.open_dataset(
-            dataset_id="cmems_mod_glo_bgc_my_0.25deg_P1D-m",
-            variables=["CHL"],
-            username=username,
-            password=password
-        )
+    ds = copernicusmarine.open_dataset(
+        dataset_id="cmems_mod_glo_bgc_my_0.25deg_P1D-m",
+        username=username,
+        password=password
+    )
 
-        # Sélection géographique APRÈS ouverture
-        ds_point = ds.sel(
-            latitude=LAT,
-            longitude=LON,
-            method="nearest"
-        )
+    print(f"📦 Variables disponibles: {list(ds.data_vars)}")
 
-        return ds_point
+    # Nom réel dans ce dataset
+    VAR_CHL = "chl"
 
-    except Exception as e:
-        print(f"❌ Erreur Copernicus Marine: {e}")
-        return None
+    if VAR_CHL not in ds:
+        raise RuntimeError(f"❌ Variable {VAR_CHL} absente du dataset")
+
+    ds_point = ds.sel(
+        latitude=LAT,
+        longitude=LON,
+        method="nearest"
+    )
+
+    return ds_point
 
 
 def compute_fishing_score(chl):
@@ -52,10 +53,7 @@ def compute_fishing_score(chl):
 def main():
     chl_ds = load_copernicus_chl()
 
-    if chl_ds is None or "CHL" not in chl_ds:
-        raise RuntimeError("❌ Dataset CHL indisponible")
-
-    chl = float(chl_ds["CHL"].mean().values)
+    chl = float(chl_ds["chl"].mean().values)
     score = compute_fishing_score(chl)
 
     data = {
