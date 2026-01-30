@@ -1,56 +1,16 @@
 [
   {
-    "zone": "SAINT-LOUIS",
-    "lat": 16.03,
-    "lon": -16.5,
-    "vhm0": 3.05,
-    "temp": 26.5,
-    "alert": "🔴 DANGER",
-    "trend": "↘"
-  },
-  {
-    "zone": "KAYAR",
-    "lat": 14.92,
-    "lon": -17.2,
-    "vhm0": 0.9,
-    "temp": 22.1,
-    "alert": "🟢 OK",
-    "trend": "↘"
-  },
-  {
     "zone": "DAKAR-YOFF",
     "lat": 14.75,
     "lon": -17.48,
-    "vhm0": 1.07,
-    "temp": 22.7,
+    "vhm0": 1.8,
+    "temp": 26.5,
+    "wind_speed": 18,
+    "wind_dir": "NW",
     "alert": "🟢 OK",
-    "trend": "↗"
-  },
-  {
-    "zone": "MBOUR-JOAL",
-    "lat": 14.41,
-    "lon": -16.96,
-    "vhm0": 2.68,
-    "temp": 27.9,
-    "alert": "🔴 DANGER",
-    "trend": "↗"
-  },
-  {
-    "zone": "CASAMANCE",
-    "lat": 12.5,
-    "lon": -16.7,
-    "vhm0": 1.94,
-    "temp": 22.4,
-    "alert": "🟢 OK",
-    "trend": "↗"
-  },
-  {
-    "zone": "LOUGA-POTOU",
-    "lat": 15.48,
-    "lon": -16.75,
-    "vhm0": 2.45,
-    "temp": 24.0,
-    "alert": "🔴 DANGER",
-    "trend": "↘"
+    "trend": "↗",
+    "next_vhm": 2.1,
+    "timestamp": "2026-01-29T18:20:00Z",
+    "source": "fallback"
   }
 ]
