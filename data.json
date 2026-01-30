@@ -1,54 +1,56 @@
-{
-  "source": "Copernicus Marine",
-  "generated_at": "2026-01-30T16:36:11.615425Z",
-  "zones": [
-    {
-      "zone": "Dakar",
-      "lat": 14.7,
-      "lon": -17.4,
-      "etat_mer": "Jàmm",
-      "indice_plancton": 0.35,
-      "danger": "Vert"
-    },
-    {
-      "zone": "Rufisque",
-      "lat": 14.7,
-      "lon": -17.2,
-      "etat_mer": "Jàmm",
-      "indice_plancton": 0.4,
-      "danger": "Vert"
-    },
-    {
-      "zone": "Joal",
-      "lat": 14.2,
-      "lon": -16.8,
-      "etat_mer": "Jàmm",
-      "indice_plancton": 0.45,
-      "danger": "Vert"
-    },
-    {
-      "zone": "Mbour",
-      "lat": 14.4,
-      "lon": -16.9,
-      "etat_mer": "Jàmm",
-      "indice_plancton": 0.5,
-      "danger": "Vert"
-    },
-    {
-      "zone": "Saint-Louis",
-      "lat": 16.0,
-      "lon": -16.5,
-      "etat_mer": "Jàmm",
-      "indice_plancton": 0.55,
-      "danger": "Vert"
-    },
-    {
-      "zone": "Casamance",
-      "lat": 12.6,
-      "lon": -16.3,
-      "etat_mer": "Jàmm",
-      "indice_plancton": 0.6,
-      "danger": "Vert"
-    }
-  ]
-}
+[
+  {
+    "zone": "SAINT-LOUIS",
+    "lat": 16.03,
+    "lon": -16.5,
+    "vhm0": 1.37,
+    "temp": 27.0,
+    "alert": "🟢 OK",
+    "trend": "↗"
+  },
+  {
+    "zone": "KAYAR",
+    "lat": 14.92,
+    "lon": -17.2,
+    "vhm0": 3.17,
+    "temp": 27.4,
+    "alert": "🔴 DANGER",
+    "trend": "↗"
+  },
+  {
+    "zone": "DAKAR-YOFF",
+    "lat": 14.75,
+    "lon": -17.48,
+    "vhm0": 1.16,
+    "temp": 27.6,
+    "alert": "🟢 OK",
+    "trend": "↗"
+  },
+  {
+    "zone": "MBOUR-JOAL",
+    "lat": 14.41,
+    "lon": -16.96,
+    "vhm0": 2.07,
+    "temp": 26.4,
+    "alert": "🟢 OK",
+    "trend": "↗"
+  },
+  {
+    "zone": "CASAMANCE",
+    "lat": 12.5,
+    "lon": -16.7,
+    "vhm0": 1.63,
+    "temp": 27.4,
+    "alert": "🟢 OK",
+    "trend": "↗"
+  },
+  {
+    "zone": "LOUGA-POTOU",
+    "lat": 15.48,
+    "lon": -16.75,
+    "vhm0": 1.81,
+    "temp": 22.2,
+    "alert": "🟢 OK",
+    "trend": "↘"
+  }
+]
