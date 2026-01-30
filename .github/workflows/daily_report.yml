@@ -1,60 +1,38 @@
-name: PecheurConnect-Runner
+name: Copernicus Auto Update
 
 on:
   schedule:
-    - cron: '0 */6 * * *'  # toutes les 6h
-  workflow_dispatch:       # lancement manuel
+    - cron: "0 6 * * *"
+  workflow_dispatch:
 
 jobs:
-  build:
+  update:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
 
     steps:
-      # 1️⃣ Checkout code
-      - name: 📂 Checkout code
-        uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
-      # 2️⃣ Setup Python
-      - name: 🐍 Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
 
-      # 3️⃣ Install dependencies
-      - name: 📦 Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+    - name: Install deps
+      run: |
+        pip install copernicusmarine xarray netCDF4 requests
 
-      # 4️⃣ Run PecheurConnect script
-      - name: 🚀 Run script_peche.py
-        env:
-          TG_TOKEN: ${{ secrets.TG_TOKEN }}
-          TG_ID: ${{ secrets.TG_ID }}
-          COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
-          COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
-        run: python script_peche.py
+    - name: Run Copernicus + Telegram
+      env:
+        COPERNICUSMARINE_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
+        COPERNICUSMARINE_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      run: python script_peche.py
 
-      # 5️⃣ Commit & push data.json si changé
-      - name: 🌐 Commit & Push data.json
-        run: |
-          git config --global user.name "PecheurConnect-Bot"
-          git config --global user.email "bot@pecheurconnect.sn"
-          git add data.json
-          CHANGES=$(git status --porcelain)
-          echo "Changements détectés : $CHANGES"
-          if [ -n "$CHANGES" ]; then
-            git commit -m "📊 Mise à jour data.json $(date +'%d-%m-%Y %H:%M')"
-            git push origin main
-          else
-            echo "✅ Aucun changement détecté. Pas de commit nécessaire."
-
-      # 6️⃣ Publish Leaflet map to GitHub Pages
-      - name: 🌊 Publish map to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v5
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./templates
-          publish_branch: gh-pages
+    - name: Commit data.json
+      run: |
+        git config user.name "Copernicus Bot"
+        git config user.email "bot@copernicus.eu"
+        git add data.json
+        git commit -m "📡 Update Copernicus data" || echo "No changes"
+        git push
