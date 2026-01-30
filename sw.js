@@ -1,17 +1,9 @@
-const CACHE = "pecheurconnect-v1";
-const FILES = [
-  "./",
-  "./index.html",
-  "./data.json",
-  "./manifest.json",
-  "./icon-192.png",
-  "./icon-512.png"
-];
-
-self.addEventListener("install", e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)));
+// sw.js - Service Worker minimal pour PecheurConnect
+self.addEventListener('install', (e) => {
+  console.log('PecheurConnect SW installé');
 });
 
-self.addEventListener("fetch", e => {
-  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+self.addEventListener('fetch', (e) => {
+  // Nécessaire pour le mode hors-ligne basique
+  e.respondWith(fetch(e.request));
 });
