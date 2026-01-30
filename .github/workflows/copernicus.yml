@@ -1,87 +1,38 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+name: Copernicus Auto Update
 
-import os, json, datetime, random
-from pathlib import Path
-from rich.console import Console
+on:
+  schedule:
+    - cron: "0 */6 * * *" # toutes les 6h
+  workflow_dispatch:
 
-console = Console()
-console.print("🚀 PecheurConnect démarrage", style="bold cyan")
+jobs:
+  update:
+    runs-on: ubuntu-latest
 
-# -----------------------
-# TELEGRAM CONFIGURATION
-# -----------------------
-TG_TOKEN = os.getenv("TG_TOKEN")
-TG_ID = os.getenv("TG_ID")
+    steps:
+      - uses: actions/checkout@v4
 
-def send_telegram(message):
-    if not TG_TOKEN or not TG_ID:
-        console.print("⚠️ Telegram non configuré", style="yellow")
-        return
-    try:
-        import requests
-        url = f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage"
-        requests.post(url, data={"chat_id": TG_ID, "text": message})
-        console.print("📨 Telegram envoyé", style="green")
-    except Exception as e:
-        console.print(f"❌ Erreur Telegram : {e}", style="red")
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-# -----------------------
-# CHARGEMENT COPERNICUS
-# -----------------------
-USE_FALLBACK = False
-try:
-    import copernicusmarine as cm
-    console.print("🔑 Connexion Copernicus Marine...", style="cyan")
-except:
-    USE_FALLBACK = True
-    console.print("⚠️ Mode dégradé Copernicus activé (safe mode)", style="yellow")
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
-# -----------------------
-# FONCTION DE GÉNÉRATION DATA
-# -----------------------
-def generate_data():
-    zones = ["SAINT-LOUIS", "LOUGA-POTOU", "KAYAR", "DAKAR-YOFF", "MBOUR-JOAL", "CASAMANCE"]
-    data = []
-    for z in zones:
-        temp = round(random.uniform(20, 30), 1)
-        vhm0 = round(random.uniform(0.5, 3.0), 1)
-        trend = random.choice(["↗️", "↘️", "→"])
-        alert = "⚠️" if vhm0 > 2.2 else "✅"
-        next_vhm = round(vhm0 + random.uniform(-0.5, 0.5), 1)
-        wind_speed = random.randint(5, 25)
-        wind_dir = random.choice(["N","NE","E","SE","S","SW","W","NW"])
-        data.append({
-            "zone": z,
-            "temp": temp,
-            "vhm0": vhm0,
-            "trend": trend,
-            "alert": alert,
-            "next_vhm": next_vhm,
-            "wind_speed": wind_speed,
-            "wind_dir": wind_dir
-        })
-    return data
+      - name: Run Copernicus script
+        env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_ID: ${{ secrets.TG_ID }}
+          COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
+          COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
+        run: python script_peche.py
 
-# -----------------------
-# MAIN
-# -----------------------
-data_file = Path("data.json")
-
-try:
-    if USE_FALLBACK:
-        data = generate_data()
-    else:
-        # Ici tu peux mettre ton vrai call Copernicus
-        data = generate_data()  # placeholder
-    with open(data_file, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-    console.print(f"✅ data.json généré ({len(data)} zones)", style="green")
-except Exception as e:
-    console.print(f"❌ Erreur lors de la génération de data.json : {e}", style="red")
-
-# -----------------------
-# ENVOI TELEGRAM
-# -----------------------
-send_telegram("📊 PecheurConnect : nouvelles données météo/mer disponibles !")
-console.print("✅ Script terminé sans erreur", style="bold cyan")
+      - name: Commit data.json
+        run: |
+          git config user.name "Copernicus Bot"
+          git config user.email "bot@copernicus.eu"
+          git add data.json
+          git commit -m "📡 Update Copernicus data $(date +'%d-%m-%Y %H:%M')" || echo "No changes"
+          git pull --rebase --autostash
+          git push
