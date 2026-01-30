@@ -1,8 +1,8 @@
-name: Copernicus Auto Update
+name: 📡 Copernicus Auto Update – PecheurConnect
 
 on:
   schedule:
-    - cron: "0 6 * * *"
+    - cron: "0 6 * * *"   # Tous les jours à 06h UTC
   workflow_dispatch:
 
 jobs:
@@ -10,29 +10,46 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    # 1️⃣ Récupérer le dépôt
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0   # IMPORTANT pour git pull --rebase
 
-    - name: Install Python
+    # 2️⃣ Installer Python
+    - name: Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.11"
 
-    - name: Install deps
+    # 3️⃣ Installer dépendances
+    - name: Install dependencies
       run: |
-        pip install copernicusmarine xarray netCDF4 requests
+        pip install --upgrade pip
+        pip install copernicusmarine xarray netCDF4 numpy pandas requests python-telegram-bot python-dotenv
 
-    - name: Run Copernicus + Telegram
+    # 4️⃣ Lancer le script Copernicus → data.json + Telegram
+    - name: Run Copernicus PecheurConnect script
       env:
         COPERNICUSMARINE_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
         COPERNICUSMARINE_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-      run: python script_peche.py
+      run: |
+        python script_peche.py
 
-    - name: Commit data.json
+    # 5️⃣ Commit + Push ROBUSTE (ANTI-CONFLIT)
+    - name: Commit and push data.json safely
       run: |
         git config user.name "Copernicus Bot"
         git config user.email "bot@copernicus.eu"
+
+        # 🔐 Récupère les changements distants (GitHub Pages / autres workflows)
+        git pull origin main --rebase
+
+        # 📦 Commit uniquement si data.json a changé
         git add data.json
-        git commit -m "📡 Update Copernicus data" || echo "No changes"
-        git push
+        git commit -m "📡 Update Copernicus data (auto)" || echo "No changes to commit"
+
+        # 🚀 Push sécurisé
+        git push origin main
