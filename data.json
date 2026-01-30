@@ -3,8 +3,8 @@
     "zone": "SAINT-LOUIS",
     "lat": 16.03,
     "lon": -16.5,
-    "vhm0": 1.37,
-    "temp": 27.0,
+    "vhm0": 1.48,
+    "temp": 23.0,
     "alert": "🟢 OK",
     "trend": "↗"
   },
@@ -12,45 +12,45 @@
     "zone": "KAYAR",
     "lat": 14.92,
     "lon": -17.2,
-    "vhm0": 3.17,
-    "temp": 27.4,
+    "vhm0": 2.71,
+    "temp": 27.2,
     "alert": "🔴 DANGER",
-    "trend": "↗"
+    "trend": "↘"
   },
   {
     "zone": "DAKAR-YOFF",
     "lat": 14.75,
     "lon": -17.48,
-    "vhm0": 1.16,
-    "temp": 27.6,
-    "alert": "🟢 OK",
+    "vhm0": 3.03,
+    "temp": 24.9,
+    "alert": "🔴 DANGER",
     "trend": "↗"
   },
   {
     "zone": "MBOUR-JOAL",
     "lat": 14.41,
     "lon": -16.96,
-    "vhm0": 2.07,
-    "temp": 26.4,
+    "vhm0": 0.92,
+    "temp": 23.9,
     "alert": "🟢 OK",
-    "trend": "↗"
+    "trend": "↘"
   },
   {
     "zone": "CASAMANCE",
     "lat": 12.5,
     "lon": -16.7,
-    "vhm0": 1.63,
-    "temp": 27.4,
+    "vhm0": 2.12,
+    "temp": 24.7,
     "alert": "🟢 OK",
-    "trend": "↗"
+    "trend": "↘"
   },
   {
     "zone": "LOUGA-POTOU",
     "lat": 15.48,
     "lon": -16.75,
-    "vhm0": 1.81,
-    "temp": 22.2,
-    "alert": "🟢 OK",
+    "vhm0": 2.34,
+    "temp": 22.5,
+    "alert": "🔴 DANGER",
     "trend": "↘"
   }
 ]
