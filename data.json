@@ -1,12 +1,68 @@
-{
-  "updated": "2026-01-29T16:30:00Z",
-  "source": "Copernicus Marine",
-  "zones": [
-    {
-      "zone": "DAKAR",
-      "chl": 1.8,
-      "score_peche": 45,
-      "etat": "🟠 Moyen"
-    }
-  ]
-}
+[
+  {
+    "zone": "SAINT-LOUIS",
+    "temp": 23.1,
+    "vhm0": 3.0,
+    "next_vhm": 2.9,
+    "wind_speed": 7,
+    "wind_dir": "NE",
+    "alert": "🔴",
+    "trend": "Dangereux",
+    "score_peche": 21
+  },
+  {
+    "zone": "LOUGA-POTOU",
+    "temp": 23.1,
+    "vhm0": 1.8,
+    "next_vhm": 2.1,
+    "wind_speed": 21,
+    "wind_dir": "NE",
+    "alert": "🟠",
+    "trend": "Moyen",
+    "score_peche": 44
+  },
+  {
+    "zone": "KAYAR",
+    "temp": 24.9,
+    "vhm0": 0.9,
+    "next_vhm": 0.9,
+    "wind_speed": 34,
+    "wind_dir": "W",
+    "alert": "🟢",
+    "trend": "Bon",
+    "score_peche": 81
+  },
+  {
+    "zone": "DAKAR-YOFF",
+    "temp": 26.1,
+    "vhm0": 1.5,
+    "next_vhm": 1.7,
+    "wind_speed": 27,
+    "wind_dir": "NW",
+    "alert": "🟠",
+    "trend": "Moyen",
+    "score_peche": 40
+  },
+  {
+    "zone": "MBOUR-JOAL",
+    "temp": 27.5,
+    "vhm0": 1.7,
+    "next_vhm": 2.0,
+    "wind_speed": 22,
+    "wind_dir": "NW",
+    "alert": "🟠",
+    "trend": "Moyen",
+    "score_peche": 46
+  },
+  {
+    "zone": "CASAMANCE",
+    "temp": 22.2,
+    "vhm0": 3.0,
+    "next_vhm": 3.2,
+    "wind_speed": 14,
+    "wind_dir": "N",
+    "alert": "🔴",
+    "trend": "Dangereux",
+    "score_peche": 22
+  }
+]
