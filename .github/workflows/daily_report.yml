@@ -2,54 +2,54 @@ name: 📡 Copernicus Auto Update – PecheurConnect
 
 on:
   schedule:
-    - cron: "0 6 * * *"   # Tous les jours à 06h UTC
+    - cron: "0 */6 * * *"   # toutes les 6 heures
   workflow_dispatch:
 
 jobs:
   update:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
-    # 1️⃣ Récupérer le dépôt
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0   # IMPORTANT pour git pull --rebase
+      - name: 📂 Checkout repository
+        uses: actions/checkout@v4
 
-    # 2️⃣ Installer Python
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.11"
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-    # 3️⃣ Installer dépendances
-    - name: Install dependencies
-      run: |
-        pip install --upgrade pip
-        pip install copernicusmarine xarray netCDF4 numpy pandas requests python-telegram-bot python-dotenv
+      - name: 📦 Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install copernicusmarine xarray netCDF4 numpy pandas requests python-telegram-bot
 
-    # 4️⃣ Lancer le script Copernicus → data.json + Telegram
-    - name: Run Copernicus PecheurConnect script
-      env:
-        COPERNICUSMARINE_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
-        COPERNICUSMARINE_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
-        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-      run: |
-        python script_peche.py
+      - name: 🚀 Run PecheurConnect script
+        env:
+          COPERNICUSMARINE_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
+          COPERNICUSMARINE_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_ID: ${{ secrets.TG_ID }}
+        run: python script_peche.py
 
-    # 5️⃣ Commit + Push ROBUSTE (ANTI-CONFLIT)
-    - name: Commit and push data.json safely
-      run: |
-        git config user.name "Copernicus Bot"
-        git config user.email "bot@copernicus.eu"
+      - name: 📤 Commit & Push data.json (SAFE MODE)
+        run: |
+          git config user.name "Copernicus Bot"
+          git config user.email "bot@copernicus.eu"
 
-        # 🔐 Récupère les changements distants (GitHub Pages / autres workflows)
-        git pull origin main --rebase
+          # 🧹 Sauvegarde locale
+          git stash push -u -m "auto-stash Copernicus" || echo "Nothing to stash"
 
-        # 📦 Commit uniquement si data.json a changé
-        git add data.json
-        git commit -m "📡 Update Copernicus data (auto)" || echo "No changes to commit"
+          # 🔄 Sync remote
+          git pull origin main --rebase
 
-        # 🚀 Push sécurisé
-        git push origin main
+          # ♻️ Restore data.json généré
+          git stash pop || echo "Nothing to pop"
+
+          # 📦 Commit si changement
+          git add data.json
+          git commit -m "📡 Update Copernicus data (auto)" || echo "No changes to commit"
+
+          # 🚀 Push final
+          git push origin main
