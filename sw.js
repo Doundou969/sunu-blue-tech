@@ -1,33 +1,39 @@
-const CACHE_NAME = 'pecheurconnect-v1';
-const URLS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/data.json',
-  '/icon-192.png',
-  '/icon-512.png',
-  '/manifest.json',
-  'https://cdn.tailwindcss.com',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
-  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
+const CACHE_NAME = "pecheurconnect-v1";
+
+const FILES_TO_CACHE = [
+  "./",
+  "./index.html",
+  "./manifest.json",
+  "./data.json",
+  "./icon-192.png",
+  "./icon-512.png"
 ];
 
-self.addEventListener('install', event => {
-  console.log('Service Worker installé');
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(URLS_TO_CACHE)));
+// INSTALL
+self.addEventListener("install", event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(FILES_TO_CACHE))
+  );
+  self.skipWaiting();
 });
 
-self.addEventListener('activate', event => {
-  console.log('Service Worker activé');
+// ACTIVATE
+self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)))
+      Promise.all(
+        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+      )
     )
   );
+  self.clients.claim();
 });
 
-self.addEventListener('fetch', event => {
+// FETCH (OFFLINE FIRST)
+self.addEventListener("fetch", event => {
   event.respondWith(
-    caches.match(event.request).then(response => response || fetch(event.request))
+    caches.match(event.request).then(resp => {
+      return resp || fetch(event.request);
+    })
   );
 });
