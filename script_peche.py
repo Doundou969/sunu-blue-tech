@@ -1,81 +1,90 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+# ==========================================================
+# 📲 TELEGRAM ALERTS – PECHEURCONNECT 🇸🇳 (PRODUCTION)
+# ==========================================================
 
-  <title>PêcheurConnect 🇸🇳</title>
-  <meta name="description" content="Radar satellite Copernicus pour pêcheurs artisanaux sénégalais">
+import os
+import requests
+from datetime import datetime
 
-  <!-- PWA -->
-  <link rel="manifest" href="./manifest.json">
-  <meta name="theme-color" content="#0ea5e9">
 
-  <!-- Icons -->
-  <link rel="icon" href="./icon-192.png">
+def send_telegram_message(message: str):
+    """
+    Envoie un message Telegram sans bloquer le script principal
+    """
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
 
-  <!-- Tailwind (OK pour MVP) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
+    if not token or not chat_id:
+        print("⚠️ Telegram non configuré (variables manquantes)")
+        return
 
-<body class="bg-sky-50 text-gray-800">
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
 
-  <header class="bg-sky-600 text-white p-4 text-center">
-    <h1 class="text-2xl font-bold">🌊 PÊCHEURCONNECT</h1>
-    <p class="text-sm">Ta sécurité. Ta réussite.</p>
-  </header>
+    payload = {
+        "chat_id": chat_id,
+        "text": message,
+        "parse_mode": "Markdown",
+        "disable_web_page_preview": True
+    }
 
-  <main class="p-4 space-y-4">
+    try:
+        r = requests.post(url, json=payload, timeout=10)
+        if r.status_code == 200:
+            print("📲 Telegram envoyé avec succès")
+        else:
+            print("⚠️ Erreur Telegram:", r.text)
+    except Exception as e:
+        print("❌ Exception Telegram:", e)
 
-    <div class="bg-white rounded-xl shadow p-4">
-      <h2 class="font-semibold text-lg">📡 Radar Poisson</h2>
-      <p id="score" class="text-3xl font-bold text-sky-600">--</p>
-      <p class="text-sm text-gray-500">Indice satellite Copernicus</p>
-    </div>
 
-    <div class="bg-white rounded-xl shadow p-4">
-      <h2 class="font-semibold text-lg">🧭 Position GPS</h2>
-      <p id="gps">En attente...</p>
-    </div>
+# ==========================================================
+# 📡 MESSAGE AUTOMATIQUE APRÈS GÉNÉRATION DE data.json
+# ==========================================================
 
-  </main>
+try:
+    summary_lines = []
+    danger_detected = False
 
-  <footer class="text-center text-xs text-gray-500 p-2">
-    © PêcheurConnect Sénégal
-  </footer>
+    # ⚠️ data = liste Python déjà utilisée pour écrire data.json
+    for zone in data:
+        zone_name = zone.get("zone", "Zone inconnue")
+        houle = float(zone.get("vhm0", 0))
+        score = int(zone.get("score_peche", 0))
+        temp = zone.get("temp", "?")
+        vent = zone.get("wind_speed", "?")
 
-<script>
-/* =========================
-   DATA.JSON
-========================= */
-fetch('./data.json')
-  .then(r => r.json())
-  .then(data => {
-    document.getElementById("score").textContent = data.score_peche;
-  })
-  .catch(() => {
-    document.getElementById("score").textContent = "N/A";
-  });
+        # Logique alerte
+        if houle >= 2.2:
+            emoji = "🔴"
+            danger_detected = True
+        elif score >= 60:
+            emoji = "🟢"
+        else:
+            emoji = "🟠"
 
-/* =========================
-   GPS
-========================= */
-if ("geolocation" in navigator) {
-  navigator.geolocation.getCurrentPosition(pos => {
-    document.getElementById("gps").textContent =
-      pos.coords.latitude.toFixed(4) + ", " + pos.coords.longitude.toFixed(4);
-  });
-}
+        summary_lines.append(
+            f"{emoji} *{zone_name}*\n"
+            f"🎯 Score: {score}\n"
+            f"🌊 Houle: {houle} m\n"
+            f"🌡️ Temp: {temp} °C\n"
+            f"🌬️ Vent: {vent} km/h\n"
+        )
 
-/* =========================
-   SERVICE WORKER
-========================= */
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js')
-    .then(() => console.log("✅ Service Worker OK"))
-    .catch(err => console.error("❌ SW erreur", err));
-}
-</script>
+    header = (
+        "🚨 *ALERTE MER DANGEREUSE – PECHEURCONNECT* 🚨\n\n"
+        if danger_detected
+        else "📡 *PêcheurConnect – Données Copernicus à jour*\n\n"
+    )
 
-</body>
-</html>
+    footer = (
+        "\n🕒 "
+        + datetime.utcnow().strftime("%d-%m-%Y %H:%M UTC")
+        + "\n🌊 Données satellites Copernicus Marine"
+    )
+
+    telegram_message = header + "\n".join(summary_lines) + footer
+
+    send_telegram_message(telegram_message)
+
+except Exception as e:
+    print("⚠️ Envoi Telegram ignoré :", e)
