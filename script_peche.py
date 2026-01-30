@@ -1,17 +1,9 @@
-import os
 import json
+import os
 import random
-import requests
 from datetime import datetime
 
 print("🚀 PecheurConnect démarrage")
-
-# ================================
-# CONFIG
-# ================================
-
-DATA_DIR = "data"
-DATA_FILE = f"{DATA_DIR}/data.json"
 
 ZONES = {
     "SAINT-LOUIS": (16.03, -16.50),
@@ -22,11 +14,7 @@ ZONES = {
     "LOUGA-POTOU": (15.48, -16.75)
 }
 
-# ================================
-# FALLBACK DATA (SAFE MODE)
-# ================================
-
-def fallback_data():
+def generate_fallback():
     data = []
     for zone, (lat, lon) in ZONES.items():
         vhm0 = round(random.uniform(0.8, 3.2), 2)
@@ -38,62 +26,26 @@ def fallback_data():
             "lon": lon,
             "vhm0": vhm0,
             "temp": round(random.uniform(22, 28), 1),
+            "wind_speed": random.randint(8, 30),
+            "wind_dir": random.choice(["N", "NE", "NW", "W", "SW"]),
             "alert": alert,
             "trend": "↗" if random.random() > 0.5 else "↘",
-            "timestamp": datetime.utcnow().isoformat()
+            "next_vhm": round(vhm0 + random.uniform(-0.5, 0.6), 2),
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "source": "fallback"
         })
     return data
 
+# Génération données
+data = generate_fallback()
 
-# ================================
-# MAIN
-# ================================
+# Écriture data.json
+with open("data.json", "w", encoding="utf-8") as f:
+    json.dump(data, f, indent=2, ensure_ascii=False)
 
-def main():
-    # 1️⃣ Génération données (fallback sécurisé)
-    try:
-        data = fallback_data()
-    except Exception as e:
-        print("❌ Impossible de générer les données :", e)
-        return
+print("✅ data.json généré")
 
-    # 2️⃣ Sauvegarde JSON
-    try:
-        os.makedirs(DATA_DIR, exist_ok=True)
-        with open(DATA_FILE, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2, ensure_ascii=False)
-        print("✅ data.json généré")
-    except Exception as e:
-        print("❌ Erreur écriture data.json :", e)
-        return
+# Telegram volontairement désactivé
+print("⚠️ Telegram non configuré")
 
-    # 3️⃣ Telegram (OPTIONNEL)
-    TG_TOKEN = os.getenv("TG_TOKEN")
-    TG_ID = os.getenv("TG_ID")
-
-    if TG_TOKEN and TG_ID:
-        try:
-            message = "📡 *PecheurConnect – État de la mer*\n"
-            for d in data:
-                message += f"\n{d['zone']} : {d['vhm0']} m {d['alert']}"
-
-            requests.post(
-                f"https://api.telegram.org/bot{TG_TOKEN}/sendMessage",
-                data={
-                    "chat_id": TG_ID,
-                    "text": message,
-                    "parse_mode": "Markdown"
-                },
-                timeout=10
-            )
-            print("📨 Telegram envoyé")
-        except Exception as e:
-            print("⚠️ Erreur Telegram (ignorée) :", e)
-    else:
-        print("⚠️ Telegram non configuré")
-
-    print("✅ Script terminé sans erreur")
-
-
-if __name__ == "__main__":
-    main()
+print("✅ Script terminé sans erreur")
