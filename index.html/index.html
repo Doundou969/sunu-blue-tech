@@ -5,12 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>PecheurConnect 🇸🇳 | Radar Satellite Copernicus</title>
 
-<link rel="icon" href="icon-192.png">
-<link rel="manifest" href="manifest.json">
+<!-- Manifest & Icons -->
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/icon-192.png">
+<link rel="apple-touch-icon" href="/icon-192.png">
 
-<script src="https://cdn.tailwindcss.com"></script>
+<!-- CSS Tailwind compilé -->
+<link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <style>
@@ -70,12 +75,14 @@ body { background: #020617; color: white; font-family: system-ui, -apple-system,
 <p>&copy; 2026 PecheurConnect - Marine Data Senegal</p>
 </footer>
 
+<script src="/sw.js"></script>
 <script>
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').then(() => console.log('SW enregistré')).catch(e => console.log('SW erreur:', e));
+  navigator.serviceWorker.register('/sw.js').then(() => console.log('✅ SW enregistré')).catch(e => console.log('❌ SW erreur:', e));
 }
 
-const DATA_URL = "data.json";
+const DATA_URL = "/data.json";
+
 const map = L.map('map', { tap: false, zoomControl: false }).setView([14.5, -17.2], 7);
 L.control.zoom({ position: 'bottomright' }).addTo(map);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
