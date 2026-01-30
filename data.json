@@ -1,9 +1,12 @@
 {
-  "zone": "Grande Côte – Sénégal",
-  "date": "2026-01-29T16:00:00Z",
-  "chlorophylle_mg_m3": 0.84,
-  "sst_celsius": 24.6,
-  "courant_ms": 0.21,
-  "score_peche": 0.78,
-  "etat": "🟢 Favorable"
+  "updated": "2026-01-29T16:30:00Z",
+  "source": "Copernicus Marine",
+  "zones": [
+    {
+      "zone": "DAKAR",
+      "chl": 1.8,
+      "score_peche": 45,
+      "etat": "🟠 Moyen"
+    }
+  ]
 }
