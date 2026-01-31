@@ -1,38 +1,36 @@
-name: Copernicus Auto Update
+name: Update Marine Data
 
 on:
   schedule:
-    - cron: "0 */6 * * *" # toutes les 6h
-  workflow_dispatch:
+    - cron: '0 */3 * * *' # S'exécute toutes les 3 heures
+  workflow_dispatch:      # Permet de le lancer manuellement
 
 jobs:
-  update:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Install Python
-        uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: '3.9'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          pip install copernicusmarine python-dotenv numpy
 
-      - name: Run Copernicus script
+      - name: Run script
         env:
-          TG_TOKEN: ${{ secrets.TG_TOKEN }}
-          TG_ID: ${{ secrets.TG_ID }}
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
         run: python script_peche.py
 
-      - name: Commit data.json
+      - name: Commit and Push
         run: |
-          git config user.name "Copernicus Bot"
-          git config user.email "bot@copernicus.eu"
+          git config --global user.name "PecheurConnect-Bot"
+          git config --global user.email "bot@pecheurconnect.sn"
           git add data.json
-          git commit -m "📡 Update Copernicus data $(date +'%d-%m-%Y %H:%M')" || echo "No changes"
-          git pull --rebase --autostash
+          git commit -m "Automated update: $(date)" || echo "No changes to commit"
           git push
