@@ -1,0 +1,56 @@
+[
+  {
+    "zone": "SAINT-LOUIS",
+    "lat": 16.03,
+    "lon": -16.5,
+    "vhm0": 1.62,
+    "alert": "🟢 OK",
+    "timestamp": "2026-02-09T00:00:00.000000000",
+    "source": "PecheurConnect / Copernicus"
+  },
+  {
+    "zone": "KAYAR",
+    "lat": 14.92,
+    "lon": -17.2,
+    "vhm0": 0.0,
+    "alert": "🟢 OK",
+    "timestamp": "2026-02-09T00:00:00.000000000",
+    "source": "PecheurConnect / Copernicus"
+  },
+  {
+    "zone": "DAKAR-YOFF",
+    "lat": 14.75,
+    "lon": -17.48,
+    "vhm0": 1.78,
+    "alert": "🟢 OK",
+    "timestamp": "2026-02-09T00:00:00.000000000",
+    "source": "PecheurConnect / Copernicus"
+  },
+  {
+    "zone": "MBOUR-JOAL",
+    "lat": 14.41,
+    "lon": -16.96,
+    "vhm0": 0.55,
+    "alert": "🟢 OK",
+    "timestamp": "2026-02-09T00:00:00.000000000",
+    "source": "PecheurConnect / Copernicus"
+  },
+  {
+    "zone": "CASAMANCE",
+    "lat": 12.5,
+    "lon": -16.7,
+    "vhm0": 0.0,
+    "alert": "🟢 OK",
+    "timestamp": "2026-02-09T00:00:00.000000000",
+    "source": "PecheurConnect / Copernicus"
+  },
+  {
+    "zone": "LOUGA-POTOU",
+    "lat": 15.48,
+    "lon": -16.75,
+    "vhm0": 1.49,
+    "alert": "🟢 OK",
+    "timestamp": "2026-02-09T00:00:00.000000000",
+    "source": "PecheurConnect / Copernicus"
+  }
+]
