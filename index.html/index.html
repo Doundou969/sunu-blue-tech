@@ -13,124 +13,83 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
-        body { background:#020617; color:white; font-family: sans-serif; }
-        #map { height:350px; border-radius:16px; border: 2px solid #1e293b; z-index: 1; }
-        .zone-card { transition: transform 0.2s; border-left-width: 6px; }
-        .zone-card:hover { transform: translateY(-2px); }
-        /* Correction pour les popups Leaflet */
-        .leaflet-popup-content-wrapper { background: #1e293b; color: white; border: 1px solid #334155; }
-        .leaflet-popup-tip { background: #1e293b; }
+        body { background:#020617; color:white; font-family: system-ui, sans-serif; }
+        #map { height:350px; border-radius:16px; border: 1px solid #1e293b; z-index: 10; }
+        .card-danger { border-left: 5px solid #ef4444; background: rgba(239, 68, 68, 0.1); }
+        .card-ok { border-left: 5px solid #22d3ee; background: rgba(30, 41, 59, 0.5); }
     </style>
 </head>
 
 <body class="p-4 max-w-4xl mx-auto">
 
     <header class="text-center mb-6">
-        <h1 class="text-3xl font-black text-sky-400 tracking-tighter">PECHEUR CONNECT 🇸🇳</h1>
-        <p class="text-slate-400 text-[10px] uppercase tracking-[0.2em] mt-1">Surveillance Maritime & Sécurité</p>
+        <h1 class="text-3xl font-black text-sky-400">PECHEUR CONNECT 🇸🇳</h1>
+        <p class="text-slate-400 text-xs uppercase tracking-widest mt-1">Données Copernicus en Temps Réel</p>
     </header>
 
-    <div id="map" class="mb-6 shadow-2xl shadow-blue-900/20"></div>
+    <div id="map" class="mb-6 shadow-2xl"></div>
     
     <div id="dashboard" class="grid gap-4 sm:grid-cols-2">
-        <div class="col-span-full text-center py-10 text-slate-500 italic text-sm">
-            Chargement des données Copernicus...
         </div>
-    </div>
-
-    <footer class="mt-10 mb-6 text-center text-[10px] text-slate-600 border-t border-slate-800 pt-4">
-        &copy; 2026 PecheurConnect - Données via Copernicus Marine Service
-    </footer>
 
     <script>
-        // 1. Initialisation de la carte (Centrée Sénégal)
-        const map = L.map('map').setView([14.4, -17.0], 7);
+        // 1. Initialisation Carte
+        const map = L.map('map').setView([14.5, -17.0], 7);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; CARTO'
         }).addTo(map);
 
-        // 2. Fonction de chargement des données
-        async function loadData() {
+        // 2. Chargement des données
+        async function updateApp() {
             const dash = document.getElementById("dashboard");
-            
             try {
-                // Utilisation d'un chemin relatif strict pour éviter les erreurs 404 GitHub
-                const response = await fetch("data.json?v=" + Date.now());
+                // Le "./" est crucial pour GitHub Pages
+                const res = await fetch("./data.json?t=" + Date.now());
+                if (!res.ok) throw new Error("Fichier data.json introuvable");
                 
-                if (!response.ok) throw new Error("Fichier data.json introuvable");
-                
-                const data = await response.json();
-                dash.innerHTML = ""; // Vider le message de chargement
+                const data = await res.json();
+                dash.innerHTML = "";
 
                 data.forEach(z => {
-                    const isDanger = parseFloat(z.vhm0) >= 2.2;
-                    const statusBg = isDanger ? 'bg-red-500/10' : 'bg-slate-800/50';
-                    const borderColor = isDanger ? 'border-red-600' : 'border-cyan-600';
-                    const textColor = isDanger ? 'text-red-500' : 'text-cyan-400';
+                    const isDanger = z.vhm0 >= 2.2;
+                    const markerColor = isDanger ? "#ef4444" : "#22d3ee";
 
-                    // Création de la carte HTML
-                    const card = document.createElement("div");
-                    card.className = `p-4 rounded-xl ${statusBg} border ${borderColor} zone-card shadow-lg`;
-                    card.innerHTML = `
-                        <div class="flex justify-between items-start mb-3">
-                            <h2 class="font-bold text-lg tracking-tight">${z.zone}</h2>
-                            <span class="text-[10px] font-black px-2 py-0.5 rounded ${isDanger ? 'bg-red-600 text-white' : 'bg-cyan-900 text-cyan-200'}">
+                    // Création Card
+                    const div = document.createElement("div");
+                    div.className = `p-4 rounded-xl shadow-lg border border-slate-700 ${isDanger ? 'card-danger' : 'card-ok'}`;
+                    div.innerHTML = `
+                        <div class="flex justify-between items-center mb-2">
+                            <b class="text-lg">${z.zone}</b>
+                            <span class="text-[10px] px-2 py-1 rounded font-bold ${isDanger ? 'bg-red-600' : 'bg-cyan-600'}">
                                 ${z.alert}
                             </span>
                         </div>
-                        <div class="grid grid-cols-2 gap-y-2 text-sm">
-                            <div class="text-slate-400">🌊 Houle</div>
-                            <div class="text-right font-mono font-bold ${textColor}">${z.vhm0} m ${z.trend}</div>
-                            <div class="text-slate-400">🌡️ Temp.</div>
-                            <div class="text-right font-bold">${z.temp} °C</div>
-                            <div class="text-slate-400">💨 Vent</div>
-                            <div class="text-right font-bold text-xs">${z.wind_speed} km/h (${z.wind_dir})</div>
-                        </div>
-                        <div class="mt-4 text-[9px] text-slate-500 flex justify-between border-t border-slate-700/50 pt-2">
-                            <span>Source: ${z.source}</span>
-                            <span>${z.timestamp.split('T')[1].split('.')[0]} GMT</span>
+                        <div class="grid grid-cols-2 text-sm gap-2">
+                            <div class="text-slate-400">🌊 Houle</div><div class="text-right font-bold">${z.vhm0}m ${z.trend}</div>
+                            <div class="text-slate-400">🌡️ Mer</div><div class="text-right font-bold">${z.temp}°C</div>
+                            <div class="text-slate-400">💨 Vent</div><div class="text-right font-bold">${z.wind_speed}km/h</div>
                         </div>
                     `;
-                    dash.appendChild(card);
+                    dash.appendChild(div);
 
-                    // Ajout du marqueur sur la carte Leaflet
+                    // Ajout Marqueur
                     if (z.lat && z.lon) {
-                        const marker = L.circleMarker([z.lat, z.lon], {
-                            radius: 10,
-                            color: "#fff",
-                            weight: 1,
-                            fillColor: isDanger ? "#ef4444" : "#06b6d4",
-                            fillOpacity: 0.8
-                        }).addTo(map);
-
-                        marker.bindPopup(`
-                            <div class="text-xs">
-                                <b class="text-sm">${z.zone}</b><br>
-                                <span class="${isDanger ? 'text-red-500' : 'text-cyan-400'}"><b>${z.alert}</b></span><br>
-                                Houle: ${z.vhm0}m
-                            </div>
-                        `);
+                        L.circleMarker([z.lat, z.lon], {
+                            radius: 12, color: "#fff", weight: 2, fillColor: markerColor, fillOpacity: 0.9
+                        }).addTo(map).bindPopup(`<b>${z.zone}</b><br>Houle: ${z.vhm0}m`);
                     }
                 });
-
             } catch (err) {
-                console.error("Erreur PecheurConnect:", err);
-                dash.innerHTML = `
-                    <div class="col-span-full p-8 border-2 border-dashed border-red-900/50 rounded-2xl text-center bg-red-900/10">
-                        <div class="text-3xl mb-2">⚠️</div>
-                        <p class="text-red-400 font-bold">Données Indisponibles</p>
-                        <p class="text-[10px] text-slate-500 mt-2 italic">
-                            Vérifiez que "data.json" est bien à la racine du dépôt GitHub et que l'URL ne contient pas de "/" après index.html
-                        </p>
-                    </div>
-                `;
+                dash.innerHTML = `<div class="col-span-full text-center p-10 bg-red-900/20 border border-red-500 rounded-xl">
+                    <p class="font-bold">⚠️ Erreur de données</p>
+                    <p class="text-xs text-slate-400 mt-2 italic">Vérifiez que data.json est à la racine et n'utilisez pas de "/" après index.html</p>
+                </div>`;
             }
         }
 
-        // Lancement
-        loadData();
+        updateApp();
 
-        // Enregistrement Service Worker (PWA)
+        // 3. Service Worker
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register("sw.js").catch(() => {});
         }
