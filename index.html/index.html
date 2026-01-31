@@ -6,11 +6,9 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { margin:0; font-family:sans-serif; background:#f0f2f5; }
-        #map { height:100vh; width:100%; }
-        .marker-label { color:white; padding:5px 10px; border-radius:15px; font-weight:bold; border:2px solid white; display:flex; align-items:center; gap:5px; font-size:13px; box-shadow:0 2px 4px rgba(0,0,0,0.2); }
-        .popup-card { width:200px; text-align:center; }
-        .box { background:#fff; padding:8px; margin:5px 0; border-radius:8px; border:1px solid #ddd; border-left:5px solid #ccc; }
+        body { margin:0; font-family:sans-serif; } #map { height:100vh; }
+        .marker-label { color:white; padding:5px 10px; border-radius:15px; font-weight:bold; border:2px solid white; display:flex; align-items:center; gap:5px; font-size:13px; }
+        .box { background:#f4f4f4; padding:8px; margin:5px 0; border-radius:5px; border-left:4px solid #ccc; text-align:center; }
     </style>
 </head>
 <body>
@@ -20,37 +18,46 @@
     const map = L.map('map').setView([14.5, -17.2], 7);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
 
-    // Chargement des données avec forçage de mise à jour (Date.now())
     fetch('./data.json?v=' + Date.now()).then(r => r.json()).then(data => {
         data.forEach((z, i) => {
-            const color = z.v_now >= 2.1 ? '#e74c3c' : '#2ecc71';
-            const alertColor = z.w_tomorrow >= 2.1 ? '#e74c3c' : '#2ecc71';
+            // SÉCURITÉ : On vérifie si les données existent, sinon on met des valeurs par défaut
+            const vNow = z.v_now || z.vhm0 || 0;
+            const tNow = z.t_now || z.temp || 0;
+            const wTom = z.w_tomorrow || 0;
+            const hDat = z.h_dat || (z.history ? z.history.dates : []);
+            const hVal = z.h_val || (z.history ? z.history.values : []);
+
+            const color = vNow >= 2.1 ? '#e74c3c' : '#2ecc71';
             
             const popup = `
-                <div class="popup-card">
-                    <h3 style="margin:5px">${z.zone}</h3>
-                    <div class="box"><b>Aujourd'hui</b><br>🌊 ${z.v_now}m | 🌡️ ${z.t_now}°C</div>
-                    <div class="box" style="border-left-color:${alertColor}">
-                        <b>Demain (Prévision)</b><br>🌊 ${z.w_tomorrow}m ${z.w_tomorrow >= 2.1 ? '⚠️' : '✅'}
+                <div style="width:200px">
+                    <h3 style="text-align:center">${z.zone}</h3>
+                    <div class="box"><b>Aujourd'hui</b><br>🌊 ${vNow}m | 🌡️ ${tNow}°C</div>
+                    <div class="box" style="border-left-color:${wTom >= 2.1 ? '#e74c3c' : '#2ecc71'}">
+                        <b>Demain</b><br>🌊 ${wTom}m ${wTom >= 2.1 ? '⚠️' : '✅'}
                     </div>
-                    <canvas id="chart-${i}" height="100"></canvas>
+                    ${hDat.length > 0 ? `<canvas id="chart-${i}" height="100"></canvas>` : '<p style="font-size:10px">Graphique indisponible</p>'}
                 </div>`;
 
-            L.marker([z.lat, z.lon], {
-                icon: L.divIcon({ html: `<div class="marker-label" style="background:${color}">${z.v_now}m ${z.t_now <= 22 ? '🐟' : ''}</div>`, iconSize: [85, 30] })
-            }).addTo(map).bindPopup(popup).on('popupopen', () => {
-                const ctx = document.getElementById(`chart-${i}`).getContext('2d');
-                new Chart(ctx, {
+            const m = L.marker([z.lat, z.lon], {
+                icon: L.divIcon({ html: `<div class="marker-label" style="background:${color}">${vNow}m ${tNow <= 22 ? '🐟' : ''}</div>`, iconSize: [85, 30] })
+            }).addTo(map).bindPopup(popup);
+
+            m.on('popupopen', () => {
+                const canvas = document.getElementById(`chart-${i}`);
+                if (!canvas || hDat.length === 0) return; // Empêche l'erreur .map()
+
+                new Chart(canvas.getContext('2d'), {
                     type: 'line',
                     data: {
-                        labels: z.h_dat.map(d => d.slice(8,10) + '/' + d.slice(5,7)),
-                        datasets: [{ label:'Temp', data:z.h_val, borderColor:'#3498db', tension:0.3, fill:true, backgroundColor:'rgba(52,152,219,0.1)' }]
+                        labels: hDat.map(d => d.slice(8,10)),
+                        datasets: [{ label:'Temp', data:hVal, borderColor:'#3498db', tension:0.3, fill:true }]
                     },
-                    options: { plugins:{legend:{display:false}}, scales:{y:{beginAtZero:false}} }
+                    options: { plugins: { legend: { display: false } } }
                 });
             });
         });
-    });
+    }).catch(err => console.error("Erreur chargement JSON:", err));
 </script>
 </body>
 </html>
