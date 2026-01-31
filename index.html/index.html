@@ -3,17 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PecheurConnect - Sécurité & Pêche</title>
+    <title>PecheurConnect - Sécurité & Historique</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { margin: 0; font-family: sans-serif; }
         #map { height: 100vh; width: 100%; }
-        .marker-label {
-            color: white; padding: 5px 10px; border-radius: 20px;
-            font-weight: bold; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            display: flex; align-items: center; gap: 5px; font-size: 13px;
-        }
-        .legend { background: white; padding: 10px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
+        .popup-chart { width: 250px; height: 150px; }
     </style>
 </head>
 <body>
@@ -26,41 +22,52 @@
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
 
     fetch('data.json').then(res => res.json()).then(data => {
-        data.forEach(zone => {
+        data.forEach((zone, index) => {
             const color = zone.vhm0 >= 2.2 ? '#d63031' : '#27ae60';
             const fishMarker = zone.temp <= 22 ? '🐟' : '';
 
-            const customIcon = L.divIcon({
-                className: 'custom-marker',
-                html: `<div class="marker-label" style="background-color: ${color};">${zone.vhm0}m ${zone.trend} ${fishMarker}</div>`,
-                iconSize: [80, 30]
-            });
-
+            const canvasId = `chart-${index}`;
             const content = `
                 <div style="text-align: center;">
-                    <h3>${zone.zone}</h3>
-                    <p style="font-size: 20px; margin: 5px 0;">🌊 <b>${zone.vhm0} m</b></p>
-                    <p style="margin: 5px 0;">🌡️ Temp: <b>${zone.temp}°C</b></p>
-                    <p style="color: blue;">${zone.fish_status}</p>
-                    <hr>
-                    <small>État : ${zone.alert}</small>
+                    <h3>${zone.zone} ${fishMarker}</h3>
+                    <b>${zone.vhm0}m</b> | <b>${zone.temp}°C</b><br>
+                    <small>${zone.temp_trend}</small>
+                    <canvas id="${canvasId}" class="popup-chart"></canvas>
                 </div>
             `;
 
-            L.marker([zone.lat, zone.lon], { icon: customIcon }).addTo(map).bindPopup(content);
+            const marker = L.marker([zone.lat, zone.lon], {
+                icon: L.divIcon({
+                    className: 'custom-marker',
+                    html: `<div style="background:${color}; color:white; padding:5px; border-radius:10px; border:2px solid white; font-weight:bold;">${zone.vhm0}m</div>`,
+                    iconSize: [50, 30]
+                })
+            }).addTo(map).bindPopup(content);
+
+            // Générer le graphique quand on ouvre le popup
+            marker.on('popupopen', () => {
+                const ctx = document.getElementById(canvasId).getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: zone.history.dates,
+                        datasets: [{
+                            label: 'Temp °C',
+                            data: zone.history.values,
+                            borderColor: '#3498db',
+                            backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                            fill: true,
+                            tension: 0.3
+                        }]
+                    },
+                    options: { 
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: false } }
+                    }
+                });
+            });
         });
     });
-
-    const legend = L.control({ position: 'bottomright' });
-    legend.onAdd = () => {
-        const div = L.DomUtil.create('div', 'legend');
-        div.innerHTML = `<b>Légende :</b><br>
-            🟢 Mer Calme | 🔴 Danger<br>
-            🐟 = Zone riche en poissons (Eau froide)<br>
-            ↗ Tendance Hausse`;
-        return div;
-    };
-    legend.addTo(map);
 </script>
 </body>
 </html>
