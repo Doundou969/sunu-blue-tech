@@ -3,138 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PecheurConnect - Sécurité Maritime Sénégal</title>
-    
+    <title>PecheurConnect - Sécurité & Pêche</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
     <style>
-        body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { margin: 0; font-family: sans-serif; }
         #map { height: 100vh; width: 100%; }
-
-        /* Style de la légende */
-        .info-legend {
-            background: white;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.2);
-            line-height: 1.5;
-            font-size: 14px;
-        }
-
-        /* Style des étiquettes sur la carte */
-        .custom-marker {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
         .marker-label {
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-weight: bold;
-            border: 2px solid white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 14px;
+            color: white; padding: 5px 10px; border-radius: 20px;
+            font-weight: bold; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            display: flex; align-items: center; gap: 5px; font-size: 13px;
         }
-
-        /* En-tête du site */
-        header {
-            position: absolute;
-            top: 10px;
-            left: 50px;
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 10px 20px;
-            border-radius: 30px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            border: 1px solid #0056b3;
-        }
-        header h1 { margin: 0; font-size: 18px; color: #0056b3; }
+        .legend { background: white; padding: 10px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>🚢 PecheurConnect : État de la Mer</h1>
-</header>
-
 <div id="map"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <script>
-    // 1. Initialisation de la carte centrée sur le Sénégal
     const map = L.map('map').setView([14.4974, -14.4524], 7);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
 
-    // 2. Ajout du fond de carte (CartoDB Voyager pour une meilleure lisibilité)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; PecheurConnect | Copernicus Marine'
-    }).addTo(map);
+    fetch('data.json').then(res => res.json()).then(data => {
+        data.forEach(zone => {
+            const color = zone.vhm0 >= 2.2 ? '#d63031' : '#27ae60';
+            const fishMarker = zone.temp <= 22 ? '🐟' : '';
 
-    // 3. Chargement des données depuis data.json
-    fetch('data.json')
-        .then(response => response.json())
-        .then(data => {
-            data.forEach(zone => {
-                // Seuil de danger : 2.2 mètres
-                const isDanger = zone.vhm0 >= 2.2;
-                const color = isDanger ? '#d63031' : '#27ae60';
-                
-                // Icône dynamique avec Tendance
-                const customIcon = L.divIcon({
-                    className: 'custom-marker',
-                    html: `
-                        <div class="marker-label" style="background-color: ${color};">
-                            ${zone.vhm0}m <span>${zone.trend || '→'}</span>
-                        </div>
-                    `,
-                    iconSize: [70, 30],
-                    iconAnchor: [35, 15]
-                });
-
-                // Popup détaillé
-                const popupContent = `
-                    <div style="text-align: center; min-width: 150px;">
-                        <h3 style="margin: 5px 0; color: #2c3e50;">${zone.zone}</h3>
-                        <div style="font-size: 24px; font-weight: bold; margin: 10px 0;">
-                            ${zone.vhm0} m
-                        </div>
-                        <div style="padding: 5px; border-radius: 4px; background: #f8f9fa;">
-                            Tendance : <b>${zone.trend === '↗' ? 'En hausse' : zone.trend === '↘' ? 'En baisse' : 'Stable'}</b><br>
-                            Alerte : <span style="color: ${color}; font-weight: bold;">${zone.alert}</span>
-                        </div>
-                        <p style="font-size: 10px; color: #7f8c8d; margin-top: 10px;">
-                            MàJ : ${new Date(zone.timestamp).toLocaleString('fr-FR')}
-                        </p>
-                    </div>
-                `;
-
-                L.marker([zone.lat, zone.lon], { icon: customIcon })
-                    .addTo(map)
-                    .bindPopup(popupContent);
+            const customIcon = L.divIcon({
+                className: 'custom-marker',
+                html: `<div class="marker-label" style="background-color: ${color};">${zone.vhm0}m ${zone.trend} ${fishMarker}</div>`,
+                iconSize: [80, 30]
             });
-        })
-        .catch(err => console.error("Erreur lors du chargement des données :", err));
 
-    // 4. Ajout d'une légende simple
+            const content = `
+                <div style="text-align: center;">
+                    <h3>${zone.zone}</h3>
+                    <p style="font-size: 20px; margin: 5px 0;">🌊 <b>${zone.vhm0} m</b></p>
+                    <p style="margin: 5px 0;">🌡️ Temp: <b>${zone.temp}°C</b></p>
+                    <p style="color: blue;">${zone.fish_status}</p>
+                    <hr>
+                    <small>État : ${zone.alert}</small>
+                </div>
+            `;
+
+            L.marker([zone.lat, zone.lon], { icon: customIcon }).addTo(map).bindPopup(content);
+        });
+    });
+
     const legend = L.control({ position: 'bottomright' });
-    legend.onAdd = function() {
-        const div = L.DomUtil.create('div', 'info-legend');
-        div.innerHTML = `
-            <b>Légende</b><br>
-            <i style="background: #27ae60; width: 12px; height: 12px; display: inline-block; border-radius: 50%;"></i> Mer Calme (&lt; 2.2m)<br>
-            <i style="background: #d63031; width: 12px; height: 12px; display: inline-block; border-radius: 50%;"></i> Danger (&gt; 2.2m)<br>
-            <span>↗ Hausse | ↘ Baisse | → Stable</span>
-        `;
+    legend.onAdd = () => {
+        const div = L.DomUtil.create('div', 'legend');
+        div.innerHTML = `<b>Légende :</b><br>
+            🟢 Mer Calme | 🔴 Danger<br>
+            🐟 = Zone riche en poissons (Eau froide)<br>
+            ↗ Tendance Hausse`;
         return div;
     };
     legend.addTo(map);
 </script>
-
 </body>
 </html>
