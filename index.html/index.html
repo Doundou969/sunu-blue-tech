@@ -3,68 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PecheurConnect - Sécurité & Historique</title>
+    <title>PecheurConnect - Sécurité & Pêche</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { margin: 0; font-family: sans-serif; }
         #map { height: 100vh; width: 100%; }
-        .popup-chart { width: 250px; height: 150px; }
+        .marker-label { color: white; padding: 5px 10px; border-radius: 15px; font-weight: bold; border: 2px solid white; display: flex; align-items: center; gap: 5px; font-size: 12px; }
+        .share-btn { background: #25D366; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 10px; font-weight: bold; }
     </style>
 </head>
 <body>
-
 <div id="map"></div>
-
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
     const map = L.map('map').setView([14.4974, -14.4524], 7);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
 
+    function shareAlert(zone, vhm0) {
+        navigator.geolocation.getCurrentPosition(pos => {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+            const text = `🚨 ALERTE PECHEURCONNECT\nJe suis en mer vers ${zone}.\nHoule : ${vhm0}m.\nMa position : https://www.google.com/maps?q=${lat},${lon}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        });
+    }
+
     fetch('data.json').then(res => res.json()).then(data => {
-        data.forEach((zone, index) => {
+        data.forEach((zone, i) => {
             const color = zone.vhm0 >= 2.2 ? '#d63031' : '#27ae60';
-            const fishMarker = zone.temp <= 22 ? '🐟' : '';
+            const popupContent = `
+                <div style="text-align: center; width: 200px;">
+                    <h3>${zone.zone}</h3>
+                    <b>Vagues : ${zone.vhm0}m</b><br>
+                    🌡️ Temp : ${zone.temp}°C (${zone.fish_status})
+                    <canvas id="chart-${i}" style="height:100px; width:100%;"></canvas>
+                    <button class="share-btn" onclick="shareAlert('${zone.zone}', ${zone.vhm0})">📲 Alerter sur WhatsApp</button>
+                </div>`;
 
-            const canvasId = `chart-${index}`;
-            const content = `
-                <div style="text-align: center;">
-                    <h3>${zone.zone} ${fishMarker}</h3>
-                    <b>${zone.vhm0}m</b> | <b>${zone.temp}°C</b><br>
-                    <small>${zone.temp_trend}</small>
-                    <canvas id="${canvasId}" class="popup-chart"></canvas>
-                </div>
-            `;
+            const m = L.marker([zone.lat, zone.lon], {
+                icon: L.divIcon({ className:'c-m', html:`<div class="marker-label" style="background:${color}">${zone.vhm0}m ${zone.temp <= 22 ? '🐟' : ''}</div>`, iconSize:[60,30] })
+            }).addTo(map).bindPopup(popupContent);
 
-            const marker = L.marker([zone.lat, zone.lon], {
-                icon: L.divIcon({
-                    className: 'custom-marker',
-                    html: `<div style="background:${color}; color:white; padding:5px; border-radius:10px; border:2px solid white; font-weight:bold;">${zone.vhm0}m</div>`,
-                    iconSize: [50, 30]
-                })
-            }).addTo(map).bindPopup(content);
-
-            // Générer le graphique quand on ouvre le popup
-            marker.on('popupopen', () => {
-                const ctx = document.getElementById(canvasId).getContext('2d');
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: zone.history.dates,
-                        datasets: [{
-                            label: 'Temp °C',
-                            data: zone.history.values,
-                            borderColor: '#3498db',
-                            backgroundColor: 'rgba(52, 152, 219, 0.2)',
-                            fill: true,
-                            tension: 0.3
-                        }]
-                    },
-                    options: { 
-                        plugins: { legend: { display: false } },
-                        scales: { y: { beginAtZero: false } }
-                    }
-                });
+            m.on('popupopen', () => {
+                const ctx = document.getElementById(`chart-${i}`).getContext('2d');
+                new Chart(ctx, { type: 'line', data: { labels: zone.history.dates, datasets: [{ label:'°C', data: zone.history.values, borderColor:'#3498db', fill:true, tension:0.3 }] }, options: { plugins: { legend: { display:false } } } });
             });
         });
     });
