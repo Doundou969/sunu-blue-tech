@@ -1,40 +1,31 @@
-name: PecheurConnect Intelligence Update
-
+name: PecheurConnect Update
 on:
   schedule:
     - cron: "0 5 * * *"
   workflow_dispatch:
-
 jobs:
-  build_and_run:
+  run:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
     steps:
-      - name: 📥 Récupération du code
-        uses: actions/checkout@v4
-
-      - name: 🐍 Configuration Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
-      - name: 📦 Installation des outils
-        run: |
-          pip install copernicusmarine numpy python-telegram-bot python-dotenv rich xarray netCDF4
-
-      - name: 📡 Exécution PecheurConnect
+      - name: Install Libs
+        run: pip install copernicusmarine numpy python-telegram-bot python-dotenv rich xarray netCDF4
+      - name: Run
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_ID: ${{ secrets.TG_ID }}
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
         run: python script_peche.py
-
-      - name: 🚀 Mise à jour du site web
+      - name: Deploy
         run: |
-          git config --global user.name "PecheurConnect-Bot"
+          git config --global user.name "Bot"
           git config --global user.email "bot@pecheurconnect.sn"
           git add data.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "📊 Rapport Pêche & Sécurité : $(date +'%d-%m-%Y')" && git push)
+          git commit -m "Update data" || exit 0
+          git push
