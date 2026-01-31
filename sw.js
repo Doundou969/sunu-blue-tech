@@ -1,9 +1,9 @@
-// sw.js - Service Worker minimal pour PecheurConnect
-self.addEventListener('install', (e) => {
-  console.log('PecheurConnect SW installé');
+const CACHE_NAME = 'pecheurconnect-v2';
+self.addEventListener('install', e => {
+  console.log('SW installé');
+  self.skipWaiting();
 });
 
-self.addEventListener('fetch', (e) => {
-  // Nécessaire pour le mode hors-ligne basique
-  e.respondWith(fetch(e.request));
+self.addEventListener('fetch', e => {
+  e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
 });
