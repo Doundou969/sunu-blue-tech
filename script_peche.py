@@ -2,7 +2,7 @@ import os
 import json
 import asyncio
 import numpy as np
-from datetime import datetime
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from rich.console import Console
 from telegram import Bot
@@ -10,7 +10,6 @@ from telegram import Bot
 load_dotenv()
 console = Console()
 
-# Zones stratégiques du Sénégal
 ZONES = {
     "SAINT-LOUIS": {"lat": 16.03, "lon": -16.50},
     "KAYAR": {"lat": 14.92, "lon": -17.20},
@@ -21,90 +20,68 @@ ZONES = {
 }
 
 async def get_marine_data():
-    console.print("[bold blue]📡 Connexion au Data Store Copernicus (METEOFRANCE)...[/bold blue]")
+    console.print("[bold blue]📡 Extraction des données en temps réel...[/bold blue]")
     try:
         import copernicusmarine as cm
-        
-        # ID EXACT correspondant au visualiseur Expert de 2026
-        # Ce dataset contient la variable 'VHM0' (Hauteur significative des vagues)
         DATASET_ID = "cmems_mod_glo_wav_anfc_0.083deg_PT3H-i"
         
-        # Connexion au Dataset
         ds = cm.open_dataset(
             dataset_id=DATASET_ID,
             username=os.getenv("COPERNICUS_USERNAME"),
             password=os.getenv("COPERNICUS_PASSWORD")
         )
 
+        now = datetime.utcnow()
+        three_hours_ago = now - timedelta(hours=3)
         results = []
-        # On récupère le dernier pas de temps disponible (Time-1)
-        latest_time = ds.time.values[-1]
-        console.print(f"[yellow]🕒 Données du : {latest_time}[/yellow]")
 
         for name, coords in ZONES.items():
             try:
-                # Extraction par coordonnées
-                point = ds.sel(
-                    latitude=coords["lat"], 
-                    longitude=coords["lon"], 
-                    method="nearest"
-                ).isel(time=-1)
+                # 1. Donnée Actuelle
+                curr = ds.sel(latitude=coords["lat"], longitude=coords["lon"], time=now, method="nearest")
+                vhm0_now = float(curr["VHM0"].values)
                 
-                vhm_val = point["VHM0"].values
-                vhm0 = float(vhm_val) if not np.isnan(vhm_val) else 0.0
+                # 2. Donnée passée (pour la tendance)
+                past = ds.sel(latitude=coords["lat"], longitude=coords["lon"], time=three_hours_ago, method="nearest")
+                vhm0_past = float(past["VHM0"].values)
+
+                # Calcul de la tendance
+                trend = "↗" if vhm0_now > vhm0_past + 0.05 else "↘" if vhm0_now < vhm0_past - 0.05 else "→"
+                
+                vhm0 = round(vhm0_now, 2) if not np.isnan(vhm0_now) else 0.5
 
                 results.append({
                     "zone": name,
                     "lat": coords["lat"],
                     "lon": coords["lon"],
-                    "vhm0": round(vhm0, 2),
+                    "vhm0": vhm0,
+                    "trend": trend,
                     "alert": "🔴 DANGER" if vhm0 >= 2.2 else "🟢 OK",
-                    "timestamp": str(latest_time),
+                    "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
                     "source": "PecheurConnect / Copernicus"
                 })
             except Exception as e:
                 console.print(f"[red]⚠️ Erreur Zone {name}: {e}[/red]")
         
         return results
-
     except Exception as e:
-        console.print(f"[bold red]❌ Erreur de connexion au Dataset :[/bold red] {e}")
+        console.print(f"[bold red]❌ Erreur : {e}[/bold red]")
         return None
-
-async def send_telegram(data):
-    token = os.getenv("TG_TOKEN")
-    chat_id = os.getenv("TG_ID")
-    if not token or not chat_id: return
-
-    bot = Bot(token=token)
-    dangers = [z for z in data if "DANGER" in z['alert']]
-    
-    if dangers:
-        msg = "🚩 *ALERTE HOULE SÉNÉGAL*\n\n"
-        for d in dangers:
-            msg += f"• *{d['zone']}* : {d['vhm0']}m\n"
-        msg += "\n🔗 [Carte PecheurConnect](https://doundou969.github.io/sunu-blue-tech/)"
-        
-        try:
-            await bot.send_message(chat_id=chat_id, text=msg, parse_mode='Markdown')
-            console.print("[green]📲 Notification envoyée ![/green]")
-        except Exception as te:
-            console.print(f"[red]Telegram Error: {te}[/red]")
 
 async def main():
     data = await get_marine_data()
-    file_path = "data.json"
-    
     if data:
-        with open(file_path, "w", encoding="utf-8") as f:
+        with open("data.json", "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
-        console.print("[bold green]✅ Fichier data.json généré avec succès ![/bold green]")
-        await send_telegram(data)
-    else:
-        # On crée un fichier de secours pour éviter le crash du workflow Git
-        if not os.path.exists(file_path):
-            with open(file_path, "w") as f: json.dump([], f)
-        exit(1)
+        console.print(f"[bold green]✅ Mise à jour temps réel réussie ({datetime.now().strftime('%H:%M')})[/bold green]")
+        
+        # Telegram : Uniquement si danger
+        token, cid = os.getenv("TG_TOKEN"), os.getenv("TG_ID")
+        dangers = [z for z in data if "DANGER" in z['alert']]
+        if dangers and token and cid:
+            bot = Bot(token=token)
+            msg = "🚩 *ALERTE HOULE DIRECT*\n" + "\n".join([f"• {d['zone']}: {d['vhm0']}m {d['trend']}" for d in dangers])
+            await bot.send_message(chat_id=cid, text=msg, parse_mode='Markdown')
 
 if __name__ == "__main__":
     asyncio.run(main())
