@@ -3,34 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PecheurConnect - État de la Mer & Pêche</title>
-    
+    <title>PecheurConnect - Sénégal</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <style>
-        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; }
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         #map { height: 100vh; width: 100%; }
-        
-        /* Style des pastilles sur la carte */
-        .marker-label {
-            color: white; padding: 6px 12px; border-radius: 20px;
-            font-weight: bold; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            display: flex; align-items: center; gap: 6px; font-size: 14px;
+        .marker-label { 
+            color: white; padding: 5px 12px; border-radius: 20px; 
+            font-weight: bold; border: 2px solid white; 
+            display: flex; align-items: center; gap: 5px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            font-size: 14px; white-space: nowrap;
         }
-
-        .chart-container { width: 250px; height: 150px; margin-top: 10px; }
-
-        .share-btn {
-            background: #25D366; color: white; border: none; padding: 10px;
-            border-radius: 8px; cursor: pointer; width: 100%; margin-top: 10px;
-            font-weight: bold; display: flex; justify-content: center; align-items: center; gap: 5px;
+        .popup-card { text-align: center; width: 240px; }
+        .forecast-box { 
+            background: #f8f9fa; border-radius: 8px; 
+            padding: 10px; margin: 10px 0; border: 1px solid #eee;
         }
-
-        .legend {
-            background: white; padding: 10px; border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1); line-height: 1.5; font-size: 13px;
+        .share-btn { 
+            background: #25D366; color: white; border: none; 
+            padding: 12px; border-radius: 8px; cursor: pointer; 
+            width: 100%; font-weight: bold; margin-top: 5px;
         }
+        .alert-text { color: #d63031; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -39,98 +35,73 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    // 1. Initialisation de la carte (Centrée Sénégal)
     const map = L.map('map').setView([14.4974, -14.4524], 7);
+    
     L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '© PecheurConnect | Copernicus Marine'
+        attribution: '© PecheurConnect'
     }).addTo(map);
 
-    // 2. Fonction de partage WhatsApp avec position GPS
-    function shareAlert(zone, houle) {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(pos => {
-                const lat = pos.coords.latitude;
-                const lon = pos.coords.longitude;
-                const msg = `🚨 *ALERTE PECHEURCONNECT*\n📍 Zone : ${zone}\n🌊 Houle : ${houle}m\n📍 Ma Position : https://www.google.com/maps?q=${lat},${lon}`;
-                window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
-            }, () => {
-                alert("Erreur : Géolocalisation nécessaire pour le partage.");
-            });
-        }
+    function shareToWhatsApp(zone, now, next) {
+        const msg = `🚢 *PECHEURCONNECT - ${zone}*\n🌊 Aujourd'hui: ${now}m\n🔮 Demain: ${next}m\n📍 Ma Position: https://www.google.com/maps?q=${map.getCenter().lat},${map.getCenter().lng}`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    // 3. Récupération des données data.json
-    fetch('./data.json')
-        .then(res => res.json())
-        .then(data => {
-            data.forEach((zone, i) => {
-                const color = zone.vhm0 >= 2.2 ? '#d63031' : '#27ae60';
-                const fishIcon = zone.temp <= 22 ? '🐟' : '';
-                const canvasId = `chart-${i}`;
+    fetch('./data.json?v=' + Date.now()).then(r => r.json()).then(data => {
+        data.forEach((z, i) => {
+            // Couleur de la pastille (Aujourd'hui)
+            const color = z.vhm0 >= 2.1 ? '#d63031' : '#27ae60';
+            const fishIcon = z.temp <= 22 ? '🐟' : '';
+            const alertIcon = z.tomorrow_wave >= 2.1 ? '⚠️' : '✅';
 
-                const popupContent = `
-                    <div style="text-align: center;">
-                        <h3 style="margin: 0;">${zone.zone}</h3>
-                        <p style="margin: 5px 0;">🌊 <b>${zone.vhm0}m</b> | 🌡️ <b>${zone.temp}°C</b></p>
-                        <div style="color: #2980b9; font-size: 12px; font-weight: bold;">${zone.fish_status}</div>
-                        <div class="chart-container">
-                            <canvas id="${canvasId}"></canvas>
-                        </div>
-                        <button class="share-btn" onclick="shareAlert('${zone.zone}', ${zone.vhm0})">
-                            Partager sur WhatsApp
-                        </button>
+            const popupContent = `
+                <div class="popup-card">
+                    <h3 style="margin:5px 0">${z.zone}</h3>
+                    <div class="forecast-box">
+                        <small>AUJOURD'HUI</small><br>
+                        <b>🌊 ${z.vhm0}m</b> | 🌡️ <b>${z.temp}°C</b>
                     </div>
-                `;
+                    <div class="forecast-box" style="border-left: 4px solid ${z.tomorrow_wave >= 2.1 ? '#d63031' : '#27ae60'}">
+                        <small>PRÉVISIONS DEMAIN</small><br>
+                        <b>${alertIcon} Vagues : ${z.tomorrow_wave}m</b>
+                    </div>
+                    <canvas id="chart-${i}" height="100"></canvas>
+                    <button class="share-btn" onclick="shareToWhatsApp('${z.zone}', ${z.vhm0}, ${z.tomorrow_wave})">
+                        📲 Alerter sur WhatsApp
+                    </button>
+                </div>
+            `;
 
-                const marker = L.marker([zone.lat, zone.lon], {
-                    icon: L.divIcon({
-                        className: 'custom',
-                        html: `<div class="marker-label" style="background:${color}">${zone.vhm0}m ${fishIcon}</div>`,
-                        iconSize: [80, 35]
-                    })
-                }).addTo(map).bindPopup(popupContent);
+            const marker = L.marker([z.lat, z.lon], {
+                icon: L.divIcon({
+                    className: 'custom-div-icon',
+                    html: `<div class="marker-label" style="background:${color}">${z.vhm0}m ${fishIcon}</div>`,
+                    iconSize: [80, 35]
+                })
+            }).addTo(map).bindPopup(popupContent);
 
-                // Initialisation du graphique Chart.js à l'ouverture du popup
-                marker.on('popupopen', () => {
-                    const ctx = document.getElementById(canvasId).getContext('2d');
-                    new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: zone.history.dates.map(d => d.split('-').slice(1).join('/')),
-                            datasets: [{
-                                label: 'Temp °C',
-                                data: zone.history.values,
-                                borderColor: '#3498db',
-                                backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                                fill: true,
-                                tension: 0.3
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            plugins: { legend: { display: false } },
-                            scales: { y: { beginAtZero: false } }
-                        }
-                    });
+            marker.on('popupopen', () => {
+                const ctx = document.getElementById(`chart-${i}`).getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: z.history.dates.map(d => d.slice(8, 10) + '/' + d.slice(5, 7)),
+                        datasets: [{
+                            label: 'Température (°C)',
+                            data: z.history.values,
+                            borderColor: '#3498db',
+                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: { 
+                        plugins: { legend: { display: false } },
+                        scales: { y: { beginAtZero: false } }
+                    }
                 });
             });
-        })
-        .catch(err => console.error("Erreur de chargement data.json:", err));
-
-    // 4. Ajout de la légende
-    const legend = L.control({ position: 'bottomright' });
-    legend.onAdd = () => {
-        const div = L.DomUtil.create('div', 'legend');
-        div.innerHTML = `
-            <b>Légende</b><br>
-            🟢 OK | 🔴 Danger (> 2.2m)<br>
-            🐟 Zone de Pêche (Eau froide)<br>
-            📈 Évolution Temp. (7 jours)
-        `;
-        return div;
-    };
-    legend.addTo(map);
+        });
+    });
 </script>
-
 </body>
 </html>
