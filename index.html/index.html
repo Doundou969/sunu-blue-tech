@@ -3,101 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PecheurConnect - Sénégal</title>
+    <title>PecheurConnect</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        #map { height: 100vh; width: 100%; }
-        .marker-label { 
-            color: white; padding: 5px 12px; border-radius: 20px; 
-            font-weight: bold; border: 2px solid white; 
-            display: flex; align-items: center; gap: 5px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-            font-size: 14px; white-space: nowrap;
-        }
-        .popup-card { text-align: center; width: 240px; }
-        .forecast-box { 
-            background: #f8f9fa; border-radius: 8px; 
-            padding: 10px; margin: 10px 0; border: 1px solid #eee;
-        }
-        .share-btn { 
-            background: #25D366; color: white; border: none; 
-            padding: 12px; border-radius: 8px; cursor: pointer; 
-            width: 100%; font-weight: bold; margin-top: 5px;
-        }
-        .alert-text { color: #d63031; font-weight: bold; }
+        body { margin: 0; font-family: sans-serif; }
+        #map { height: 100vh; }
+        .marker-label { color: white; padding: 5px 10px; border-radius: 15px; font-weight: bold; border: 2px solid white; display:flex; align-items:center; gap:5px; }
+        .popup-card { text-align: center; width: 220px; }
+        .box { background: #f4f4f4; padding: 8px; margin: 5px 0; border-radius: 5px; border-left: 4px solid #ccc; }
     </style>
 </head>
 <body>
-
 <div id="map"></div>
-
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    const map = L.map('map').setView([14.4974, -14.4524], 7);
-    
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '© PecheurConnect'
-    }).addTo(map);
+    const map = L.map('map').setView([14.5, -17.0], 7);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
 
-    function shareToWhatsApp(zone, now, next) {
-        const msg = `🚢 *PECHEURCONNECT - ${zone}*\n🌊 Aujourd'hui: ${now}m\n🔮 Demain: ${next}m\n📍 Ma Position: https://www.google.com/maps?q=${map.getCenter().lat},${map.getCenter().lng}`;
-        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
-    }
-
-    fetch('./data.json?v=' + Date.now()).then(r => r.json()).then(data => {
+    // Ajout d'un paramètre aléatoire pour forcer la mise à jour des données (évite le cache)
+    fetch('./data.json?nocache=' + Math.random()).then(r => r.json()).then(data => {
         data.forEach((z, i) => {
-            // Couleur de la pastille (Aujourd'hui)
-            const color = z.vhm0 >= 2.1 ? '#d63031' : '#27ae60';
-            const fishIcon = z.temp <= 22 ? '🐟' : '';
-            const alertIcon = z.tomorrow_wave >= 2.1 ? '⚠️' : '✅';
-
-            const popupContent = `
+            const color = z.vhm0 >= 2.1 ? '#e74c3c' : '#2ecc71';
+            const alertColor = z.tomorrow_wave >= 2.1 ? '#e74c3c' : '#2ecc71';
+            
+            const popup = `
                 <div class="popup-card">
-                    <h3 style="margin:5px 0">${z.zone}</h3>
-                    <div class="forecast-box">
-                        <small>AUJOURD'HUI</small><br>
-                        <b>🌊 ${z.vhm0}m</b> | 🌡️ <b>${z.temp}°C</b>
-                    </div>
-                    <div class="forecast-box" style="border-left: 4px solid ${z.tomorrow_wave >= 2.1 ? '#d63031' : '#27ae60'}">
-                        <small>PRÉVISIONS DEMAIN</small><br>
-                        <b>${alertIcon} Vagues : ${z.tomorrow_wave}m</b>
+                    <h3>${z.zone}</h3>
+                    <div class="box"><b>Aujourd'hui:</b> ${z.vhm0}m | ${z.temp}°C</div>
+                    <div class="box" style="border-left-color:${alertColor}">
+                        <b>Demain:</b> ${z.tomorrow_wave}m ${z.tomorrow_wave >= 2.1 ? '⚠️' : '✅'}
                     </div>
                     <canvas id="chart-${i}" height="100"></canvas>
-                    <button class="share-btn" onclick="shareToWhatsApp('${z.zone}', ${z.vhm0}, ${z.tomorrow_wave})">
-                        📲 Alerter sur WhatsApp
-                    </button>
-                </div>
-            `;
+                </div>`;
 
-            const marker = L.marker([z.lat, z.lon], {
-                icon: L.divIcon({
-                    className: 'custom-div-icon',
-                    html: `<div class="marker-label" style="background:${color}">${z.vhm0}m ${fishIcon}</div>`,
-                    iconSize: [80, 35]
-                })
-            }).addTo(map).bindPopup(popupContent);
+            const m = L.marker([z.lat, z.lon], {
+                icon: L.divIcon({ html: `<div class="marker-label" style="background:${color}">${z.vhm0}m ${z.temp <= 22 ? '🐟' : ''}</div>`, iconSize: [80, 30] })
+            }).addTo(map).bindPopup(popup);
 
-            marker.on('popupopen', () => {
+            m.on('popupopen', () => {
                 const ctx = document.getElementById(`chart-${i}`).getContext('2d');
                 new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: z.history.dates.map(d => d.slice(8, 10) + '/' + d.slice(5, 7)),
-                        datasets: [{
-                            label: 'Température (°C)',
-                            data: z.history.values,
-                            borderColor: '#3498db',
-                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                            fill: true,
-                            tension: 0.4
-                        }]
+                        labels: z.history.dates.map(d => d.slice(8,10)),
+                        datasets: [{ label: 'Temp', data: z.history.values, borderColor: '#3498db', tension: 0.3 }]
                     },
-                    options: { 
-                        plugins: { legend: { display: false } },
-                        scales: { y: { beginAtZero: false } }
-                    }
+                    options: { plugins: { legend: { display: false } } }
                 });
             });
         });
