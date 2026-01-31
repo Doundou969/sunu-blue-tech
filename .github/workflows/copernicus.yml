@@ -1,36 +1,47 @@
-name: Update Marine Data
+name: Copernicus Auto Update
 
 on:
   schedule:
-    - cron: '0 */3 * * *' # S'exécute toutes les 3 heures
-  workflow_dispatch:      # Permet de le lancer manuellement
+    - cron: "0 */6 * * *" # S'exécute toutes les 6 heures
+  workflow_dispatch:      # Permet de le lancer manuellement pour tester
 
 jobs:
-  build:
+  update:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: "3.11"
+          cache: 'pip' # Accélère les prochaines exécutions
 
       - name: Install dependencies
         run: |
-          pip install copernicusmarine python-dotenv numpy
+          python -m pip install --upgrade pip
+          pip install copernicusmarine xarray netCDF4 numpy pandas requests python-telegram-bot python-dotenv rich tqdm
 
-      - name: Run script
+      - name: Run Copernicus script
         env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_ID: ${{ secrets.TG_ID }}
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
         run: python script_peche.py
 
-      - name: Commit and Push
+      - name: Commit and Push data.json
         run: |
           git config --global user.name "PecheurConnect-Bot"
           git config --global user.email "bot@pecheurconnect.sn"
           git add data.json
-          git commit -m "Automated update: $(date)" || echo "No changes to commit"
-          git push
+          # On vérifie s'il y a des changements avant de commit pour éviter les erreurs
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "📡 MàJ Données Mer : $(date +'%d-%m-%Y %H:%M')"
+            git pull --rebase --autostash
+            git push
+          fi
