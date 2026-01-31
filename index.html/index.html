@@ -3,96 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PecheurConnect 🇸🇳</title>
+    <title>PecheurConnect - Sécurité Maritime Sénégal</title>
     
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="icon-192.png">
-
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
     <style>
-        body { background:#020617; color:white; font-family: system-ui, sans-serif; }
-        #map { height:350px; border-radius:16px; border: 1px solid #1e293b; z-index: 10; }
-        .card-danger { border-left: 5px solid #ef4444; background: rgba(239, 68, 68, 0.1); }
-        .card-ok { border-left: 5px solid #22d3ee; background: rgba(30, 41, 59, 0.5); }
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        #map { height: 100vh; width: 100%; }
+
+        /* Style de la légende */
+        .info-legend {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        /* Style des étiquettes sur la carte */
+        .custom-marker {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .marker-label {
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+        }
+
+        /* En-tête du site */
+        header {
+            position: absolute;
+            top: 10px;
+            left: 50px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            border: 1px solid #0056b3;
+        }
+        header h1 { margin: 0; font-size: 18px; color: #0056b3; }
     </style>
 </head>
+<body>
 
-<body class="p-4 max-w-4xl mx-auto">
+<header>
+    <h1>🚢 PecheurConnect : État de la Mer</h1>
+</header>
 
-    <header class="text-center mb-6">
-        <h1 class="text-3xl font-black text-sky-400">PECHEUR CONNECT 🇸🇳</h1>
-        <p class="text-slate-400 text-xs uppercase tracking-widest mt-1">Données Copernicus en Temps Réel</p>
-    </header>
+<div id="map"></div>
 
-    <div id="map" class="mb-6 shadow-2xl"></div>
-    
-    <div id="dashboard" class="grid gap-4 sm:grid-cols-2">
-        </div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <script>
-        // 1. Initialisation Carte
-        const map = L.map('map').setView([14.5, -17.0], 7);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; CARTO'
-        }).addTo(map);
+<script>
+    // 1. Initialisation de la carte centrée sur le Sénégal
+    const map = L.map('map').setView([14.4974, -14.4524], 7);
 
-        // 2. Chargement des données
-        async function updateApp() {
-            const dash = document.getElementById("dashboard");
-            try {
-                // Le "./" est crucial pour GitHub Pages
-                const res = await fetch("./data.json?t=" + Date.now());
-                if (!res.ok) throw new Error("Fichier data.json introuvable");
+    // 2. Ajout du fond de carte (CartoDB Voyager pour une meilleure lisibilité)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; PecheurConnect | Copernicus Marine'
+    }).addTo(map);
+
+    // 3. Chargement des données depuis data.json
+    fetch('data.json')
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(zone => {
+                // Seuil de danger : 2.2 mètres
+                const isDanger = zone.vhm0 >= 2.2;
+                const color = isDanger ? '#d63031' : '#27ae60';
                 
-                const data = await res.json();
-                dash.innerHTML = "";
-
-                data.forEach(z => {
-                    const isDanger = z.vhm0 >= 2.2;
-                    const markerColor = isDanger ? "#ef4444" : "#22d3ee";
-
-                    // Création Card
-                    const div = document.createElement("div");
-                    div.className = `p-4 rounded-xl shadow-lg border border-slate-700 ${isDanger ? 'card-danger' : 'card-ok'}`;
-                    div.innerHTML = `
-                        <div class="flex justify-between items-center mb-2">
-                            <b class="text-lg">${z.zone}</b>
-                            <span class="text-[10px] px-2 py-1 rounded font-bold ${isDanger ? 'bg-red-600' : 'bg-cyan-600'}">
-                                ${z.alert}
-                            </span>
+                // Icône dynamique avec Tendance
+                const customIcon = L.divIcon({
+                    className: 'custom-marker',
+                    html: `
+                        <div class="marker-label" style="background-color: ${color};">
+                            ${zone.vhm0}m <span>${zone.trend || '→'}</span>
                         </div>
-                        <div class="grid grid-cols-2 text-sm gap-2">
-                            <div class="text-slate-400">🌊 Houle</div><div class="text-right font-bold">${z.vhm0}m ${z.trend}</div>
-                            <div class="text-slate-400">🌡️ Mer</div><div class="text-right font-bold">${z.temp}°C</div>
-                            <div class="text-slate-400">💨 Vent</div><div class="text-right font-bold">${z.wind_speed}km/h</div>
-                        </div>
-                    `;
-                    dash.appendChild(div);
-
-                    // Ajout Marqueur
-                    if (z.lat && z.lon) {
-                        L.circleMarker([z.lat, z.lon], {
-                            radius: 12, color: "#fff", weight: 2, fillColor: markerColor, fillOpacity: 0.9
-                        }).addTo(map).bindPopup(`<b>${z.zone}</b><br>Houle: ${z.vhm0}m`);
-                    }
+                    `,
+                    iconSize: [70, 30],
+                    iconAnchor: [35, 15]
                 });
-            } catch (err) {
-                dash.innerHTML = `<div class="col-span-full text-center p-10 bg-red-900/20 border border-red-500 rounded-xl">
-                    <p class="font-bold">⚠️ Erreur de données</p>
-                    <p class="text-xs text-slate-400 mt-2 italic">Vérifiez que data.json est à la racine et n'utilisez pas de "/" après index.html</p>
-                </div>`;
-            }
-        }
 
-        updateApp();
+                // Popup détaillé
+                const popupContent = `
+                    <div style="text-align: center; min-width: 150px;">
+                        <h3 style="margin: 5px 0; color: #2c3e50;">${zone.zone}</h3>
+                        <div style="font-size: 24px; font-weight: bold; margin: 10px 0;">
+                            ${zone.vhm0} m
+                        </div>
+                        <div style="padding: 5px; border-radius: 4px; background: #f8f9fa;">
+                            Tendance : <b>${zone.trend === '↗' ? 'En hausse' : zone.trend === '↘' ? 'En baisse' : 'Stable'}</b><br>
+                            Alerte : <span style="color: ${color}; font-weight: bold;">${zone.alert}</span>
+                        </div>
+                        <p style="font-size: 10px; color: #7f8c8d; margin-top: 10px;">
+                            MàJ : ${new Date(zone.timestamp).toLocaleString('fr-FR')}
+                        </p>
+                    </div>
+                `;
 
-        // 3. Service Worker
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register("sw.js").catch(() => {});
-        }
-    </script>
+                L.marker([zone.lat, zone.lon], { icon: customIcon })
+                    .addTo(map)
+                    .bindPopup(popupContent);
+            });
+        })
+        .catch(err => console.error("Erreur lors du chargement des données :", err));
+
+    // 4. Ajout d'une légende simple
+    const legend = L.control({ position: 'bottomright' });
+    legend.onAdd = function() {
+        const div = L.DomUtil.create('div', 'info-legend');
+        div.innerHTML = `
+            <b>Légende</b><br>
+            <i style="background: #27ae60; width: 12px; height: 12px; display: inline-block; border-radius: 50%;"></i> Mer Calme (&lt; 2.2m)<br>
+            <i style="background: #d63031; width: 12px; height: 12px; display: inline-block; border-radius: 50%;"></i> Danger (&gt; 2.2m)<br>
+            <span>↗ Hausse | ↘ Baisse | → Stable</span>
+        `;
+        return div;
+    };
+    legend.addTo(map);
+</script>
+
 </body>
 </html>
