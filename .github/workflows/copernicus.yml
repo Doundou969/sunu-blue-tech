@@ -2,8 +2,8 @@ name: PecheurConnect Intelligence Update
 
 on:
   schedule:
-    - cron: "0 5 * * *"  # Chaque matin à 05h00 UTC
-  workflow_dispatch:      # Pour lancer manuellement si besoin
+    - cron: "0 5 * * *"
+  workflow_dispatch:
 
 jobs:
   build_and_run:
@@ -19,13 +19,12 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: 'pip' # Accélère les prochaines exécutions
 
       - name: 📦 Installation des outils
         run: |
-          pip install copernicusmarine numpy python-telegram-bot python-dotenv rich xarray netCDF4 chart.js
+          pip install copernicusmarine numpy python-telegram-bot python-dotenv rich xarray netCDF4
 
-      - name: 📡 Exécution PecheurConnect (Vagues + Upwelling)
+      - name: 📡 Exécution PecheurConnect
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_ID: ${{ secrets.TG_ID }}
@@ -38,5 +37,4 @@ jobs:
           git config --global user.name "PecheurConnect-Bot"
           git config --global user.email "bot@pecheurconnect.sn"
           git add data.json
-          # On ne commit que s'il y a de nouvelles données
           git diff --quiet && git diff --staged --quiet || (git commit -m "📊 Rapport Pêche & Sécurité : $(date +'%d-%m-%Y')" && git push)
