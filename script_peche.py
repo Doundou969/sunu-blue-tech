@@ -20,7 +20,7 @@ ZONES = {
 }
 
 async def get_marine_data():
-    console.print("[bold blue]📡 Extraction Copernicus Temps Réel...[/bold blue]")
+    console.print("[bold blue]📡 Synchronisation Copernicus...[/bold blue]")
     try:
         import copernicusmarine as cm
         DATASET_ID = "cmems_mod_glo_wav_anfc_0.083deg_PT3H-i"
@@ -52,28 +52,16 @@ async def get_marine_data():
                     "alert": "🔴 DANGER" if vhm0 >= 2.2 else "🟢 OK",
                     "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ")
                 })
-            except Exception as e:
-                console.print(f"[red]⚠️ Erreur Zone {name}: {e}[/red]")
+            except Exception:
+                continue
         return results
     except Exception as e:
         console.print(f"[bold red]❌ Erreur Copernicus : {e}[/bold red]")
         return None
 
 async def send_telegram(data):
-    # --- SECTION DEBUG ---
-    token = os.getenv("TG_TOKEN")
-    chat_id = os.getenv("TG_ID")
-    
-    console.print("--- 🛠 DEBUG TELEGRAM ---")
-    console.print(f"Token trouvé : {'✅ OUI' if token else '❌ NON'}")
-    console.print(f"Chat ID trouvé : {'✅ OUI' if chat_id else '❌ NON'}")
-    
-    if token and len(token) > 5:
-        console.print(f"Format Token : {token[:5]}...{token[-5:]}")
-    
-    if not token or not chat_id:
-        console.print("[bold red]❌ ERREUR : Les secrets TG_TOKEN ou TG_ID sont absents de GitHub ![/bold red]")
-        return
+    token, chat_id = os.getenv("TG_TOKEN"), os.getenv("TG_ID")
+    if not token or not chat_id: return
 
     try:
         bot = Bot(token=token)
@@ -89,11 +77,10 @@ async def send_telegram(data):
         msg += "------------------------------------\n🔗 [Carte en direct](https://doundou969.github.io/sunu-blue-tech/)"
         
         await bot.send_message(chat_id=int(chat_id), text=msg, parse_mode='Markdown')
-        console.print("[bold green]📲 Bulletin Telegram envoyé avec succès ![/bold green]")
+        console.print("[bold green]📲 Bulletin envoyé.[/bold green]")
         
     except Exception as e:
-        console.print(f"[bold red]❌ Erreur lors de l'envoi Telegram : {e}[/bold red]")
-        console.print("[yellow]Avez-vous bien lancé le bot avec /start sur Telegram ?[/yellow]")
+        console.print(f"[red]❌ Erreur Telegram : {e}[/red]")
 
 async def main():
     data = await get_marine_data()
@@ -102,7 +89,6 @@ async def main():
             json.dump(data, f, indent=2, ensure_ascii=False)
         await send_telegram(data)
     else:
-        console.print("[red]Abandon : Pas de données récupérées.[/red]")
         exit(1)
 
 if __name__ == "__main__":
