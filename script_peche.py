@@ -1,4 +1,4 @@
-import os, json, asyncio, numpy as np
+import os, json, asyncio, requests
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from rich.console import Console
@@ -14,13 +14,32 @@ ZONES = {
     "CASAMANCE": {"lat": 12.50, "lon": -16.70}
 }
 
+def get_temp_open_meteo(lat, lon):
+    """Récupère la température et l'historique via Open-Meteo (Sans login)"""
+    try:
+        url = f"https://marine-api.open-meteo.com/v1/marine?latitude={lat}&longitude={lon}&hourly=wave_height&daily=wave_height_max&timezone=GMT"
+        # Pour la température pure, Open-Meteo utilise souvent l'API météo classique même sur mer
+        url_temp = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&hourly=temperature_2m&past_days=7&forecast_days=1"
+        r = requests.get(url_temp, timeout=10).json()
+        
+        temps = r['hourly']['temperature_2m']
+        dates = r['hourly']['time']
+        
+        # On prend une mesure par jour pour l'historique (toutes les 24h)
+        return {
+            "current": temps[-1],
+            "values": temps[-168::24], # 7 derniers jours
+            "dates": dates[-168::24]
+        }
+    except:
+        return {"current": "N/A", "values": [], "dates": []}
+
 async def get_marine_data():
-    console.print("[bold blue]📡 Mode Sécurité : Récupération des vagues...[/bold blue]")
+    console.print("[bold blue]📡 Synchronisation Hybride (Copernicus + Open-Meteo)...[/bold blue]")
     try:
         import copernicusmarine as cm
-        
-        # Connexion au Dataset Vagues (Très stable)
         WAV_ID = "cmems_mod_glo_wav_anfc_0.083deg_PT3H-i"
+        
         ds_wav = cm.open_dataset(
             dataset_id=WAV_ID, 
             username=os.getenv("COPERNICUS_USERNAME"), 
@@ -31,32 +50,27 @@ async def get_marine_data():
         results = []
 
         for name, coords in ZONES.items():
-            try:
-                # Récupération Houle
-                curr_wav = ds_wav.sel(latitude=coords["lat"], longitude=coords["lon"], time=now, method="nearest")
-                vhm0 = round(float(curr_wav["VHM0"].values), 2)
-                
-                # Tendance simple
-                past_wav = ds_wav.sel(latitude=coords["lat"], longitude=coords["lon"], time=now - timedelta(hours=3), method="nearest")
-                vhm0_past = float(past_wav["VHM0"].values)
-                trend = "↗" if vhm0 > vhm0_past + 0.05 else "↘" if vhm0 < vhm0_past - 0.05 else "→"
+            # 1. Vagues via Copernicus
+            curr_wav = ds_wav.sel(latitude=coords["lat"], longitude=coords["lon"], time=now, method="nearest")
+            vhm0 = round(float(curr_wav["VHM0"].values), 2)
 
-                # Données de secours pour la pêche (puisque PHY plante)
-                results.append({
-                    "zone": name, "lat": coords["lat"], "lon": coords["lon"],
-                    "vhm0": vhm0, "trend": trend, "temp": "N/A",
-                    "history": {"dates": [], "values": []},
-                    "fish_status": "Analyse pêche indisponible",
-                    "alert": "🔴 DANGER" if vhm0 >= 2.2 else "🟢 OK",
-                    "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ")
-                })
-                console.print(f"[green]✔ {name} : {vhm0}m[/green]")
-            except Exception as e:
-                console.print(f"[yellow]⚠️ Zone {name} erreur : {e}[/yellow]")
+            # 2. Température via Open-Meteo (Plus d'erreur 404 !)
+            temp_data = get_temp_open_meteo(coords["lat"], coords["lon"])
+            
+            results.append({
+                "zone": name, "lat": coords["lat"], "lon": coords["lon"],
+                "vhm0": vhm0, "trend": "→", 
+                "temp": temp_data["current"],
+                "history": {"dates": temp_data["dates"], "values": temp_data["values"]},
+                "fish_status": "🐟 Zone Riche" if (temp_data["current"] != "N/A" and temp_data["current"] <= 22) else "🌊 Zone Pauvre",
+                "alert": "🔴 DANGER" if vhm0 >= 2.2 else "🟢 OK",
+                "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ")
+            })
+            console.print(f"[green]✔ {name} mis à jour.[/green]")
         
         return results
     except Exception as e:
-        console.print(f"[bold red]❌ Erreur Copernicus : {e}[/bold red]")
+        console.print(f"[bold red]❌ Erreur : {e}[/bold red]")
         return None
 
 async def main():
@@ -64,9 +78,7 @@ async def main():
     if data:
         with open("data.json", "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
-        console.print("[bold green]✅ data.json mis à jour avec les vagues ![/bold green]")
-    else:
-        exit(1)
+    else: exit(1)
 
 if __name__ == "__main__":
     asyncio.run(main())
