@@ -4,95 +4,97 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PecheurConnect 🇸🇳</title>
-    <link rel="manifest" href="./manifest.json">
-    <link rel="icon" href="./icon-192.png">
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icon-192.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <style>
-        body { background:#020617; color:white; font-family: sans-serif; }
-        #map { height:350px; border-radius:16px; border: 1px solid #1e293b; }
-        .danger-card { border-left: 4px solid #ef4444; }
-        .safe-card { border-left: 4px solid #06b6d4; }
+        body { background:#020617; color:white; }
+        #map { height:350px; border-radius:16px; border: 2px solid #1e293b; }
+        .zone-card { transition: transform 0.2s; }
+        .zone-card:hover { transform: scale(1.02); }
     </style>
 </head>
+
 <body class="p-4 max-w-4xl mx-auto">
 
     <header class="text-center mb-6">
         <h1 class="text-3xl font-black text-sky-400">PECHEUR CONNECT 🇸🇳</h1>
-        <p class="text-slate-400 text-sm italic">Système de surveillance SunuBlueTech par Copernicus</p>
+        <p class="text-slate-400 text-xs uppercase tracking-widest mt-1">Surveillance Maritime Sénégal</p>
     </header>
 
-    <div id="map" class="mb-6 shadow-2xl"></div>
-
-    <div id="dashboard" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div id="map" class="mb-6 shadow-2xl shadow-blue-900/20"></div>
+    
+    <div id="dashboard" class="grid gap-4 sm:grid-cols-2">
         </div>
 
     <script>
-        // PWA Service Worker
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register("./sw.js").catch(() => {});
-        }
+        // Initialisation de la carte
+        const map = L.map('map').setView([14.5, -16.8], 7);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
-        // Init Map (Centrée sur le Sénégal)
-        const map = L.map('map').setView([14.497, -16.5], 7);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap &copy; CARTO'
-        }).addTo(map);
-
-        // Fetch Data
-        fetch("./data.json?t=" + Date.now())
-            .then(r => r.json())
+        // Chargement des données avec gestion d'erreur robuste
+        // On utilise le nom direct du fichier
+        fetch("data.json?t=" + Date.now())
+            .then(r => {
+                if (!r.ok) throw new Error("Fichier data.json non trouvé (404)");
+                return r.json();
+            })
             .then(data => {
                 const dash = document.getElementById("dashboard");
                 dash.innerHTML = "";
 
                 data.forEach(z => {
                     const isDanger = z.vhm0 >= 2.2;
-                    const statusColor = isDanger ? "text-red-500" : "text-cyan-400";
-                    
-                    // 1. Ajout de la Carte HTML
-                    const div = document.createElement("div");
-                    div.className = `p-4 bg-slate-800/50 rounded-xl shadow-md border border-slate-700 ${isDanger ? 'danger-card' : 'safe-card'}`;
-                    div.innerHTML = `
-                        <div class="flex justify-between items-center mb-2">
+                    const color = isDanger ? "#ef4444" : "#22d3ee";
+
+                    // 1. Création de la carte dans le dashboard
+                    const card = document.createElement("div");
+                    card.className = `p-4 rounded-xl bg-slate-800/50 border-l-4 zone-card ${isDanger ? 'border-red-500' : 'border-cyan-500'}`;
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start">
                             <b class="text-lg">${z.zone}</b>
-                            <span class="text-xs px-2 py-1 rounded bg-slate-900 font-bold ${statusColor}">${z.alert}</span>
+                            <span class="font-bold ${isDanger ? 'text-red-500' : 'text-cyan-400'}">${z.alert}</span>
                         </div>
-                        <div class="text-sm grid grid-cols-2 gap-2">
-                            <div>🌊 Houle: <span class="font-bold text-white">${z.vhm0}m</span></div>
-                            <div>🌡️ Mer: <span class="font-bold text-white">${z.temp}°C</span></div>
-                            <div>💨 Vent: <span class="font-bold text-white">${z.wind_speed}km/h</span></div>
-                            <div>🧭 Dir: <span class="font-bold text-white">${z.wind_dir}</span></div>
+                        <div class="mt-2 text-sm text-slate-300">
+                            <p>🌊 Houle : <b>${z.vhm0} m</b> ${z.trend}</p>
+                            <p>🌡️ Temp : <b>${z.temp} °C</b></p>
+                            <p>💨 Vent : <b>${z.wind_speed} km/h (${z.wind_dir})</b></p>
                         </div>
+                        <div class="mt-2 text-[10px] text-slate-500 italic">MàJ: ${z.timestamp.split('T')[1].split('.')[0]}</div>
                     `;
-                    dash.appendChild(div);
+                    dash.appendChild(card);
 
-                    // 2. Ajout du Marqueur sur la carte
+                    // 2. Ajout du marqueur sur la carte
                     if (z.lat && z.lon) {
-                        const markerColor = isDanger ? "#ef4444" : "#22d3ee";
-                        const marker = L.circleMarker([z.lat, z.lon], {
-                            radius: 12,
+                        L.circleMarker([z.lat, z.lon], {
+                            radius: 10,
                             color: "#fff",
-                            weight: 2,
-                            fillColor: markerColor,
-                            fillOpacity: 0.9
-                        }).addTo(map);
-
-                        // Popup interactive
-                        marker.bindPopup(`
-                            <div style="color:#000">
-                                <b>${z.zone}</b><br>
-                                Houle: ${z.vhm0}m<br>
-                                <b>${z.alert}</b>
-                            </div>
-                        `);
+                            weight: 1,
+                            fillColor: color,
+                            fillOpacity: 0.8
+                        }).addTo(map).bindPopup(`<b>${z.zone}</b><br>Houle: ${z.vhm0}m<br>${z.alert}`);
                     }
                 });
             })
             .catch(err => {
-                document.getElementById("dashboard").innerHTML = "<p class='text-center text-red-400'>Erreur de chargement des données...</p>";
+                console.error(err);
+                document.getElementById("dashboard").innerHTML = `
+                    <div class="col-span-full p-6 bg-red-900/20 border border-red-500 rounded-xl text-center">
+                        <p class="text-red-400 font-bold">⚠️ Erreur de chargement</p>
+                        <p class="text-xs text-slate-400">Vérifiez que data.json est bien à la racine de votre dépôt GitHub.</p>
+                    </div>
+                `;
             });
+
+        // Service Worker pour le mode PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register("sw.js").catch(e => console.log(e));
+        }
     </script>
 </body>
 </html>
