@@ -37,11 +37,9 @@ async def get_marine_data():
 
         for name, coords in ZONES.items():
             try:
-                # Donnée actuelle
                 curr = ds.sel(latitude=coords["lat"], longitude=coords["lon"], time=now, method="nearest")
                 vhm0_now = float(curr["VHM0"].values)
                 
-                # Donnée passée pour tendance
                 past = ds.sel(latitude=coords["lat"], longitude=coords["lon"], time=past_time, method="nearest")
                 vhm0_past = float(past["VHM0"].values)
 
@@ -58,30 +56,44 @@ async def get_marine_data():
                 console.print(f"[red]⚠️ Erreur Zone {name}: {e}[/red]")
         return results
     except Exception as e:
-        console.print(f"[bold red]❌ Erreur : {e}[/bold red]")
+        console.print(f"[bold red]❌ Erreur Copernicus : {e}[/bold red]")
         return None
 
 async def send_telegram(data):
-    token, chat_id = os.getenv("TG_TOKEN"), os.getenv("TG_ID")
-    if not token or not chat_id: return
-
-    bot = Bot(token=token)
-    date_str = datetime.now().strftime("%d/%m/%Y à %H:%M")
+    # --- SECTION DEBUG ---
+    token = os.getenv("TG_TOKEN")
+    chat_id = os.getenv("TG_ID")
     
-    msg = f"🌊 *BULLETIN PECHEURCONNECT*\n📅 _{date_str}_\n"
-    msg += "------------------------------------\n\n"
-
-    for d in data:
-        icon = "🚩" if "DANGER" in d['alert'] else "✅"
-        msg += f"{icon} *{d['zone']}*\n   🌊 Houle : {d['vhm0']}m ({d['trend']})\n   📊 État : {d['alert']}\n\n"
-
-    msg += "------------------------------------\n🔗 [Carte en direct](https://doundou969.github.io/sunu-blue-tech/)"
+    console.print("--- 🛠 DEBUG TELEGRAM ---")
+    console.print(f"Token trouvé : {'✅ OUI' if token else '❌ NON'}")
+    console.print(f"Chat ID trouvé : {'✅ OUI' if chat_id else '❌ NON'}")
     
+    if token and len(token) > 5:
+        console.print(f"Format Token : {token[:5]}...{token[-5:]}")
+    
+    if not token or not chat_id:
+        console.print("[bold red]❌ ERREUR : Les secrets TG_TOKEN ou TG_ID sont absents de GitHub ![/bold red]")
+        return
+
     try:
-        await bot.send_message(chat_id=chat_id, text=msg, parse_mode='Markdown')
-        console.print("[green]📲 Bulletin Telegram envoyé.[/green]")
+        bot = Bot(token=token)
+        date_str = datetime.now().strftime("%d/%m/%Y à %H:%M")
+        
+        msg = f"🌊 *BULLETIN PECHEURCONNECT*\n📅 _{date_str}_\n"
+        msg += "------------------------------------\n\n"
+
+        for d in data:
+            icon = "🚩" if "DANGER" in d['alert'] else "✅"
+            msg += f"{icon} *{d['zone']}*\n   🌊 Houle : {d['vhm0']}m ({d['trend']})\n   📊 État : {d['alert']}\n\n"
+
+        msg += "------------------------------------\n🔗 [Carte en direct](https://doundou969.github.io/sunu-blue-tech/)"
+        
+        await bot.send_message(chat_id=int(chat_id), text=msg, parse_mode='Markdown')
+        console.print("[bold green]📲 Bulletin Telegram envoyé avec succès ![/bold green]")
+        
     except Exception as e:
-        console.print(f"[red]Erreur Telegram: {e}[/red]")
+        console.print(f"[bold red]❌ Erreur lors de l'envoi Telegram : {e}[/bold red]")
+        console.print("[yellow]Avez-vous bien lancé le bot avec /start sur Telegram ?[/yellow]")
 
 async def main():
     data = await get_marine_data()
@@ -89,8 +101,8 @@ async def main():
         with open("data.json", "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
         await send_telegram(data)
-        console.print("[bold green]✅ Opération terminée avec succès.[/bold green]")
     else:
+        console.print("[red]Abandon : Pas de données récupérées.[/red]")
         exit(1)
 
 if __name__ == "__main__":
