@@ -20,7 +20,7 @@ ZONES = {
 }
 
 async def get_marine_data():
-    console.print("[bold blue]📡 Extraction des données en temps réel...[/bold blue]")
+    console.print("[bold blue]📡 Extraction Copernicus Temps Réel...[/bold blue]")
     try:
         import copernicusmarine as cm
         DATASET_ID = "cmems_mod_glo_wav_anfc_0.083deg_PT3H-i"
@@ -32,56 +32,66 @@ async def get_marine_data():
         )
 
         now = datetime.utcnow()
-        three_hours_ago = now - timedelta(hours=3)
+        past_time = now - timedelta(hours=3)
         results = []
 
         for name, coords in ZONES.items():
             try:
-                # 1. Donnée Actuelle
+                # Donnée actuelle
                 curr = ds.sel(latitude=coords["lat"], longitude=coords["lon"], time=now, method="nearest")
                 vhm0_now = float(curr["VHM0"].values)
                 
-                # 2. Donnée passée (pour la tendance)
-                past = ds.sel(latitude=coords["lat"], longitude=coords["lon"], time=three_hours_ago, method="nearest")
+                # Donnée passée pour tendance
+                past = ds.sel(latitude=coords["lat"], longitude=coords["lon"], time=past_time, method="nearest")
                 vhm0_past = float(past["VHM0"].values)
 
-                # Calcul de la tendance
                 trend = "↗" if vhm0_now > vhm0_past + 0.05 else "↘" if vhm0_now < vhm0_past - 0.05 else "→"
-                
                 vhm0 = round(vhm0_now, 2) if not np.isnan(vhm0_now) else 0.5
 
                 results.append({
-                    "zone": name,
-                    "lat": coords["lat"],
-                    "lon": coords["lon"],
-                    "vhm0": vhm0,
-                    "trend": trend,
+                    "zone": name, "lat": coords["lat"], "lon": coords["lon"],
+                    "vhm0": vhm0, "trend": trend,
                     "alert": "🔴 DANGER" if vhm0 >= 2.2 else "🟢 OK",
-                    "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ"),
-                    "source": "PecheurConnect / Copernicus"
+                    "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ")
                 })
             except Exception as e:
                 console.print(f"[red]⚠️ Erreur Zone {name}: {e}[/red]")
-        
         return results
     except Exception as e:
         console.print(f"[bold red]❌ Erreur : {e}[/bold red]")
         return None
+
+async def send_telegram(data):
+    token, chat_id = os.getenv("TG_TOKEN"), os.getenv("TG_ID")
+    if not token or not chat_id: return
+
+    bot = Bot(token=token)
+    date_str = datetime.now().strftime("%d/%m/%Y à %H:%M")
+    
+    msg = f"🌊 *BULLETIN PECHEURCONNECT*\n📅 _{date_str}_\n"
+    msg += "------------------------------------\n\n"
+
+    for d in data:
+        icon = "🚩" if "DANGER" in d['alert'] else "✅"
+        msg += f"{icon} *{d['zone']}*\n   🌊 Houle : {d['vhm0']}m ({d['trend']})\n   📊 État : {d['alert']}\n\n"
+
+    msg += "------------------------------------\n🔗 [Carte en direct](https://doundou969.github.io/sunu-blue-tech/)"
+    
+    try:
+        await bot.send_message(chat_id=chat_id, text=msg, parse_mode='Markdown')
+        console.print("[green]📲 Bulletin Telegram envoyé.[/green]")
+    except Exception as e:
+        console.print(f"[red]Erreur Telegram: {e}[/red]")
 
 async def main():
     data = await get_marine_data()
     if data:
         with open("data.json", "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
-        console.print(f"[bold green]✅ Mise à jour temps réel réussie ({datetime.now().strftime('%H:%M')})[/bold green]")
-        
-        # Telegram : Uniquement si danger
-        token, cid = os.getenv("TG_TOKEN"), os.getenv("TG_ID")
-        dangers = [z for z in data if "DANGER" in z['alert']]
-        if dangers and token and cid:
-            bot = Bot(token=token)
-            msg = "🚩 *ALERTE HOULE DIRECT*\n" + "\n".join([f"• {d['zone']}: {d['vhm0']}m {d['trend']}" for d in dangers])
-            await bot.send_message(chat_id=cid, text=msg, parse_mode='Markdown')
+        await send_telegram(data)
+        console.print("[bold green]✅ Opération terminée avec succès.[/bold green]")
+    else:
+        exit(1)
 
 if __name__ == "__main__":
     asyncio.run(main())
