@@ -20,16 +20,16 @@ ZONES = {
 }
 
 async def get_marine_data():
-    console.print("[bold blue]📡 Synchronisation Copernicus...[/bold blue]")
+    console.print("[bold blue]📡 Synchronisation Copernicus (Vagues + Poissons)...[/bold blue]")
     try:
         import copernicusmarine as cm
-        DATASET_ID = "cmems_mod_glo_wav_anfc_0.083deg_PT3H-i"
+        # IDs des Datasets 2026
+        WAV_ID = "cmems_mod_glo_wav_anfc_0.083deg_PT3H-i"
+        PHY_ID = "cmems_mod_glo_phy_anfc_0.083deg_PT24H-i"
         
-        ds = cm.open_dataset(
-            dataset_id=DATASET_ID,
-            username=os.getenv("COPERNICUS_USERNAME"),
-            password=os.getenv("COPERNICUS_PASSWORD")
-        )
+        # 1. Ouverture des datasets
+        ds_wav = cm.open_dataset(dataset_id=WAV_ID, username=os.getenv("COPERNICUS_USERNAME"), password=os.getenv("COPERNICUS_PASSWORD"))
+        ds_phy = cm.open_dataset(dataset_id=PHY_ID, username=os.getenv("COPERNICUS_USERNAME"), password=os.getenv("COPERNICUS_PASSWORD"))
 
         now = datetime.utcnow()
         past_time = now - timedelta(hours=3)
@@ -37,50 +37,51 @@ async def get_marine_data():
 
         for name, coords in ZONES.items():
             try:
-                curr = ds.sel(latitude=coords["lat"], longitude=coords["lon"], time=now, method="nearest")
-                vhm0_now = float(curr["VHM0"].values)
-                
-                past = ds.sel(latitude=coords["lat"], longitude=coords["lon"], time=past_time, method="nearest")
-                vhm0_past = float(past["VHM0"].values)
+                # --- DONNÉES VAGUES ---
+                curr_wav = ds_wav.sel(latitude=coords["lat"], longitude=coords["lon"], time=now, method="nearest")
+                past_wav = ds_wav.sel(latitude=coords["lat"], longitude=coords["lon"], time=past_time, method="nearest")
+                vhm0 = round(float(curr_wav["VHM0"].values), 2)
+                vhm0_past = float(past_wav["VHM0"].values)
+                trend = "↗" if vhm0 > vhm0_past + 0.05 else "↘" if vhm0 < vhm0_past - 0.05 else "→"
 
-                trend = "↗" if vhm0_now > vhm0_past + 0.05 else "↘" if vhm0_now < vhm0_past - 0.05 else "→"
-                vhm0 = round(vhm0_now, 2) if not np.isnan(vhm0_now) else 0.5
+                # --- DONNÉES TEMPÉRATURE (POISSONS) ---
+                curr_phy = ds_phy.sel(latitude=coords["lat"], longitude=coords["lon"], time=now, method="nearest")
+                temp = round(float(curr_phy["thetao"].values), 1)
+                
+                # Logique de pêche : Upwelling (eaux froides entre 17 et 22°C au Sénégal)
+                if 17 <= temp <= 22:
+                    fish_status = "🐟 Zone de Pêche Riche (Eau Froide)"
+                    fish_icon = "🔵"
+                else:
+                    fish_status = "🌊 Eau Chaude (Moins de poissons)"
+                    fish_icon = "🟡"
 
                 results.append({
                     "zone": name, "lat": coords["lat"], "lon": coords["lon"],
-                    "vhm0": vhm0, "trend": trend,
+                    "vhm0": vhm0, "trend": trend, "temp": temp,
+                    "fish_status": fish_status, "fish_icon": fish_icon,
                     "alert": "🔴 DANGER" if vhm0 >= 2.2 else "🟢 OK",
                     "timestamp": now.strftime("%Y-%m-%dT%H:%M:%SZ")
                 })
-            except Exception:
-                continue
+            except Exception: continue
         return results
     except Exception as e:
-        console.print(f"[bold red]❌ Erreur Copernicus : {e}[/bold red]")
-        return None
+        console.print(f"[bold red]❌ Erreur : {e}[/bold red]"); return None
 
 async def send_telegram(data):
     token, chat_id = os.getenv("TG_TOKEN"), os.getenv("TG_ID")
     if not token or not chat_id: return
-
     try:
         bot = Bot(token=token)
-        date_str = datetime.now().strftime("%d/%m/%Y à %H:%M")
-        
-        msg = f"🌊 *BULLETIN PECHEURCONNECT*\n📅 _{date_str}_\n"
+        msg = f"🚢 *PECHEURCONNECT : SÉCURITÉ & PÊCHE*\n📅 _{datetime.now().strftime('%d/%m/%Y')}_\n"
         msg += "------------------------------------\n\n"
-
         for d in data:
-            icon = "🚩" if "DANGER" in d['alert'] else "✅"
-            msg += f"{icon} *{d['zone']}*\n   🌊 Houle : {d['vhm0']}m ({d['trend']})\n   📊 État : {d['alert']}\n\n"
-
+            msg += f"📍 *{d['zone']}*\n"
+            msg += f"   🌊 Vagues : {d['vhm0']}m ({d['trend']}) -> {d['alert']}\n"
+            msg += f"   🌡️ Temp : {d['temp']}°C | {d['fish_icon']} {d['fish_status']}\n\n"
         msg += "------------------------------------\n🔗 [Carte en direct](https://doundou969.github.io/sunu-blue-tech/)"
-        
         await bot.send_message(chat_id=int(chat_id), text=msg, parse_mode='Markdown')
-        console.print("[bold green]📲 Bulletin envoyé.[/bold green]")
-        
-    except Exception as e:
-        console.print(f"[red]❌ Erreur Telegram : {e}[/red]")
+    except Exception as e: console.print(f"[red]❌ Telegram : {e}[/red]")
 
 async def main():
     data = await get_marine_data()
@@ -88,8 +89,7 @@ async def main():
         with open("data.json", "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
         await send_telegram(data)
-    else:
-        exit(1)
+        console.print("[bold green]✅ Données Sécurité + Pêche mises à jour ![/bold green]")
 
 if __name__ == "__main__":
     asyncio.run(main())
