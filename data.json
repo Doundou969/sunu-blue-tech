@@ -3,11 +3,10 @@
     "zone": "SAINT-LOUIS",
     "lat": 16.03,
     "lon": -16.5,
-    "vhm0": 2.11,
-    "trend": "→",
+    "vhm0": 2.04,
+    "trend": "↘",
     "alert": "🟢 OK",
-    "timestamp": "2026-01-31T01:26:15Z",
-    "source": "PecheurConnect / Copernicus"
+    "timestamp": "2026-01-31T01:37:56Z"
   },
   {
     "zone": "KAYAR",
@@ -16,18 +15,16 @@
     "vhm0": 0.5,
     "trend": "→",
     "alert": "🟢 OK",
-    "timestamp": "2026-01-31T01:26:15Z",
-    "source": "PecheurConnect / Copernicus"
+    "timestamp": "2026-01-31T01:37:56Z"
   },
   {
     "zone": "DAKAR-YOFF",
     "lat": 14.75,
     "lon": -17.48,
-    "vhm0": 2.42,
-    "trend": "↘",
+    "vhm0": 2.39,
+    "trend": "→",
     "alert": "🔴 DANGER",
-    "timestamp": "2026-01-31T01:26:15Z",
-    "source": "PecheurConnect / Copernicus"
+    "timestamp": "2026-01-31T01:37:56Z"
   },
   {
     "zone": "MBOUR-JOAL",
@@ -36,8 +33,7 @@
     "vhm0": 0.65,
     "trend": "→",
     "alert": "🟢 OK",
-    "timestamp": "2026-01-31T01:26:15Z",
-    "source": "PecheurConnect / Copernicus"
+    "timestamp": "2026-01-31T01:37:56Z"
   },
   {
     "zone": "CASAMANCE",
@@ -46,17 +42,15 @@
     "vhm0": 0.5,
     "trend": "→",
     "alert": "🟢 OK",
-    "timestamp": "2026-01-31T01:26:15Z",
-    "source": "PecheurConnect / Copernicus"
+    "timestamp": "2026-01-31T01:37:56Z"
   },
   {
     "zone": "LOUGA-POTOU",
     "lat": 15.48,
     "lon": -16.75,
-    "vhm0": 1.91,
+    "vhm0": 1.85,
     "trend": "↘",
     "alert": "🟢 OK",
-    "timestamp": "2026-01-31T01:26:15Z",
-    "source": "PecheurConnect / Copernicus"
+    "timestamp": "2026-01-31T01:37:56Z"
   }
 ]
