@@ -2,29 +2,29 @@ name: Copernicus Auto Update
 
 on:
   schedule:
-    - cron: "0 */6 * * *" # S'exécute toutes les 6 heures
-  workflow_dispatch:      # Permet de le lancer manuellement pour tester
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
 
 jobs:
   update:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # Important pour autoriser le bot à écrire sur votre dépôt
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Python Setup
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: 'pip' # Accélère les prochaines exécutions
 
-      - name: Install dependencies
+      - name: Install Libs
         run: |
-          python -m pip install --upgrade pip
-          pip install copernicusmarine xarray netCDF4 numpy pandas requests python-telegram-bot python-dotenv rich tqdm
+          pip install copernicusmarine numpy python-telegram-bot python-dotenv rich xarray netCDF4
 
-      - name: Run Copernicus script
+      - name: Run Script
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_ID: ${{ secrets.TG_ID }}
@@ -32,16 +32,18 @@ jobs:
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
         run: python script_peche.py
 
-      - name: Commit and Push data.json
+      - name: Commit and Push
         run: |
           git config --global user.name "PecheurConnect-Bot"
           git config --global user.email "bot@pecheurconnect.sn"
+          
+          # Force la création si absent pour éviter l'erreur 128
+          touch data.json 
+          
           git add data.json
-          # On vérifie s'il y a des changements avant de commit pour éviter les erreurs
           if git diff --staged --quiet; then
-            echo "No changes to commit"
+            echo "Pas de nouveaux changements."
           else
-            git commit -m "📡 MàJ Données Mer : $(date +'%d-%m-%Y %H:%M')"
-            git pull --rebase --autostash
+            git commit -m "📡 MàJ Mer : $(date +'%d-%m-%Y %H:%M')"
             git push
           fi
