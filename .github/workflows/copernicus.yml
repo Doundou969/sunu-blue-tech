@@ -1,30 +1,31 @@
-name: PecheurConnect Daily Update
+name: PecheurConnect Intelligence Update
 
 on:
   schedule:
-    - cron: "0 5 * * *"  # Exécution à 05:00 AM UTC
-  workflow_dispatch:      # Permet de lancer manuellement pour tester
+    - cron: "0 5 * * *"  # Chaque matin à 05h00 UTC
+  workflow_dispatch:      # Pour lancer manuellement si besoin
 
 jobs:
-  update:
+  build_and_run:
     runs-on: ubuntu-latest
     permissions:
       contents: write
 
     steps:
-      - name: Checkout
+      - name: 📥 Récupération du code
         uses: actions/checkout@v4
 
-      - name: Python Setup
+      - name: 🐍 Configuration Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: 'pip' # Accélère les prochaines exécutions
 
-      - name: Install Libs
+      - name: 📦 Installation des outils
         run: |
-          pip install copernicusmarine numpy python-telegram-bot python-dotenv rich xarray netCDF4
+          pip install copernicusmarine numpy python-telegram-bot python-dotenv rich xarray netCDF4 chart.js
 
-      - name: Run PecheurConnect Script
+      - name: 📡 Exécution PecheurConnect (Vagues + Upwelling)
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_ID: ${{ secrets.TG_ID }}
@@ -32,15 +33,10 @@ jobs:
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
         run: python script_peche.py
 
-      - name: Commit and Push
+      - name: 🚀 Mise à jour du site web
         run: |
           git config --global user.name "PecheurConnect-Bot"
           git config --global user.email "bot@pecheurconnect.sn"
-          touch data.json
           git add data.json
-          if git diff --staged --quiet; then
-            echo "Pas de changements."
-          else
-            git commit -m "📡 Bulletin Mer : $(date +'%d-%m-%Y %H:%M')"
-            git push
-          fi
+          # On ne commit que s'il y a de nouvelles données
+          git diff --quiet && git diff --staged --quiet || (git commit -m "📊 Rapport Pêche & Sécurité : $(date +'%d-%m-%Y')" && git push)
