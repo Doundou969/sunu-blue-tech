@@ -1,40 +1,33 @@
 name: PecheurConnect Update
-
 on:
+  workflow_dispatch: # Permet de le lancer à la main
   schedule:
     - cron: "0 5 * * *"
-  workflow_dispatch:
 
 jobs:
-  run_script:
+  run:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-
+      contents: write # TRÈS IMPORTANT
     steps:
-      - name: 📥 Récupération du code
-        uses: actions/checkout@v4
-
-      - name: 🐍 Configuration Python
+      - uses: actions/checkout@v4
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-
-      - name: 📦 Installation des dépendances
-        run: |
-          pip install copernicusmarine numpy python-telegram-bot python-dotenv rich xarray netCDF4 requests
-
-      - name: 📡 Exécution du script (Copernicus + Open-Meteo)
+      - name: Install dependencies
+        run: pip install copernicusmarine numpy python-telegram-bot python-dotenv requests
+      - name: Run script
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_ID: ${{ secrets.TG_ID }}
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
         run: python script_peche.py
-
-      - name: 🚀 Déploiement
+      - name: Commit and Push
         run: |
-          git config --global user.name "PecheurConnect-Bot"
-          git config --global user.email "bot@pecheurconnect.sn"
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
           git add data.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "📊 Mise à jour Hybride : $(date +'%d-%m-%Y')" && git push)
+          git commit -m "Mise à jour des données de pêche" || exit 0
+          git push
