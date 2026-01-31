@@ -1,15 +1,15 @@
-name: Copernicus Auto Update
+name: PecheurConnect Daily Update
 
 on:
   schedule:
-    - cron: "0 */6 * * *"
-  workflow_dispatch:
+    - cron: "0 5 * * *"  # Exécution à 05:00 AM UTC
+  workflow_dispatch:      # Permet de lancer manuellement pour tester
 
 jobs:
   update:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Important pour autoriser le bot à écrire sur votre dépôt
+      contents: write
 
     steps:
       - name: Checkout
@@ -24,7 +24,7 @@ jobs:
         run: |
           pip install copernicusmarine numpy python-telegram-bot python-dotenv rich xarray netCDF4
 
-      - name: Run Script
+      - name: Run PecheurConnect Script
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_ID: ${{ secrets.TG_ID }}
@@ -36,14 +36,11 @@ jobs:
         run: |
           git config --global user.name "PecheurConnect-Bot"
           git config --global user.email "bot@pecheurconnect.sn"
-          
-          # Force la création si absent pour éviter l'erreur 128
-          touch data.json 
-          
+          touch data.json
           git add data.json
           if git diff --staged --quiet; then
-            echo "Pas de nouveaux changements."
+            echo "Pas de changements."
           else
-            git commit -m "📡 MàJ Mer : $(date +'%d-%m-%Y %H:%M')"
+            git commit -m "📡 Bulletin Mer : $(date +'%d-%m-%Y %H:%M')"
             git push
           fi
