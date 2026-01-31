@@ -3,8 +3,7 @@
     "zone": "SAINT-LOUIS",
     "lat": 16.03,
     "lon": -16.5,
-    "vhm0": 1.8,
-    "trend": "→",
+    "vhm0": 1.87,
     "temp": 19.2,
     "history": {
       "dates": [
@@ -28,14 +27,13 @@
     },
     "fish_status": "🐟 Zone Riche",
     "alert": "🟢 OK",
-    "timestamp": "2026-01-31T16:26:05Z"
+    "timestamp": "2026-01-31T16:46:02Z"
   },
   {
     "zone": "KAYAR",
     "lat": 14.92,
     "lon": -17.2,
     "vhm0": NaN,
-    "trend": "→",
     "temp": 20.1,
     "history": {
       "dates": [
@@ -59,14 +57,13 @@
     },
     "fish_status": "🐟 Zone Riche",
     "alert": "🟢 OK",
-    "timestamp": "2026-01-31T16:26:05Z"
+    "timestamp": "2026-01-31T16:46:02Z"
   },
   {
     "zone": "DAKAR-YOFF",
     "lat": 14.75,
     "lon": -17.48,
     "vhm0": 2.06,
-    "trend": "→",
     "temp": 20.0,
     "history": {
       "dates": [
@@ -90,14 +87,13 @@
     },
     "fish_status": "🐟 Zone Riche",
     "alert": "🟢 OK",
-    "timestamp": "2026-01-31T16:26:05Z"
+    "timestamp": "2026-01-31T16:46:02Z"
   },
   {
     "zone": "MBOUR-JOAL",
     "lat": 14.41,
     "lon": -16.96,
-    "vhm0": 0.57,
-    "trend": "→",
+    "vhm0": 0.56,
     "temp": 21.1,
     "history": {
       "dates": [
@@ -121,14 +117,13 @@
     },
     "fish_status": "🐟 Zone Riche",
     "alert": "🟢 OK",
-    "timestamp": "2026-01-31T16:26:05Z"
+    "timestamp": "2026-01-31T16:46:02Z"
   },
   {
     "zone": "CASAMANCE",
     "lat": 12.5,
     "lon": -16.7,
     "vhm0": NaN,
-    "trend": "→",
     "temp": 23.2,
     "history": {
       "dates": [
@@ -152,6 +147,6 @@
     },
     "fish_status": "🌊 Zone Pauvre",
     "alert": "🟢 OK",
-    "timestamp": "2026-01-31T16:26:05Z"
+    "timestamp": "2026-01-31T16:46:02Z"
   }
 ]
