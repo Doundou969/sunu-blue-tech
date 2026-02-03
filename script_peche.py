@@ -6,7 +6,7 @@ from telegram import Bot
 
 load_dotenv()
 
-# Zones stratégiques du Sénégal
+# Zones stratégiques décalées au large (pour éviter les erreurs de pixels côtiers)
 ZONES = {
     "SAINT-LOUIS": {"lat": 16.05, "lon": -16.65},
     "KAYAR": {"lat": 14.95, "lon": -17.35},
@@ -16,80 +16,94 @@ ZONES = {
 }
 
 async def fetch_marine_data():
-    # Chargement des 3 piliers Copernicus
-    # 1. Vagues  2. Physique (Temp/Courants) 3. Bio (Chlorophylle)
-    ds_wav = cm.open_dataset(dataset_id="cmems_mod_glo_wav_anfc_0.083deg_PT3H-i")
-    ds_phy = cm.open_dataset(dataset_id="cmems_mod_glo_phy-cur_anfc_0.083deg_PT6H-i")
-    ds_bio = cm.open_dataset(dataset_id="cmems_mod_glo_bio-pft_anfc_0.25deg_P1D-m")
-    
     results = []
     now = datetime.utcnow()
+    
+    # Identifiants depuis les secrets GitHub
+    user = os.getenv("COPERNICUS_USERNAME")
+    pw = os.getenv("COPERNICUS_PASSWORD")
 
-    for name, coords in ZONES.items():
-        try:
-            # --- VAGUES ---
-            w = ds_wav.sel(latitude=coords["lat"], longitude=coords["lon"], time=now, method="nearest")
-            v_now = round(float(w["VHM0"].values), 2)
-            
-            # --- COURANTS & TEMPÉRATURE ---
-            p = ds_phy.sel(latitude=coords["lat"], longitude=coords["lon"], time=now, method="nearest")
-            t_mer = round(float(p["thetao"].values), 1)
-            # Calcul de la vitesse du courant (m/s) à partir des vecteurs U et V
-            uo, vo = float(p["uo"].values), float(p["vo"].values)
-            c_speed = round(np.sqrt(uo**2 + vo**2), 2)
+    try:
+        print("🚀 Connexion aux services Copernicus...")
+        # Authentification forcée
+        cm.login(username=user, password=pw, skip_if_logged=True)
 
-            # --- BIOLOGIE (CHLOROPHYLLE) ---
-            b = ds_bio.sel(latitude=coords["lat"], longitude=coords["lon"], time=now, method="nearest")
-            chl = round(float(b["chl"].values), 3)
+        # 1. Ouverture des Datasets (Physique, Vagues, Bio)
+        # Physique (Température et Courants)
+        ds_phy = cm.open_dataset(dataset_id="cmems_mod_glo_phy-cur_anfc_0.083deg_PT6H-i", username=user, password=pw)
+        # Vagues
+        ds_wav = cm.open_dataset(dataset_id="cmems_mod_glo_wav_anfc_0.083deg_PT3H-i", username=user, password=pw)
+        # Biologie (Chlorophylle)
+        ds_bio = cm.open_dataset(dataset_id="cmems_mod_glo_bio-pft_anfc_0.25deg_P1D-m", username=user, password=pw)
 
-            # --- INDICE DE PÊCHE (Logique métier PecheurConnect) ---
-            # Un bon indice = Eau fraîche (upwelling) + forte chlorophylle
-            fish_index = "ÉLEVÉ" if (t_mer < 22 and chl > 0.5) else "MOYEN" if (chl > 0.2) else "FAIBLE"
-            
-            # --- SÉCURITÉ ---
-            safety = "DANGER" if v_now > 2.2 or c_speed > 0.6 else "SÛR"
+        for name, coords in ZONES.items():
+            try:
+                # --- EXTRACTION PHYSIQUE (Température & Courants) ---
+                p = ds_phy.sel(latitude=coords["lat"], longitude=coords["lon"], time=now, method="nearest")
+                t_mer = round(float(p["thetao"].values), 1)
+                uo, vo = float(p["uo"].values), float(p["vo"].values)
+                c_speed = round(np.sqrt(uo**2 + vo**2), 2)
 
-            results.append({
-                "zone": name,
-                "vagues": v_now,
-                "temp_mer": t_mer,
-                "courant_ms": c_speed,
-                "chlorophylle": chl,
-                "indice_poisson": fish_index,
-                "securite": safety,
-                "timestamp": now.strftime("%H:%M")
-            })
-        except Exception as e:
-            print(f"Erreur sur {name}: {e}")
+                # --- EXTRACTION VAGUES ---
+                w = ds_wav.sel(latitude=coords["lat"], longitude=coords["lon"], time=now, method="nearest")
+                v_now = round(float(w["VHM0"].values), 2)
+
+                # --- EXTRACTION BIO (Chlorophylle) ---
+                b = ds_bio.sel(latitude=coords["lat"], longitude=coords["lon"], time=now, method="nearest")
+                chl = round(float(b["chl"].values), 3)
+
+                # --- LOGIQUE MÉTIER PECHEURCONNECT ---
+                # Un bon indice de poisson = Eau fraîche (<22°C) + Chl élevée (>0.4)
+                if t_mer < 22 and chl > 0.4: fish_index = "ÉLEVÉ"
+                elif chl > 0.2: fish_index = "MOYEN"
+                else: fish_index = "FAIBLE"
+
+                # Sécurité (Vagues > 2.1m ou Courant > 0.6 m/s)
+                safety = "DANGER" if v_now > 2.1 or c_speed > 0.6 else "SÛR"
+
+                results.append({
+                    "zone": name, "lat": coords["lat"], "lon": coords["lon"],
+                    "v_now": v_now, "t_now": t_mer, "courant_ms": c_speed,
+                    "chlorophylle": chl, "indice_poisson": fish_index,
+                    "securite": safety, "date": now.strftime("%Y-%m-%d %H:%M")
+                })
+                print(f"✅ {name} traité.")
+
+            except Exception as e:
+                print(f"❌ Erreur sur la zone {name}: {e}")
+
+    except Exception as e:
+        print(f"🔥 Erreur critique Copernicus: {e}")
+        return None
 
     return results
 
-async def send_telegram_rich(data):
+async def send_telegram(data):
     token, chat_id = os.getenv("TG_TOKEN"), os.getenv("TG_ID")
-    if not token or not chat_id: return
-    bot = Bot(token=token)
-    
-    header = "🌊 *PECHEURCONNECT - INTELLIGENCE MARINE*\n"
-    header += f"📅 {datetime.now().strftime('%d/%m/%Y')}\n"
-    header += "----------------------------------\n\n"
-    
-    msg = header
-    for d in data:
-        icon = "🔴" if d['securite'] == "DANGER" else "🟢"
-        msg += f"{icon} *{d['zone']}*\n"
-        msg += f"🌊 Vagues: `{d['vagues']}m` | 🧭 Courant: `{d['courant_ms']}m/s`\n"
-        msg += f"🌡️ Eau: `{d['temp_mer']}°C` | 🌿 Chl: `{d['chlorophylle']}mg/m³`\n"
-        msg += f"🐟 Potentiel Pêche: *{d['indice_poisson']}*\n\n"
-        
-    await bot.send_message(chat_id=int(chat_id), text=msg, parse_mode='Markdown')
+    if not token or not chat_id or not data: return
+    try:
+        bot = Bot(token=token)
+        msg = "🚢 *PECHEURCONNECT - RAPPORT DU MATIN*\n"
+        msg += f"📅 {datetime.now().strftime('%d/%m/%Y')}\n"
+        msg += "----------------------------------\n\n"
+        for d in data:
+            alert = "🔴" if d['securite'] == "DANGER" else "🟢"
+            fish = "🐟" if d['indice_poisson'] == "ÉLEVÉ" else ""
+            msg += f"{alert} *{d['zone']}* {fish}\n"
+            msg += f"🌊 `{d['v_now']}m` | 🧭 `{d['courant_ms']}m/s`\n"
+            msg += f"🌡️ `{d['t_now']}°C` | 🌿 `{d['chlorophylle']}`\n\n"
+        await bot.send_message(chat_id=int(chat_id), text=msg, parse_mode='Markdown')
+    except Exception as e: print(f"Erreur Telegram: {e}")
 
 async def main():
     data = await fetch_marine_data()
-    # Sauvegarde pour le dashboard web
-    with open("data.json", "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
-    # Envoi Telegram
-    await send_telegram_rich(data)
+    if data:
+        with open("data.json", "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        await send_telegram(data)
+    else:
+        # Forcer une erreur pour l'alerte GitHub Action
+        exit(1)
 
 if __name__ == "__main__":
     asyncio.run(main())
