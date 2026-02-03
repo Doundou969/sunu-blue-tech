@@ -11,38 +11,24 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          
       - name: Install dependencies
         run: pip install copernicusmarine numpy python-telegram-bot python-dotenv requests
-        
       - name: Run script
-        id: run_script # ID ajouté pour suivre l'état de cette étape
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_ID: ${{ secrets.TG_ID }}
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
         run: python script_peche.py
-
-      # CETTE ÉTAPE S'EXÉCUTE UNIQUEMENT SI LE SCRIPT ÉCHOUE
-      - name: Notify on Failure
-        if: failure()
-        run: |
-          curl -s -X POST https://api.telegram.org/bot${{ secrets.TG_TOKEN }}/sendMessage \
-          -d chat_id=${{ secrets.TG_ID }} \
-          -d text="⚠️ *ALERTE PECHEURCONNECT* : La mise à jour automatique a échoué. Vérifiez les logs GitHub Actions. 🛠️" \
-          -d parse_mode="Markdown"
-
       - name: Commit and Push
-        if: success() # S'exécute uniquement si tout s'est bien passé
+        if: success()
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
           git add data.json
-          git commit -m "⚡ Mise à jour automatique Copernicus" || exit 0
+          git commit -m "Mise à jour PecheurConnect" || exit 0
           git push
