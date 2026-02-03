@@ -2,13 +2,14 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PecheurConnect</title>
+    <title>PecheurConnect - Intelligence Marine</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { margin:0; font-family:sans-serif; } #map { height:100vh; }
-        .marker-label { color:white; padding:5px 10px; border-radius:15px; font-weight:bold; border:2px solid white; display:flex; align-items:center; gap:5px; font-size:13px; }
-        .box { background:#f4f4f4; padding:8px; margin:5px 0; border-radius:5px; border-left:4px solid #ccc; text-align:center; }
+        .marker-label { color:white; padding:5px 10px; border-radius:15px; font-weight:bold; border:2px solid white; display:flex; align-items:center; gap:5px; font-size:13px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        .box { background:#f4f4f4; padding:8px; margin:5px 0; border-radius:5px; border-left:4px solid #ccc; text-align:left; font-size: 12px; }
+        .badge-fish { background: #2ecc71; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; float: right; }
     </style>
 </head>
 <body>
@@ -20,40 +21,61 @@
 
     fetch('./data.json?v=' + Date.now()).then(r => r.json()).then(data => {
         data.forEach((z, i) => {
-            // SÉCURITÉ : On vérifie si les données existent, sinon on met des valeurs par défaut
-            const vNow = z.v_now || z.vhm0 || 0;
-            const tNow = z.t_now || z.temp || 0;
-            const wTom = z.w_tomorrow || 0;
-            const hDat = z.h_dat || (z.history ? z.history.dates : []);
-            const hVal = z.h_val || (z.history ? z.history.values : []);
+            // Mapping des nouvelles données Copernicus
+            const vNow = z.v_now || z.vagues || 0;
+            const tNow = z.t_now || z.temp_mer || 0;
+            const chl = z.chlorophylle || 0;
+            const current = z.courant_ms || 0;
+            const fishIndex = z.indice_poisson || "MOYEN";
+            const safety = z.securite || "SÛR";
+            
+            // Historique pour le graphique
+            const hDat = z.h_dat || [];
+            const hVal = z.h_val || [];
 
-            const color = vNow >= 2.1 ? '#e74c3c' : '#2ecc71';
+            // Couleur selon sécurité
+            const color = safety === "DANGER" ? '#e74c3c' : '#2ecc71';
             
             const popup = `
-                <div style="width:200px">
-                    <h3 style="text-align:center">${z.zone}</h3>
-                    <div class="box"><b>Aujourd'hui</b><br>🌊 ${vNow}m | 🌡️ ${tNow}°C</div>
-                    <div class="box" style="border-left-color:${wTom >= 2.1 ? '#e74c3c' : '#2ecc71'}">
-                        <b>Demain</b><br>🌊 ${wTom}m ${wTom >= 2.1 ? '⚠️' : '✅'}
+                <div style="width:220px">
+                    <h3 style="text-align:center; margin-bottom:5px;">${z.zone}</h3>
+                    <div class="box" style="border-left-color: #3498db">
+                        <b>🌊 État de la mer</b><br>
+                        Vagues : ${vNow}m | Courant : ${current}m/s
                     </div>
-                    ${hDat.length > 0 ? `<canvas id="chart-${i}" height="100"></canvas>` : '<p style="font-size:10px">Graphique indisponible</p>'}
+                    <div class="box" style="border-left-color: #2ecc71">
+                        <span class="badge-fish">${fishIndex}</span>
+                        <b>🐟 Potentiel Pêche</b><br>
+                        Temp : ${tNow}°C | Chl : ${chl}
+                    </div>
+                    <div class="box" style="border-left-color:${color}">
+                        <b>🛡️ Sécurité : ${safety}</b>
+                    </div>
+                    ${hDat.length > 0 ? `<canvas id="chart-${i}" height="100"></canvas>` : ''}
+                </div>`;
+
+            // Label sur la carte : affiche Vagues + Icône Poisson si l'indice est Élevé
+            const markerHtml = `
+                <div class="marker-label" style="background:${color}">
+                    ${vNow}m ${fishIndex === 'ÉLEVÉ' ? '🐟' : ''}
                 </div>`;
 
             const m = L.marker([z.lat, z.lon], {
-                icon: L.divIcon({ html: `<div class="marker-label" style="background:${color}">${vNow}m ${tNow <= 22 ? '🐟' : ''}</div>`, iconSize: [85, 30] })
+                icon: L.divIcon({ html: markerHtml, iconSize: [85, 30] })
             }).addTo(map).bindPopup(popup);
 
+            // Graphique de tendance
             m.on('popupopen', () => {
                 const canvas = document.getElementById(`chart-${i}`);
-                if (!canvas || hDat.length === 0) return; // Empêche l'erreur .map()
+                if (!canvas || hDat.length === 0) return;
 
                 new Chart(canvas.getContext('2d'), {
                     type: 'line',
                     data: {
                         labels: hDat.map(d => d.slice(8,10)),
-                        datasets: [{ label:'Temp', data:hVal, borderColor:'#3498db', tension:0.3, fill:true }]
+                        datasets: [{ label:'Temp', data:hVal, borderColor:'#3498db', backgroundColor:'rgba(52, 152, 219, 0.1)', tension:0.3, fill:true }]
                     },
-                    options: { plugins: { legend: { display: false } } }
+                    options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
                 });
             });
         });
