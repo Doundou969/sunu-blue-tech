@@ -1,47 +1,107 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>PecheurConnect</title>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PecheurConnect - Dashboard Sénégal</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         #map { height: 100vh; width: 100%; }
-        .popup-card { font-family: sans-serif; min-width: 180px; }
-        .stat { background: #f0f2f5; padding: 5px; margin: 3px 0; border-radius: 4px; border-left: 3px solid #3498db; }
+        
+        /* Fenêtre d'information (Popup) */
+        .popup-card { min-width: 200px; font-size: 14px; }
+        .zone-title { text-align: center; color: #2c3e50; margin: 0 0 10px 0; border-bottom: 2px solid #eee; padding-bottom: 5px; }
+        .stat-group { background: #f8f9fa; border-left: 4px solid #3498db; padding: 8px; margin: 6px 0; border-radius: 4px; }
+        .stat-group.fish { border-left-color: #27ae60; }
+        
+        /* Étiquette sur la carte */
+        .marker-label {
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 11px;
+            text-align: center;
+            white-space: nowrap;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .safety-tag {
+            display: block;
+            text-align: center;
+            padding: 5px;
+            border-radius: 4px;
+            color: white;
+            font-weight: bold;
+            margin-top: 8px;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
-    <div id="map"></div>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-        const map = L.map('map').setView([14.5, -17.3], 7);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-        fetch('./data.json?v=' + Date.now())
-            .then(r => r.json())
-            .then(data => {
-                data.forEach(item => {
-                    const color = item.safety === "DANGER" ? "#e74c3c" : "#2ecc71";
-                    
-                    const html = `
-                        <div class="popup-card">
-                            <h3 style="margin:0">${item.zone}</h3>
-                            <div class="stat">🌊 Vagues : <b>${item.v_now}m</b></div>
-                            <div class="stat">🧭 Courant : <b>${item.c_now}m/s</b></div>
-                            <div class="stat" style="border-left-color:#2ecc71">🌡️ Temp : <b>${item.t_now}°C</b></div>
-                            <div style="background:${color}; color:white; padding:5px; text-align:center; border-radius:4px; font-weight:bold; margin-top:5px">
-                                ${item.safety} | Pêche : ${item.index}
-                            </div>
-                        </div>`;
+<div id="map"></div>
 
-                    L.marker([item.lat, item.lon], {
-                        icon: L.divIcon({
-                            html: `<div style="background:${color}; color:white; padding:2px 5px; border-radius:4px; font-weight:bold; font-size:11px; white-space:nowrap;">${item.v_now}m</div>`,
-                            iconSize: [50, 20]
-                        })
-                    }).addTo(map).bindPopup(html);
-                });
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // Initialisation de la carte sur les côtes sénégalaises
+    const map = L.map('map').setView([14.45, -17.2], 7);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap | PecheurConnect'
+    }).addTo(map);
+
+    // Chargement des données avec anti-cache (?v=)
+    fetch('./data.json?v=' + Date.now())
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(item => {
+                // Couleurs selon la sécurité
+                const isDanger = item.safety === "DANGER";
+                const color = isDanger ? "#e74c3c" : "#2ecc71";
+                const icon = isDanger ? "⚠️ " : "✅ ";
+
+                const popupContent = `
+                    <div class="popup-card">
+                        <h3 class="zone-title">${item.zone}</h3>
+                        
+                        <div class="stat-group">
+                            🌊 <b>ÉTAT DE LA MER</b><br>
+                            Vagues : <b>${item.v_now}m</b><br>
+                            Courant : <b>${item.c_now}m/s</b>
+                        </div>
+
+                        <div class="stat-group fish">
+                            🐟 <b>POTENTIEL PÊCHE</b><br>
+                            Indice : <b>${item.index}</b><br>
+                            Température : <b>${item.t_now}°C</b>
+                        </div>
+
+                        <div class="safety-tag" style="background:${color}">
+                            ${icon}${item.safety}
+                        </div>
+                        
+                        <div style="font-size:10px; color:#95a5a6; text-align:right; margin-top:8px;">
+                            Mise à jour : ${item.date}
+                        </div>
+                    </div>
+                `;
+
+                // Création du marqueur avec étiquette dynamique
+                L.marker([item.lat, item.lon], {
+                    icon: L.divIcon({
+                        className: 'custom-icon',
+                        html: `<div class="marker-label" style="background:${color}">${item.v_now}m | ${item.t_now}°C</div>`,
+                        iconSize: [90, 25],
+                        iconAnchor: [45, 12]
+                    })
+                })
+                .addTo(map)
+                .bindPopup(popupContent);
             });
-    </script>
+        })
+        .catch(err => console.error("Erreur de lecture data.json :", err));
+</script>
+
 </body>
 </html>
