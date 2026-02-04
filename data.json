@@ -3,55 +3,55 @@
     "zone": "SAINT-LOUIS",
     "lat": 16.05,
     "lon": -16.65,
-    "v_now": 1.73,
-    "t_now": 17.4,
-    "courant_ms": 0.28,
+    "v_now": 2.09,
+    "t_now": 17.8,
+    "courant_ms": 0.24,
     "indice_poisson": "ÉLEVÉ",
     "securite": "SÛR",
-    "date": "2026-02-04 05:48"
+    "date": "2026-02-04 17:32"
   },
   {
     "zone": "KAYAR",
     "lat": 14.95,
     "lon": -17.35,
-    "v_now": 1.81,
-    "t_now": 18.9,
-    "courant_ms": 0.12,
+    "v_now": 2.18,
+    "t_now": 19.4,
+    "courant_ms": 0.13,
     "indice_poisson": "ÉLEVÉ",
-    "securite": "SÛR",
-    "date": "2026-02-04 05:48"
+    "securite": "DANGER",
+    "date": "2026-02-04 17:32"
   },
   {
     "zone": "DAKAR-YOFF",
     "lat": 14.8,
     "lon": -17.65,
-    "v_now": 1.97,
-    "t_now": 19.8,
-    "courant_ms": 0.09,
+    "v_now": 2.33,
+    "t_now": 20.1,
+    "courant_ms": 0.01,
     "indice_poisson": "ÉLEVÉ",
-    "securite": "SÛR",
-    "date": "2026-02-04 05:48"
+    "securite": "DANGER",
+    "date": "2026-02-04 17:32"
   },
   {
     "zone": "MBOUR-JOAL",
     "lat": 14.35,
     "lon": -17.15,
-    "v_now": 1.01,
-    "t_now": 18.7,
-    "courant_ms": 0.17,
+    "v_now": 1.07,
+    "t_now": 19.4,
+    "courant_ms": 0.21,
     "indice_poisson": "ÉLEVÉ",
     "securite": "SÛR",
-    "date": "2026-02-04 05:48"
+    "date": "2026-02-04 17:32"
   },
   {
     "zone": "CASAMANCE",
     "lat": 12.5,
     "lon": -16.95,
     "v_now": 0.78,
-    "t_now": 22.5,
+    "t_now": 23.5,
     "courant_ms": 0.07,
     "indice_poisson": "MOYEN",
     "securite": "SÛR",
-    "date": "2026-02-04 05:48"
+    "date": "2026-02-04 17:32"
   }
 ]
