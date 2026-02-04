@@ -19,7 +19,9 @@ async def fetch_marine_data():
     user, pw = os.getenv("COPERNICUS_USERNAME"), os.getenv("COPERNICUS_PASSWORD")
 
     try:
+        print("🚀 Connexion Copernicus...")
         cm.login(username=user, password=pw)
+
         ds_temp = cm.open_dataset(dataset_id="cmems_mod_glo_phy-thetao_anfc_0.083deg_PT6H-i", username=user, password=pw)
         ds_cur = cm.open_dataset(dataset_id="cmems_mod_glo_phy-cur_anfc_0.083deg_PT6H-i", username=user, password=pw)
         ds_wav = cm.open_dataset(dataset_id="cmems_mod_glo_wav_anfc_0.083deg_PT3H-i", username=user, password=pw)
@@ -29,13 +31,15 @@ async def fetch_marine_data():
                 # Température
                 st = ds_temp.sel(latitude=coords["lat"], longitude=coords["lon"], time=now, method="nearest")
                 if 'depth' in st.coords: st = st.isel(depth=0)
+                # Conversion FORCÉE en float standard Python pour le JSON
                 t_now = round(float(st["thetao"].values.flatten()[0]), 1)
 
                 # Courants
                 sc = ds_cur.sel(latitude=coords["lat"], longitude=coords["lon"], time=now, method="nearest")
                 if 'depth' in sc.coords: sc = sc.isel(depth=0)
-                uo, vo = sc["uo"].values.flatten()[0], sc["vo"].values.flatten()[0]
-                c_now = round(np.sqrt(uo**2 + vo**2), 2)
+                uo = float(sc["uo"].values.flatten()[0])
+                vo = float(sc["vo"].values.flatten()[0])
+                c_now = round(float(np.sqrt(uo**2 + vo**2)), 2)
 
                 # Vagues
                 sw = ds_wav.sel(latitude=coords["lat"], longitude=coords["lon"], time=now, method="nearest")
@@ -51,16 +55,25 @@ async def fetch_marine_data():
                     "index": fish, "safety": safety,
                     "date": now.strftime("%H:%M")
                 })
-            except: continue
-    except: return None
+                print(f"✅ {name} : {v_now}m | {t_now}°C")
+            except Exception as e: 
+                print(f"⚠️ Erreur zone {name}: {e}")
+                continue
+    except Exception as e:
+        print(f"🔥 Erreur critique Copernicus: {e}")
+        return None
     return results
 
 async def main():
     data = await fetch_marine_data()
     if data:
+        # On s'assure que le dossier de sortie est propre
         with open("data.json", "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
-    else: exit(1)
+        print("🎉 data.json sauvegardé avec succès !")
+    else: 
+        print("❌ Aucune donnée à sauvegarder.")
+        exit(1)
 
 if __name__ == "__main__":
     asyncio.run(main())
