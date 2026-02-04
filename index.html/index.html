@@ -1,85 +1,117 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PecheurConnect - Intelligence Marine</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PecheurConnect - Sénégal</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { margin:0; font-family:sans-serif; } #map { height:100vh; }
-        .marker-label { color:white; padding:5px 10px; border-radius:15px; font-weight:bold; border:2px solid white; display:flex; align-items:center; gap:5px; font-size:13px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
-        .box { background:#f4f4f4; padding:8px; margin:5px 0; border-radius:5px; border-left:4px solid #ccc; text-align:left; font-size: 12px; }
-        .badge-fish { background: #2ecc71; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; float: right; }
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        #map { height: 100vh; width: 100%; }
+        
+        /* Style des boîtes d'info dans les Popups */
+        .box {
+            background: #f8f9fa;
+            border-left: 5px solid #ccc;
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .badge-fish {
+            float: right;
+            background: #27ae60;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        /* Style des étiquettes sur la carte */
+        .marker-label {
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-align: center;
+            border: 1px solid rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            white-space: nowrap;
+        }
     </style>
 </head>
 <body>
+
 <div id="map"></div>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    const map = L.map('map').setView([14.5, -17.2], 7);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
+    // Initialisation de la carte centrée sur le Sénégal
+    const map = L.map('map').setView([14.5, -17.5], 7);
 
-    fetch('./data.json?v=' + Date.now()).then(r => r.json()).then(data => {
-        data.forEach((z, i) => {
-            // Mapping des nouvelles données Copernicus
-            const vNow = z.v_now || z.vagues || 0;
-            const tNow = z.t_now || z.temp_mer || 0;
-            const chl = z.chlorophylle || 0;
-            const current = z.courant_ms || 0;
-            const fishIndex = z.indice_poisson || "MOYEN";
-            const safety = z.securite || "SÛR";
-            
-            // Historique pour le graphique
-            const hDat = z.h_dat || [];
-            const hVal = z.h_val || [];
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
 
-            // Couleur selon sécurité
-            const color = safety === "DANGER" ? '#e74c3c' : '#2ecc71';
-            
-            const popup = `
-                <div style="width:220px">
-                    <h3 style="text-align:center; margin-bottom:5px;">${z.zone}</h3>
-                    <div class="box" style="border-left-color: #3498db">
-                        <b>🌊 État de la mer</b><br>
-                        Vagues : ${vNow}m | Courant : ${current}m/s
+    // Chargement des données générées par l'Action GitHub
+    // On ajoute un timestamp (?v=) pour éviter que le navigateur ne garde une vieille version en cache
+    fetch('./data.json?v=' + Date.now())
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(z => {
+                // Correspondance avec les noms de clés de votre script Python
+                const vagues = z.v_now;
+                const temp = z.t_now;
+                const courant = z.courant_ms;
+                const chl = z.chlorophylle;
+                const indexPêche = z.indice_poisson;
+                const securite = z.securite;
+
+                // Couleur dynamique selon la sécurité
+                const color = (securite === "DANGER") ? '#e74c3c' : '#2ecc71';
+
+                const popupContent = `
+                    <div style="width:220px">
+                        <h3 style="text-align:center; margin:0 0 10px 0; color:#2c3e50;">${z.zone}</h3>
+                        
+                        <div class="box" style="border-left-color: #3498db">
+                            <b>🌊 État de la Mer</b><br>
+                            Vagues : <b>${vagues}m</b><br>
+                            Courant : <b>${courant}m/s</b>
+                        </div>
+
+                        <div class="box" style="border-left-color: #27ae60">
+                            <span class="badge-fish">${indexPêche}</span>
+                            <b>🐟 Potentiel Pêche</b><br>
+                            Température : <b>${temp}°C</b><br>
+                            Chlorophylle : <b>${chl}</b>
+                        </div>
+
+                        <div class="box" style="border-left-color: ${color}">
+                            <b>🛡️ Sécurité : <span style="color:${color}">${securite}</span></b>
+                        </div>
+                        
+                        <div style="font-size:0.7em; color:#95a5a6; text-align:right; margin-top:5px;">
+                            MàJ : ${z.date}
+                        </div>
                     </div>
-                    <div class="box" style="border-left-color: #2ecc71">
-                        <span class="badge-fish">${fishIndex}</span>
-                        <b>🐟 Potentiel Pêche</b><br>
-                        Temp : ${tNow}°C | Chl : ${chl}
-                    </div>
-                    <div class="box" style="border-left-color:${color}">
-                        <b>🛡️ Sécurité : ${safety}</b>
-                    </div>
-                    ${hDat.length > 0 ? `<canvas id="chart-${i}" height="100"></canvas>` : ''}
-                </div>`;
+                `;
 
-            // Label sur la carte : affiche Vagues + Icône Poisson si l'indice est Élevé
-            const markerHtml = `
-                <div class="marker-label" style="background:${color}">
-                    ${vNow}m ${fishIndex === 'ÉLEVÉ' ? '🐟' : ''}
-                </div>`;
-
-            const m = L.marker([z.lat, z.lon], {
-                icon: L.divIcon({ html: markerHtml, iconSize: [85, 30] })
-            }).addTo(map).bindPopup(popup);
-
-            // Graphique de tendance
-            m.on('popupopen', () => {
-                const canvas = document.getElementById(`chart-${i}`);
-                if (!canvas || hDat.length === 0) return;
-
-                new Chart(canvas.getContext('2d'), {
-                    type: 'line',
-                    data: {
-                        labels: hDat.map(d => d.slice(8,10)),
-                        datasets: [{ label:'Temp', data:hVal, borderColor:'#3498db', backgroundColor:'rgba(52, 152, 219, 0.1)', tension:0.3, fill:true }]
-                    },
-                    options: { plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
-                });
+                // Création du marqueur avec étiquette lisible directement sur la carte
+                L.marker([z.lat, z.lon], {
+                    icon: L.divIcon({
+                        className: 'custom-div-icon',
+                        html: `<div class="marker-label" style="background:${color}">${vagues}m | ${temp}°C</div>`,
+                        iconSize: [100, 30],
+                        iconAnchor: [50, 15]
+                    })
+                })
+                .addTo(map)
+                .bindPopup(popupContent);
             });
-        });
-    }).catch(err => console.error("Erreur chargement JSON:", err));
+        })
+        .catch(err => console.error("Erreur de chargement des données :", err));
 </script>
+
 </body>
 </html>
