@@ -1,47 +1,115 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>PecheurConnect - Sénégal</title>
-    <meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PecheurConnect - Dashboard Sénégal</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
         #map { height: 100vh; width: 100%; }
-        .box { background: #f9f9f9; padding: 8px; margin: 4px 0; border-left: 4px solid #3498db; border-radius: 4px; font-family: sans-serif; font-size: 13px; }
-        .marker-label { color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 11px; text-align: center; white-space: nowrap; }
+        
+        /* Styles des Popups */
+        .popup-container { min-width: 200px; }
+        .info-box { 
+            background: #f4f7f6; 
+            border-left: 4px solid #3498db; 
+            padding: 8px; 
+            margin: 5px 0; 
+            border-radius: 4px; 
+            font-size: 13px;
+        }
+        .safety-badge {
+            color: white;
+            text-align: center;
+            padding: 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-top: 8px;
+            letter-spacing: 1px;
+        }
+        /* Style des étiquettes directement sur la carte */
+        .marker-label {
+            color: white;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 11px;
+            text-align: center;
+            white-space: nowrap;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            border: 1px solid rgba(0,0,0,0.1);
+        }
     </style>
 </head>
 <body>
-    <div id="map"></div>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-        const map = L.map('map').setView([14.5, -17.5], 7);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-        fetch('./data.json?v=' + Date.now())
-            .then(res => res.json())
-            .then(data => {
-                data.forEach(z => {
-                    const color = z.securite === "DANGER" ? "#e74c3c" : "#2ecc71";
-                    
-                    const content = `
-                        <div style="min-width:180px">
-                            <h3 style="margin:0; color:#2c3e50">${z.zone}</h3>
-                            <div class="box">🌊 <b>Mer :</b> ${z.v_now}m | ${z.courant_ms}m/s</div>
-                            <div class="box" style="border-left-color:#27ae60">🐟 <b>Pêche :</b> ${z.indice_poisson}<br>🌡️ <b>Temp :</b> ${z.t_now}°C</div>
-                            <div style="background:${color}; color:white; padding:5px; text-align:center; border-radius:4px; font-weight:bold; margin-top:5px">
-                                🛡️ Sécurité : ${z.securite}
-                            </div>
-                            <div style="font-size:9px; text-align:right; margin-top:5px; color:gray">MàJ: ${z.date}</div>
-                        </div>`;
+<div id="map"></div>
 
-                    L.marker([z.lat, z.lon], {
-                        icon: L.divIcon({
-                            html: `<div class="marker-label" style="background:${color}">${z.v_now}m | ${z.t_now}°C</div>`,
-                            iconSize: [85, 25]
-                        })
-                    }).addTo(map).bindPopup(content);
-                });
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // 1. Initialisation de la carte sur le Sénégal
+    const map = L.map('map').setView([14.45, -17.2], 7);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap | PecheurConnect'
+    }).addTo(map);
+
+    // 2. Récupération des données JSON
+    fetch('./data.json?v=' + Date.now()) // Le timestamp évite le cache
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(zone => {
+                // Détermination de la couleur (Rouge si Danger, Vert si Sûr)
+                const isDanger = zone.securite === "DANGER";
+                const statusColor = isDanger ? "#e74c3c" : "#2ecc71";
+                const alertIcon = isDanger ? "⚠️ " : "";
+
+                // Construction du contenu du Popup
+                const popupContent = `
+                    <div class="popup-container">
+                        <h3 style="margin:0 0 10px 0; color:#2c3e50; text-align:center;">${zone.zone}</h3>
+                        
+                        <div class="info-box" style="border-left-color:#3498db">
+                            🌊 <b>MER :</b><br>
+                            Vagues : <b>${zone.v_now}m</b><br>
+                            Courant : <b>${zone.courant_ms}m/s</b>
+                        </div>
+
+                        <div class="info-box" style="border-left-color:#27ae60">
+                            🐟 <b>PÊCHE :</b><br>
+                            Indice : <b>${zone.indice_poisson}</b><br>
+                            Température : <b>${zone.t_now}°C</b>
+                        </div>
+
+                        <div class="safety-badge" style="background:${statusColor}">
+                            ${alertIcon}${zone.securite}
+                        </div>
+                        
+                        <div style="font-size:10px; color:#95a5a6; text-align:right; margin-top:8px;">
+                            Données du : ${zone.date}
+                        </div>
+                    </div>
+                `;
+
+                // 3. Ajout du marqueur sur la carte
+                L.marker([zone.lat, zone.lon], {
+                    icon: L.divIcon({
+                        className: 'custom-div-icon',
+                        html: `<div class="marker-label" style="background:${statusColor}">${alertIcon}${zone.v_now}m | ${zone.t_now}°C</div>`,
+                        iconSize: [100, 25],
+                        iconAnchor: [50, 12]
+                    })
+                })
+                .addTo(map)
+                .bindPopup(popupContent);
             });
-    </script>
+        })
+        .catch(err => {
+            console.error("Erreur lors du chargement des données :", err);
+        });
+</script>
+
 </body>
 </html>
