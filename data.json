@@ -3,7 +3,7 @@
         "zone": "Saint-Louis",
         "lat": 16.03,
         "lon": -16.51,
-        "date_update": "03:50",
+        "date_update": "03:59",
         "forecasts": [
             {
                 "jour": "Thursday",
@@ -35,7 +35,7 @@
         "zone": "Kayar",
         "lat": 14.91,
         "lon": -17.12,
-        "date_update": "03:50",
+        "date_update": "03:59",
         "forecasts": [
             {
                 "jour": "Thursday",
@@ -67,7 +67,7 @@
         "zone": "Dakar",
         "lat": 14.68,
         "lon": -17.44,
-        "date_update": "03:50",
+        "date_update": "03:59",
         "forecasts": [
             {
                 "jour": "Thursday",
@@ -99,7 +99,7 @@
         "zone": "Mbour",
         "lat": 14.41,
         "lon": -16.96,
-        "date_update": "03:50",
+        "date_update": "03:59",
         "forecasts": [
             {
                 "jour": "Thursday",
@@ -131,7 +131,7 @@
         "zone": "Ziguinchor",
         "lat": 12.58,
         "lon": -16.27,
-        "date_update": "03:50",
+        "date_update": "03:59",
         "forecasts": [
             {
                 "jour": "Thursday",
