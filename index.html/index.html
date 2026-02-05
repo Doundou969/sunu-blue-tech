@@ -3,164 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PecheurConnect 🇸🇳 | Sécurité Maritime</title>
-    
+    <title>PecheurConnect PRO 🇸🇳</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
     <style>
         :root { 
-            --primary: #0056b3; 
-            --danger: #d9534f; 
-            --safe: #28a745; 
-            --dark: #2c3e50;
-            --whatsapp: #25D366;
+            --bg: #f4f7f6; --text: #2c3e50; --panel: rgba(255,255,255,0.9);
+            --primary: #0056b3; --whatsapp: #25D366;
+        }
+        /* Mode Nuit Automatique */
+        @media (prefers-color-scheme: dark) {
+            :root { --bg: #1a1a1a; --text: #ecf0f1; --panel: rgba(44, 62, 80, 0.9); }
         }
 
-        body { margin: 0; font-family: 'Segoe UI', Roboto, sans-serif; overflow: hidden; background: #f4f7f6; }
-        #map { height: 100vh; width: 100%; z-index: 1; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); }
+        #map { height: 100vh; width: 100%; }
 
-        /* Barre de Recherche et En-tête */
-        .search-container {
-            position: absolute; top: 15px; left: 15px; right: 15px; z-index: 1000;
-            max-width: 400px;
+        /* Sélecteur de prévisions */
+        .forecast-selector {
+            position: absolute; top: 85px; left: 15px; z-index: 1000;
+            display: flex; gap: 5px; background: var(--panel); padding: 5px; border-radius: 20px;
         }
-        .brand-header {
-            background: white; margin-bottom: 10px; padding: 12px 20px;
-            border-radius: 12px; display: flex; align-items: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-left: 5px solid var(--primary);
+        .day-btn { 
+            border: none; padding: 8px 15px; border-radius: 15px; cursor: pointer;
+            background: transparent; color: var(--text); font-weight: bold;
         }
-        .brand-header h1 { margin: 0; font-size: 18px; color: var(--dark); font-weight: 800; }
+        .day-btn.active { background: var(--primary); color: white; }
 
-        .search-box {
-            width: 100%; padding: 12px 20px; border-radius: 25px; border: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); font-size: 16px; outline: none;
-            box-sizing: border-box;
+        /* Calculateur de carburant */
+        .fuel-calc {
+            margin-top: 10px; padding: 10px; background: #eef2f3; border-radius: 8px; color: #333; font-size: 11px;
         }
-
-        /* Panneau d'information */
-        .info-panel {
-            position: absolute; bottom: 30px; left: 15px; z-index: 1000;
-            background: rgba(255, 255, 255, 0.95); padding: 15px; border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); font-size: 12px;
-            backdrop-filter: blur(5px);
-        }
-        .status-legend { display: flex; gap: 15px; margin-top: 5px; }
-
-        /* Badge des Vagues sur la Carte */
-        .wave-badge {
-            color: white; padding: 5px 10px; border-radius: 20px;
-            font-weight: bold; font-size: 12px; border: 2px solid white;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.3); text-align: center;
-            min-width: 55px;
-        }
-
-        /* Bouton WhatsApp Flottant */
-        .whatsapp-btn {
-            position: absolute; bottom: 30px; right: 20px; z-index: 1000;
-            background: var(--whatsapp); color: white; width: 60px; height: 60px;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .whatsapp-btn:hover { transform: scale(1.1); }
-        .whatsapp-btn svg { width: 32px; height: 32px; fill: white; }
-
-        /* Popup Styling */
-        .leaflet-popup-content-wrapper { border-radius: 12px; padding: 5px; }
-        .popup-title { border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 8px; font-size: 16px; }
+        
+        .whatsapp-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; background: var(--whatsapp); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="search-container">
-        <div class="brand-header">
-            <h1>🇸🇳 PecheurConnect</h1>
-        </div>
-        <input type="text" id="zoneSearch" class="search-box" placeholder="🔍 Chercher un port (Kayar, Ndar...)">
-    </div>
-
-    <div class="info-panel">
-        <div id="update-tag" style="color:var(--primary); font-weight:bold; margin-bottom:5px;">Mise à jour : --:--</div>
-        <div class="status-legend">
-            <span><b style="color:var(--safe)">●</b> Sûr</span>
-            <span><b style="color:var(--danger)">●</b> Danger</span>
+    <div class="search-container" style="position: absolute; top: 15px; left: 15px; right: 15px; z-index: 1000; max-width: 400px;">
+        <div style="background: white; padding: 10px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: flex; align-items: center;">
+            <h2 style="margin:0; font-size:16px;">🇸🇳 PecheurConnect PRO</h2>
         </div>
     </div>
 
-    <div class="whatsapp-btn" onclick="openWhatsAppReport()" title="Signaler un danger">
-        <svg viewBox="0 0 24 24"><path d="M12.031 6.172c-2.32 0-4.591 1.342-5.467 3.398-.19.447-.442 1.397-.442 2.43 0 1.258.423 2.185.834 2.893l-.75 2.15 2.222-.72c.607.35 1.417.618 2.204.618 2.32 0 4.59-1.342 5.466-3.397.876-2.056.463-4.11-.96-5.353-.96-.842-1.802-1.02-3.107-1.02zm-2.015 7.15c-.18 0-.324-.045-.434-.135s-.166-.215-.166-.374c0-.158.056-.285.166-.38s.255-.143.434-.143c.18 0 .324.048.434.143s.166.222.166.38c0 .16-.056.284-.166.374s-.255.135-.434.135zm2.844 0c-.18 0-.324-.045-.434-.135s-.166-.215-.166-.374c0-.158.056-.285.166-.38s.255-.143.434-.143c.18 0 .324.048.434.143s.166.222.166.38c0 .16-.056.284-.166.374s-.255.135-.434.135z"/></svg>
+    <div class="forecast-selector">
+        <button class="day-btn active" onclick="changeDay(0)">Aujourd'hui</button>
+        <button class="day-btn" onclick="changeDay(1)">Demain</button>
+        <button class="day-btn" onclick="changeDay(2)">J+2</button>
     </div>
 
     <div id="map"></div>
 
+    <div class="whatsapp-btn" onclick="window.open('https://wa.me/221XXXXXXXXX')">📢</div>
+
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Initialisation de la carte centrée sur le Sénégal
-            const map = L.map('map', { zoomControl: false }).setView([14.45, -17.2], 7);
-            const markers = [];
+        let currentDay = 0;
+        let globalData = [];
+        const map = L.map('map', { zoomControl: false }).setView([14.45, -17.2], 7);
+        const markerGroup = L.layerGroup().addTo(map);
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap | PecheurConnect'
-            }).addTo(map);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
 
-            L.control.zoom({ position: 'bottomright' }).addTo(map);
-
-            // Chargement des données JSON
+        function loadData() {
             fetch('./data.json?v=' + Date.now())
                 .then(res => res.json())
                 .then(data => {
-                    // Mise à jour de l'heure
-                    document.getElementById('update-tag').innerText = "Mise à jour : " + (data[0].date || "En cours");
-
-                    data.forEach(item => {
-                        const isDanger = (item.safety || "").includes("🔴");
-                        const color = isDanger ? "#d9534f" : "#28a745";
-
-                        const marker = L.marker([item.lat, item.lon], {
-                            icon: L.divIcon({
-                                className: 'custom-div-icon',
-                                html: `<div class="wave-badge" style="background:${color}">${item.v_now}m</div>`,
-                                iconSize: [65, 30]
-                            })
-                        }).addTo(map);
-
-                        const popupContent = `
-                            <div style="min-width:180px;">
-                                <div class="popup-title"><b style="color:var(--primary)">📍 ${item.zone}</b></div>
-                                🌊 <b>Vagues :</b> ${item.v_now}m<br>
-                                🌡️ <b>Température :</b> ${item.t_now}°C<br>
-                                🧭 <b>Courant :</b> ${item.c_now}m/s<br>
-                                🐟 <b>Pêche :</b> ${item.index}<br>
-                                <div style="margin-top:10px; padding:8px; border-radius:6px; background:${color}; color:white; text-align:center; font-weight:bold;">
-                                    ${item.safety}
-                                </div>
-                            </div>
-                        `;
-                        
-                        marker.bindPopup(popupContent);
-                        markers.push({ name: item.zone.toLowerCase(), marker: marker, latlng: [item.lat, item.lon] });
-                    });
-                })
-                .catch(err => console.error("Erreur chargement données:", err));
-
-            // Logique de recherche dynamique
-            document.getElementById('zoneSearch').addEventListener('input', function(e) {
-                const search = e.target.value.toLowerCase();
-                const found = markers.find(m => m.name.includes(search));
-                if (found && search.length > 2) {
-                    map.flyTo(found.latlng, 10);
-                    found.marker.openPopup();
-                }
-            });
-        });
-
-        // Fonction WhatsApp
-        function openWhatsAppReport() {
-            const phoneNumber = "221777020818"; // REMPLACER PAR VOTRE NUMÉRO
-            const message = encodeURIComponent("📢 *SIGNALEMENT PECHEURCONNECT*\n\nJe signale un changement en mer :\n\n📍 Zone : \n🌊 État : \n⚠️ Commentaire : ");
-            window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+                    globalData = data;
+                    renderMarkers();
+                });
         }
+
+        function renderMarkers() {
+            markerGroup.clearLayers();
+            globalData.forEach(item => {
+                const dayData = item.forecasts[currentDay];
+                const color = dayData.safety.includes("🔴") ? "#d9534f" : "#28a745";
+                
+                // Calcul de carburant simplifié : conso de base + (0.5L par 0.1m de vague)
+                const fuelEst = 20 + (dayData.v_now * 5);
+
+                const marker = L.marker([item.lat, item.lon], {
+                    icon: L.divIcon({
+                        className: 'custom',
+                        html: `<div style="background:${color}; color:white; padding:5px; border-radius:10px; font-weight:bold; border:2px solid white; width:50px; text-align:center;">${dayData.v_now}m</div>`
+                    })
+                }).addTo(markerGroup);
+
+                marker.bindPopup(`
+                    <b>📍 ${item.zone} (${dayData.jour})</b><br>
+                    🌊 Vagues : ${dayData.v_now}m<br>
+                    🐟 Pêche : ${dayData.index}<br>
+                    <div class="fuel-calc">
+                        ⛽ Est. Carburant : <b>~${fuelEst.toFixed(1)} Litres</b><br>
+                        (Basé sur courant/vagues)
+                    </div>
+                `);
+            });
+        }
+
+        function changeDay(day) {
+            currentDay = day;
+            document.querySelectorAll('.day-btn').forEach((btn, idx) => {
+                btn.classList.toggle('active', idx === day);
+            });
+            renderMarkers();
+        }
+
+        loadData();
     </script>
 </body>
 </html>
