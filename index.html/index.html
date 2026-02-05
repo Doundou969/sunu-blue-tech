@@ -3,46 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PecheurConnect - Sénégal</title>
+    <title>PecheurConnect 🇸🇳</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        :root { --danger: #e74c3c; --safe: #2ecc71; --primary: #2980b9; }
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; }
+        :root { --main-blue: #0056b3; --danger-red: #d9534f; --safe-green: #28a745; }
+        body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         #map { height: 100vh; width: 100%; z-index: 1; }
         
-        .header { 
-            position: absolute; top: 10px; left: 50px; z-index: 1000;
-            background: white; padding: 10px 20px; border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2); border-left: 5px solid var(--primary);
+        .top-bar {
+            position: absolute; top: 10px; left: 10px; right: 10px; z-index: 1000;
+            background: white; padding: 12px; border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex;
+            justify-content: space-between; align-items: center; border-bottom: 3px solid var(--main-blue);
         }
-        .header h1 { margin: 0; font-size: 18px; color: #2c3e50; }
-        
-        .legend {
-            position: absolute; bottom: 30px; right: 10px; z-index: 1000;
-            background: white; padding: 10px; border-radius: 5px; font-size: 12px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.2);
-        }
-        .legend-item { display: flex; align-items: center; margin-bottom: 5px; }
-        .dot { height: 10px; width: 10px; border-radius: 50%; margin-right: 8px; }
+        .top-bar h1 { margin: 0; font-size: 16px; color: var(--main-blue); }
+        .last-update { font-size: 10px; color: #666; }
 
-        .custom-label {
-            color: white; padding: 5px 10px; border-radius: 20px;
-            font-weight: bold; font-size: 12px; text-align: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3); border: 2px solid white;
+        .legend {
+            position: absolute; bottom: 20px; left: 10px; z-index: 1000;
+            background: rgba(255,255,255,0.9); padding: 8px; border-radius: 6px; font-size: 11px;
+        }
+        .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+
+        /* Style des bulles sur la carte */
+        .wave-badge {
+            color: white; padding: 4px 8px; border-radius: 12px;
+            font-weight: bold; font-size: 12px; border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3); text-align: center;
         }
     </style>
 </head>
 <body>
 
-    <div class="header">
+    <div class="top-bar">
         <h1>🇸🇳 PecheurConnect</h1>
-        <small id="update-time">Chargement...</small>
+        <div id="meta-info" class="last-update">Chargement...</div>
     </div>
 
     <div class="legend">
-        <b>Sécurité :</b>
-        <div class="legend-item"><span class="dot" style="background:var(--safe)"></span> Sortie Autorisée</div>
-        <div class="legend-item"><span class="dot" style="background:var(--danger)"></span> Sortie Dangereuse</div>
+        <div><span class="status-dot" style="background:var(--safe-green)"></span> Sortie Autorisée</div>
+        <div><span class="status-dot" style="background:var(--danger-red)"></span> Vigilance Requise</div>
     </div>
 
     <div id="map"></div>
@@ -51,35 +51,37 @@
     <script>
         window.onload = function() {
             const map = L.map('map', { zoomControl: false }).setView([14.45, -17.2], 7);
-            L.control.zoom({ position: 'bottomleft' }).addTo(map);
-
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+            L.control.zoom({ position: 'bottomright' }).addTo(map);
 
             fetch('./data.json?v=' + Date.now())
                 .then(res => res.json())
                 .then(data => {
-                    document.getElementById('update-time').innerText = "MàJ : " + data[0].date;
+                    document.getElementById('meta-info').innerHTML = "Données : " + data[0].date;
                     
                     data.forEach(item => {
-                        const isDanger = item.safety.includes("🔴");
-                        const color = isDanger ? "#e74c3c" : "#2ecc71";
+                        const isDanger = item.safety.includes("DANGER");
+                        const color = isDanger ? "#d9534f" : "#28a745";
 
                         L.marker([item.lat, item.lon], {
                             icon: L.divIcon({
-                                className: 'custom-icon',
-                                html: `<div class="custom-label" style="background:${color}">${item.v_now}m</div>`,
-                                iconSize: [60, 30]
+                                className: 'custom-div-icon',
+                                html: `<div class="wave-badge" style="background:${color}">${item.v_now}m</div>`,
+                                iconSize: [50, 25]
                             })
                         })
                         .addTo(map)
                         .bindPopup(`
-                            <div style="font-size:14px;">
-                                <b style="font-size:16px;">${item.zone}</b><br><br>
+                            <div style="font-size:14px; line-height:1.6;">
+                                <b style="font-size:16px; color:#333;">📍 ${item.zone}</b><br>
+                                <hr style="border:0; border-top:1px solid #eee;">
                                 🌊 Vagues : <b>${item.v_now}m</b><br>
-                                🌡️ Temp : <b>${item.t_now}°C</b><br>
-                                🧭 Courant : <b>${item.c_now}m/s</b><br><hr>
-                                🛡️ État : <b>${item.safety}</b><br>
-                                🐟 Pêche : <b>${item.index}</b>
+                                🌡️ Température : <b>${item.t_now}°C</b><br>
+                                🧭 Courant : <b>${item.c_now}m/s</b><br>
+                                🐟 Pêche : <b>${item.index}</b><br>
+                                <div style="margin-top:8px; padding:5px; border-radius:4px; background:${color}; color:white; text-align:center; font-weight:bold;">
+                                    ${item.safety}
+                                </div>
                             </div>
                         `);
                     });
