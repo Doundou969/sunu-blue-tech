@@ -2,42 +2,37 @@ name: Update PecheurConnect Data
 
 on:
   schedule:
-    - cron: '0 */6 * * *' # S'exécute toutes les 6 heures (00h, 06h, 12h, 18h)
-  workflow_dispatch: # Permet de lancer la mise à jour manuellement pour tester
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
 
 permissions:
-  contents: write # Autorise explicitement le bot à modifier data.json sur votre dépôt
+  contents: write
 
 jobs:
-  update_data:
+  update:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4 # Version 4 plus rapide et stable
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-
-      - name: Install dependencies
+      
+      - name: Install Libs
         run: |
-          python -m pip install --upgrade pip
-          pip install copernicusmarine numpy xarray netcdf4 requests python-dotenv
-
-      - name: Run Marine Script
+          pip install requests xarray netcdf4 numpy
+          
+      - name: Run Script
         env:
-          COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
-          COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_ID: ${{ secrets.TG_ID }}
+          COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
+          COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
         run: python script_peche.py
-
-      - name: Commit and Push changes
+        
+      - name: Save to Repo
         run: |
-          git config --global user.name "PecheurConnect-Bot"
+          git config --global user.name "Bot-PecheurConnect"
           git config --global user.email "bot@pecheurconnect.sn"
           git add data.json
-          # Le "exit 0" évite que le workflow marque une erreur s'il n'y a pas de changement de données
-          git commit -m "Auto-update marine data: $(date)" || exit 0
+          git commit -m "Auto-update: $(date)" || exit 0
           git push
