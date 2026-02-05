@@ -3,160 +3,160 @@
         "zone": "Saint-Louis",
         "lat": 16.03,
         "lon": -16.51,
+        "date_update": "03:17",
         "forecasts": [
             {
                 "jour": "Thursday",
-                "v_now": 1.2,
-                "t_now": 22.5,
-                "c_now": 0.4,
-                "safety": "\ud83d\udfe2 S\u00dbR",
-                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+                "v_now": 1.1,
+                "t_now": 21.5,
+                "c_now": 0.3,
+                "safety": "🟢 SÛR",
+                "index": "Excellent 🐟🐟🐟"
             },
             {
                 "jour": "Friday",
-                "v_now": 1.5,
+                "v_now": 1.3,
                 "t_now": 22.5,
                 "c_now": 0.4,
-                "safety": "\ud83d\udfe2 S\u00dbR",
-                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+                "safety": "🟢 SÛR",
+                "index": "Excellent 🐟🐟🐟"
             },
             {
                 "jour": "Saturday",
-                "v_now": 1.8,
-                "t_now": 22.5,
-                "c_now": 0.4,
-                "safety": "\ud83d\udfe2 S\u00dbR",
-                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+                "v_now": 1.5,
+                "t_now": 23.5,
+                "c_now": 0.5,
+                "safety": "🟢 SÛR",
+                "index": "Bon 🐟🐟"
             }
-        ],
-        "date_update": "02:57"
+        ]
     },
     {
         "zone": "Kayar",
         "lat": 14.91,
         "lon": -17.12,
+        "date_update": "03:17",
         "forecasts": [
             {
                 "jour": "Thursday",
-                "v_now": 1.2,
-                "t_now": 22.5,
-                "c_now": 0.4,
-                "safety": "\ud83d\udfe2 S\u00dbR",
-                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+                "v_now": 1.1,
+                "t_now": 21.5,
+                "c_now": 0.3,
+                "safety": "🟢 SÛR",
+                "index": "Excellent 🐟🐟🐟"
             },
             {
                 "jour": "Friday",
-                "v_now": 1.5,
+                "v_now": 1.3,
                 "t_now": 22.5,
                 "c_now": 0.4,
-                "safety": "\ud83d\udfe2 S\u00dbR",
-                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+                "safety": "🟢 SÛR",
+                "index": "Excellent 🐟🐟🐟"
             },
             {
                 "jour": "Saturday",
-                "v_now": 1.8,
-                "t_now": 22.5,
-                "c_now": 0.4,
-                "safety": "\ud83d\udfe2 S\u00dbR",
-                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+                "v_now": 1.5,
+                "t_now": 23.5,
+                "c_now": 0.5,
+                "safety": "🟢 SÛR",
+                "index": "Bon 🐟🐟"
             }
-        ],
-        "date_update": "02:57"
+        ]
     },
     {
         "zone": "Dakar",
         "lat": 14.68,
         "lon": -17.44,
+        "date_update": "03:17",
         "forecasts": [
             {
                 "jour": "Thursday",
-                "v_now": 1.2,
-                "t_now": 22.5,
-                "c_now": 0.4,
-                "safety": "\ud83d\udfe2 S\u00dbR",
-                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+                "v_now": 1.1,
+                "t_now": 21.5,
+                "c_now": 0.3,
+                "safety": "🟢 SÛR",
+                "index": "Excellent 🐟🐟🐟"
             },
             {
                 "jour": "Friday",
-                "v_now": 1.5,
+                "v_now": 1.3,
                 "t_now": 22.5,
                 "c_now": 0.4,
-                "safety": "\ud83d\udfe2 S\u00dbR",
-                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+                "safety": "🟢 SÛR",
+                "index": "Excellent 🐟🐟🐟"
             },
             {
                 "jour": "Saturday",
-                "v_now": 1.8,
-                "t_now": 22.5,
-                "c_now": 0.4,
-                "safety": "\ud83d\udfe2 S\u00dbR",
-                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+                "v_now": 1.5,
+                "t_now": 23.5,
+                "c_now": 0.5,
+                "safety": "🟢 SÛR",
+                "index": "Bon 🐟🐟"
             }
-        ],
-        "date_update": "02:57"
+        ]
     },
     {
         "zone": "Mbour",
         "lat": 14.41,
         "lon": -16.96,
+        "date_update": "03:17",
         "forecasts": [
             {
                 "jour": "Thursday",
-                "v_now": 1.2,
-                "t_now": 22.5,
-                "c_now": 0.4,
-                "safety": "\ud83d\udfe2 S\u00dbR",
-                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+                "v_now": 1.1,
+                "t_now": 21.5,
+                "c_now": 0.3,
+                "safety": "🟢 SÛR",
+                "index": "Excellent 🐟🐟🐟"
             },
             {
                 "jour": "Friday",
-                "v_now": 1.5,
+                "v_now": 1.3,
                 "t_now": 22.5,
                 "c_now": 0.4,
-                "safety": "\ud83d\udfe2 S\u00dbR",
-                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+                "safety": "🟢 SÛR",
+                "index": "Excellent 🐟🐟🐟"
             },
             {
                 "jour": "Saturday",
-                "v_now": 1.8,
-                "t_now": 22.5,
-                "c_now": 0.4,
-                "safety": "\ud83d\udfe2 S\u00dbR",
-                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+                "v_now": 1.5,
+                "t_now": 23.5,
+                "c_now": 0.5,
+                "safety": "🟢 SÛR",
+                "index": "Bon 🐟🐟"
             }
-        ],
-        "date_update": "02:57"
+        ]
     },
     {
         "zone": "Ziguinchor",
         "lat": 12.58,
         "lon": -16.27,
+        "date_update": "03:17",
         "forecasts": [
             {
                 "jour": "Thursday",
-                "v_now": 1.2,
-                "t_now": 22.5,
-                "c_now": 0.4,
-                "safety": "\ud83d\udfe2 S\u00dbR",
-                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+                "v_now": 1.1,
+                "t_now": 21.5,
+                "c_now": 0.3,
+                "safety": "🟢 SÛR",
+                "index": "Excellent 🐟🐟🐟"
             },
             {
                 "jour": "Friday",
-                "v_now": 1.5,
+                "v_now": 1.3,
                 "t_now": 22.5,
                 "c_now": 0.4,
-                "safety": "\ud83d\udfe2 S\u00dbR",
-                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+                "safety": "🟢 SÛR",
+                "index": "Excellent 🐟🐟🐟"
             },
             {
                 "jour": "Saturday",
-                "v_now": 1.8,
-                "t_now": 22.5,
-                "c_now": 0.4,
-                "safety": "\ud83d\udfe2 S\u00dbR",
-                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+                "v_now": 1.5,
+                "t_now": 23.5,
+                "c_now": 0.5,
+                "safety": "🟢 SÛR",
+                "index": "Bon 🐟🐟"
             }
-        ],
-        "date_update": "02:57"
+        ]
     }
 ]
