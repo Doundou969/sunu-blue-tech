@@ -6,13 +6,14 @@
     <title>PecheurConnect - Sénégal</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        body { margin: 0; padding: 0; }
-        #map { height: 100vh; width: 100%; background: #e0e0e0; }
+        body { margin: 0; padding: 0; font-family: sans-serif; }
+        #map { height: 100vh; width: 100%; background: #f0f0f0; }
         .marker-label {
-            color: white; padding: 3px 6px; border-radius: 4px;
-            font-weight: bold; font-size: 11px; white-space: nowrap;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            color: white; padding: 4px 8px; border-radius: 4px;
+            font-weight: bold; font-size: 11px; text-align: center;
+            white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
+        .popup-card { min-width: 180px; }
     </style>
 </head>
 <body>
@@ -20,24 +21,39 @@
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-        // On attend que le DOM soit chargé pour éviter "Map container not found"
-        document.addEventListener("DOMContentLoaded", function() {
-            
-            // Initialisation
-            const map = L.map('map').setView([14.45, -17.2], 7);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-            // Chargement des données
+    <script>
+        // On attend que le navigateur ait fini de dessiner la page (DOM)
+        window.onload = function() {
+            console.log("Démarrage de PecheurConnect...");
+
+            // Initialisation de la carte sur le Sénégal
+            const map = L.map('map').setView([14.45, -17.2], 7);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+
+            // Chargement des données avec gestion d'erreur 404
+            // On utilise './data.json' car il est dans le même dossier sur GitHub
             fetch('./data.json?v=' + Date.now())
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Le fichier data.json n'a pas été trouvé (Erreur 404).");
+                    }
+                    return response.json();
+                })
                 .then(data => {
+                    console.log("Données reçues :", data);
+                    
                     data.forEach(item => {
+                        // Nettoyage et sécurité des données
                         const vagues = item.v_now || "0";
                         const temp = item.t_now || "0";
                         const securite = (item.safety || "SÛR").toString();
                         const color = securite.includes("DANGER") ? "#e74c3c" : "#2ecc71";
 
+                        // Ajout du marqueur
                         L.marker([item.lat, item.lon], {
                             icon: L.divIcon({
                                 className: 'custom-icon',
@@ -46,11 +62,25 @@
                             })
                         })
                         .addTo(map)
-                        .bindPopup(`<b>${item.zone}</b><br>Mer: ${vagues}m<br>Sécurité: ${securite}`);
+                        .bindPopup(`
+                            <div class="popup-card">
+                                <b>📍 ${item.zone}</b><br>
+                                🌊 Vagues : ${vagues}m<br>
+                                🌡️ Temp : ${temp}°C<br>
+                                🛡️ Sécurité : <b>${securite}</b>
+                            </div>
+                        `);
                     });
                 })
-                .catch(err => console.error("Erreur JSON:", err));
-        });
+                .catch(err => {
+                    console.error("Erreur critique :", err.message);
+                    // On affiche une petite info sur la carte en cas d'erreur
+                    L.popup()
+                        .setLatLng([14.45, -17.2])
+                        .setContent("⚠️ Erreur : Impossible de charger les données (data.json manquant).")
+                        .openOn(map);
+                });
+        };
     </script>
 </body>
 </html>
