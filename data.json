@@ -1,57 +1,162 @@
 [
-  {
-    "zone": "SAINT-LOUIS",
-    "lat": 16.05,
-    "lon": -16.65,
-    "v_now": 2.22,
-    "t_now": 17.6,
-    "c_now": 0.22,
-    "index": "🐟 ÉLEVÉ",
-    "safety": "🔴 DANGER",
-    "date": "05/02 02:07"
-  },
-  {
-    "zone": "KAYAR",
-    "lat": 14.95,
-    "lon": -17.35,
-    "v_now": 2.43,
-    "t_now": 19.2,
-    "c_now": 0.13,
-    "index": "🐟 ÉLEVÉ",
-    "safety": "🔴 DANGER",
-    "date": "05/02 02:07"
-  },
-  {
-    "zone": "DAKAR-YOFF",
-    "lat": 14.8,
-    "lon": -17.65,
-    "v_now": 2.54,
-    "t_now": 20.0,
-    "c_now": 0.02,
-    "index": "🐟 ÉLEVÉ",
-    "safety": "🔴 DANGER",
-    "date": "05/02 02:07"
-  },
-  {
-    "zone": "MBOUR-JOAL",
-    "lat": 14.35,
-    "lon": -17.15,
-    "v_now": 1.23,
-    "t_now": 18.9,
-    "c_now": 0.24,
-    "index": "🐟 ÉLEVÉ",
-    "safety": "🟢 SÛR",
-    "date": "05/02 02:07"
-  },
-  {
-    "zone": "CASAMANCE",
-    "lat": 12.5,
-    "lon": -16.95,
-    "v_now": 0.9,
-    "t_now": 23.1,
-    "c_now": 0.11,
-    "index": "🎣 MOYEN",
-    "safety": "🟢 SÛR",
-    "date": "05/02 02:07"
-  }
+    {
+        "zone": "Saint-Louis",
+        "lat": 16.03,
+        "lon": -16.51,
+        "forecasts": [
+            {
+                "jour": "Thursday",
+                "v_now": 1.2,
+                "t_now": 22.5,
+                "c_now": 0.4,
+                "safety": "\ud83d\udfe2 S\u00dbR",
+                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+            },
+            {
+                "jour": "Friday",
+                "v_now": 1.5,
+                "t_now": 22.5,
+                "c_now": 0.4,
+                "safety": "\ud83d\udfe2 S\u00dbR",
+                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+            },
+            {
+                "jour": "Saturday",
+                "v_now": 1.8,
+                "t_now": 22.5,
+                "c_now": 0.4,
+                "safety": "\ud83d\udfe2 S\u00dbR",
+                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+            }
+        ],
+        "date_update": "02:57"
+    },
+    {
+        "zone": "Kayar",
+        "lat": 14.91,
+        "lon": -17.12,
+        "forecasts": [
+            {
+                "jour": "Thursday",
+                "v_now": 1.2,
+                "t_now": 22.5,
+                "c_now": 0.4,
+                "safety": "\ud83d\udfe2 S\u00dbR",
+                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+            },
+            {
+                "jour": "Friday",
+                "v_now": 1.5,
+                "t_now": 22.5,
+                "c_now": 0.4,
+                "safety": "\ud83d\udfe2 S\u00dbR",
+                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+            },
+            {
+                "jour": "Saturday",
+                "v_now": 1.8,
+                "t_now": 22.5,
+                "c_now": 0.4,
+                "safety": "\ud83d\udfe2 S\u00dbR",
+                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+            }
+        ],
+        "date_update": "02:57"
+    },
+    {
+        "zone": "Dakar",
+        "lat": 14.68,
+        "lon": -17.44,
+        "forecasts": [
+            {
+                "jour": "Thursday",
+                "v_now": 1.2,
+                "t_now": 22.5,
+                "c_now": 0.4,
+                "safety": "\ud83d\udfe2 S\u00dbR",
+                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+            },
+            {
+                "jour": "Friday",
+                "v_now": 1.5,
+                "t_now": 22.5,
+                "c_now": 0.4,
+                "safety": "\ud83d\udfe2 S\u00dbR",
+                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+            },
+            {
+                "jour": "Saturday",
+                "v_now": 1.8,
+                "t_now": 22.5,
+                "c_now": 0.4,
+                "safety": "\ud83d\udfe2 S\u00dbR",
+                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+            }
+        ],
+        "date_update": "02:57"
+    },
+    {
+        "zone": "Mbour",
+        "lat": 14.41,
+        "lon": -16.96,
+        "forecasts": [
+            {
+                "jour": "Thursday",
+                "v_now": 1.2,
+                "t_now": 22.5,
+                "c_now": 0.4,
+                "safety": "\ud83d\udfe2 S\u00dbR",
+                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+            },
+            {
+                "jour": "Friday",
+                "v_now": 1.5,
+                "t_now": 22.5,
+                "c_now": 0.4,
+                "safety": "\ud83d\udfe2 S\u00dbR",
+                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+            },
+            {
+                "jour": "Saturday",
+                "v_now": 1.8,
+                "t_now": 22.5,
+                "c_now": 0.4,
+                "safety": "\ud83d\udfe2 S\u00dbR",
+                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+            }
+        ],
+        "date_update": "02:57"
+    },
+    {
+        "zone": "Ziguinchor",
+        "lat": 12.58,
+        "lon": -16.27,
+        "forecasts": [
+            {
+                "jour": "Thursday",
+                "v_now": 1.2,
+                "t_now": 22.5,
+                "c_now": 0.4,
+                "safety": "\ud83d\udfe2 S\u00dbR",
+                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+            },
+            {
+                "jour": "Friday",
+                "v_now": 1.5,
+                "t_now": 22.5,
+                "c_now": 0.4,
+                "safety": "\ud83d\udfe2 S\u00dbR",
+                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+            },
+            {
+                "jour": "Saturday",
+                "v_now": 1.8,
+                "t_now": 22.5,
+                "c_now": 0.4,
+                "safety": "\ud83d\udfe2 S\u00dbR",
+                "index": "Excellent \ud83d\udc1f\ud83d\udc1f\ud83d\udc1f"
+            }
+        ],
+        "date_update": "02:57"
+    }
 ]
