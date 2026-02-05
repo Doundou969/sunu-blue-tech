@@ -9,18 +9,20 @@ permissions:
   contents: write
 
 jobs:
-  update:
+  update_data:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      
-      - name: Install Libs
-        run: |
-          pip install requests xarray netcdf4 numpy
-          
+
+      - name: Install Dependencies
+        run: pip install requests xarray netcdf4 numpy
+
       - name: Run Script
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
@@ -28,11 +30,11 @@ jobs:
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
         run: python script_peche.py
-        
-      - name: Save to Repo
+
+      - name: Commit and Push
         run: |
-          git config --global user.name "Bot-PecheurConnect"
+          git config --global user.name "PecheurConnect-Bot"
           git config --global user.email "bot@pecheurconnect.sn"
           git add data.json
-          git commit -m "Auto-update: $(date)" || exit 0
+          git commit -m "Auto-update marine data: $(date)" || exit 0
           git push
