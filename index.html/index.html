@@ -6,79 +6,83 @@
     <title>PecheurConnect - Sénégal</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        body { margin: 0; padding: 0; font-family: sans-serif; }
-        #map { height: 100vh; width: 100%; background: #f0f0f0; }
-        .marker-label {
-            color: white; padding: 4px 8px; border-radius: 4px;
-            font-weight: bold; font-size: 11px; text-align: center;
-            white-space: nowrap; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        :root { --danger: #e74c3c; --safe: #2ecc71; --primary: #2980b9; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; }
+        #map { height: 100vh; width: 100%; z-index: 1; }
+        
+        .header { 
+            position: absolute; top: 10px; left: 50px; z-index: 1000;
+            background: white; padding: 10px 20px; border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2); border-left: 5px solid var(--primary);
         }
-        .popup-card { min-width: 180px; }
+        .header h1 { margin: 0; font-size: 18px; color: #2c3e50; }
+        
+        .legend {
+            position: absolute; bottom: 30px; right: 10px; z-index: 1000;
+            background: white; padding: 10px; border-radius: 5px; font-size: 12px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+        }
+        .legend-item { display: flex; align-items: center; margin-bottom: 5px; }
+        .dot { height: 10px; width: 10px; border-radius: 50%; margin-right: 8px; }
+
+        .custom-label {
+            color: white; padding: 5px 10px; border-radius: 20px;
+            font-weight: bold; font-size: 12px; text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3); border: 2px solid white;
+        }
     </style>
 </head>
 <body>
 
+    <div class="header">
+        <h1>🇸🇳 PecheurConnect</h1>
+        <small id="update-time">Chargement...</small>
+    </div>
+
+    <div class="legend">
+        <b>Sécurité :</b>
+        <div class="legend-item"><span class="dot" style="background:var(--safe)"></span> Sortie Autorisée</div>
+        <div class="legend-item"><span class="dot" style="background:var(--danger)"></span> Sortie Dangereuse</div>
+    </div>
+
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
     <script>
-        // On attend que le navigateur ait fini de dessiner la page (DOM)
         window.onload = function() {
-            console.log("Démarrage de PecheurConnect...");
+            const map = L.map('map', { zoomControl: false }).setView([14.45, -17.2], 7);
+            L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
-            // Initialisation de la carte sur le Sénégal
-            const map = L.map('map').setView([14.45, -17.2], 7);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap'
-            }).addTo(map);
-
-            // Chargement des données avec gestion d'erreur 404
-            // On utilise './data.json' car il est dans le même dossier sur GitHub
             fetch('./data.json?v=' + Date.now())
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("Le fichier data.json n'a pas été trouvé (Erreur 404).");
-                    }
-                    return response.json();
-                })
+                .then(res => res.json())
                 .then(data => {
-                    console.log("Données reçues :", data);
+                    document.getElementById('update-time').innerText = "MàJ : " + data[0].date;
                     
                     data.forEach(item => {
-                        // Nettoyage et sécurité des données
-                        const vagues = item.v_now || "0";
-                        const temp = item.t_now || "0";
-                        const securite = (item.safety || "SÛR").toString();
-                        const color = securite.includes("DANGER") ? "#e74c3c" : "#2ecc71";
+                        const isDanger = item.safety.includes("🔴");
+                        const color = isDanger ? "#e74c3c" : "#2ecc71";
 
-                        // Ajout du marqueur
                         L.marker([item.lat, item.lon], {
                             icon: L.divIcon({
                                 className: 'custom-icon',
-                                html: `<div class="marker-label" style="background:${color}">${vagues}m | ${temp}°C</div>`,
-                                iconSize: [95, 25]
+                                html: `<div class="custom-label" style="background:${color}">${item.v_now}m</div>`,
+                                iconSize: [60, 30]
                             })
                         })
                         .addTo(map)
                         .bindPopup(`
-                            <div class="popup-card">
-                                <b>📍 ${item.zone}</b><br>
-                                🌊 Vagues : ${vagues}m<br>
-                                🌡️ Temp : ${temp}°C<br>
-                                🛡️ Sécurité : <b>${securite}</b>
+                            <div style="font-size:14px;">
+                                <b style="font-size:16px;">${item.zone}</b><br><br>
+                                🌊 Vagues : <b>${item.v_now}m</b><br>
+                                🌡️ Temp : <b>${item.t_now}°C</b><br>
+                                🧭 Courant : <b>${item.c_now}m/s</b><br><hr>
+                                🛡️ État : <b>${item.safety}</b><br>
+                                🐟 Pêche : <b>${item.index}</b>
                             </div>
                         `);
                     });
-                })
-                .catch(err => {
-                    console.error("Erreur critique :", err.message);
-                    // On affiche une petite info sur la carte en cas d'erreur
-                    L.popup()
-                        .setLatLng([14.45, -17.2])
-                        .setContent("⚠️ Erreur : Impossible de charger les données (data.json manquant).")
-                        .openOn(map);
                 });
         };
     </script>
