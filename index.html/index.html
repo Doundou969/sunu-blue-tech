@@ -4,209 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PecheurConnect PRO 🇸🇳</title>
-    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
     <style>
-        :root { 
-            --primary: #0056b3; 
-            --danger: #d9534f; 
-            --safe: #28a745; 
-            --dark: #2c3e50;
-            --panel: rgba(255, 255, 255, 0.9);
-            --whatsapp: #25D366;
-            --text: #333;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            :root { 
-                --panel: rgba(30, 30, 30, 0.95);
-                --text: #f0f0f0;
-                --dark: #ffffff;
-            }
-        }
-
-        body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; overflow: hidden; background: #1a1a1a; }
-        #map { height: 100vh; width: 100%; z-index: 1; }
-
-        .top-ui {
-            position: absolute; top: 15px; left: 15px; right: 15px; z-index: 1000;
-            max-width: 450px;
-        }
-        .brand-card {
-            background: var(--panel); padding: 12px 20px; border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3); display: flex;
-            justify-content: space-between; align-items: center;
-            border-bottom: 4px solid var(--primary); color: var(--text);
-        }
-        .brand-card h1 { margin: 0; font-size: 18px; font-weight: 900; }
-
-        .forecast-bar {
-            margin-top: 10px; display: flex; gap: 5px; 
-            background: var(--panel); padding: 5px; border-radius: 25px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-        .day-btn {
-            flex: 1; border: none; padding: 10px; border-radius: 20px;
-            cursor: pointer; background: transparent; color: var(--text);
-            font-weight: bold; font-size: 12px; transition: 0.3s;
-        }
+        :root { --primary: #0056b3; --danger: #d9534f; --safe: #28a745; --panel: rgba(255, 255, 255, 0.9); --text: #333; --whatsapp: #25D366; }
+        @media (prefers-color-scheme: dark) { :root { --panel: rgba(30, 30, 30, 0.95); --text: #f0f0f0; } }
+        body { margin: 0; font-family: sans-serif; background: #1a1a1a; color: var(--text); }
+        #map { height: 100vh; width: 100%; }
+        .top-ui { position: absolute; top: 15px; left: 15px; right: 15px; z-index: 1000; max-width: 400px; }
+        .brand-card { background: var(--panel); padding: 12px; border-radius: 12px; display: flex; justify-content: space-between; border-bottom: 4px solid var(--primary); }
+        .forecast-bar { margin-top: 10px; display: flex; gap: 5px; background: var(--panel); padding: 5px; border-radius: 25px; }
+        .day-btn { flex: 1; border: none; padding: 10px; border-radius: 20px; cursor: pointer; background: transparent; color: var(--text); font-weight: bold; }
         .day-btn.active { background: var(--primary); color: white; }
-
-        .search-box {
-            width: 100%; margin-top: 10px; padding: 12px 20px;
-            border-radius: 25px; border: none; background: var(--panel);
-            color: var(--text); box-shadow: 0 4px 10px rgba(0,0,0,0.2); outline: none;
-        }
-
-        .legend-panel {
-            position: absolute; bottom: 30px; left: 15px; z-index: 1000;
-            background: var(--panel); padding: 12px; border-radius: 12px;
-            font-size: 11px; color: var(--text); box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-
-        .whatsapp-float {
-            position: absolute; bottom: 30px; right: 20px; z-index: 1000;
-            background: var(--whatsapp); color: white; width: 60px; height: 60px;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4); cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .whatsapp-float:hover { transform: scale(1.1); }
-
-        .wave-label {
-            color: white; padding: 4px 8px; border-radius: 12px;
-            font-weight: bold; font-size: 12px; border: 2px solid white;
-            text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.5);
-        }
-
-        .fuel-info {
-            background: rgba(0,0,0,0.05); padding: 8px; border-radius: 6px;
-            margin-top: 8px; font-size: 11px; border-left: 3px solid #f39c12;
-        }
+        .search-box { width: 100%; margin-top: 10px; padding: 12px; border-radius: 25px; border: none; background: var(--panel); color: var(--text); outline: none; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .whatsapp-btn { position: absolute; bottom: 30px; right: 20px; z-index: 1000; background: var(--whatsapp); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .wave-label { color: white; padding: 4px 8px; border-radius: 10px; font-weight: bold; border: 2px solid white; }
     </style>
 </head>
 <body>
-
     <div class="top-ui">
-        <div class="brand-card">
-            <h1>🇸🇳 PecheurConnect PRO</h1>
-            <span id="update-time" style="font-size:10px; opacity:0.8;">MàJ: --:--</span>
-        </div>
-
+        <div class="brand-card"><h1>🇸🇳 PecheurConnect</h1><span id="update-time">--:--</span></div>
         <div class="forecast-bar">
             <button class="day-btn active" onclick="updateDay(0)">Aujourd'hui</button>
             <button class="day-btn" onclick="updateDay(1)">Demain</button>
             <button class="day-btn" onclick="updateDay(2)">J+2</button>
         </div>
-
-        <input type="text" id="zoneSearch" class="search-box" placeholder="🔍 Rechercher un port...">
+        <input type="text" id="zoneSearch" class="search-box" placeholder="🔍 Chercher un port...">
     </div>
-
-    <div class="legend-panel">
-        <b style="color:var(--primary)">UPWELLING (ZONE DE PÊCHE)</b><br>
-        <span style="color:#003399">■</span> Froid (Poisson +++) | <span style="color:#ffcc00">■</span> Chaud (Poisson -)<br>
-        <hr style="opacity:0.2">
-        <b>SÉCURITÉ :</b> <span style="color:var(--safe)">●</span> OK | <span style="color:var(--danger)">●</span> DANGER
-    </div>
-
-    <div class="whatsapp-float" onclick="sendWhatsApp()">
-        <svg width="35" height="35" fill="white" viewBox="0 0 24 24"><path d="M12.031 6.172c-2.32 0-4.591 1.342-5.467 3.398-.19.447-.442 1.397-.442 2.43 0 1.258.423 2.185.834 2.893l-.75 2.15 2.222-.72c.607.35 1.417.618 2.204.618 2.32 0 4.59-1.342 5.466-3.397.876-2.056.463-4.11-.96-5.353-.96-.842-1.802-1.02-3.107-1.02zm-2.015 7.15c-.18 0-.324-.045-.434-.135s-.166-.215-.166-.374c0-.158.056-.285.166-.38s.255-.143.434-.143c.18 0 .324.048.434.143s.166.222.166.38c0 .16-.056.284-.166.374s-.255.135-.434.135zm2.844 0c-.18 0-.324-.045-.434-.135s-.166-.215-.166-.374c0-.158.056-.285.166-.38s.255-.143.434-.143c.18 0 .324.048.434.143s.166.222.166.38c0 .16-.056.284-.166.374s-.255.135-.434.135z"/></svg>
-    </div>
-
     <div id="map"></div>
+    <div class="whatsapp-btn" onclick="window.open('https://wa.me/221777020818')">💬</div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
         let currentDay = 0;
         let marineData = [];
-        let markers = []; // Changé en let pour pouvoir vider la liste
+        let markers = [];
         const map = L.map('map', { zoomControl: false }).setView([14.45, -17.2], 7);
         const dataLayer = L.layerGroup().addTo(map);
 
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '© PecheurConnect PRO | Copernicus'
-        }).addTo(map);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
         async function fetchData() {
             try {
-                const response = await fetch('./data.json?v=' + Date.now());
-                marineData = await response.json();
-                if(marineData.length > 0) {
-                    document.getElementById('update-time').innerText = "MàJ: " + marineData[0].date_update;
-                    renderScene();
-                }
-            } catch (e) { console.error("Erreur de données", e); }
+                const r = await fetch('data.json?v=' + Date.now());
+                if(!r.ok) throw new Error("Fichier data.json absent");
+                marineData = await r.json();
+                document.getElementById('update-time').innerText = "MàJ: " + marineData[0].date_update;
+                renderScene();
+            } catch (e) { console.error(e); }
         }
 
         function renderScene() {
             dataLayer.clearLayers();
-            markers = []; // Vider la liste de recherche à chaque rendu
-            
+            markers = [];
             marineData.forEach(item => {
-                const forecast = item.forecasts[currentDay];
-                const isDanger = forecast.safety.includes("🔴");
-                const color = isDanger ? "#d9534f" : "#28a745";
+                const f = item.forecasts[currentDay];
+                const color = f.safety.includes("🔴") ? "#d9534f" : "#28a745";
                 
-                let tempColor = "#ffcc00"; 
-                if (forecast.t_now < 23) tempColor = "#003399"; 
-                else if (forecast.t_now < 25) tempColor = "#3399ff";
+                // Upwelling
+                L.circle([item.lat, item.lon], { radius: 30000, color: (f.t_now < 23 ? "#003399" : "#ffcc00"), fillOpacity: 0.2 }).addTo(dataLayer);
 
-                // Couche Thermique
-                L.circle([item.lat, item.lon], {
-                    radius: 35000, color: tempColor, fillOpacity: 0.15, weight: 1
-                }).addTo(dataLayer);
-
-                // Marqueur
                 const marker = L.marker([item.lat, item.lon], {
-                    icon: L.divIcon({
-                        className: 'wave-icon',
-                        html: `<div class="wave-label" style="background:${color}">${forecast.v_now}m</div>`,
-                        iconSize: [60, 30]
-                    })
+                    icon: L.divIcon({ className: 'custom', html: `<div class="wave-label" style="background:${color}">${f.v_now}m</div>` })
                 }).addTo(dataLayer);
 
-                const fuel = 15 + (forecast.v_now * 4) + (forecast.c_now * 10);
-
-                marker.bindPopup(`
-                    <div style="min-width:180px; color:#333">
-                        <h3 style="margin:0">📍 ${item.zone}</h3>
-                        <small>${forecast.jour}</small><hr>
-                        🌊 Vagues : <b>${forecast.v_now}m</b><br>
-                        🌡️ Mer : <b>${forecast.t_now}°C</b> (Upwelling)<br>
-                        🐟 Pêche : <b>${forecast.index}</b><br>
-                        <div class="fuel-info">
-                            ⛽ Est. Carburant : <b>~${fuel.toFixed(1)}L</b><br>
-                            <span style="font-size:9px">Consommation estimée (vagues/courants)</span>
-                        </div>
-                        <div style="margin-top:8px; padding:5px; background:${color}; color:white; text-align:center; border-radius:4px; font-weight:bold;">
-                            ${forecast.safety}
-                        </div>
-                    </div>
-                `);
-                
+                marker.bindPopup(`<b>📍 ${item.zone}</b><br>Vagues: ${f.v_now}m<br>Mer: ${f.t_now}°C<br>Pêche: ${f.index}<br><b>${f.safety}</b>`);
                 markers.push({ name: item.zone.toLowerCase(), latlng: [item.lat, item.lon], marker: marker });
             });
         }
 
-        function updateDay(day) {
-            currentDay = day;
-            document.querySelectorAll('.day-btn').forEach((b, i) => b.classList.toggle('active', i === day));
+        function updateDay(d) {
+            currentDay = d;
+            document.querySelectorAll('.day-btn').forEach((b, i) => b.classList.toggle('active', i === d));
             renderScene();
-        }
-
-        function sendWhatsApp() {
-            const msg = encodeURIComponent("📢 *SIGNALEMENT PECHEURCONNECT*\nJe signale un changement au quai de pêche...");
-            window.open(`https://wa.me/221777020818?text=${msg}`, '_blank');
         }
 
         document.getElementById('zoneSearch').addEventListener('input', (e) => {
             const s = e.target.value.toLowerCase();
             const f = markers.find(m => m.name.includes(s));
-            if(f && s.length > 2) { 
-                map.flyTo(f.latlng, 10); 
-                f.marker.openPopup(); 
-            }
+            if(f && s.length > 2) { map.flyTo(f.latlng, 10); f.marker.openPopup(); }
         });
 
         fetchData();
