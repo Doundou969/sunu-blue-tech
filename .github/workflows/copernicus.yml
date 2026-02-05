@@ -2,15 +2,18 @@ name: Update PecheurConnect Data
 
 on:
   schedule:
-    - cron: '0 */6 * * *' # S'exécute à 00h, 06h, 12h, 18h
-  workflow_dispatch: # Permet de lancer manuellement depuis l'onglet Actions
+    - cron: '0 */6 * * *' # S'exécute toutes les 6 heures (00h, 06h, 12h, 18h)
+  workflow_dispatch: # Permet de lancer la mise à jour manuellement pour tester
+
+permissions:
+  contents: write # Autorise explicitement le bot à modifier data.json sur votre dépôt
 
 jobs:
   update_data:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 # Version 4 plus rapide et stable
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -19,7 +22,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install copernicusmarine numpy requests python-dotenv
+          python -m pip install --upgrade pip
+          pip install copernicusmarine numpy xarray netcdf4 requests python-dotenv
 
       - name: Run Marine Script
         env:
@@ -34,5 +38,6 @@ jobs:
           git config --global user.name "PecheurConnect-Bot"
           git config --global user.email "bot@pecheurconnect.sn"
           git add data.json
+          # Le "exit 0" évite que le workflow marque une erreur s'il n'y a pas de changement de données
           git commit -m "Auto-update marine data: $(date)" || exit 0
           git push
