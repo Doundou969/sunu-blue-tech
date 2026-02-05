@@ -8,7 +8,7 @@
     "c_now": 0.22,
     "index": "🐟 ÉLEVÉ",
     "safety": "🔴 DANGER",
-    "date": "05/02 00:43"
+    "date": "05/02 00:57"
   },
   {
     "zone": "KAYAR",
@@ -19,7 +19,7 @@
     "c_now": 0.13,
     "index": "🐟 ÉLEVÉ",
     "safety": "🔴 DANGER",
-    "date": "05/02 00:43"
+    "date": "05/02 00:57"
   },
   {
     "zone": "DAKAR-YOFF",
@@ -30,7 +30,7 @@
     "c_now": 0.02,
     "index": "🐟 ÉLEVÉ",
     "safety": "🔴 DANGER",
-    "date": "05/02 00:43"
+    "date": "05/02 00:57"
   },
   {
     "zone": "MBOUR-JOAL",
@@ -41,7 +41,7 @@
     "c_now": 0.24,
     "index": "🐟 ÉLEVÉ",
     "safety": "🟢 SÛR",
-    "date": "05/02 00:43"
+    "date": "05/02 00:57"
   },
   {
     "zone": "CASAMANCE",
@@ -52,6 +52,6 @@
     "c_now": 0.11,
     "index": "🎣 MOYEN",
     "safety": "🟢 SÛR",
-    "date": "05/02 00:43"
+    "date": "05/02 00:57"
   }
 ]
