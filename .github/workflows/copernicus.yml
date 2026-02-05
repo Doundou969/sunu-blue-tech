@@ -1,40 +1,34 @@
-name: Update PecheurConnect Data
-
+name: PecheurConnect Update
 on:
-  schedule:
-    - cron: '0 */6 * * *'
   workflow_dispatch:
-
-permissions:
-  contents: write
+  schedule:
+    - cron: "0 5 * * *"
 
 jobs:
-  update_data:
+  run:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-
-      - name: Install Dependencies
-        run: pip install requests xarray netcdf4 numpy
-
-      - name: Run Script
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install copernicusmarine numpy python-telegram-bot python-dotenv requests
+      - name: Run script
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_ID: ${{ secrets.TG_ID }}
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
         run: python script_peche.py
-
       - name: Commit and Push
+        if: success()
         run: |
-          git config --global user.name "PecheurConnect-Bot"
-          git config --global user.email "bot@pecheurconnect.sn"
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
           git add data.json
-          git commit -m "Auto-update marine data: $(date)" || exit 0
+          git commit -m "Mise à jour PecheurConnect" || exit 0
           git push
