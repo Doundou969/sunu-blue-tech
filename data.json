@@ -1,0 +1,162 @@
+[
+    {
+        "zone": "Saint-Louis",
+        "lat": 16.03,
+        "lon": -16.51,
+        "date_update": "06:45",
+        "forecasts": [
+            {
+                "jour": "Thursday",
+                "v_now": 1.2,
+                "t_now": 21.5,
+                "c_now": 0.4,
+                "safety": "🟢 SÛR",
+                "index": "Excellent 🐟🐟🐟"
+            },
+            {
+                "jour": "Friday",
+                "v_now": 1.4,
+                "t_now": 22.5,
+                "c_now": 0.4,
+                "safety": "🟢 SÛR",
+                "index": "Excellent 🐟🐟🐟"
+            },
+            {
+                "jour": "Saturday",
+                "v_now": 1.6,
+                "t_now": 23.5,
+                "c_now": 0.4,
+                "safety": "🟢 SÛR",
+                "index": "Moyen 🐟"
+            }
+        ]
+    },
+    {
+        "zone": "Kayar",
+        "lat": 14.91,
+        "lon": -17.12,
+        "date_update": "06:45",
+        "forecasts": [
+            {
+                "jour": "Thursday",
+                "v_now": 1.2,
+                "t_now": 21.5,
+                "c_now": 0.4,
+                "safety": "🟢 SÛR",
+                "index": "Excellent 🐟🐟🐟"
+            },
+            {
+                "jour": "Friday",
+                "v_now": 1.4,
+                "t_now": 22.5,
+                "c_now": 0.4,
+                "safety": "🟢 SÛR",
+                "index": "Excellent 🐟🐟🐟"
+            },
+            {
+                "jour": "Saturday",
+                "v_now": 1.6,
+                "t_now": 23.5,
+                "c_now": 0.4,
+                "safety": "🟢 SÛR",
+                "index": "Moyen 🐟"
+            }
+        ]
+    },
+    {
+        "zone": "Dakar",
+        "lat": 14.68,
+        "lon": -17.44,
+        "date_update": "06:45",
+        "forecasts": [
+            {
+                "jour": "Thursday",
+                "v_now": 1.2,
+                "t_now": 21.5,
+                "c_now": 0.4,
+                "safety": "🟢 SÛR",
+                "index": "Excellent 🐟🐟🐟"
+            },
+            {
+                "jour": "Friday",
+                "v_now": 1.4,
+                "t_now": 22.5,
+                "c_now": 0.4,
+                "safety": "🟢 SÛR",
+                "index": "Excellent 🐟🐟🐟"
+            },
+            {
+                "jour": "Saturday",
+                "v_now": 1.6,
+                "t_now": 23.5,
+                "c_now": 0.4,
+                "safety": "🟢 SÛR",
+                "index": "Moyen 🐟"
+            }
+        ]
+    },
+    {
+        "zone": "Mbour",
+        "lat": 14.41,
+        "lon": -16.96,
+        "date_update": "06:45",
+        "forecasts": [
+            {
+                "jour": "Thursday",
+                "v_now": 1.2,
+                "t_now": 21.5,
+                "c_now": 0.4,
+                "safety": "🟢 SÛR",
+                "index": "Excellent 🐟🐟🐟"
+            },
+            {
+                "jour": "Friday",
+                "v_now": 1.4,
+                "t_now": 22.5,
+                "c_now": 0.4,
+                "safety": "🟢 SÛR",
+                "index": "Excellent 🐟🐟🐟"
+            },
+            {
+                "jour": "Saturday",
+                "v_now": 1.6,
+                "t_now": 23.5,
+                "c_now": 0.4,
+                "safety": "🟢 SÛR",
+                "index": "Moyen 🐟"
+            }
+        ]
+    },
+    {
+        "zone": "Ziguinchor",
+        "lat": 12.58,
+        "lon": -16.27,
+        "date_update": "06:45",
+        "forecasts": [
+            {
+                "jour": "Thursday",
+                "v_now": 1.2,
+                "t_now": 21.5,
+                "c_now": 0.4,
+                "safety": "🟢 SÛR",
+                "index": "Excellent 🐟🐟🐟"
+            },
+            {
+                "jour": "Friday",
+                "v_now": 1.4,
+                "t_now": 22.5,
+                "c_now": 0.4,
+                "safety": "🟢 SÛR",
+                "index": "Excellent 🐟🐟🐟"
+            },
+            {
+                "jour": "Saturday",
+                "v_now": 1.6,
+                "t_now": 23.5,
+                "c_now": 0.4,
+                "safety": "🟢 SÛR",
+                "index": "Moyen 🐟"
+            }
+        ]
+    }
+]
