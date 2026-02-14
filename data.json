@@ -3,55 +3,55 @@
     "zone": "SAINT-LOUIS",
     "lat": 16.05,
     "lon": -16.65,
-    "v_now": 2.35,
+    "v_now": 1.99,
     "t_now": 18.2,
-    "c_now": 0.21,
+    "c_now": 0.15,
     "index": "🐟 ÉLEVÉ",
-    "safety": "🔴 DANGER",
-    "date": "13/02 06:02"
+    "safety": "🟢 SÛR",
+    "date": "14/02 05:49"
   },
   {
     "zone": "KAYAR",
     "lat": 14.95,
     "lon": -17.35,
-    "v_now": 2.42,
-    "t_now": 19.0,
-    "c_now": 0.06,
+    "v_now": 2.06,
+    "t_now": 19.2,
+    "c_now": 0.03,
     "index": "🐟 ÉLEVÉ",
-    "safety": "🔴 DANGER",
-    "date": "13/02 06:02"
+    "safety": "🟢 SÛR",
+    "date": "14/02 05:49"
   },
   {
     "zone": "DAKAR-YOFF",
     "lat": 14.8,
     "lon": -17.65,
-    "v_now": 2.44,
-    "t_now": 21.4,
-    "c_now": 0.1,
+    "v_now": 2.17,
+    "t_now": 21.3,
+    "c_now": 0.03,
     "index": "🐟 ÉLEVÉ",
     "safety": "🔴 DANGER",
-    "date": "13/02 06:02"
+    "date": "14/02 05:49"
   },
   {
     "zone": "MBOUR-JOAL",
     "lat": 14.35,
     "lon": -17.15,
-    "v_now": 1.64,
-    "t_now": 18.5,
-    "c_now": 0.19,
+    "v_now": 1.35,
+    "t_now": 18.4,
+    "c_now": 0.28,
     "index": "🐟 ÉLEVÉ",
     "safety": "🟢 SÛR",
-    "date": "13/02 06:02"
+    "date": "14/02 05:49"
   },
   {
     "zone": "CASAMANCE",
     "lat": 12.5,
     "lon": -16.95,
-    "v_now": 1.22,
-    "t_now": 23.1,
-    "c_now": 0.15,
+    "v_now": 1.11,
+    "t_now": 23.2,
+    "c_now": 0.12,
     "index": "🎣 MOYEN",
     "safety": "🟢 SÛR",
-    "date": "13/02 06:02"
+    "date": "14/02 05:49"
   }
 ]
