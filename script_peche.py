@@ -35,6 +35,7 @@ DATASETS = {
     "waves": "cmems_mod_glo_wav_anfc_0.083deg_PT3H-i"
 }
 
+
 def log(msg, level="INFO"):
     timestamp = datetime.now().strftime('%H:%M:%S')
     emoji = {"ERROR": "❌", "WARNING": "⚠️", "SUCCESS": "✅", "INFO": "ℹ️", "DEBUG": "🔍"}
@@ -58,27 +59,27 @@ def calculate_fish_index(temp, current, wave):
     
     if 18 <= temp <= 24:
         score += 3
-        factors.append("🌡️ Température idéale")
+        factors.append("Température idéale")
     elif 15 <= temp <= 27:
         score += 1
-        factors.append("🌡️ Température acceptable")
+        factors.append("Température acceptable")
     
     if 0.2 <= current <= 0.5:
         score += 2
-        factors.append("🧭 Courants favorables")
+        factors.append("Courants favorables")
     elif current < 0.2:
         score += 1
-        factors.append("🧭 Courants faibles")
+        factors.append("Courants faibles")
     
     if wave < 1.0:
         score += 3
-        factors.append("🌊 Mer très calme")
+        factors.append("Mer très calme")
     elif wave < 1.5:
         score += 2
-        factors.append("🌊 Mer calme")
+        factors.append("Mer calme")
     elif wave < 2.0:
         score += 1
-        factors.append("🌊 Mer modérée")
+        factors.append("Mer modérée")
     
     if score >= 7:
         return "🐟🐟🐟 EXCELLENT", "excellent", factors
@@ -95,128 +96,122 @@ def generate_recommendations(safety_level, fish_level, wave, current, temp):
     
     if safety_level == "danger":
         recommendations.extend([
-            "⛔ NE PAS SORTIR EN MER",
-            "🏠 Restez à quai - Conditions dangereuses"
+            "NE PAS SORTIR EN MER",
+            "Restez à quai - Conditions dangereuses"
         ])
     elif safety_level == "warning":
         recommendations.extend([
-            "⚠️ Sortie fortement déconseillée",
-            "📱 Si nécessaire, restez près des côtes"
+            "Sortie fortement déconseillée",
+            "Si nécessaire, restez près des côtes"
         ])
     elif safety_level == "caution":
         recommendations.extend([
-            "⚠️ Vigilance accrue recommandée",
-            "👥 Sortie en groupe privilégiée"
+            "Vigilance accrue recommandée",
+            "Sortie en groupe privilégiée"
         ])
     else:
-        recommendations.append("✅ Conditions sûres pour la navigation")
+        recommendations.append("Conditions sûres pour la navigation")
     
     if fish_level == "excellent":
-        recommendations.append("🎣 Conditions OPTIMALES pour la pêche")
+        recommendations.append("Conditions OPTIMALES pour la pêche")
     elif fish_level == "good":
-        recommendations.append("🎣 Bonnes conditions de pêche")
+        recommendations.append("Bonnes conditions de pêche")
     elif fish_level == "moderate":
-        recommendations.append("🎣 Pêche possible - Conditions moyennes")
+        recommendations.append("Pêche possible - Conditions moyennes")
     
     return recommendations
 
 
 def fetch_zone_data_alternative(name, coords, now):
-    """
-    Méthode alternative : utiliser read_dataframe au lieu de subset
-    """
-    log(f"🔍 Tentative alternative pour {name}...", "DEBUG")
+    """Méthode alternative avec read_dataframe"""
+    log(f"Tentative alternative pour {name}...", "DEBUG")
     
+    wave = None
+    temp = None
+    current = None
+    
+    # VAGUES
     try:
-        # Essayer avec read_dataframe pour les vagues
-        wave = None
-        try:
-            log(f"  Téléchargement vagues {name}...", "DEBUG")
-            wave_df = cm.read_dataframe(
-                dataset_id=DATASETS["waves"],
-                variables=["VHM0"],
-                minimum_longitude=coords["lon"] - 0.1,
-                maximum_longitude=coords["lon"] + 0.1,
-                minimum_latitude=coords["lat"] - 0.1,
-                maximum_latitude=coords["lat"] + 0.1,
-                start_datetime=now - timedelta(hours=6),
-                end_datetime=now,
-                username=COPERNICUS_USER,
-                password=COPERNICUS_PASS
-            )
-            
-            if wave_df is not None and len(wave_df) > 0 and 'VHM0' in wave_df.columns:
-                wave_values = wave_df['VHM0'].dropna()
-                if len(wave_values) > 0:
-                    wave = round(float(wave_values.iloc[-1]), 2)
-                    log(f"  ✅ Vagues: {wave}m (read_dataframe)", "DEBUG")
-        except Exception as e:
-            log(f"  ⚠️ Erreur vagues read_dataframe: {str(e)[:50]}", "WARNING")
+        log(f"  Téléchargement vagues {name}...", "DEBUG")
+        wave_df = cm.read_dataframe(
+            dataset_id=DATASETS["waves"],
+            variables=["VHM0"],
+            minimum_longitude=coords["lon"] - 0.1,
+            maximum_longitude=coords["lon"] + 0.1,
+            minimum_latitude=coords["lat"] - 0.1,
+            maximum_latitude=coords["lat"] + 0.1,
+            start_datetime=now - timedelta(hours=6),
+            end_datetime=now,
+            username=COPERNICUS_USER,
+            password=COPERNICUS_PASS
+        )
         
-        # Température
-        temp = None
-        try:
-            log(f"  Téléchargement température {name}...", "DEBUG")
-            temp_df = cm.read_dataframe(
-                dataset_id=DATASETS["temperature"],
-                variables=["thetao"],
-                minimum_longitude=coords["lon"] - 0.1,
-                maximum_longitude=coords["lon"] + 0.1,
-                minimum_latitude=coords["lat"] - 0.1,
-                maximum_latitude=coords["lat"] + 0.1,
-                minimum_depth=0,
-                maximum_depth=1,
-                start_datetime=now - timedelta(hours=12),
-                end_datetime=now,
-                username=COPERNICUS_USER,
-                password=COPERNICUS_PASS
-            )
-            
-            if temp_df is not None and len(temp_df) > 0 and 'thetao' in temp_df.columns:
-                temp_values = temp_df['thetao'].dropna()
-                if len(temp_values) > 0:
-                    temp = round(float(temp_values.iloc[-1]), 1)
-                    log(f"  ✅ Température: {temp}°C (read_dataframe)", "DEBUG")
-        except Exception as e:
-            log(f"  ⚠️ Erreur température read_dataframe: {str(e)[:50]}", "WARNING")
-        
-        # Courants
-        current = None
-        try:
-            log(f"  Téléchargement courants {name}...", "DEBUG")
-            current_df = cm.read_dataframe(
-                dataset_id=DATASETS["current"],
-                variables=["uo", "vo"],
-                minimum_longitude=coords["lon"] - 0.1,
-                maximum_longitude=coords["lon"] + 0.1,
-                minimum_latitude=coords["lat"] - 0.1,
-                maximum_latitude=coords["lat"] + 0.1,
-                minimum_depth=0,
-                maximum_depth=1,
-                start_datetime=now - timedelta(hours=12),
-                end_datetime=now,
-                username=COPERNICUS_USER,
-                password=COPERNICUS_PASS
-            )
-            
-            if current_df is not None and len(current_df) > 0:
-                if 'uo' in current_df.columns and 'vo' in current_df.columns:
-                    u = current_df['uo'].dropna().iloc[-1] if len(current_df['uo'].dropna()) > 0 else 0
-                    v = current_df['vo'].dropna().iloc[-1] if len(current_df['vo'].dropna()) > 0 else 0
-                    current = round(float(np.sqrt(u**2 + v**2)), 2)
-                    log(f"  ✅ Courant: {current}m/s (read_dataframe)", "DEBUG")
-        except Exception as e:
-            log(f"  ⚠️ Erreur courants read_dataframe: {str(e)[:50]}", "WARNING")
-        
-        return wave, temp, current
-        
+        if wave_df is not None and len(wave_df) > 0 and 'VHM0' in wave_df.columns:
+            wave_values = wave_df['VHM0'].dropna()
+            if len(wave_values) > 0:
+                wave = round(float(wave_values.iloc[-1]), 2)
+                log(f"  Vagues: {wave}m (réelles)", "DEBUG")
     except Exception as e:
-        log(f"  ❌ Erreur totale alternative {name}: {str(e)}", "ERROR")
-        return None, None, None
+        log(f"  Erreur vagues: {str(e)[:50]}", "WARNING")
+    
+    # TEMPERATURE
+    try:
+        log(f"  Téléchargement température {name}...", "DEBUG")
+        temp_df = cm.read_dataframe(
+            dataset_id=DATASETS["temperature"],
+            variables=["thetao"],
+            minimum_longitude=coords["lon"] - 0.1,
+            maximum_longitude=coords["lon"] + 0.1,
+            minimum_latitude=coords["lat"] - 0.1,
+            maximum_latitude=coords["lat"] + 0.1,
+            minimum_depth=0,
+            maximum_depth=1,
+            start_datetime=now - timedelta(hours=12),
+            end_datetime=now,
+            username=COPERNICUS_USER,
+            password=COPERNICUS_PASS
+        )
+        
+        if temp_df is not None and len(temp_df) > 0 and 'thetao' in temp_df.columns:
+            temp_values = temp_df['thetao'].dropna()
+            if len(temp_values) > 0:
+                temp = round(float(temp_values.iloc[-1]), 1)
+                log(f"  Température: {temp}°C (réelle)", "DEBUG")
+    except Exception as e:
+        log(f"  Erreur température: {str(e)[:50]}", "WARNING")
+    
+    # COURANTS
+    try:
+        log(f"  Téléchargement courants {name}...", "DEBUG")
+        current_df = cm.read_dataframe(
+            dataset_id=DATASETS["current"],
+            variables=["uo", "vo"],
+            minimum_longitude=coords["lon"] - 0.1,
+            maximum_longitude=coords["lon"] + 0.1,
+            minimum_latitude=coords["lat"] - 0.1,
+            maximum_latitude=coords["lat"] + 0.1,
+            minimum_depth=0,
+            maximum_depth=1,
+            start_datetime=now - timedelta(hours=12),
+            end_datetime=now,
+            username=COPERNICUS_USER,
+            password=COPERNICUS_PASS
+        )
+        
+        if current_df is not None and len(current_df) > 0:
+            if 'uo' in current_df.columns and 'vo' in current_df.columns:
+                u = current_df['uo'].dropna().iloc[-1] if len(current_df['uo'].dropna()) > 0 else 0
+                v = current_df['vo'].dropna().iloc[-1] if len(current_df['vo'].dropna()) > 0 else 0
+                current = round(float(np.sqrt(u**2 + v**2)), 2)
+                log(f"  Courant: {current}m/s (réel)", "DEBUG")
+    except Exception as e:
+        log(f"  Erreur courants: {str(e)[:50]}", "WARNING")
+    
+    return wave, temp, current
 
 
 def fetch_data():
-    log("🔐 Connexion à Copernicus Marine Service...")
+    log("Connexion à Copernicus Marine Service...")
     
     if not COPERNICUS_USER or not COPERNICUS_PASS:
         log("Identifiants Copernicus manquants", "ERROR")
@@ -226,36 +221,34 @@ def fetch_data():
         cm.login(username=COPERNICUS_USER, password=COPERNICUS_PASS)
         log("Connexion réussie", "SUCCESS")
         
-        log("📡 Collecte des données avec méthode alternative...")
+        log("Collecte des données avec méthode alternative...")
         now = datetime.utcnow()
         results = []
         
         for name, coords in ZONES.items():
             try:
-                log(f"📍 {name} ({coords['lat']}, {coords['lon']})...")
+                log(f"{name} ({coords['lat']}, {coords['lon']})...")
                 
                 # Utiliser la méthode alternative
                 wave, temp, current = fetch_zone_data_alternative(name, coords, now)
                 
-                # Valeurs par défaut SI et SEULEMENT SI échec total
+                # Valeurs par défaut si échec
                 if wave is None:
                     wave = 1.5
-                    log(f"  ⚠️ Vagues par défaut: {wave}m", "WARNING")
+                    log(f"  Vagues par défaut: {wave}m", "WARNING")
                 
                 if temp is None:
                     temp = 22.0
-                    log(f"  ⚠️ Température par défaut: {temp}°C", "WARNING")
+                    log(f"  Température par défaut: {temp}°C", "WARNING")
                 
                 if current is None:
                     current = 0.3
-                    log(f"  ⚠️ Courant par défaut: {current}m/s", "WARNING")
+                    log(f"  Courant par défaut: {current}m/s", "WARNING")
                 
                 # Vérifier si toutes les valeurs sont par défaut
-                if wave == 1.5 and temp == 22.0 and current == 0.3:
-                    log(f"  🚨 ATTENTION: {name} utilise TOUTES les valeurs par défaut!", "WARNING")
-                
-                # Prévisions (simplifié)
-                forecast = []
+                is_default = (wave == 1.5 and temp == 22.0 and current == 0.3)
+                if is_default:
+                    log(f"  ATTENTION: {name} utilise TOUTES les valeurs par défaut!", "WARNING")
                 
                 # Calculs
                 safety, safety_level, color = calculate_safety_level(wave, current)
@@ -286,12 +279,12 @@ def fetch_data():
                     "danger_score": danger_score,
                     "date": now.strftime("%d/%m %H:%M"),
                     "timestamp": now.isoformat(),
-                    "forecast": forecast,
+                    "forecast": [],
                     "recommendations": recommendations,
-                    "data_source": "real" if (wave != 1.5 or temp != 22.0 or current != 0.3) else "default"
+                    "data_source": "default" if is_default else "real"
                 })
                 
-                log(f"  {safety} | 🌊{wave}m | 🌡️{temp}°C | 🐟{fish}", "SUCCESS")
+                log(f"  {safety} | Vagues {wave}m | Temp {temp}°C | Pêche {fish}", "SUCCESS")
                 
             except Exception as e:
                 log(f"Erreur zone {name}: {str(e)}", "ERROR")
@@ -301,14 +294,14 @@ def fetch_data():
             log("Aucune donnée collectée", "ERROR")
             return None
         
-        # Statistiques sur les sources de données
+        # Statistiques sur les sources
         real_data = len([r for r in results if r.get("data_source") == "real"])
         default_data = len([r for r in results if r.get("data_source") == "default"])
         
-        log(f"📊 Sources: {real_data} réelles | {default_data} par défaut", "INFO")
+        log(f"Sources: {real_data} réelles | {default_data} par défaut", "INFO")
         
         if default_data == len(results):
-            log("🚨 ALERTE: TOUTES les zones utilisent des données par défaut!", "WARNING")
+            log("ALERTE: TOUTES les zones utilisent des données par défaut!", "WARNING")
         
         return results
         
@@ -348,7 +341,6 @@ def send_telegram(data):
         log("Telegram non configuré", "WARNING")
         return
     
-    # Vérifier si données par défaut
     default_count = len([z for z in data if z.get("data_source") == "default"])
     
     message = "🌊 *PECHEURCONNECT - RAPPORT*\n\n"
@@ -380,7 +372,7 @@ def main():
     start_time = datetime.now()
     
     log("=" * 60, "INFO")
-    log("🇸🇳 PECHEURCONNECT - VERSION DEBUG", "INFO")
+    log("PECHEURCONNECT - VERSION DEBUG", "INFO")
     log("=" * 60, "INFO")
     
     data = fetch_data()
@@ -397,7 +389,7 @@ def main():
     
     duration = (datetime.now() - start_time).total_seconds()
     log("=" * 60, "INFO")
-    log(f"✅ Terminé en {duration:.2f}s", "SUCCESS")
+    log(f"Terminé en {duration:.2f}s", "SUCCESS")
     log("=" * 60, "INFO")
 
 
@@ -410,30 +402,3 @@ if __name__ == "__main__":
     except Exception as e:
         log(f"Erreur fatale: {str(e)}", "ERROR")
         exit(1)
-```
-
----
-
-## 🔍 Ce script va :
-
-1. ✅ **Afficher des logs DEBUG détaillés** pour chaque zone
-2. ✅ **Utiliser `read_dataframe`** au lieu de `subset`
-3. ✅ **Indiquer la source des données** (réelle vs défaut)
-4. ✅ **Alerter si toutes les données sont par défaut**
-
----
-
-## 📊 Dans les logs GitHub Actions, vous verrez :
-```
-[12:34:56] 📍 SAINT-LOUIS (16.05, -16.65)...
-[12:34:57] 🔍 Tentative alternative pour SAINT-LOUIS...
-[12:34:58]   Téléchargement vagues SAINT-LOUIS...
-[12:35:02]   ✅ Vagues: 2.3m (read_dataframe)
-[12:35:03]   Téléchargement température SAINT-LOUIS...
-[12:35:07]   ✅ Température: 21.5°C (read_dataframe)
-```
-
-Ou si ça échoue :
-```
-[12:35:10]   ⚠️ Erreur vagues read_dataframe: ...
-[12:35:11]   ⚠️ Vagues par défaut: 1.5m
