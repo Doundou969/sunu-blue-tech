@@ -1,13 +1,69 @@
 {
-  "name": "PecheurConnect",
+  "name": "PecheurConnect - Sécurité Maritime Sénégal",
   "short_name": "PecheurConnect",
+  "description": "Surveillance maritime en temps réel pour les pêcheurs sénégalais",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#0056b3",
   "theme_color": "#0056b3",
-  "icons": [{
-    "src": "https://cdn-icons-png.flaticon.com/512/2965/2965315.png",
-    "sizes": "512x512",
-    "type": "image/png"
-  }]
+  "lang": "fr-SN",
+  "dir": "ltr",
+  "categories": ["navigation", "weather", "utilities"],
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2965/2965315.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/256/2965/2965315.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/128/2965/2965315.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://via.placeholder.com/540x720/0056b3/ffffff?text=PecheurConnect",
+      "sizes": "540x720",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Carte Maritime",
+      "short_name": "Carte",
+      "description": "Voir la carte des zones de pêche",
+      "url": "./index.html",
+      "icons": [
+        {
+          "src": "https://cdn-icons-png.flaticon.com/128/854/854878.png",
+          "sizes": "128x128"
+        }
+      ]
+    },
+    {
+      "name": "Signaler un danger",
+      "short_name": "Signaler",
+      "description": "Signaler un danger via WhatsApp",
+      "url": "./index.html#report",
+      "icons": [
+        {
+          "src": "https://cdn-icons-png.flaticon.com/128/5968/5968841.png",
+          "sizes": "128x128"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
 }
