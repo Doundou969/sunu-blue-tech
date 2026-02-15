@@ -6,150 +6,543 @@
     <title>PecheurConnect 🇸🇳 | Sécurité Maritime</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
         :root { 
             --primary: #0056b3; 
-            --danger: #d9534f; 
+            --danger: #d32f2f; 
+            --warning: #ff9800;
+            --caution: #ffc107;
             --safe: #28a745; 
             --dark: #2c3e50;
             --whatsapp: #25D366;
         }
 
-        body { margin: 0; font-family: 'Segoe UI', Roboto, sans-serif; overflow: hidden; background: #f4f7f6; }
-        #map { height: 100vh; width: 100%; z-index: 1; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            margin: 0; 
+            font-family: 'Segoe UI', Roboto, -apple-system, sans-serif; 
+            overflow: hidden; 
+            background: #f4f7f6; 
+        }
+        
+        #map { 
+            height: 100vh; 
+            width: 100%; 
+            z-index: 1; 
+        }
 
-        /* Barre de Recherche et En-tête */
+        /* En-tête */
         .search-container {
-            position: absolute; top: 15px; left: 15px; right: 15px; z-index: 1000;
-            max-width: 400px;
+            position: absolute; 
+            top: 15px; 
+            left: 15px; 
+            right: 15px; 
+            z-index: 1000;
+            max-width: 420px;
         }
+        
         .brand-header {
-            background: white; margin-bottom: 10px; padding: 12px 20px;
-            border-radius: 12px; display: flex; align-items: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-left: 5px solid var(--primary);
+            background: linear-gradient(135deg, #0056b3 0%, #004494 100%);
+            margin-bottom: 12px; 
+            padding: 15px 22px;
+            border-radius: 14px; 
+            display: flex; 
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            color: white;
         }
-        .brand-header h1 { margin: 0; font-size: 18px; color: var(--dark); font-weight: 800; }
+        
+        .brand-header h1 { 
+            margin: 0; 
+            font-size: 19px; 
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        
+        .brand-header .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #28a745;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
 
         .search-box {
-            width: 100%; padding: 12px 20px; border-radius: 25px; border: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); font-size: 16px; outline: none;
-            box-sizing: border-box;
+            width: 100%; 
+            padding: 14px 22px; 
+            border-radius: 30px; 
+            border: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12); 
+            font-size: 16px; 
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .search-box:focus {
+            box-shadow: 0 6px 25px rgba(0,86,179,0.25);
         }
 
         /* Panneau d'information */
         .info-panel {
-            position: absolute; bottom: 30px; left: 15px; z-index: 1000;
-            background: rgba(255, 255, 255, 0.95); padding: 15px; border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); font-size: 12px;
-            backdrop-filter: blur(5px);
+            position: absolute; 
+            bottom: 30px; 
+            left: 15px; 
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.97); 
+            padding: 18px; 
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
+            font-size: 13px;
+            backdrop-filter: blur(10px);
+            max-width: 320px;
         }
-        .status-legend { display: flex; gap: 15px; margin-top: 5px; }
+        
+        #update-tag {
+            color: var(--primary); 
+            font-weight: 700; 
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .status-legend { 
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px; 
+            margin-top: 8px; 
+        }
+        
+        .status-legend span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+        
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
 
         /* Badge des Vagues sur la Carte */
         .wave-badge {
-            color: white; padding: 5px 10px; border-radius: 20px;
-            font-weight: bold; font-size: 12px; border: 2px solid white;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.3); text-align: center;
-            min-width: 55px;
+            color: white; 
+            padding: 6px 12px; 
+            border-radius: 25px;
+            font-weight: 800; 
+            font-size: 13px; 
+            border: 3px solid white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4); 
+            text-align: center;
+            min-width: 65px;
+            letter-spacing: 0.5px;
         }
 
         /* Bouton WhatsApp Flottant */
         .whatsapp-btn {
-            position: absolute; bottom: 30px; right: 20px; z-index: 1000;
-            background: var(--whatsapp); color: white; width: 60px; height: 60px;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: absolute; 
+            bottom: 30px; 
+            right: 20px; 
+            z-index: 1000;
+            background: var(--whatsapp); 
+            color: white; 
+            width: 64px; 
+            height: 64px;
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4); 
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .whatsapp-btn:hover { transform: scale(1.1); }
-        .whatsapp-btn svg { width: 32px; height: 32px; fill: white; }
+        
+        .whatsapp-btn:hover { 
+            transform: scale(1.15); 
+            box-shadow: 0 8px 30px rgba(37, 211, 102, 0.6);
+        }
+        
+        .whatsapp-btn svg { 
+            width: 34px; 
+            height: 34px; 
+            fill: white; 
+        }
 
         /* Popup Styling */
-        .leaflet-popup-content-wrapper { border-radius: 12px; padding: 5px; }
-        .popup-title { border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 8px; font-size: 16px; }
+        .leaflet-popup-content-wrapper { 
+            border-radius: 14px; 
+            padding: 8px;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.2);
+        }
+        
+        .leaflet-popup-content {
+            margin: 14px;
+        }
+        
+        .popup-title { 
+            border-bottom: 2px solid #eee; 
+            padding-bottom: 10px; 
+            margin-bottom: 12px; 
+            font-size: 17px;
+            font-weight: 800;
+        }
+        
+        .popup-content {
+            line-height: 1.8;
+        }
+        
+        .popup-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+        
+        .popup-label {
+            font-weight: 700;
+        }
+        
+        .safety-badge {
+            margin-top: 14px;
+            padding: 12px;
+            border-radius: 10px;
+            color: white;
+            text-align: center;
+            font-weight: 800;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+        }
+        
+        .forecast-chart {
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 2px solid #eee;
+        }
+        
+        .forecast-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--primary);
+            font-size: 14px;
+        }
+        
+        .recommendations {
+            margin-top: 12px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        
+        .recommendation-item {
+            margin: 5px 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .search-container {
+                left: 10px;
+                right: 10px;
+                max-width: 100%;
+            }
+            
+            .brand-header {
+                padding: 12px 18px;
+            }
+            
+            .brand-header h1 {
+                font-size: 16px;
+            }
+            
+            .info-panel {
+                left: 10px;
+                right: 10px;
+                bottom: 20px;
+                font-size: 12px;
+                max-width: 100%;
+            }
+            
+            .whatsapp-btn {
+                width: 56px;
+                height: 56px;
+                bottom: 120px;
+                right: 15px;
+            }
+            
+            .whatsapp-btn svg {
+                width: 28px;
+                height: 28px;
+            }
+            
+            .status-legend {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+        }
+
+        /* Loading */
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2000;
+            text-align: center;
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
 
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p style="margin-top: 15px; color: var(--primary); font-weight: 700;">Chargement...</p>
+    </div>
+
     <div class="search-container">
         <div class="brand-header">
             <h1>🇸🇳 PecheurConnect</h1>
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>EN LIGNE</span>
+            </div>
         </div>
-        <input type="text" id="zoneSearch" class="search-box" placeholder="🔍 Chercher un port (Kayar, Ndar...)">
+        <input type="text" id="zoneSearch" class="search-box" placeholder="🔍 Chercher un port (Kayar, Saint-Louis...)">
     </div>
 
     <div class="info-panel">
-        <div id="update-tag" style="color:var(--primary); font-weight:bold; margin-bottom:5px;">Mise à jour : --:--</div>
+        <div id="update-tag">Mise à jour : Chargement...</div>
         <div class="status-legend">
-            <span><b style="color:var(--safe)">●</b> Sûr</span>
-            <span><b style="color:var(--danger)">●</b> Danger</span>
+            <span><div class="legend-dot" style="background: var(--safe);"></div> Sûr</span>
+            <span><div class="legend-dot" style="background: var(--caution);"></div> Vigilance</span>
+            <span><div class="legend-dot" style="background: var(--warning);"></div> Prudence</span>
+            <span><div class="legend-dot" style="background: var(--danger);"></div> Danger</span>
         </div>
     </div>
 
     <div class="whatsapp-btn" onclick="openWhatsAppReport()" title="Signaler un danger">
-        <svg viewBox="0 0 24 24"><path d="M12.031 6.172c-2.32 0-4.591 1.342-5.467 3.398-.19.447-.442 1.397-.442 2.43 0 1.258.423 2.185.834 2.893l-.75 2.15 2.222-.72c.607.35 1.417.618 2.204.618 2.32 0 4.59-1.342 5.466-3.397.876-2.056.463-4.11-.96-5.353-.96-.842-1.802-1.02-3.107-1.02zm-2.015 7.15c-.18 0-.324-.045-.434-.135s-.166-.215-.166-.374c0-.158.056-.285.166-.38s.255-.143.434-.143c.18 0 .324.048.434.143s.166.222.166.38c0 .16-.056.284-.166.374s-.255.135-.434.135zm2.844 0c-.18 0-.324-.045-.434-.135s-.166-.215-.166-.374c0-.158.056-.285.166-.38s.255-.143.434-.143c.18 0 .324.048.434.143s.166.222.166.38c0 .16-.056.284-.166.374s-.255.135-.434.135z"/></svg>
+        <svg viewBox="0 0 24 24">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+        </svg>
     </div>
 
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        let chartInstances = {};
+
         document.addEventListener("DOMContentLoaded", function() {
-            // Initialisation de la carte centrée sur le Sénégal
+            // Initialisation de la carte
             const map = L.map('map', { zoomControl: false }).setView([14.45, -17.2], 7);
             const markers = [];
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap | PecheurConnect'
+                attribution: '© OpenStreetMap | PecheurConnect',
+                maxZoom: 19
             }).addTo(map);
 
             L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-            // Chargement des données JSON
+            // Chargement des données
             fetch('./data.json?v=' + Date.now())
-                .then(res => res.json())
+                .then(res => {
+                    if (!res.ok) throw new Error('Erreur réseau');
+                    return res.json();
+                })
                 .then(data => {
+                    // Masquer le loading
+                    document.getElementById('loading').style.display = 'none';
+                    
                     // Mise à jour de l'heure
-                    document.getElementById('update-tag').innerText = "Mise à jour : " + (data[0].date || "En cours");
+                    if (data[0] && data[0].date) {
+                        document.getElementById('update-tag').innerText = "Mise à jour : " + data[0].date + " UTC";
+                    }
 
                     data.forEach(item => {
-                        const isDanger = (item.safety || "").includes("🔴");
-                        const color = isDanger ? "#d9534f" : "#28a745";
-
+                        const color = item.color || "#28a745";
+                        
+                        // Créer le marqueur
                         const marker = L.marker([item.lat, item.lon], {
                             icon: L.divIcon({
                                 className: 'custom-div-icon',
                                 html: `<div class="wave-badge" style="background:${color}">${item.v_now}m</div>`,
-                                iconSize: [65, 30]
+                                iconSize: [70, 32]
                             })
                         }).addTo(map);
 
+                        // Contenu du popup
                         const popupContent = `
-                            <div style="min-width:180px;">
-                                <div class="popup-title"><b style="color:var(--primary)">📍 ${item.zone}</b></div>
-                                🌊 <b>Vagues :</b> ${item.v_now}m<br>
-                                🌡️ <b>Température :</b> ${item.t_now}°C<br>
-                                🧭 <b>Courant :</b> ${item.c_now}m/s<br>
-                                🐟 <b>Pêche :</b> ${item.index}<br>
-                                <div style="margin-top:10px; padding:8px; border-radius:6px; background:${color}; color:white; text-align:center; font-weight:bold;">
+                            <div style="min-width: 280px; max-width: 320px;">
+                                <div class="popup-title">📍 ${item.zone}</div>
+                                
+                                <div class="popup-content">
+                                    <div class="popup-row">
+                                        🌊 <span class="popup-label">Vagues:</span> ${item.v_now}m
+                                    </div>
+                                    <div class="popup-row">
+                                        🌡️ <span class="popup-label">Température:</span> ${item.t_now}°C
+                                    </div>
+                                    <div class="popup-row">
+                                        🧭 <span class="popup-label">Courant:</span> ${item.c_now}m/s
+                                    </div>
+                                    <div class="popup-row">
+                                        🐟 <span class="popup-label">Indice Pêche:</span> ${item.index}
+                                    </div>
+                                </div>
+                                
+                                ${item.forecast && item.forecast.length > 0 ? `
+                                    <div class="forecast-chart">
+                                        <div class="forecast-title">📈 Prévisions 24h</div>
+                                        <canvas id="chart-${item.zone.replace(/\s+/g, '-')}" height="120"></canvas>
+                                    </div>
+                                ` : ''}
+                                
+                                ${item.recommendations && item.recommendations.length > 0 ? `
+                                    <div class="recommendations">
+                                        ${item.recommendations.map(r => `<div class="recommendation-item">${r}</div>`).join('')}
+                                    </div>
+                                ` : ''}
+                                
+                                <div class="safety-badge" style="background:${color}">
                                     ${item.safety}
                                 </div>
                             </div>
                         `;
                         
-                        marker.bindPopup(popupContent);
-                        markers.push({ name: item.zone.toLowerCase(), marker: marker, latlng: [item.lat, item.lon] });
+                        marker.bindPopup(popupContent, {
+                            maxWidth: 350,
+                            className: 'custom-popup'
+                        });
+
+                        // Créer le graphique quand le popup s'ouvre
+                        if (item.forecast && item.forecast.length > 0) {
+                            marker.on('popupopen', function() {
+                                const chartId = `chart-${item.zone.replace(/\s+/g, '-')}`;
+                                const ctx = document.getElementById(chartId);
+                                
+                                if (ctx && !chartInstances[chartId]) {
+                                    chartInstances[chartId] = new Chart(ctx, {
+                                        type: 'line',
+                                        data: {
+                                            labels: item.forecast.map(f => f.time),
+                                            datasets: [{
+                                                label: 'Hauteur vagues (m)',
+                                                data: item.forecast.map(f => f.wave),
+                                                borderColor: color,
+                                                backgroundColor: color + '33',
+                                                tension: 0.4,
+                                                fill: true,
+                                                borderWidth: 3,
+                                                pointRadius: 4,
+                                                pointBackgroundColor: color,
+                                                pointBorderColor: '#fff',
+                                                pointBorderWidth: 2
+                                            }]
+                                        },
+                                        options: {
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+                                            plugins: {
+                                                legend: { display: false },
+                                                tooltip: {
+                                                    backgroundColor: 'rgba(0,0,0,0.8)',
+                                                    padding: 12,
+                                                    titleFont: { size: 14, weight: 'bold' },
+                                                    bodyFont: { size: 13 },
+                                                    callbacks: {
+                                                        label: function(context) {
+                                                            return 'Vagues: ' + context.parsed.y + 'm';
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            scales: {
+                                                y: { 
+                                                    beginAtZero: true,
+                                                    ticks: {
+                                                        callback: function(value) {
+                                                            return value + 'm';
+                                                        }
+                                                    },
+                                                    grid: {
+                                                        color: 'rgba(0,0,0,0.05)'
+                                                    }
+                                                },
+                                                x: {
+                                                    grid: {
+                                                        display: false
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                            
+                            // Détruire le graphique quand le popup se ferme
+                            marker.on('popupclose', function() {
+                                const chartId = `chart-${item.zone.replace(/\s+/g, '-')}`;
+                                if (chartInstances[chartId]) {
+                                    chartInstances[chartId].destroy();
+                                    delete chartInstances[chartId];
+                                }
+                            });
+                        }
+
+                        markers.push({ 
+                            name: item.zone.toLowerCase(), 
+                            marker: marker, 
+                            latlng: [item.lat, item.lon] 
+                        });
                     });
                 })
-                .catch(err => console.error("Erreur chargement données:", err));
+                .catch(err => {
+                    console.error("Erreur chargement données:", err);
+                    document.getElementById('loading').innerHTML = '<p style="color: var(--danger); font-weight: 700;">❌ Erreur de chargement</p>';
+                });
 
-            // Logique de recherche dynamique
+            // Logique de recherche
             document.getElementById('zoneSearch').addEventListener('input', function(e) {
                 const search = e.target.value.toLowerCase();
                 const found = markers.find(m => m.name.includes(search));
+                
                 if (found && search.length > 2) {
-                    map.flyTo(found.latlng, 10);
+                    map.flyTo(found.latlng, 11, {
+                        duration: 1.5
+                    });
                     found.marker.openPopup();
                 }
             });
@@ -158,7 +551,13 @@
         // Fonction WhatsApp
         function openWhatsAppReport() {
             const phoneNumber = "221777020818"; // REMPLACER PAR VOTRE NUMÉRO
-            const message = encodeURIComponent("📢 *SIGNALEMENT PECHEURCONNECT*\n\nJe signale un changement en mer :\n\n📍 Zone : \n🌊 État : \n⚠️ Commentaire : ");
+            const message = encodeURIComponent(
+                "📢 *SIGNALEMENT PECHEURCONNECT*\n\n" +
+                "Je signale un changement en mer :\n\n" +
+                "📍 Zone : \n" +
+                "🌊 État de la mer : \n" +
+                "⚠️ Commentaire : "
+            );
             window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
         }
     </script>
