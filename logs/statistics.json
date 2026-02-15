@@ -1,0 +1,36 @@
+{
+  "timestamp": "2026-02-15T23:17:14.429811",
+  "total_zones": 5,
+  "safety_breakdown": {
+    "safe": 5,
+    "caution": 0,
+    "warning": 0,
+    "danger": 0
+  },
+  "fish_breakdown": {
+    "excellent": 0,
+    "good": 5,
+    "moderate": 0,
+    "poor": 0
+  },
+  "averages": {
+    "wave_height": 1.5,
+    "temperature": 22.0,
+    "current_speed": 0.3,
+    "danger_score": 37.0
+  },
+  "extremes": {
+    "max_wave": {
+      "value": 1.5,
+      "zone": "SAINT-LOUIS"
+    },
+    "min_temp": {
+      "value": 22.0,
+      "zone": "SAINT-LOUIS"
+    },
+    "max_current": {
+      "value": 0.3,
+      "zone": "SAINT-LOUIS"
+    }
+  }
+}
