@@ -1,9 +1,9 @@
 name: PecheurConnect Update
 
 on:
-  workflow_dispatch:  # Déclenchement manuel
+  workflow_dispatch:
   schedule:
-    - cron: "0 */6 * * *"  # Toutes les 6 heures
+    - cron: "0 */6 * * *"
 
 jobs:
   update-data:
@@ -12,61 +12,41 @@ jobs:
       contents: write
     
     steps:
-      - name: Checkout repository
+      - name: 📥 Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       
-      - name: Setup Python
+      - name: 🐍 Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: 'pip'
       
-      - name: Install dependencies
+      - name: 📦 Install dependencies
         run: |
-          pip install --upgrade pip
-          pip install copernicusmarine numpy python-telegram-bot python-dotenv requests pandas
+          python -m pip install --upgrade pip
+          pip install copernicusmarine==1.3.3 xarray==2024.1.0 netCDF4==1.6.5 numpy==1.26.4 pandas==2.2.0 requests==2.31.0 python-dotenv==1.0.1
       
-      - name: Run data collection script
+      - name: 🌊 Run script
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_ID: ${{ secrets.TG_ID }}
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
         run: python script_peche.py
-        continue-on-error: false
       
-      - name: Verify data.json exists
+      - name: ✅ Verify output
         run: |
-          if [ ! -f data.json ]; then
-            echo "❌ Erreur: data.json n'a pas été généré"
+          if [ -f data.json ]; then
+            echo "✅ data.json créé"
+            ls -lh data.json
+          else
+            echo "❌ data.json manquant"
             exit 1
           fi
-          echo "✅ data.json généré avec succès"
-          echo "Contenu:"
-          cat data.json
       
-      - name: Commit and Push changes
+      - name: 💾 Commit and Push
         run: |
-          git config --global user.name "PecheurConnect Bot"
-          git config --global user.email "bot@pecheurconnect.sn"
-          git add data.json logs/
-          
-          if git diff --staged --quiet; then
-            echo "ℹ️ Aucun changement à committer"
-            exit 0
-          fi
-          
-          git commit -m "🌊 Mise à jour données marines - $(date '+%Y-%m-%d %H:%M UTC')"
-          git push
-      
-      - name: Notification de succès
-        if: success()
-        run: echo "✅ Mise à jour PecheurConnect terminée avec succès"
-      
-      - name: Notification d'échec
-        if: failure()
-        run: |
-          echo "❌ Échec de la mise à jour PecheurConnect"
-          exit 1
+          git config user.name "PecheurConnect Bot"
+          git config user.email "bot@pecheurconnect.sn"
+          git add data.json logs/ || true
+          git diff --quiet && git diff --staged --quiet || git commit -m "🌊 Update $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git push || echo "Rien à pusher"
