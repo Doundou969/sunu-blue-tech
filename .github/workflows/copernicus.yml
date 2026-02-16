@@ -23,7 +23,7 @@ jobs:
       - name: 📦 Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install copernicusmarine xarray netCDF4 numpy pandas requests python-dotenv
+          pip install -r requirements.txt
       
       - name: 🌊 Run script
         env:
@@ -31,21 +31,24 @@ jobs:
           TG_ID: ${{ secrets.TG_ID }}
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
+          OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+          WORLDTIDES_API_KEY: ${{ secrets.WORLDTIDES_API_KEY }}
         run: python script_peche.py
       
       - name: ✅ Verify output
         run: |
           if [ -f data.json ]; then
-            echo "✅ data.json créé avec $(jq length data.json) zones"
+            echo "✅ data.json créé"
+            ls -lh data.json
           else
             echo "❌ data.json manquant"
             exit 1
           fi
       
-      - name: 💾 Commit
+      - name: 💾 Commit and Push
         run: |
           git config user.name "PecheurConnect Bot"
           git config user.email "bot@pecheurconnect.sn"
-          git add data.json logs/ || true
-          git diff --quiet && git diff --staged --quiet || git commit -m "🌊 $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git add data.json logs/
+          git diff --quiet && git diff --staged --quiet || git commit -m "🌊 Update $(date -u '+%Y-%m-%d %H:%M UTC')"
           git push || echo "Rien à pusher"
