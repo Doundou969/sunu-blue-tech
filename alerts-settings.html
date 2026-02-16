@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paramètres Alertes - PecheurConnect</title>
+    
+    <style>
+        :root {
+            --primary: #0056b3;
+            --safe: #28a745;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        
+        .section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .section h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+        
+        .toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .toggle:last-child {
+            border-bottom: none;
+        }
+        
+        .switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 30px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--safe);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+        
+        .zone-select {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .zone-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>🔔 Paramètres des Alertes</h1>
+            <p style="color: #666; margin-bottom: 20px;">Configurez vos notifications personnalisées</p>
+            
+            <div class="section">
+                <h3>Activer les notifications</h3>
+                <div class="toggle">
+                    <span>Recevoir des alertes push</span>
+                    <label class="switch">
+                        <input type="checkbox" id="enableAlerts">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3>Types d'alertes</h3>
+                <div class="toggle">
+                    <span>🔴 Alertes DANGER (conditions dangereuses)</span>
+                    <label class="switch">
+                        <input type="checkbox" id="alertDanger" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toggle">
+                    <span>🟠 Alertes PRUDENCE (conditions dégradées)</span>
+                    <label class="switch">
+                        <input type="checkbox" id="alertWarning" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="toggle">
+                    <span>🎣 Alertes CONDITIONS OPTIMALES</span>
+                    <label class="switch">
+                        <input type="checkbox" id="alertOptimal" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3>Zones à surveiller</h3>
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                    Laissez vide pour surveiller toutes les zones
+                </p>
+                <div class="zone-select" id="zoneSelect"></div>
+            </div>
+            
+            <button class="btn" onclick="savePreferences()">💾 Sauvegarder les paramètres</button>
+            <button class="btn btn-secondary" onclick="window.location.href='./index.html'">← Retour</button>
+        </div>
+    </div>
+    
+    <script src="./alerts.js"></script>
+    <script>
+        const zones = [
+            "SAINT-LOUIS", "GANDIOL", "KAYAR", "LOMPOUL",
+            "DAKAR-YOFF", "DAKAR-SOUMBEDIOUNE", "DAKAR-HANN", "RUFISQUE", "BARGNY",
+            "MBOUR-JOAL", "NIANING", "SALY",
+            "PALMARIN", "FOUNDIOUGNE", "MISSIRAH",
+            "CASAMANCE-ZIGUINCHOR", "CASAMANCE-CAP-SKIRRING", "KAFOUNTINE"
+        ];
+        
+        // Remplir zones
+        const zoneSelect = document.getElementById('zoneSelect');
+        zones.forEach(zone => {
+            const div = document.createElement('div');
+            div.className = 'zone-checkbox';
+            div.innerHTML = `
+                <input type="checkbox" id="zone_${zone}" value="${zone}">
+                <label for="zone_${zone}">${zone}</label>
+            `;
+            zoneSelect.appendChild(div);
+        });
+        
+        // Charger préférences
+        const prefs = alertSystem.loadPreferences();
+        document.getElementById('enableAlerts').checked = prefs.enabled;
+        document.getElementById('alertDanger').checked = prefs.conditions.danger;
+        document.getElementById('alertWarning').checked = prefs.conditions.warning;
+        document.getElementById('alertOptimal').checked = prefs.conditions.optimal;
+        
+        prefs.zones.forEach(zone => {
+            const checkbox = document.getElementById(`zone_${zone}`);
+            if (checkbox) checkbox.checked = true;
+        });
+        
+        // Sauvegarder
+        async function savePreferences() {
+            const enabled = document.getElementById('enableAlerts').checked;
+            
+            if (enabled && Notification.permission !== 'granted') {
+                const granted = await alertSystem.requestPermission();
+                if (!granted) {
+                    alert('Vous devez autoriser les notifications');
+                    document.getElementById('enableAlerts').checked = false;
+                    return;
+                }
+            }
+            
+            alertSystem.preferences = {
+                enabled: enabled,
+                zones: Array.from(document.querySelectorAll('.zone-checkbox input:checked'))
+                    .map(cb => cb.value),
+                conditions: {
+                    danger: document.getElementById('alertDanger').checked,
+                    warning: document.getElementById('alertWarning').checked,
+                    optimal: document.getElementById('alertOptimal').checked
+                }
+            };
+            
+            alertSystem.savePreferences();
+            alert('✅ Paramètres sauvegardés !');
+        }
+    </script>
+</body>
+</html>
