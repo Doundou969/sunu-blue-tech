@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PecheurConnect 🇸🇳 | Sécurité Maritime</title>
+    <title>PecheurConnect v2.0 🇸🇳 | 18 Zones Actives</title>
     
+    <link rel="manifest" href="./manifest.json">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
@@ -22,10 +25,9 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body { 
-            margin: 0; 
             font-family: 'Segoe UI', Roboto, -apple-system, sans-serif; 
             overflow: hidden; 
-            background: #f4f7f6; 
+            background: #f4f7f6;
         }
         
         #map { 
@@ -34,269 +36,277 @@
             z-index: 1; 
         }
 
-        /* En-tête */
-        .search-container {
-            position: absolute; 
-            top: 15px; 
-            left: 15px; 
-            right: 15px; 
+        /* En-tête v2.0 */
+        .header-v2 {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
             z-index: 1000;
-            max-width: 420px;
+            max-width: 450px;
         }
         
-        .brand-header {
+        .brand-header-v2 {
             background: linear-gradient(135deg, #0056b3 0%, #004494 100%);
-            margin-bottom: 12px; 
             padding: 15px 22px;
-            border-radius: 14px; 
-            display: flex; 
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            border-radius: 14px;
             color: white;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.25);
+            margin-bottom: 12px;
         }
         
-        .brand-header h1 { 
-            margin: 0; 
-            font-size: 19px; 
-            font-weight: 800;
-            letter-spacing: -0.5px;
-        }
-        
-        .brand-header .status-indicator {
+        .brand-title {
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .brand-title h1 {
+            font-size: 20px;
+            font-weight: 800;
+        }
+        
+        .version-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        
+        .stats-bar {
+            display: flex;
+            gap: 15px;
             font-size: 13px;
-            font-weight: 600;
+            opacity: 0.95;
         }
         
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #28a745;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
-        .search-box {
-            width: 100%; 
-            padding: 14px 22px; 
-            border-radius: 30px; 
-            border: none;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.12); 
-            font-size: 16px; 
-            outline: none;
-            transition: all 0.3s ease;
-        }
-        
-        .search-box:focus {
-            box-shadow: 0 6px 25px rgba(0,86,179,0.25);
-        }
-
-        /* Panneau d'information */
-        .info-panel {
-            position: absolute; 
-            bottom: 30px; 
-            left: 15px; 
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.97); 
-            padding: 18px; 
-            border-radius: 14px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
-            font-size: 13px;
-            backdrop-filter: blur(10px);
-            max-width: 320px;
-        }
-        
-        #update-tag {
-            color: var(--primary); 
-            font-weight: 700; 
+        /* Filtres régions */
+        .region-filters {
+            background: white;
+            padding: 12px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             margin-bottom: 10px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .region-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        
+        .region-btn:hover {
+            border-color: var(--primary);
+            background: #f0f7ff;
+        }
+        
+        .region-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .region-btn.all {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+
+        /* Search box */
+        .search-box {
+            width: 100%;
+            padding: 14px 22px;
+            border-radius: 30px;
+            border: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+            font-size: 16px;
+            outline: none;
+        }
+
+        /* Info panel v2 */
+        .info-panel-v2 {
+            position: absolute;
+            bottom: 30px;
+            left: 15px;
+            z-index: 1000;
+            background: rgba(255,255,255,0.97);
+            padding: 18px;
+            border-radius: 14px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            backdrop-filter: blur(10px);
+            max-width: 350px;
+        }
+        
+        .update-time {
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 12px;
             font-size: 14px;
-        }
-        
-        .status-legend { 
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px; 
-            margin-top: 8px; 
-        }
-        
-        .status-legend span {
             display: flex;
             align-items: center;
             gap: 6px;
-            font-weight: 600;
         }
         
-        .legend-dot {
-            width: 12px;
-            height: 12px;
+        .zone-summary {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 12px;
+        }
+        
+        .summary-card {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .summary-card .number {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        
+        .summary-card .label {
+            font-size: 11px;
+            opacity: 0.7;
+            text-transform: uppercase;
+        }
+
+        /* Cluster markers custom */
+        .marker-cluster {
+            background-clip: padding-box;
             border-radius: 50%;
         }
-
-        /* Badge des Vagues sur la Carte */
-        .wave-badge {
-            color: white; 
-            padding: 6px 12px; 
-            border-radius: 25px;
-            font-weight: 800; 
-            font-size: 13px; 
-            border: 3px solid white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4); 
+        
+        .marker-cluster-small {
+            background-color: rgba(40, 167, 69, 0.6);
+        }
+        
+        .marker-cluster-medium {
+            background-color: rgba(255, 193, 7, 0.6);
+        }
+        
+        .marker-cluster-large {
+            background-color: rgba(255, 152, 0, 0.6);
+        }
+        
+        .marker-cluster div {
+            width: 30px;
+            height: 30px;
+            margin-left: 5px;
+            margin-top: 5px;
             text-align: center;
-            min-width: 65px;
-            letter-spacing: 0.5px;
-        }
-
-        /* Bouton WhatsApp Flottant */
-        .whatsapp-btn {
-            position: absolute; 
-            bottom: 30px; 
-            right: 20px; 
-            z-index: 1000;
-            background: var(--whatsapp); 
-            color: white; 
-            width: 64px; 
-            height: 64px;
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4); 
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        
-        .whatsapp-btn:hover { 
-            transform: scale(1.15); 
-            box-shadow: 0 8px 30px rgba(37, 211, 102, 0.6);
-        }
-        
-        .whatsapp-btn svg { 
-            width: 34px; 
-            height: 34px; 
-            fill: white; 
-        }
-
-        /* Popup Styling */
-        .leaflet-popup-content-wrapper { 
-            border-radius: 14px; 
-            padding: 8px;
-            box-shadow: 0 6px 25px rgba(0,0,0,0.2);
-        }
-        
-        .leaflet-popup-content {
-            margin: 14px;
-        }
-        
-        .popup-title { 
-            border-bottom: 2px solid #eee; 
-            padding-bottom: 10px; 
-            margin-bottom: 12px; 
-            font-size: 17px;
-            font-weight: 800;
-        }
-        
-        .popup-content {
-            line-height: 1.8;
-        }
-        
-        .popup-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 8px 0;
-            font-size: 14px;
-        }
-        
-        .popup-label {
-            font-weight: 700;
-        }
-        
-        .safety-badge {
-            margin-top: 14px;
-            padding: 12px;
-            border-radius: 10px;
+            border-radius: 50%;
+            font: 12px "Helvetica Neue", Arial, Helvetica, sans-serif;
+            font-weight: bold;
             color: white;
-            text-align: center;
-            font-weight: 800;
-            font-size: 15px;
-            letter-spacing: 0.5px;
-        }
-        
-        .forecast-chart {
-            margin-top: 14px;
-            padding-top: 14px;
-            border-top: 2px solid #eee;
-        }
-        
-        .forecast-title {
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: var(--primary);
-            font-size: 14px;
-        }
-        
-        .recommendations {
-            margin-top: 12px;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            font-size: 13px;
-            line-height: 1.6;
-        }
-        
-        .recommendation-item {
-            margin: 5px 0;
+            line-height: 30px;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .search-container {
-                left: 10px;
-                right: 10px;
-                max-width: 100%;
-            }
-            
-            .brand-header {
-                padding: 12px 18px;
-            }
-            
-            .brand-header h1 {
-                font-size: 16px;
-            }
-            
-            .info-panel {
-                left: 10px;
-                right: 10px;
-                bottom: 20px;
-                font-size: 12px;
-                max-width: 100%;
-            }
-            
-            .whatsapp-btn {
-                width: 56px;
-                height: 56px;
-                bottom: 120px;
-                right: 15px;
-            }
-            
-            .whatsapp-btn svg {
-                width: 28px;
-                height: 28px;
-            }
-            
-            .status-legend {
-                grid-template-columns: 1fr 1fr;
-                gap: 8px;
-            }
+        /* Wave badge amélioré */
+        .wave-badge-v2 {
+            color: white;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-weight: 800;
+            font-size: 13px;
+            border: 3px solid white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            text-align: center;
+            min-width: 70px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+        
+        .wave-value {
+            font-size: 16px;
+        }
+        
+        .wave-label {
+            font-size: 9px;
+            opacity: 0.9;
+        }
+
+        /* Popup enrichi */
+        .popup-header {
+            background: linear-gradient(135deg, var(--primary) 0%, #003d7a 100%);
+            color: white;
+            padding: 15px;
+            margin: -14px -14px 14px -14px;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .popup-zone-name {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        
+        .popup-region {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        .popup-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .metric-box {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        
+        .metric-label {
+            font-size: 11px;
+            margin-top: 4px;
+            opacity: 0.7;
+        }
+        
+        .weather-info {
+            background: #e3f2fd;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 12px 0;
+        }
+        
+        .weather-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 13px;
         }
 
         /* Loading */
@@ -307,6 +317,10 @@
             transform: translate(-50%, -50%);
             z-index: 2000;
             text-align: center;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
         }
         
         .spinner {
@@ -316,249 +330,312 @@
             border-top: 6px solid var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
         }
         
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-v2 {
+                left: 10px;
+                right: 10px;
+                max-width: 100%;
+            }
+            
+            .brand-header-v2 {
+                padding: 12px 16px;
+            }
+            
+            .brand-title h1 {
+                font-size: 17px;
+            }
+            
+            .stats-bar {
+                gap: 10px;
+                font-size: 11px;
+            }
+            
+            .region-filters {
+                gap: 6px;
+            }
+            
+            .region-btn {
+                min-width: 70px;
+                padding: 6px 10px;
+                font-size: 11px;
+            }
+            
+            .info-panel-v2 {
+                left: 10px;
+                right: 10px;
+                bottom: 20px;
+                max-width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
 
+    <!-- Loading -->
     <div class="loading" id="loading">
         <div class="spinner"></div>
-        <p style="margin-top: 15px; color: var(--primary); font-weight: 700;">Chargement...</p>
+        <p style="color: var(--primary); font-weight: 700; font-size: 16px;">
+            Chargement de 18 zones...
+        </p>
     </div>
 
-    <div class="search-container">
-        <div class="brand-header">
-            <h1>🇸🇳 PecheurConnect</h1>
-            <div class="status-indicator">
-                <div class="status-dot"></div>
-                <span>EN LIGNE</span>
+    <!-- Header v2.0 -->
+    <div class="header-v2">
+        <div class="brand-header-v2">
+            <div class="brand-title">
+                <h1>🇸🇳 PecheurConnect</h1>
+                <div class="version-badge">v2.0</div>
+            </div>
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span>📍</span>
+                    <span id="zoneCount">18 zones</span>
+                </div>
+                <div class="stat-item">
+                    <span>🗺️</span>
+                    <span id="regionCount">6 régions</span>
+                </div>
+                <div class="stat-item">
+                    <span id="statusDot">🟢</span>
+                    <span id="statusText">EN LIGNE</span>
+                </div>
             </div>
         </div>
-        <input type="text" id="zoneSearch" class="search-box" placeholder="🔍 Chercher un port (Kayar, Saint-Louis...)">
+        
+        <!-- Filtres régions -->
+        <div class="region-filters">
+            <button class="region-btn all active" data-region="all">Tout</button>
+            <button class="region-btn" data-region="Nord">Nord</button>
+            <button class="region-btn" data-region="Grande Côte">G. Côte</button>
+            <button class="region-btn" data-region="Dakar">Dakar</button>
+            <button class="region-btn" data-region="Petite Côte">P. Côte</button>
+            <button class="region-btn" data-region="Sine Saloum">S. Saloum</button>
+            <button class="region-btn" data-region="Casamance">Casamance</button>
+        </div>
+        
+        <input type="text" id="zoneSearch" class="search-box" placeholder="🔍 Chercher une zone...">
     </div>
 
-    <div class="info-panel">
-        <div id="update-tag">Mise à jour : Chargement...</div>
-        <div class="status-legend">
-            <span><div class="legend-dot" style="background: var(--safe);"></div> Sûr</span>
-            <span><div class="legend-dot" style="background: var(--caution);"></div> Vigilance</span>
-            <span><div class="legend-dot" style="background: var(--warning);"></div> Prudence</span>
-            <span><div class="legend-dot" style="background: var(--danger);"></div> Danger</span>
+    <!-- Info Panel v2 -->
+    <div class="info-panel-v2">
+        <div class="update-time">
+            <span>🕐</span>
+            <span id="updateTime">Chargement...</span>
+        </div>
+        
+        <div class="zone-summary">
+            <div class="summary-card" style="background: #d4edda;">
+                <div class="number" style="color: var(--safe);" id="safeCount">0</div>
+                <div class="label">Sûr</div>
+            </div>
+            <div class="summary-card" style="background: #fff3cd;">
+                <div class="number" style="color: var(--caution);" id="cautionCount">0</div>
+                <div class="label">Vigilance</div>
+            </div>
+            <div class="summary-card" style="background: #ffe5d0;">
+                <div class="number" style="color: var(--warning);" id="warningCount">0</div>
+                <div class="label">Prudence</div>
+            </div>
+            <div class="summary-card" style="background: #f8d7da;">
+                <div class="number" style="color: var(--danger);" id="dangerCount">0</div>
+                <div class="label">Danger</div>
+            </div>
         </div>
     </div>
 
-    <div class="whatsapp-btn" onclick="openWhatsAppReport()" title="Signaler un danger">
-        <svg viewBox="0 0 24 24">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-        </svg>
-    </div>
-
+    <!-- Map -->
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
     <script>
-        let chartInstances = {};
+        let map, markers = [], allZones = [];
+        let currentRegion = 'all';
+        let markerLayer;
 
         document.addEventListener("DOMContentLoaded", function() {
-            // Initialisation de la carte
-            const map = L.map('map', { zoomControl: false }).setView([14.45, -17.2], 7);
-            const markers = [];
-
+            // Init map
+            map = L.map('map', { zoomControl: false }).setView([14.0, -16.5], 7);
+            
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap | PecheurConnect',
-                maxZoom: 19
+                attribution: '© OpenStreetMap | PecheurConnect v2.0'
             }).addTo(map);
-
+            
             L.control.zoom({ position: 'bottomright' }).addTo(map);
+            
+            // Marker cluster group
+            markerLayer = L.markerClusterGroup({
+                maxClusterRadius: 50,
+                spiderfyOnMaxZoom: true,
+                showCoverageOnHover: false
+            });
 
-            // Chargement des données
+            // Charger données
             fetch('./data.json?v=' + Date.now())
-                .then(res => {
-                    if (!res.ok) throw new Error('Erreur réseau');
-                    return res.json();
-                })
+                .then(res => res.json())
                 .then(data => {
-                    // Masquer le loading
                     document.getElementById('loading').style.display = 'none';
-                    
-                    // Mise à jour de l'heure
-                    if (data[0] && data[0].date) {
-                        document.getElementById('update-tag').innerText = "Mise à jour : " + data[0].date + " UTC";
-                    }
-
-                    data.forEach(item => {
-                        const color = item.color || "#28a745";
-                        
-                        // Créer le marqueur
-                        const marker = L.marker([item.lat, item.lon], {
-                            icon: L.divIcon({
-                                className: 'custom-div-icon',
-                                html: `<div class="wave-badge" style="background:${color}">${item.v_now}m</div>`,
-                                iconSize: [70, 32]
-                            })
-                        }).addTo(map);
-
-                        // Contenu du popup
-                        const popupContent = `
-                            <div style="min-width: 280px; max-width: 320px;">
-                                <div class="popup-title">📍 ${item.zone}</div>
-                                
-                                <div class="popup-content">
-                                    <div class="popup-row">
-                                        🌊 <span class="popup-label">Vagues:</span> ${item.v_now}m
-                                    </div>
-                                    <div class="popup-row">
-                                        🌡️ <span class="popup-label">Température:</span> ${item.t_now}°C
-                                    </div>
-                                    <div class="popup-row">
-                                        🧭 <span class="popup-label">Courant:</span> ${item.c_now}m/s
-                                    </div>
-                                    <div class="popup-row">
-                                        🐟 <span class="popup-label">Indice Pêche:</span> ${item.index}
-                                    </div>
-                                </div>
-                                
-                                ${item.forecast && item.forecast.length > 0 ? `
-                                    <div class="forecast-chart">
-                                        <div class="forecast-title">📈 Prévisions 24h</div>
-                                        <canvas id="chart-${item.zone.replace(/\s+/g, '-')}" height="120"></canvas>
-                                    </div>
-                                ` : ''}
-                                
-                                ${item.recommendations && item.recommendations.length > 0 ? `
-                                    <div class="recommendations">
-                                        ${item.recommendations.map(r => `<div class="recommendation-item">${r}</div>`).join('')}
-                                    </div>
-                                ` : ''}
-                                
-                                <div class="safety-badge" style="background:${color}">
-                                    ${item.safety}
-                                </div>
-                            </div>
-                        `;
-                        
-                        marker.bindPopup(popupContent, {
-                            maxWidth: 350,
-                            className: 'custom-popup'
-                        });
-
-                        // Créer le graphique quand le popup s'ouvre
-                        if (item.forecast && item.forecast.length > 0) {
-                            marker.on('popupopen', function() {
-                                const chartId = `chart-${item.zone.replace(/\s+/g, '-')}`;
-                                const ctx = document.getElementById(chartId);
-                                
-                                if (ctx && !chartInstances[chartId]) {
-                                    chartInstances[chartId] = new Chart(ctx, {
-                                        type: 'line',
-                                        data: {
-                                            labels: item.forecast.map(f => f.time),
-                                            datasets: [{
-                                                label: 'Hauteur vagues (m)',
-                                                data: item.forecast.map(f => f.wave),
-                                                borderColor: color,
-                                                backgroundColor: color + '33',
-                                                tension: 0.4,
-                                                fill: true,
-                                                borderWidth: 3,
-                                                pointRadius: 4,
-                                                pointBackgroundColor: color,
-                                                pointBorderColor: '#fff',
-                                                pointBorderWidth: 2
-                                            }]
-                                        },
-                                        options: {
-                                            responsive: true,
-                                            maintainAspectRatio: false,
-                                            plugins: {
-                                                legend: { display: false },
-                                                tooltip: {
-                                                    backgroundColor: 'rgba(0,0,0,0.8)',
-                                                    padding: 12,
-                                                    titleFont: { size: 14, weight: 'bold' },
-                                                    bodyFont: { size: 13 },
-                                                    callbacks: {
-                                                        label: function(context) {
-                                                            return 'Vagues: ' + context.parsed.y + 'm';
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            scales: {
-                                                y: { 
-                                                    beginAtZero: true,
-                                                    ticks: {
-                                                        callback: function(value) {
-                                                            return value + 'm';
-                                                        }
-                                                    },
-                                                    grid: {
-                                                        color: 'rgba(0,0,0,0.05)'
-                                                    }
-                                                },
-                                                x: {
-                                                    grid: {
-                                                        display: false
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    });
-                                }
-                            });
-                            
-                            // Détruire le graphique quand le popup se ferme
-                            marker.on('popupclose', function() {
-                                const chartId = `chart-${item.zone.replace(/\s+/g, '-')}`;
-                                if (chartInstances[chartId]) {
-                                    chartInstances[chartId].destroy();
-                                    delete chartInstances[chartId];
-                                }
-                            });
-                        }
-
-                        markers.push({ 
-                            name: item.zone.toLowerCase(), 
-                            marker: marker, 
-                            latlng: [item.lat, item.lon] 
-                        });
-                    });
+                    allZones = data;
+                    displayZones(data);
+                    updateStats(data);
                 })
                 .catch(err => {
-                    console.error("Erreur chargement données:", err);
-                    document.getElementById('loading').innerHTML = '<p style="color: var(--danger); font-weight: 700;">❌ Erreur de chargement</p>';
+                    console.error("Erreur:", err);
+                    document.getElementById('loading').innerHTML = '<p style="color: var(--danger);">❌ Erreur de chargement</p>';
                 });
-
-            // Logique de recherche
+            
+            // Filtres régions
+            document.querySelectorAll('.region-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.region-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentRegion = this.dataset.region;
+                    filterByRegion(currentRegion);
+                });
+            });
+            
+            // Recherche
             document.getElementById('zoneSearch').addEventListener('input', function(e) {
                 const search = e.target.value.toLowerCase();
-                const found = markers.find(m => m.name.includes(search));
-                
-                if (found && search.length > 2) {
-                    map.flyTo(found.latlng, 11, {
-                        duration: 1.5
-                    });
-                    found.marker.openPopup();
+                if (search.length > 2) {
+                    const found = markers.find(m => m.name.includes(search));
+                    if (found) {
+                        map.flyTo(found.latlng, 11);
+                        found.marker.openPopup();
+                    }
                 }
             });
         });
 
-        // Fonction WhatsApp
-        function openWhatsAppReport() {
-            const phoneNumber = "221777020818"; // REMPLACER PAR VOTRE NUMÉRO
-            const message = encodeURIComponent(
-                "📢 *SIGNALEMENT PECHEURCONNECT*\n\n" +
-                "Je signale un changement en mer :\n\n" +
-                "📍 Zone : \n" +
-                "🌊 État de la mer : \n" +
-                "⚠️ Commentaire : "
-            );
-            window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+        function displayZones(data) {
+            markerLayer.clearLayers();
+            markers = [];
+            
+            if (data[0] && data[0].date) {
+                document.getElementById('updateTime').textContent = "Mise à jour : " + data[0].date + " UTC";
+            }
+            
+            data.forEach(item => {
+                const color = item.color || "#28a745";
+                
+                const marker = L.marker([item.lat, item.lon], {
+                    icon: L.divIcon({
+                        className: 'custom-div-icon',
+                        html: `
+                            <div class="wave-badge-v2" style="background:${color}">
+                                <div class="wave-value">${item.v_now}m</div>
+                                <div class="wave-label">VAGUES</div>
+                            </div>
+                        `,
+                        iconSize: [75, 50]
+                    })
+                });
+                
+                const popupContent = `
+                    <div style="min-width: 300px;">
+                        <div class="popup-header">
+                            <div class="popup-zone-name">${item.zone}</div>
+                            <div class="popup-region">📍 ${item.region} - ${item.description}</div>
+                        </div>
+                        
+                        <div class="popup-metrics">
+                            <div class="metric-box">
+                                <div class="metric-value">${item.v_now}m</div>
+                                <div class="metric-label">🌊 Vagues</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-value">${item.t_now}°C</div>
+                                <div class="metric-label">🌡️ Température</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-value">${item.c_now}m/s</div>
+                                <div class="metric-label">🧭 Courant</div>
+                            </div>
+                            <div class="metric-box">
+                                <div class="metric-value">${item.wind_speed || 'N/A'}</div>
+                                <div class="metric-label">🌬️ Vent m/s</div>
+                            </div>
+                        </div>
+                        
+                        ${item.weather_desc ? `
+                            <div class="weather-info">
+                                <div class="weather-row">
+                                    <span>☁️ Météo:</span>
+                                    <strong>${item.weather_desc}</strong>
+                                </div>
+                                <div class="weather-row">
+                                    <span>👁️ Visibilité:</span>
+                                    <strong>${item.visibility || 'N/A'} km</strong>
+                                </div>
+                                <div class="weather-row">
+                                    <span>💧 Humidité:</span>
+                                    <strong>${item.humidity || 'N/A'}%</strong>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="popup-row">
+                            <strong>🐟 Indice Pêche:</strong> ${item.index}
+                        </div>
+                        
+                        <div style="margin-top: 14px; padding: 12px; border-radius: 10px; background:${color}; color: white; text-align: center; font-weight: 800; font-size: 15px;">
+                            ${item.safety}
+                        </div>
+                    </div>
+                `;
+                
+                marker.bindPopup(popupContent, { maxWidth: 350 });
+                
+                markerLayer.addLayer(marker);
+                
+                markers.push({ 
+                    name: item.zone.toLowerCase(), 
+                    marker: marker, 
+                    latlng: [item.lat, item.lon],
+                    region: item.region
+                });
+            });
+            
+            map.addLayer(markerLayer);
+        }
+
+        function updateStats(data) {
+            const stats = {
+                safe: data.filter(z => z.safety_level === "safe").length,
+                caution: data.filter(z => z.safety_level === "caution").length,
+                warning: data.filter(z => z.safety_level === "warning").length,
+                danger: data.filter(z => z.safety_level === "danger").length
+            };
+            
+            document.getElementById('safeCount').textContent = stats.safe;
+            document.getElementById('cautionCount').textContent = stats.caution;
+            document.getElementById('warningCount').textContent = stats.warning;
+            document.getElementById('dangerCount').textContent = stats.danger;
+            
+            document.getElementById('zoneCount').textContent = `${data.length} zones`;
+        }
+
+        function filterByRegion(region) {
+            if (region === 'all') {
+                displayZones(allZones);
+            } else {
+                const filtered = allZones.filter(z => z.region === region);
+                displayZones(filtered);
+                
+                if (filtered.length > 0) {
+                    const bounds = L.latLngBounds(filtered.map(z => [z.lat, z.lon]));
+                    map.fitBounds(bounds, { padding: [50, 50] });
+                }
+            }
         }
     </script>
 </body>
