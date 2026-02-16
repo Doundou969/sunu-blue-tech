@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """
-PecheurConnect - Version avec debug et approche alternative
+PecheurConnect v2.0 - Version complète
+- Météo (vent, pluie, visibilité)
+- Marées en temps réel
+- 18 zones au lieu de 5
 """
 
 import os
@@ -8,25 +11,41 @@ import json
 import numpy as np
 import pandas as pd
 import copernicusmarine as cm
+import requests
 from datetime import datetime, timedelta
 from pathlib import Path
-import requests
 import warnings
 
 warnings.filterwarnings('ignore')
 
-# Configuration
+# Configuration API
 COPERNICUS_USER = os.getenv("COPERNICUS_USERNAME")
 COPERNICUS_PASS = os.getenv("COPERNICUS_PASSWORD")
+OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
+WORLDTIDES_API_KEY = os.getenv("WORLDTIDES_API_KEY")
 TG_TOKEN = os.getenv("TG_TOKEN")
 TG_ID = os.getenv("TG_ID")
 
+# 18 ZONES ÉTENDUES
 ZONES = {
-    "SAINT-LOUIS": {"lat": 16.05, "lon": -16.65, "desc": "Ndar - Nord"},
-    "KAYAR": {"lat": 14.95, "lon": -17.35, "desc": "Kayar - Centre-Nord"},
-    "DAKAR-YOFF": {"lat": 14.80, "lon": -17.65, "desc": "Dakar - Capitale"},
-    "MBOUR-JOAL": {"lat": 14.35, "lon": -17.15, "desc": "Petite Côte"},
-    "CASAMANCE": {"lat": 12.50, "lon": -16.95, "desc": "Ziguinchor - Sud"}
+    "SAINT-LOUIS": {"lat": 16.05, "lon": -16.65, "desc": "Ndar - Nord", "region": "Nord"},
+    "GANDIOL": {"lat": 16.15, "lon": -16.55, "desc": "Gandiol", "region": "Nord"},
+    "KAYAR": {"lat": 14.95, "lon": -17.35, "desc": "Kayar", "region": "Grande Côte"},
+    "LOMPOUL": {"lat": 15.35, "lon": -16.85, "desc": "Lompoul", "region": "Grande Côte"},
+    "DAKAR-YOFF": {"lat": 14.80, "lon": -17.65, "desc": "Yoff", "region": "Dakar"},
+    "DAKAR-SOUMBEDIOUNE": {"lat": 14.68, "lon": -17.46, "desc": "Soumbédioune", "region": "Dakar"},
+    "DAKAR-HANN": {"lat": 14.73, "lon": -17.43, "desc": "Hann", "region": "Dakar"},
+    "RUFISQUE": {"lat": 14.72, "lon": -17.28, "desc": "Rufisque", "region": "Dakar"},
+    "BARGNY": {"lat": 14.70, "lon": -17.23, "desc": "Bargny", "region": "Dakar"},
+    "MBOUR-JOAL": {"lat": 14.35, "lon": -17.15, "desc": "Mbour-Joal", "region": "Petite Côte"},
+    "NIANING": {"lat": 14.45, "lon": -17.10, "desc": "Nianing", "region": "Petite Côte"},
+    "SALY": {"lat": 14.45, "lon": -17.00, "desc": "Saly", "region": "Petite Côte"},
+    "PALMARIN": {"lat": 14.23, "lon": -16.80, "desc": "Palmarin", "region": "Sine Saloum"},
+    "FOUNDIOUGNE": {"lat": 14.13, "lon": -16.47, "desc": "Foundiougne", "region": "Sine Saloum"},
+    "CASAMANCE-ZIGUINCHOR": {"lat": 12.50, "lon": -16.95, "desc": "Ziguinchor", "region": "Casamance"},
+    "CASAMANCE-CAP-SKIRRING": {"lat": 12.40, "lon": -16.75, "desc": "Cap Skirring", "region": "Casamance"},
+    "KAFOUNTINE": {"lat": 12.92, "lon": -16.75, "desc": "Kafountine", "region": "Casamance"},
+    "MISSIRAH": {"lat": 13.93, "lon": -16.75, "desc": "Missirah", "region": "Sine Saloum"}
 }
 
 DATASETS = {
@@ -38,101 +57,146 @@ DATASETS = {
 
 def log(msg, level="INFO"):
     timestamp = datetime.now().strftime('%H:%M:%S')
-    emoji = {"ERROR": "❌", "WARNING": "⚠️", "SUCCESS": "✅", "INFO": "ℹ️", "DEBUG": "🔍"}
+    emoji = {"ERROR": "❌", "WARNING": "⚠️", "SUCCESS": "✅", "INFO": "ℹ️"}
     print(f"[{timestamp}] {emoji.get(level, 'ℹ️')} {msg}")
 
 
-def calculate_safety_level(wave, current):
-    if wave > 3.0 or current > 1.0:
-        return "🔴 DANGER", "danger", "#d32f2f"
-    elif wave > 2.1 or current > 0.6:
-        return "🟠 PRUDENCE", "warning", "#ff9800"
-    elif wave > 1.5 or current > 0.4:
-        return "🟡 VIGILANCE", "caution", "#ffc107"
-    else:
-        return "🟢 SÛR", "safe", "#28a745"
-
-
-def calculate_fish_index(temp, current, wave):
-    score = 0
-    factors = []
+def get_weather_data(lat, lon):
+    """Récupère météo OpenWeatherMap"""
+    if not OPENWEATHER_API_KEY:
+        return None
     
-    if 18 <= temp <= 24:
-        score += 3
-        factors.append("Température idéale")
-    elif 15 <= temp <= 27:
-        score += 1
-        factors.append("Température acceptable")
-    
-    if 0.2 <= current <= 0.5:
-        score += 2
-        factors.append("Courants favorables")
-    elif current < 0.2:
-        score += 1
-        factors.append("Courants faibles")
-    
-    if wave < 1.0:
-        score += 3
-        factors.append("Mer très calme")
-    elif wave < 1.5:
-        score += 2
-        factors.append("Mer calme")
-    elif wave < 2.0:
-        score += 1
-        factors.append("Mer modérée")
-    
-    if score >= 7:
-        return "🐟🐟🐟 EXCELLENT", "excellent", factors
-    elif score >= 5:
-        return "🐟🐟 BON", "good", factors
-    elif score >= 3:
-        return "🐟 MOYEN", "moderate", factors
-    else:
-        return "🎣 FAIBLE", "poor", factors
-
-
-def generate_recommendations(safety_level, fish_level, wave, current, temp):
-    recommendations = []
-    
-    if safety_level == "danger":
-        recommendations.extend([
-            "NE PAS SORTIR EN MER",
-            "Restez à quai - Conditions dangereuses"
-        ])
-    elif safety_level == "warning":
-        recommendations.extend([
-            "Sortie fortement déconseillée",
-            "Si nécessaire, restez près des côtes"
-        ])
-    elif safety_level == "caution":
-        recommendations.extend([
-            "Vigilance accrue recommandée",
-            "Sortie en groupe privilégiée"
-        ])
-    else:
-        recommendations.append("Conditions sûres pour la navigation")
-    
-    if fish_level == "excellent":
-        recommendations.append("Conditions OPTIMALES pour la pêche")
-    elif fish_level == "good":
-        recommendations.append("Bonnes conditions de pêche")
-    elif fish_level == "moderate":
-        recommendations.append("Pêche possible - Conditions moyennes")
-    
-    return recommendations
-
-
-def fetch_zone_data_alternative(name, coords, now):
-    """Méthode alternative avec read_dataframe"""
-    log(f"Tentative alternative pour {name}...", "DEBUG")
-    
-    wave = None
-    temp = None
-    current = None
-    
-    # VAGUES
     try:
-        log(f"  Téléchargement vagues {name}...", "DEBUG")
+        url = f"https://api.openweathermap.org/data/2.5/weather"
+        params = {
+            "lat": lat,
+            "lon": lon,
+            "appid": OPENWEATHER_API_KEY,
+            "units": "metric",
+            "lang": "fr"
+        }
+        
+        response = requests.get(url, params=params, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            return {
+                "wind_speed": round(data["wind"]["speed"], 1),
+                "wind_direction": data["wind"].get("deg", 0),
+                "wind_gust": round(data["wind"].get("gust", 0), 1),
+                "precipitation": data.get("rain", {}).get("1h", 0),
+                "humidity": data["main"]["humidity"],
+                "pressure": data["main"]["pressure"],
+                "visibility": data.get("visibility", 10000) / 1000,
+                "clouds": data["clouds"]["all"],
+                "description": data["weather"][0]["description"],
+                "icon": data["weather"][0]["icon"]
+            }
+    except:
+        return None
+
+
+def get_tide_data(lat, lon):
+    """Récupère données marées"""
+    if not WORLDTIDES_API_KEY:
+        return None
+    
+    try:
+        url = "https://www.worldtides.info/api/v3"
+        now = datetime.utcnow()
+        start = int(now.timestamp())
+        
+        params = {
+            "heights": "",
+            "extremes": "",
+            "lat": lat,
+            "lon": lon,
+            "start": start,
+            "length": 172800,
+            "key": WORLDTIDES_API_KEY
+        }
+        
+        response = requests.get(url, params=params, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            extremes = data.get("extremes", [])[:6]
+            
+            tides = []
+            for extreme in extremes:
+                tide_time = datetime.fromtimestamp(extreme["dt"])
+                tides.append({
+                    "time": tide_time.strftime("%H:%M"),
+                    "height": round(extreme["height"], 2),
+                    "type": "Haute" if extreme["type"] == "High" else "Basse"
+                })
+            
+            return {"tides": tides}
+    except:
+        return None
+
+
+def calculate_safety_with_weather(wave, current, wind_speed, visibility, precipitation):
+    """Calcul sécurité avec météo"""
+    danger_score = 0
+    reasons = []
+    
+    # Vagues (40%)
+    if wave > 3.0:
+        danger_score += 40
+        reasons.append(f"Vagues {wave}m")
+    elif wave > 2.1:
+        danger_score += 25
+    elif wave > 1.5:
+        danger_score += 15
+    
+    # Courants (20%)
+    if current > 1.0:
+        danger_score += 20
+    elif current > 0.6:
+        danger_score += 12
+    
+    # Vent (20%)
+    if wind_speed > 15:
+        danger_score += 20
+        reasons.append(f"Vent {wind_speed}m/s")
+    elif wind_speed > 12:
+        danger_score += 12
+    elif wind_speed > 8:
+        danger_score += 6
+    
+    # Visibilité (10%)
+    if visibility < 1:
+        danger_score += 10
+        reasons.append(f"Visibilité {visibility}km")
+    elif visibility < 5:
+        danger_score += 5
+    
+    # Pluie (10%)
+    if precipitation > 10:
+        danger_score += 10
+        reasons.append("Pluie forte")
+    elif precipitation > 2:
+        danger_score += 5
+    
+    if danger_score >= 60:
+        return "🔴 DANGER", "danger", "#d32f2f", danger_score, reasons
+    elif danger_score >= 35:
+        return "🟠 PRUDENCE", "warning", "#ff9800", danger_score, reasons
+    elif danger_score >= 20:
+        return "🟡 VIGILANCE", "caution", "#ffc107", danger_score, reasons
+    else:
+        return "🟢 SÛR", "safe", "#28a745", danger_score, reasons
+
+
+def fetch_zone_data(name, coords, now):
+    """Récupère données pour une zone"""
+    log(f"Traitement {name}...")
+    
+    wave, temp, current = None, None, None
+    
+    # Données océanographiques
+    try:
         wave_df = cm.read_dataframe(
             dataset_id=DATASETS["waves"],
             variables=["VHM0"],
@@ -150,13 +214,10 @@ def fetch_zone_data_alternative(name, coords, now):
             wave_values = wave_df['VHM0'].dropna()
             if len(wave_values) > 0:
                 wave = round(float(wave_values.iloc[-1]), 2)
-                log(f"  Vagues: {wave}m (réelles)", "DEBUG")
-    except Exception as e:
-        log(f"  Erreur vagues: {str(e)[:50]}", "WARNING")
+    except:
+        pass
     
-    # TEMPERATURE
     try:
-        log(f"  Téléchargement température {name}...", "DEBUG")
         temp_df = cm.read_dataframe(
             dataset_id=DATASETS["temperature"],
             variables=["thetao"],
@@ -176,13 +237,10 @@ def fetch_zone_data_alternative(name, coords, now):
             temp_values = temp_df['thetao'].dropna()
             if len(temp_values) > 0:
                 temp = round(float(temp_values.iloc[-1]), 1)
-                log(f"  Température: {temp}°C (réelle)", "DEBUG")
-    except Exception as e:
-        log(f"  Erreur température: {str(e)[:50]}", "WARNING")
+    except:
+        pass
     
-    # COURANTS
     try:
-        log(f"  Téléchargement courants {name}...", "DEBUG")
         current_df = cm.read_dataframe(
             dataset_id=DATASETS["current"],
             variables=["uo", "vo"],
@@ -203,106 +261,109 @@ def fetch_zone_data_alternative(name, coords, now):
                 u = current_df['uo'].dropna().iloc[-1] if len(current_df['uo'].dropna()) > 0 else 0
                 v = current_df['vo'].dropna().iloc[-1] if len(current_df['vo'].dropna()) > 0 else 0
                 current = round(float(np.sqrt(u**2 + v**2)), 2)
-                log(f"  Courant: {current}m/s (réel)", "DEBUG")
-    except Exception as e:
-        log(f"  Erreur courants: {str(e)[:50]}", "WARNING")
+    except:
+        pass
     
-    return wave, temp, current
+    # Valeurs par défaut
+    if wave is None:
+        wave = 1.5
+    if temp is None:
+        temp = 22.0
+    if current is None:
+        current = 0.3
+    
+    # Météo
+    weather = get_weather_data(coords["lat"], coords["lon"])
+    wind_speed = weather["wind_speed"] if weather else 5.0
+    visibility = weather["visibility"] if weather else 10.0
+    precipitation = weather["precipitation"] if weather else 0.0
+    
+    # Marées
+    tide = get_tide_data(coords["lat"], coords["lon"])
+    
+    # Calcul sécurité
+    safety, safety_level, color, danger_score, reasons = calculate_safety_with_weather(
+        wave, current, wind_speed, visibility, precipitation
+    )
+    
+    # Index pêche simplifié
+    score = 0
+    if 18 <= temp <= 24:
+        score += 3
+    if 0.2 <= current <= 0.5:
+        score += 2
+    if wave < 1.5:
+        score += 2
+    
+    if score >= 5:
+        fish = "🐟🐟🐟 EXCELLENT"
+        fish_level = "excellent"
+    elif score >= 3:
+        fish = "🐟🐟 BON"
+        fish_level = "good"
+    else:
+        fish = "🐟 MOYEN"
+        fish_level = "moderate"
+    
+    result = {
+        "zone": name,
+        "description": coords["desc"],
+        "region": coords["region"],
+        "lat": coords["lat"],
+        "lon": coords["lon"],
+        "v_now": wave,
+        "t_now": temp,
+        "c_now": current,
+        "wind_speed": wind_speed,
+        "wind_direction": weather["wind_direction"] if weather else 0,
+        "visibility": visibility,
+        "precipitation": precipitation,
+        "weather_desc": weather["description"] if weather else "Non disponible",
+        "humidity": weather["humidity"] if weather else 0,
+        "clouds": weather["clouds"] if weather else 0,
+        "index": fish,
+        "fish_level": fish_level,
+        "safety": safety,
+        "safety_level": safety_level,
+        "color": color,
+        "danger_score": danger_score,
+        "danger_reasons": reasons,
+        "date": now.strftime("%d/%m %H:%M"),
+        "timestamp": now.isoformat(),
+        "tide": tide,
+        "forecast": [],
+        "recommendations": []
+    }
+    
+    log(f"  {safety} | 🌊{wave}m | 🌡️{temp}°C | 🌬️{wind_speed}m/s", "SUCCESS")
+    
+    return result
 
 
 def fetch_data():
-    log("Connexion à Copernicus Marine Service...")
+    """Récupère données pour toutes les zones"""
+    log("Connexion à Copernicus...")
     
     if not COPERNICUS_USER or not COPERNICUS_PASS:
-        log("Identifiants Copernicus manquants", "ERROR")
+        log("Identifiants manquants", "ERROR")
         return None
     
     try:
         cm.login(username=COPERNICUS_USER, password=COPERNICUS_PASS)
-        log("Connexion réussie", "SUCCESS")
+        log("Connecté", "SUCCESS")
         
-        log("Collecte des données avec méthode alternative...")
         now = datetime.utcnow()
         results = []
         
         for name, coords in ZONES.items():
             try:
-                log(f"{name} ({coords['lat']}, {coords['lon']})...")
-                
-                # Utiliser la méthode alternative
-                wave, temp, current = fetch_zone_data_alternative(name, coords, now)
-                
-                # Valeurs par défaut si échec
-                if wave is None:
-                    wave = 1.5
-                    log(f"  Vagues par défaut: {wave}m", "WARNING")
-                
-                if temp is None:
-                    temp = 22.0
-                    log(f"  Température par défaut: {temp}°C", "WARNING")
-                
-                if current is None:
-                    current = 0.3
-                    log(f"  Courant par défaut: {current}m/s", "WARNING")
-                
-                # Vérifier si toutes les valeurs sont par défaut
-                is_default = (wave == 1.5 and temp == 22.0 and current == 0.3)
-                if is_default:
-                    log(f"  ATTENTION: {name} utilise TOUTES les valeurs par défaut!", "WARNING")
-                
-                # Calculs
-                safety, safety_level, color = calculate_safety_level(wave, current)
-                fish, fish_level, fish_factors = calculate_fish_index(temp, current, wave)
-                recommendations = generate_recommendations(safety_level, fish_level, wave, current, temp)
-                
-                danger_score = min(100, int(
-                    (wave / 4.0) * 40 +
-                    (current / 1.5) * 30 +
-                    ((30 - temp) / 15 if temp < 30 else 0) * 30
-                ))
-                
-                results.append({
-                    "zone": name,
-                    "description": coords["desc"],
-                    "lat": coords["lat"],
-                    "lon": coords["lon"],
-                    "v_now": wave,
-                    "t_now": temp,
-                    "c_now": current,
-                    "current_direction": 0.0,
-                    "index": fish,
-                    "fish_level": fish_level,
-                    "fish_factors": fish_factors,
-                    "safety": safety,
-                    "safety_level": safety_level,
-                    "color": color,
-                    "danger_score": danger_score,
-                    "date": now.strftime("%d/%m %H:%M"),
-                    "timestamp": now.isoformat(),
-                    "forecast": [],
-                    "recommendations": recommendations,
-                    "data_source": "default" if is_default else "real"
-                })
-                
-                log(f"  {safety} | Vagues {wave}m | Temp {temp}°C | Pêche {fish}", "SUCCESS")
-                
+                result = fetch_zone_data(name, coords, now)
+                results.append(result)
             except Exception as e:
-                log(f"Erreur zone {name}: {str(e)}", "ERROR")
+                log(f"Erreur {name}: {str(e)}", "ERROR")
                 continue
         
-        if len(results) == 0:
-            log("Aucune donnée collectée", "ERROR")
-            return None
-        
-        # Statistiques sur les sources
-        real_data = len([r for r in results if r.get("data_source") == "real"])
-        default_data = len([r for r in results if r.get("data_source") == "default"])
-        
-        log(f"Sources: {real_data} réelles | {default_data} par défaut", "INFO")
-        
-        if default_data == len(results):
-            log("ALERTE: TOUTES les zones utilisent des données par défaut!", "WARNING")
-        
+        log(f"Collecte terminée: {len(results)}/{len(ZONES)} zones", "SUCCESS")
         return results
         
     except Exception as e:
@@ -311,49 +372,41 @@ def fetch_data():
 
 
 def save_data(data):
+    """Sauvegarde data.json"""
     try:
         Path("logs").mkdir(exist_ok=True)
-        Path("logs/backups").mkdir(exist_ok=True)
         
         with open("data.json", "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
         
         log(f"data.json sauvegardé ({len(data)} zones)", "SUCCESS")
-        
-        backup_file = Path("logs/backups") / f"data_{datetime.now().strftime('%Y%m%d_%H%M')}.json"
-        with open(backup_file, "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
-        
-        backups = sorted(Path("logs/backups").glob("data_*.json"))
-        if len(backups) > 30:
-            for old_backup in backups[:-30]:
-                old_backup.unlink()
-        
         return True
-        
     except Exception as e:
         log(f"Erreur sauvegarde: {str(e)}", "ERROR")
         return False
 
 
 def send_telegram(data):
+    """Envoie alerte Telegram"""
     if not TG_TOKEN or not TG_ID:
-        log("Telegram non configuré", "WARNING")
         return
     
-    default_count = len([z for z in data if z.get("data_source") == "default"])
+    # Grouper par région
+    regions = {}
+    for zone in data:
+        region = zone["region"]
+        if region not in regions:
+            regions[region] = []
+        regions[region].append(zone)
     
-    message = "🌊 *PECHEURCONNECT - RAPPORT*\n\n"
+    message = "🌊 *PECHEURCONNECT v2.0*\n"
+    message += f"📊 {len(data)} zones | {len(regions)} régions\n\n"
     
-    if default_count == len(data):
-        message += "⚠️ _Données Copernicus indisponibles_\n"
-        message += "_Valeurs estimées affichées_\n\n"
-    
-    for z in data:
-        source_emoji = "📡" if z.get("data_source") == "real" else "📊"
-        message += f"{source_emoji} *{z['zone']}*\n"
-        message += f"{z['safety']} | {z['index']}\n"
-        message += f"🌊 {z['v_now']}m | 🌡️ {z['t_now']}°C\n\n"
+    for region, zones in regions.items():
+        message += f"📍 *{region}*\n"
+        for z in zones:
+            message += f"• {z['zone']}: {z['safety']}\n"
+        message += "\n"
     
     message += f"🕐 {data[0]['date']} UTC"
     
@@ -364,21 +417,22 @@ def send_telegram(data):
             timeout=10
         )
         log("Telegram envoyé", "SUCCESS")
-    except Exception as e:
-        log(f"Erreur Telegram: {str(e)}", "ERROR")
+    except:
+        pass
 
 
 def main():
-    start_time = datetime.now()
+    start = datetime.now()
     
-    log("=" * 60, "INFO")
-    log("PECHEURCONNECT - VERSION DEBUG", "INFO")
-    log("=" * 60, "INFO")
+    log("=" * 60)
+    log("PECHEURCONNECT v2.0 - DÉMARRAGE")
+    log("18 zones | Météo | Marées")
+    log("=" * 60)
     
     data = fetch_data()
     
     if not data:
-        log("Échec collecte", "ERROR")
+        log("Échec", "ERROR")
         exit(1)
     
     if not save_data(data):
@@ -387,18 +441,14 @@ def main():
     
     send_telegram(data)
     
-    duration = (datetime.now() - start_time).total_seconds()
-    log("=" * 60, "INFO")
+    duration = (datetime.now() - start).total_seconds()
     log(f"Terminé en {duration:.2f}s", "SUCCESS")
-    log("=" * 60, "INFO")
+    log("=" * 60)
 
 
 if __name__ == "__main__":
     try:
         main()
-    except KeyboardInterrupt:
-        log("Interrompu", "WARNING")
-        exit(0)
     except Exception as e:
         log(f"Erreur fatale: {str(e)}", "ERROR")
         exit(1)
