@@ -1,7 +1,7 @@
 {
   "zone": "SAINT-LOUIS",
   "period": "7 jours",
-  "data_points": 1,
+  "data_points": 2,
   "history": [
     {
       "timestamp": "2026-02-16T22:35:32.906963",
@@ -10,6 +10,16 @@
       "temp": 18.7,
       "current": 0.14,
       "wind": 3.1,
+      "safety_level": "safe",
+      "fish_level": "good"
+    },
+    {
+      "timestamp": "2026-02-16T23:49:26.922392",
+      "date": "2026-02-16",
+      "wave": 1.15,
+      "temp": 18.7,
+      "current": 0.14,
+      "wind": 2.1,
       "safety_level": "safe",
       "fish_level": "good"
     }
@@ -28,14 +38,14 @@
       "trend": "stable"
     },
     "wind": {
-      "min": 3.1,
+      "min": 2.1,
       "max": 3.1,
-      "avg": 3.1,
-      "trend": "stable"
+      "avg": 2.6,
+      "trend": "baisse"
     }
   },
   "safety_summary": {
-    "safe": 1,
+    "safe": 2,
     "caution": 0,
     "warning": 0,
     "danger": 0

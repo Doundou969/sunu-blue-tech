@@ -1,7 +1,7 @@
 {
   "zone": "NIANING",
   "period": "7 jours",
-  "data_points": 1,
+  "data_points": 2,
   "history": [
     {
       "timestamp": "2026-02-16T22:35:32.906963",
@@ -10,6 +10,16 @@
       "temp": 20.2,
       "current": 0.13,
       "wind": 7.3,
+      "safety_level": "safe",
+      "fish_level": "excellent"
+    },
+    {
+      "timestamp": "2026-02-16T23:49:26.922392",
+      "date": "2026-02-16",
+      "wave": 0.46,
+      "temp": 20.2,
+      "current": 0.13,
+      "wind": 7.0,
       "safety_level": "safe",
       "fish_level": "excellent"
     }
@@ -28,14 +38,14 @@
       "trend": "stable"
     },
     "wind": {
-      "min": 7.3,
+      "min": 7.0,
       "max": 7.3,
-      "avg": 7.3,
-      "trend": "stable"
+      "avg": 7.2,
+      "trend": "baisse"
     }
   },
   "safety_summary": {
-    "safe": 1,
+    "safe": 2,
     "caution": 0,
     "warning": 0,
     "danger": 0

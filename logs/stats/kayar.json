@@ -1,7 +1,7 @@
 {
   "zone": "KAYAR",
   "period": "7 jours",
-  "data_points": 1,
+  "data_points": 2,
   "history": [
     {
       "timestamp": "2026-02-16T22:35:32.906963",
@@ -10,6 +10,16 @@
       "temp": 19.3,
       "current": 0.11,
       "wind": 7.3,
+      "safety_level": "caution",
+      "fish_level": "good"
+    },
+    {
+      "timestamp": "2026-02-16T23:49:26.922392",
+      "date": "2026-02-16",
+      "wave": 1.59,
+      "temp": 19.3,
+      "current": 0.11,
+      "wind": 7.2,
       "safety_level": "caution",
       "fish_level": "good"
     }
@@ -28,15 +38,15 @@
       "trend": "stable"
     },
     "wind": {
-      "min": 7.3,
+      "min": 7.2,
       "max": 7.3,
-      "avg": 7.3,
-      "trend": "stable"
+      "avg": 7.2,
+      "trend": "baisse"
     }
   },
   "safety_summary": {
     "safe": 0,
-    "caution": 1,
+    "caution": 2,
     "warning": 0,
     "danger": 0
   },
