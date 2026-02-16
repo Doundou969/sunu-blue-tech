@@ -1,1 +1,23 @@
+<!-- À ajouter dans le header de toutes les pages -->
+<div class="language-selector" style="position: fixed; top: 20px; right: 20px; z-index: 10000;">
+    <select id="languageSelect" onchange="changeLanguage(this.value)" 
+            style="padding: 8px 15px; border-radius: 20px; border: 2px solid white; 
+                   background: rgba(255,255,255,0.95); font-weight: 600; cursor: pointer;">
+        <option value="fr">🇫🇷 Français</option>
+        <option value="wo">🇸🇳 Wolof</option>
+        <option value="en">🇬🇧 English</option>
+    </select>
+</div>
 
+<script src="./translations.js"></script>
+<script>
+    // Charger la langue sauvegardée
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentLang = localStorage.getItem('pecheurconnect_language') || 'fr';
+        document.getElementById('languageSelect').value = currentLang;
+    });
+    
+    function changeLanguage(lang) {
+        window.lang.setLanguage(lang);
+    }
+</script>
