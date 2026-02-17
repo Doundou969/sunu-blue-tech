@@ -1,7 +1,7 @@
 {
   "zone": "SALY",
   "period": "7 jours",
-  "data_points": 6,
+  "data_points": 7,
   "history": [
     {
       "timestamp": "2026-02-17T00:54:02.914224",
@@ -44,6 +44,16 @@
       "fish_level": "excellent"
     },
     {
+      "timestamp": "2026-02-17T15:55:17.716501",
+      "date": "2026-02-17",
+      "wave": 0.45,
+      "temp": 20.0,
+      "current": 0.12,
+      "wind": 2.0,
+      "safety_level": "safe",
+      "fish_level": "excellent"
+    },
+    {
       "timestamp": "2026-02-16T22:35:32.906963",
       "date": "2026-02-16",
       "wave": 0.46,
@@ -66,7 +76,7 @@
   ],
   "statistics": {
     "waves": {
-      "min": 0.46,
+      "min": 0.45,
       "max": 0.5,
       "avg": 0.47,
       "trend": "stable"
@@ -78,14 +88,14 @@
       "trend": "stable"
     },
     "wind": {
-      "min": 5,
+      "min": 2.0,
       "max": 7.2,
-      "avg": 6.1,
-      "trend": "hausse"
+      "avg": 5.5,
+      "trend": "stable"
     }
   },
   "safety_summary": {
-    "safe": 6,
+    "safe": 7,
     "caution": 0,
     "warning": 0,
     "danger": 0
@@ -98,7 +108,7 @@
   },
   "worst_day": {
     "date": "2026-02-17",
-    "wave": 0.46,
+    "wave": 0.45,
     "safety": "safe"
   }
 }
