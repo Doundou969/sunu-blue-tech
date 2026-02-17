@@ -1,8 +1,18 @@
 {
   "zone": "DAKAR-HANN",
   "period": "7 jours",
-  "data_points": 2,
+  "data_points": 3,
   "history": [
+    {
+      "timestamp": "2026-02-17T00:54:02.914224",
+      "date": "2026-02-17",
+      "wave": 1.18,
+      "temp": 19.5,
+      "current": 0.06,
+      "wind": 5.1,
+      "safety_level": "safe",
+      "fish_level": "good"
+    },
     {
       "timestamp": "2026-02-16T22:35:32.906963",
       "date": "2026-02-16",
@@ -26,13 +36,13 @@
   ],
   "statistics": {
     "waves": {
-      "min": 1.25,
+      "min": 1.18,
       "max": 1.25,
-      "avg": 1.25,
+      "avg": 1.23,
       "trend": "stable"
     },
     "temperature": {
-      "min": 19.6,
+      "min": 19.5,
       "max": 19.6,
       "avg": 19.6,
       "trend": "stable"
@@ -40,25 +50,25 @@
     "wind": {
       "min": 5.1,
       "max": 6.2,
-      "avg": 5.6,
-      "trend": "baisse"
+      "avg": 5.5,
+      "trend": "stable"
     }
   },
   "safety_summary": {
-    "safe": 2,
+    "safe": 3,
     "caution": 0,
     "warning": 0,
     "danger": 0
   },
   "best_day": {
-    "date": "2026-02-16",
-    "wave": 1.25,
-    "temp": 19.6,
+    "date": "2026-02-17",
+    "wave": 1.18,
+    "temp": 19.5,
     "safety": "safe"
   },
   "worst_day": {
-    "date": "2026-02-16",
-    "wave": 1.25,
+    "date": "2026-02-17",
+    "wave": 1.18,
     "safety": "safe"
   }
 }
