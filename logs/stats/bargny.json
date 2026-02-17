@@ -1,7 +1,7 @@
 {
   "zone": "BARGNY",
   "period": "7 jours",
-  "data_points": 5,
+  "data_points": 6,
   "history": [
     {
       "timestamp": "2026-02-17T00:54:02.914224",
@@ -30,6 +30,16 @@
       "temp": 20.0,
       "current": 0.09,
       "wind": 4.8,
+      "safety_level": "safe",
+      "fish_level": "good"
+    },
+    {
+      "timestamp": "2026-02-17T12:40:56.246511",
+      "date": "2026-02-17",
+      "wave": 1.5,
+      "temp": 20.0,
+      "current": 0.11,
+      "wind": 6.2,
       "safety_level": "safe",
       "fish_level": "good"
     },
@@ -70,12 +80,12 @@
     "wind": {
       "min": 4.6,
       "max": 6.9,
-      "avg": 5.5,
-      "trend": "baisse"
+      "avg": 5.6,
+      "trend": "stable"
     }
   },
   "safety_summary": {
-    "safe": 5,
+    "safe": 6,
     "caution": 0,
     "warning": 0,
     "danger": 0
