@@ -33,7 +33,50 @@
             margin: 0 auto;
         }
         
-        .header {
+        .header  <!-- Dans le header, après le titre -->
+<div class="nav-menu" style="margin-top: 15px;">
+    <a href="./history.html" style="color: white; margin: 0 10px; text-decoration: none;">📊 Historique</a>
+    <a href="./comparator.html" style="color: white; margin: 0 10px; text-decoration: none;">🎯 Comparateur</a>
+    <a href="./export.html" style="color: white; margin: 0 10px; text-decoration: none;">📄 Export</a>
+    <a href="./alerts-settings.html" style="color: white; margin: 0 10px; text-decoration: none;">🔔 Alertes</a>
+    <a href="./admin.html" style="color: white; margin: 0 10px; text-decoration: none;">🏛️ Admin</a>
+    <a href="./api/index.html" style="color: white; margin: 0 10px; text-decoration: none;">🔌 API</a>
+</div>
+
+<!-- Ajouter le sélecteur de langue -->
+<script src="./translations.js"></script>
+<!-- Widget sélecteur langue ici -->
+```
+
+---
+
+## 📂 **STRUCTURE FINALE DU PROJET**
+```
+sunu-blue-tech/
+├── index.html                    # Carte principale
+├── history.html                  # Historique 7 jours
+├── comparator.html               # Comparateur intelligent
+├── export.html                   # Export rapports
+├── alerts-settings.html          # Paramètres alertes
+├── admin.html                    # Dashboard admin
+├── script_peche.py               # Script Python complet
+├── requirements.txt              # Dépendances Python
+├── translations.js               # Système multilingue
+├── alerts.js                     # Système alertes
+├── predictions.js                # Prévisions ML
+├── manifest.json                 # PWA manifest
+├── sw.js                         # Service Worker
+├── offline.html                  # Page offline
+├── data.json                     # Données actuelles (généré)
+├── api/
+│   └── index.html               # Documentation API
+├── logs/
+│   ├── history/                 # Historique quotidien
+│   ├── stats/                   # Statistiques zones
+│   └── backups/                 # Backups horodatés
+├── .github/workflows/
+│   └── update.yml               # GitHub Actions
+└── README.md                    # Documentation {
             background: white;
             padding: 30px;
             border-radius: 15px;
