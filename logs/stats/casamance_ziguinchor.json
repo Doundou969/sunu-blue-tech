@@ -1,7 +1,7 @@
 {
   "zone": "CASAMANCE-ZIGUINCHOR",
   "period": "7 jours",
-  "data_points": 7,
+  "data_points": 8,
   "history": [
     {
       "timestamp": "2026-02-17T00:54:02.914224",
@@ -54,6 +54,16 @@
       "fish_level": "excellent"
     },
     {
+      "timestamp": "2026-02-17T18:46:19.799425",
+      "date": "2026-02-17",
+      "wave": 0.48,
+      "temp": 24.5,
+      "current": 0.14,
+      "wind": 5.5,
+      "safety_level": "safe",
+      "fish_level": "good"
+    },
+    {
       "timestamp": "2026-02-16T22:35:32.906963",
       "date": "2026-02-16",
       "wave": 0.64,
@@ -76,26 +86,26 @@
   ],
   "statistics": {
     "waves": {
-      "min": 0.51,
+      "min": 0.48,
       "max": 0.64,
-      "avg": 0.57,
+      "avg": 0.56,
       "trend": "stable"
     },
     "temperature": {
       "min": 23.5,
-      "max": 24.0,
-      "avg": 23.7,
+      "max": 24.5,
+      "avg": 23.8,
       "trend": "stable"
     },
     "wind": {
       "min": 2.6,
       "max": 5.5,
-      "avg": 3.6,
+      "avg": 3.8,
       "trend": "hausse"
     }
   },
   "safety_summary": {
-    "safe": 7,
+    "safe": 8,
     "caution": 0,
     "warning": 0,
     "danger": 0
@@ -108,7 +118,7 @@
   },
   "worst_day": {
     "date": "2026-02-17",
-    "wave": 0.51,
+    "wave": 0.48,
     "safety": "safe"
   }
 }

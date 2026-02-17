@@ -1,7 +1,7 @@
 {
   "zone": "LOMPOUL",
   "period": "7 jours",
-  "data_points": 7,
+  "data_points": 8,
   "history": [
     {
       "timestamp": "2026-02-17T00:54:02.914224",
@@ -54,6 +54,16 @@
       "fish_level": "excellent"
     },
     {
+      "timestamp": "2026-02-17T18:46:19.799425",
+      "date": "2026-02-17",
+      "wave": 0.94,
+      "temp": 20.2,
+      "current": 0.07,
+      "wind": 6.0,
+      "safety_level": "safe",
+      "fish_level": "excellent"
+    },
+    {
       "timestamp": "2026-02-16T22:35:32.906963",
       "date": "2026-02-16",
       "wave": 1.27,
@@ -76,9 +86,9 @@
   ],
   "statistics": {
     "waves": {
-      "min": 0.97,
+      "min": 0.94,
       "max": 1.27,
-      "avg": 1.14,
+      "avg": 1.12,
       "trend": "stable"
     },
     "temperature": {
@@ -90,25 +100,25 @@
     "wind": {
       "min": 4.6,
       "max": 8.3,
-      "avg": 6.6,
+      "avg": 6.5,
       "trend": "hausse"
     }
   },
   "safety_summary": {
-    "safe": 7,
+    "safe": 8,
     "caution": 0,
     "warning": 0,
     "danger": 0
   },
   "best_day": {
     "date": "2026-02-17",
-    "wave": 0.97,
-    "temp": 19.8,
+    "wave": 0.94,
+    "temp": 20.2,
     "safety": "safe"
   },
   "worst_day": {
     "date": "2026-02-17",
-    "wave": 0.97,
+    "wave": 0.94,
     "safety": "safe"
   }
 }
