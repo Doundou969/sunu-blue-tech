@@ -1,7 +1,7 @@
 {
   "zone": "PALMARIN",
   "period": "7 jours",
-  "data_points": 11,
+  "data_points": 12,
   "history": [
     {
       "timestamp": "2026-02-18T01:01:30.367708",
@@ -30,6 +30,16 @@
       "temp": 22.2,
       "current": 0.04,
       "wind": 5.2,
+      "safety_level": "safe",
+      "fish_level": "excellent"
+    },
+    {
+      "timestamp": "2026-02-18T12:42:25.301963",
+      "date": "2026-02-18",
+      "wave": 0.33,
+      "temp": 22.2,
+      "current": 0.04,
+      "wind": 5.5,
       "safety_level": "safe",
       "fish_level": "excellent"
     },
@@ -135,7 +145,7 @@
     }
   },
   "safety_summary": {
-    "safe": 11,
+    "safe": 12,
     "caution": 0,
     "warning": 0,
     "danger": 0

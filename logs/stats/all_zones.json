@@ -2,7 +2,7 @@
   "SAINT-LOUIS": {
     "zone": "SAINT-LOUIS",
     "period": "7 jours",
-    "data_points": 11,
+    "data_points": 12,
     "history": [
       {
         "timestamp": "2026-02-18T01:01:30.367708",
@@ -31,6 +31,16 @@
         "temp": 18.2,
         "current": 0.06,
         "wind": 2.1,
+        "safety_level": "safe",
+        "fish_level": "excellent"
+      },
+      {
+        "timestamp": "2026-02-18T12:42:25.301963",
+        "date": "2026-02-18",
+        "wave": 0.76,
+        "temp": 18.4,
+        "current": 0.08,
+        "wind": 4.1,
         "safety_level": "safe",
         "fish_level": "excellent"
       },
@@ -117,9 +127,9 @@
     ],
     "statistics": {
       "waves": {
-        "min": 0.8,
+        "min": 0.76,
         "max": 1.15,
-        "avg": 0.97,
+        "avg": 0.95,
         "trend": "stable"
       },
       "temperature": {
@@ -136,27 +146,27 @@
       }
     },
     "safety_summary": {
-      "safe": 11,
+      "safe": 12,
       "caution": 0,
       "warning": 0,
       "danger": 0
     },
     "best_day": {
-      "date": "2026-02-17",
-      "wave": 0.86,
-      "temp": 18.6,
+      "date": "2026-02-18",
+      "wave": 0.76,
+      "temp": 18.4,
       "safety": "safe"
     },
     "worst_day": {
       "date": "2026-02-18",
-      "wave": 0.8,
+      "wave": 0.76,
       "safety": "safe"
     }
   },
   "GANDIOL": {
     "zone": "GANDIOL",
     "period": "7 jours",
-    "data_points": 11,
+    "data_points": 12,
     "history": [
       {
         "timestamp": "2026-02-18T01:01:30.367708",
@@ -185,6 +195,16 @@
         "temp": 19.0,
         "current": 0.07,
         "wind": 2.1,
+        "safety_level": "safe",
+        "fish_level": "excellent"
+      },
+      {
+        "timestamp": "2026-02-18T12:42:25.301963",
+        "date": "2026-02-18",
+        "wave": 0.71,
+        "temp": 19.1,
+        "current": 0.09,
+        "wind": 4.1,
         "safety_level": "safe",
         "fish_level": "excellent"
       },
@@ -271,9 +291,9 @@
     ],
     "statistics": {
       "waves": {
-        "min": 0.75,
+        "min": 0.71,
         "max": 1.07,
-        "avg": 0.9,
+        "avg": 0.89,
         "trend": "stable"
       },
       "temperature": {
@@ -290,27 +310,27 @@
       }
     },
     "safety_summary": {
-      "safe": 11,
+      "safe": 12,
       "caution": 0,
       "warning": 0,
       "danger": 0
     },
     "best_day": {
-      "date": "2026-02-17",
-      "wave": 0.8,
-      "temp": 19.4,
+      "date": "2026-02-18",
+      "wave": 0.71,
+      "temp": 19.1,
       "safety": "safe"
     },
     "worst_day": {
       "date": "2026-02-18",
-      "wave": 0.75,
+      "wave": 0.71,
       "safety": "safe"
     }
   },
   "KAYAR": {
     "zone": "KAYAR",
     "period": "7 jours",
-    "data_points": 11,
+    "data_points": 12,
     "history": [
       {
         "timestamp": "2026-02-18T01:01:30.367708",
@@ -341,6 +361,16 @@
         "wind": 6.0,
         "safety_level": "safe",
         "fish_level": "good"
+      },
+      {
+        "timestamp": "2026-02-18T12:42:25.301963",
+        "date": "2026-02-18",
+        "wave": 0.97,
+        "temp": 18.8,
+        "current": 0.06,
+        "wind": 6.1,
+        "safety_level": "safe",
+        "fish_level": "excellent"
       },
       {
         "timestamp": "2026-02-17T00:54:02.914224",
@@ -425,9 +455,9 @@
     ],
     "statistics": {
       "waves": {
-        "min": 1.04,
+        "min": 0.97,
         "max": 1.59,
-        "avg": 1.31,
+        "avg": 1.28,
         "trend": "stable"
       },
       "temperature": {
@@ -444,27 +474,27 @@
       }
     },
     "safety_summary": {
-      "safe": 7,
+      "safe": 8,
       "caution": 4,
       "warning": 0,
       "danger": 0
     },
     "best_day": {
       "date": "2026-02-18",
-      "wave": 1.04,
-      "temp": 18.7,
+      "wave": 0.97,
+      "temp": 18.8,
       "safety": "safe"
     },
     "worst_day": {
       "date": "2026-02-18",
-      "wave": 1.04,
+      "wave": 0.97,
       "safety": "safe"
     }
   },
   "LOMPOUL": {
     "zone": "LOMPOUL",
     "period": "7 jours",
-    "data_points": 11,
+    "data_points": 12,
     "history": [
       {
         "timestamp": "2026-02-18T01:01:30.367708",
@@ -493,6 +523,16 @@
         "temp": 19.8,
         "current": 0.11,
         "wind": 5.7,
+        "safety_level": "safe",
+        "fish_level": "excellent"
+      },
+      {
+        "timestamp": "2026-02-18T12:42:25.301963",
+        "date": "2026-02-18",
+        "wave": 0.8,
+        "temp": 19.9,
+        "current": 0.13,
+        "wind": 5.1,
         "safety_level": "safe",
         "fish_level": "excellent"
       },
@@ -579,9 +619,9 @@
     ],
     "statistics": {
       "waves": {
-        "min": 0.84,
+        "min": 0.8,
         "max": 1.27,
-        "avg": 1.06,
+        "avg": 1.03,
         "trend": "stable"
       },
       "temperature": {
@@ -593,32 +633,32 @@
       "wind": {
         "min": 4.6,
         "max": 8.3,
-        "avg": 6.1,
+        "avg": 6.0,
         "trend": "hausse"
       }
     },
     "safety_summary": {
-      "safe": 11,
+      "safe": 12,
       "caution": 0,
       "warning": 0,
       "danger": 0
     },
     "best_day": {
       "date": "2026-02-18",
-      "wave": 0.84,
-      "temp": 19.8,
+      "wave": 0.8,
+      "temp": 19.9,
       "safety": "safe"
     },
     "worst_day": {
       "date": "2026-02-18",
-      "wave": 0.84,
+      "wave": 0.8,
       "safety": "safe"
     }
   },
   "DAKAR-YOFF": {
     "zone": "DAKAR-YOFF",
     "period": "7 jours",
-    "data_points": 11,
+    "data_points": 12,
     "history": [
       {
         "timestamp": "2026-02-18T01:01:30.367708",
@@ -647,6 +687,16 @@
         "temp": 20.0,
         "current": 0.15,
         "wind": 4.1,
+        "safety_level": "safe",
+        "fish_level": "good"
+      },
+      {
+        "timestamp": "2026-02-18T12:42:25.301963",
+        "date": "2026-02-18",
+        "wave": 1.09,
+        "temp": 20.3,
+        "current": 0.14,
+        "wind": 5.1,
         "safety_level": "safe",
         "fish_level": "good"
       },
@@ -733,26 +783,26 @@
     ],
     "statistics": {
       "waves": {
-        "min": 1.18,
+        "min": 1.09,
         "max": 1.72,
-        "avg": 1.45,
+        "avg": 1.42,
         "trend": "stable"
       },
       "temperature": {
         "min": 19.6,
-        "max": 20.0,
-        "avg": 19.8,
+        "max": 20.3,
+        "avg": 19.9,
         "trend": "stable"
       },
       "wind": {
         "min": 3.1,
         "max": 7.0,
-        "avg": 4.7,
+        "avg": 4.8,
         "trend": "stable"
       }
     },
     "safety_summary": {
-      "safe": 7,
+      "safe": 8,
       "caution": 4,
       "warning": 0,
       "danger": 0
@@ -765,14 +815,14 @@
     },
     "worst_day": {
       "date": "2026-02-18",
-      "wave": 1.18,
+      "wave": 1.09,
       "safety": "safe"
     }
   },
   "DAKAR-SOUMBEDIOUNE": {
     "zone": "DAKAR-SOUMBEDIOUNE",
     "period": "7 jours",
-    "data_points": 11,
+    "data_points": 12,
     "history": [
       {
         "timestamp": "2026-02-18T01:01:30.367708",
@@ -801,6 +851,16 @@
         "temp": 20.2,
         "current": 0.12,
         "wind": 4.1,
+        "safety_level": "safe",
+        "fish_level": "excellent"
+      },
+      {
+        "timestamp": "2026-02-18T12:42:25.301963",
+        "date": "2026-02-18",
+        "wave": 0.82,
+        "temp": 20.4,
+        "current": 0.08,
+        "wind": 5.1,
         "safety_level": "safe",
         "fish_level": "excellent"
       },
@@ -887,9 +947,9 @@
     ],
     "statistics": {
       "waves": {
-        "min": 0.88,
+        "min": 0.82,
         "max": 1.25,
-        "avg": 1.06,
+        "avg": 1.04,
         "trend": "stable"
       },
       "temperature": {
@@ -901,32 +961,32 @@
       "wind": {
         "min": 1.3,
         "max": 6.2,
-        "avg": 4.2,
+        "avg": 4.3,
         "trend": "stable"
       }
     },
     "safety_summary": {
-      "safe": 11,
+      "safe": 12,
       "caution": 0,
       "warning": 0,
       "danger": 0
     },
     "best_day": {
-      "date": "2026-02-17",
-      "wave": 0.95,
-      "temp": 20.5,
+      "date": "2026-02-18",
+      "wave": 0.82,
+      "temp": 20.4,
       "safety": "safe"
     },
     "worst_day": {
       "date": "2026-02-18",
-      "wave": 0.88,
+      "wave": 0.82,
       "safety": "safe"
     }
   },
   "DAKAR-HANN": {
     "zone": "DAKAR-HANN",
     "period": "7 jours",
-    "data_points": 11,
+    "data_points": 12,
     "history": [
       {
         "timestamp": "2026-02-18T01:01:30.367708",
@@ -955,6 +1015,16 @@
         "temp": 20.2,
         "current": 0.12,
         "wind": 4.1,
+        "safety_level": "safe",
+        "fish_level": "excellent"
+      },
+      {
+        "timestamp": "2026-02-18T12:42:25.301963",
+        "date": "2026-02-18",
+        "wave": 0.82,
+        "temp": 20.4,
+        "current": 0.08,
+        "wind": 5.1,
         "safety_level": "safe",
         "fish_level": "excellent"
       },
@@ -1041,9 +1111,9 @@
     ],
     "statistics": {
       "waves": {
-        "min": 0.88,
+        "min": 0.82,
         "max": 1.25,
-        "avg": 1.06,
+        "avg": 1.04,
         "trend": "stable"
       },
       "temperature": {
@@ -1060,27 +1130,27 @@
       }
     },
     "safety_summary": {
-      "safe": 11,
+      "safe": 12,
       "caution": 0,
       "warning": 0,
       "danger": 0
     },
     "best_day": {
-      "date": "2026-02-17",
-      "wave": 0.95,
-      "temp": 20.5,
+      "date": "2026-02-18",
+      "wave": 0.82,
+      "temp": 20.4,
       "safety": "safe"
     },
     "worst_day": {
       "date": "2026-02-18",
-      "wave": 0.88,
+      "wave": 0.82,
       "safety": "safe"
     }
   },
   "RUFISQUE": {
     "zone": "RUFISQUE",
     "period": "7 jours",
-    "data_points": 11,
+    "data_points": 12,
     "history": [
       {
         "timestamp": "2026-02-18T01:01:30.367708",
@@ -1109,6 +1179,16 @@
         "temp": 19.1,
         "current": 0.07,
         "wind": 5.3,
+        "safety_level": "safe",
+        "fish_level": "excellent"
+      },
+      {
+        "timestamp": "2026-02-18T12:42:25.301963",
+        "date": "2026-02-18",
+        "wave": 0.59,
+        "temp": 19.3,
+        "current": 0.09,
+        "wind": 3.8,
         "safety_level": "safe",
         "fish_level": "excellent"
       },
@@ -1195,9 +1275,9 @@
     ],
     "statistics": {
       "waves": {
-        "min": 0.63,
+        "min": 0.59,
         "max": 0.8,
-        "avg": 0.72,
+        "avg": 0.71,
         "trend": "stable"
       },
       "temperature": {
@@ -1207,14 +1287,14 @@
         "trend": "stable"
       },
       "wind": {
-        "min": 4.0,
+        "min": 3.8,
         "max": 7.9,
-        "avg": 6.0,
+        "avg": 5.9,
         "trend": "hausse"
       }
     },
     "safety_summary": {
-      "safe": 11,
+      "safe": 12,
       "caution": 0,
       "warning": 0,
       "danger": 0
@@ -1227,14 +1307,14 @@
     },
     "worst_day": {
       "date": "2026-02-18",
-      "wave": 0.63,
+      "wave": 0.59,
       "safety": "safe"
     }
   },
   "BARGNY": {
     "zone": "BARGNY",
     "period": "7 jours",
-    "data_points": 11,
+    "data_points": 12,
     "history": [
       {
         "timestamp": "2026-02-18T01:01:30.367708",
@@ -1263,6 +1343,16 @@
         "temp": 20.0,
         "current": 0.1,
         "wind": 4.1,
+        "safety_level": "safe",
+        "fish_level": "good"
+      },
+      {
+        "timestamp": "2026-02-18T12:42:25.301963",
+        "date": "2026-02-18",
+        "wave": 1.5,
+        "temp": 20.1,
+        "current": 0.13,
+        "wind": 7.2,
         "safety_level": "safe",
         "fish_level": "good"
       },
@@ -1362,13 +1452,13 @@
       },
       "wind": {
         "min": 3.1,
-        "max": 6.9,
-        "avg": 5.3,
+        "max": 7.2,
+        "avg": 5.5,
         "trend": "stable"
       }
     },
     "safety_summary": {
-      "safe": 11,
+      "safe": 12,
       "caution": 0,
       "warning": 0,
       "danger": 0
@@ -1388,7 +1478,7 @@
   "MBOUR-JOAL": {
     "zone": "MBOUR-JOAL",
     "period": "7 jours",
-    "data_points": 11,
+    "data_points": 12,
     "history": [
       {
         "timestamp": "2026-02-18T01:01:30.367708",
@@ -1417,6 +1507,16 @@
         "temp": 20.2,
         "current": 0.02,
         "wind": 6.3,
+        "safety_level": "safe",
+        "fish_level": "excellent"
+      },
+      {
+        "timestamp": "2026-02-18T12:42:25.301963",
+        "date": "2026-02-18",
+        "wave": 0.52,
+        "temp": 20.3,
+        "current": 0.01,
+        "wind": 3.3,
         "safety_level": "safe",
         "fish_level": "excellent"
       },
@@ -1511,18 +1611,18 @@
       "temperature": {
         "min": 19.9,
         "max": 20.5,
-        "avg": 20.1,
+        "avg": 20.2,
         "trend": "stable"
       },
       "wind": {
-        "min": 3.7,
+        "min": 3.3,
         "max": 7.2,
-        "avg": 5.4,
+        "avg": 5.2,
         "trend": "stable"
       }
     },
     "safety_summary": {
-      "safe": 11,
+      "safe": 12,
       "caution": 0,
       "warning": 0,
       "danger": 0
@@ -1542,7 +1642,7 @@
   "NIANING": {
     "zone": "NIANING",
     "period": "7 jours",
-    "data_points": 11,
+    "data_points": 12,
     "history": [
       {
         "timestamp": "2026-02-18T01:01:30.367708",
@@ -1571,6 +1671,16 @@
         "temp": 20.2,
         "current": 0.08,
         "wind": 6.1,
+        "safety_level": "safe",
+        "fish_level": "excellent"
+      },
+      {
+        "timestamp": "2026-02-18T12:42:25.301963",
+        "date": "2026-02-18",
+        "wave": 0.43,
+        "temp": 20.2,
+        "current": 0.08,
+        "wind": 4.2,
         "safety_level": "safe",
         "fish_level": "excellent"
       },
@@ -1671,12 +1781,12 @@
       "wind": {
         "min": 2.4,
         "max": 7.3,
-        "avg": 5.5,
+        "avg": 5.4,
         "trend": "stable"
       }
     },
     "safety_summary": {
-      "safe": 11,
+      "safe": 12,
       "caution": 0,
       "warning": 0,
       "danger": 0
@@ -1696,7 +1806,7 @@
   "SALY": {
     "zone": "SALY",
     "period": "7 jours",
-    "data_points": 11,
+    "data_points": 12,
     "history": [
       {
         "timestamp": "2026-02-18T01:01:30.367708",
@@ -1725,6 +1835,16 @@
         "temp": 20.2,
         "current": 0.08,
         "wind": 6.0,
+        "safety_level": "safe",
+        "fish_level": "excellent"
+      },
+      {
+        "timestamp": "2026-02-18T12:42:25.301963",
+        "date": "2026-02-18",
+        "wave": 0.43,
+        "temp": 20.2,
+        "current": 0.08,
+        "wind": 4.7,
         "safety_level": "safe",
         "fish_level": "excellent"
       },
@@ -1825,12 +1945,12 @@
       "wind": {
         "min": 2.0,
         "max": 7.2,
-        "avg": 5.4,
+        "avg": 5.3,
         "trend": "stable"
       }
     },
     "safety_summary": {
-      "safe": 11,
+      "safe": 12,
       "caution": 0,
       "warning": 0,
       "danger": 0
@@ -1850,7 +1970,7 @@
   "PALMARIN": {
     "zone": "PALMARIN",
     "period": "7 jours",
-    "data_points": 11,
+    "data_points": 12,
     "history": [
       {
         "timestamp": "2026-02-18T01:01:30.367708",
@@ -1879,6 +1999,16 @@
         "temp": 22.2,
         "current": 0.04,
         "wind": 5.2,
+        "safety_level": "safe",
+        "fish_level": "excellent"
+      },
+      {
+        "timestamp": "2026-02-18T12:42:25.301963",
+        "date": "2026-02-18",
+        "wave": 0.33,
+        "temp": 22.2,
+        "current": 0.04,
+        "wind": 5.5,
         "safety_level": "safe",
         "fish_level": "excellent"
       },
@@ -1984,7 +2114,7 @@
       }
     },
     "safety_summary": {
-      "safe": 11,
+      "safe": 12,
       "caution": 0,
       "warning": 0,
       "danger": 0
@@ -2004,7 +2134,7 @@
   "FOUNDIOUGNE": {
     "zone": "FOUNDIOUGNE",
     "period": "7 jours",
-    "data_points": 11,
+    "data_points": 12,
     "history": [
       {
         "timestamp": "2026-02-18T01:01:30.367708",
@@ -2033,6 +2163,16 @@
         "temp": 22.0,
         "current": 0.0,
         "wind": 4.4,
+        "safety_level": "safe",
+        "fish_level": "good"
+      },
+      {
+        "timestamp": "2026-02-18T12:42:25.301963",
+        "date": "2026-02-18",
+        "wave": 1.5,
+        "temp": 22.0,
+        "current": 0.0,
+        "wind": 5.7,
         "safety_level": "safe",
         "fish_level": "good"
       },
@@ -2133,12 +2273,12 @@
       "wind": {
         "min": 2.9,
         "max": 7.1,
-        "avg": 4.4,
+        "avg": 4.5,
         "trend": "stable"
       }
     },
     "safety_summary": {
-      "safe": 11,
+      "safe": 12,
       "caution": 0,
       "warning": 0,
       "danger": 0
@@ -2158,7 +2298,7 @@
   "MISSIRAH": {
     "zone": "MISSIRAH",
     "period": "7 jours",
-    "data_points": 11,
+    "data_points": 12,
     "history": [
       {
         "timestamp": "2026-02-18T01:01:30.367708",
@@ -2187,6 +2327,16 @@
         "temp": 22.4,
         "current": 0.03,
         "wind": 6.1,
+        "safety_level": "safe",
+        "fish_level": "excellent"
+      },
+      {
+        "timestamp": "2026-02-18T12:42:25.301963",
+        "date": "2026-02-18",
+        "wave": 0.4,
+        "temp": 22.4,
+        "current": 0.04,
+        "wind": 4.2,
         "safety_level": "safe",
         "fish_level": "excellent"
       },
@@ -2292,7 +2442,7 @@
       }
     },
     "safety_summary": {
-      "safe": 11,
+      "safe": 12,
       "caution": 0,
       "warning": 0,
       "danger": 0
@@ -2312,7 +2462,7 @@
   "CASAMANCE-ZIGUINCHOR": {
     "zone": "CASAMANCE-ZIGUINCHOR",
     "period": "7 jours",
-    "data_points": 11,
+    "data_points": 12,
     "history": [
       {
         "timestamp": "2026-02-18T01:01:30.367708",
@@ -2341,6 +2491,16 @@
         "temp": 23.6,
         "current": 0.14,
         "wind": 4.8,
+        "safety_level": "safe",
+        "fish_level": "excellent"
+      },
+      {
+        "timestamp": "2026-02-18T12:42:25.301963",
+        "date": "2026-02-18",
+        "wave": 0.45,
+        "temp": 23.7,
+        "current": 0.11,
+        "wind": 4.3,
         "safety_level": "safe",
         "fish_level": "excellent"
       },
@@ -2427,46 +2587,46 @@
     ],
     "statistics": {
       "waves": {
-        "min": 0.48,
+        "min": 0.45,
         "max": 0.64,
-        "avg": 0.55,
+        "avg": 0.54,
         "trend": "stable"
       },
       "temperature": {
         "min": 23.5,
         "max": 24.5,
-        "avg": 23.9,
+        "avg": 23.8,
         "trend": "stable"
       },
       "wind": {
         "min": 2.6,
         "max": 5.5,
         "avg": 3.8,
-        "trend": "hausse"
+        "trend": "stable"
       }
     },
     "safety_summary": {
-      "safe": 11,
+      "safe": 12,
       "caution": 0,
       "warning": 0,
       "danger": 0
     },
     "best_day": {
-      "date": "2026-02-17",
-      "wave": 0.52,
-      "temp": 23.5,
+      "date": "2026-02-18",
+      "wave": 0.45,
+      "temp": 23.7,
       "safety": "safe"
     },
     "worst_day": {
-      "date": "2026-02-17",
-      "wave": 0.48,
+      "date": "2026-02-18",
+      "wave": 0.45,
       "safety": "safe"
     }
   },
   "CASAMANCE-CAP-SKIRRING": {
     "zone": "CASAMANCE-CAP-SKIRRING",
     "period": "7 jours",
-    "data_points": 11,
+    "data_points": 12,
     "history": [
       {
         "timestamp": "2026-02-18T01:01:30.367708",
@@ -2495,6 +2655,16 @@
         "temp": 24.3,
         "current": 0.1,
         "wind": 1.0,
+        "safety_level": "safe",
+        "fish_level": "good"
+      },
+      {
+        "timestamp": "2026-02-18T12:42:25.301963",
+        "date": "2026-02-18",
+        "wave": 0.35,
+        "temp": 24.3,
+        "current": 0.06,
+        "wind": 6.2,
         "safety_level": "safe",
         "fish_level": "good"
       },
@@ -2581,9 +2751,9 @@
     ],
     "statistics": {
       "waves": {
-        "min": 0.36,
+        "min": 0.35,
         "max": 0.5,
-        "avg": 0.42,
+        "avg": 0.41,
         "trend": "stable"
       },
       "temperature": {
@@ -2594,33 +2764,33 @@
       },
       "wind": {
         "min": 0,
-        "max": 5.1,
-        "avg": 2.4,
-        "trend": "stable"
+        "max": 6.2,
+        "avg": 2.7,
+        "trend": "baisse"
       }
     },
     "safety_summary": {
-      "safe": 11,
+      "safe": 12,
       "caution": 0,
       "warning": 0,
       "danger": 0
     },
     "best_day": {
-      "date": "2026-02-17",
-      "wave": 0.4,
+      "date": "2026-02-18",
+      "wave": 0.35,
       "temp": 24.3,
       "safety": "safe"
     },
     "worst_day": {
-      "date": "2026-02-17",
-      "wave": 0.36,
+      "date": "2026-02-18",
+      "wave": 0.35,
       "safety": "safe"
     }
   },
   "KAFOUNTINE": {
     "zone": "KAFOUNTINE",
     "period": "7 jours",
-    "data_points": 11,
+    "data_points": 12,
     "history": [
       {
         "timestamp": "2026-02-18T01:01:30.367708",
@@ -2649,6 +2819,16 @@
         "temp": 23.8,
         "current": 0.09,
         "wind": 3.9,
+        "safety_level": "safe",
+        "fish_level": "excellent"
+      },
+      {
+        "timestamp": "2026-02-18T12:42:25.301963",
+        "date": "2026-02-18",
+        "wave": 0.45,
+        "temp": 23.8,
+        "current": 0.07,
+        "wind": 3.8,
         "safety_level": "safe",
         "fish_level": "excellent"
       },
@@ -2749,19 +2929,19 @@
       "wind": {
         "min": 0.9,
         "max": 4.8,
-        "avg": 2.8,
+        "avg": 2.9,
         "trend": "hausse"
       }
     },
     "safety_summary": {
-      "safe": 11,
+      "safe": 12,
       "caution": 0,
       "warning": 0,
       "danger": 0
     },
     "best_day": {
       "date": "2026-02-18",
-      "wave": 0.46,
+      "wave": 0.45,
       "temp": 23.8,
       "safety": "safe"
     },
