@@ -1,7 +1,7 @@
 {
   "zone": "MISSIRAH",
   "period": "7 jours",
-  "data_points": 12,
+  "data_points": 13,
   "history": [
     {
       "timestamp": "2026-02-18T01:01:30.367708",
@@ -40,6 +40,16 @@
       "temp": 22.4,
       "current": 0.04,
       "wind": 4.2,
+      "safety_level": "safe",
+      "fish_level": "excellent"
+    },
+    {
+      "timestamp": "2026-02-18T18:42:51.725881",
+      "date": "2026-02-18",
+      "wave": 0.3,
+      "temp": 22.8,
+      "current": 0.05,
+      "wind": 6.9,
       "safety_level": "safe",
       "fish_level": "excellent"
     },
@@ -126,9 +136,9 @@
   ],
   "statistics": {
     "waves": {
-      "min": 0.34,
+      "min": 0.3,
       "max": 0.43,
-      "avg": 0.39,
+      "avg": 0.38,
       "trend": "stable"
     },
     "temperature": {
@@ -139,13 +149,13 @@
     },
     "wind": {
       "min": 1.2,
-      "max": 6.1,
-      "avg": 3.8,
+      "max": 6.9,
+      "avg": 4.1,
       "trend": "baisse"
     }
   },
   "safety_summary": {
-    "safe": 12,
+    "safe": 13,
     "caution": 0,
     "warning": 0,
     "danger": 0
@@ -157,8 +167,8 @@
     "safety": "safe"
   },
   "worst_day": {
-    "date": "2026-02-17",
-    "wave": 0.34,
+    "date": "2026-02-18",
+    "wave": 0.3,
     "safety": "safe"
   }
 }

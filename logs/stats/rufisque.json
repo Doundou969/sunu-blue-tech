@@ -1,7 +1,7 @@
 {
   "zone": "RUFISQUE",
   "period": "7 jours",
-  "data_points": 12,
+  "data_points": 13,
   "history": [
     {
       "timestamp": "2026-02-18T01:01:30.367708",
@@ -40,6 +40,16 @@
       "temp": 19.3,
       "current": 0.09,
       "wind": 3.8,
+      "safety_level": "safe",
+      "fish_level": "excellent"
+    },
+    {
+      "timestamp": "2026-02-18T18:42:51.725881",
+      "date": "2026-02-18",
+      "wave": 0.55,
+      "temp": 20.1,
+      "current": 0.12,
+      "wind": 5.8,
       "safety_level": "safe",
       "fish_level": "excellent"
     },
@@ -126,9 +136,9 @@
   ],
   "statistics": {
     "waves": {
-      "min": 0.59,
+      "min": 0.55,
       "max": 0.8,
-      "avg": 0.71,
+      "avg": 0.7,
       "trend": "stable"
     },
     "temperature": {
@@ -140,25 +150,25 @@
     "wind": {
       "min": 3.8,
       "max": 7.9,
-      "avg": 5.9,
+      "avg": 5.8,
       "trend": "hausse"
     }
   },
   "safety_summary": {
-    "safe": 12,
+    "safe": 13,
     "caution": 0,
     "warning": 0,
     "danger": 0
   },
   "best_day": {
-    "date": "2026-02-17",
-    "wave": 0.65,
+    "date": "2026-02-18",
+    "wave": 0.55,
     "temp": 20.1,
     "safety": "safe"
   },
   "worst_day": {
     "date": "2026-02-18",
-    "wave": 0.59,
+    "wave": 0.55,
     "safety": "safe"
   }
 }
