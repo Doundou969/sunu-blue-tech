@@ -1,8 +1,18 @@
 {
   "zone": "KAFOUNTINE",
   "period": "7 jours",
-  "data_points": 8,
+  "data_points": 9,
   "history": [
+    {
+      "timestamp": "2026-02-18T01:01:30.367708",
+      "date": "2026-02-18",
+      "wave": 0.45,
+      "temp": 24.0,
+      "current": 0.06,
+      "wind": 0.9,
+      "safety_level": "safe",
+      "fish_level": "excellent"
+    },
     {
       "timestamp": "2026-02-17T00:54:02.914224",
       "date": "2026-02-17",
@@ -88,7 +98,7 @@
     "waves": {
       "min": 0.45,
       "max": 0.61,
-      "avg": 0.54,
+      "avg": 0.53,
       "trend": "stable"
     },
     "temperature": {
@@ -98,14 +108,14 @@
       "trend": "stable"
     },
     "wind": {
-      "min": 1.6,
+      "min": 0.9,
       "max": 4.8,
-      "avg": 3.1,
+      "avg": 2.9,
       "trend": "hausse"
     }
   },
   "safety_summary": {
-    "safe": 8,
+    "safe": 9,
     "caution": 0,
     "warning": 0,
     "danger": 0
@@ -117,7 +127,7 @@
     "safety": "safe"
   },
   "worst_day": {
-    "date": "2026-02-17",
+    "date": "2026-02-18",
     "wave": 0.45,
     "safety": "safe"
   }
