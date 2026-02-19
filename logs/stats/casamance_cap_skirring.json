@@ -1,8 +1,18 @@
 {
   "zone": "CASAMANCE-CAP-SKIRRING",
   "period": "7 jours",
-  "data_points": 13,
+  "data_points": 14,
   "history": [
+    {
+      "timestamp": "2026-02-19T01:16:18.582446",
+      "date": "2026-02-19",
+      "wave": 0.44,
+      "temp": 24.5,
+      "current": 0.08,
+      "wind": 2.4,
+      "safety_level": "safe",
+      "fish_level": "good"
+    },
     {
       "timestamp": "2026-02-18T01:01:30.367708",
       "date": "2026-02-18",
@@ -151,11 +161,11 @@
       "min": 0,
       "max": 6.2,
       "avg": 2.7,
-      "trend": "baisse"
+      "trend": "stable"
     }
   },
   "safety_summary": {
-    "safe": 13,
+    "safe": 14,
     "caution": 0,
     "warning": 0,
     "danger": 0

@@ -1,8 +1,18 @@
 {
   "zone": "MBOUR-JOAL",
   "period": "7 jours",
-  "data_points": 13,
+  "data_points": 14,
   "history": [
+    {
+      "timestamp": "2026-02-19T01:16:18.582446",
+      "date": "2026-02-19",
+      "wave": 0.47,
+      "temp": 20.4,
+      "current": 0.03,
+      "wind": 4.9,
+      "safety_level": "safe",
+      "fish_level": "excellent"
+    },
     {
       "timestamp": "2026-02-18T01:01:30.367708",
       "date": "2026-02-18",
@@ -138,7 +148,7 @@
     "waves": {
       "min": 0.44,
       "max": 0.63,
-      "avg": 0.56,
+      "avg": 0.55,
       "trend": "stable"
     },
     "temperature": {
@@ -155,7 +165,7 @@
     }
   },
   "safety_summary": {
-    "safe": 13,
+    "safe": 14,
     "caution": 0,
     "warning": 0,
     "danger": 0
