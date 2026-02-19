@@ -1,7 +1,7 @@
 {
   "zone": "GANDIOL",
   "period": "7 jours",
-  "data_points": 16,
+  "data_points": 17,
   "history": [
     {
       "timestamp": "2026-02-19T01:16:18.582446",
@@ -30,6 +30,16 @@
       "temp": 19.4,
       "current": 0.13,
       "wind": 2.1,
+      "safety_level": "safe",
+      "fish_level": "excellent"
+    },
+    {
+      "timestamp": "2026-02-19T18:43:16.178181",
+      "date": "2026-02-19",
+      "wave": 0.69,
+      "temp": 19.7,
+      "current": 0.05,
+      "wind": 4.1,
       "safety_level": "safe",
       "fish_level": "excellent"
     },
@@ -168,12 +178,12 @@
     "waves": {
       "min": 0.64,
       "max": 1.07,
-      "avg": 0.84,
+      "avg": 0.83,
       "trend": "stable"
     },
     "temperature": {
       "min": 19.0,
-      "max": 19.4,
+      "max": 19.7,
       "avg": 19.2,
       "trend": "stable"
     },
@@ -181,19 +191,19 @@
       "min": 1.0,
       "max": 6.3,
       "avg": 3.1,
-      "trend": "hausse"
+      "trend": "stable"
     }
   },
   "safety_summary": {
-    "safe": 16,
+    "safe": 17,
     "caution": 0,
     "warning": 0,
     "danger": 0
   },
   "best_day": {
-    "date": "2026-02-18",
-    "wave": 0.64,
-    "temp": 19.4,
+    "date": "2026-02-19",
+    "wave": 0.69,
+    "temp": 19.7,
     "safety": "safe"
   },
   "worst_day": {

@@ -1,7 +1,7 @@
 {
   "zone": "DAKAR-YOFF",
   "period": "7 jours",
-  "data_points": 16,
+  "data_points": 17,
   "history": [
     {
       "timestamp": "2026-02-19T01:16:18.582446",
@@ -30,6 +30,16 @@
       "temp": 20.4,
       "current": 0.18,
       "wind": 6.2,
+      "safety_level": "safe",
+      "fish_level": "excellent"
+    },
+    {
+      "timestamp": "2026-02-19T18:43:16.178181",
+      "date": "2026-02-19",
+      "wave": 0.94,
+      "temp": 20.8,
+      "current": 0.24,
+      "wind": 2.1,
       "safety_level": "safe",
       "fish_level": "excellent"
     },
@@ -166,39 +176,39 @@
   ],
   "statistics": {
     "waves": {
-      "min": 0.98,
+      "min": 0.94,
       "max": 1.72,
-      "avg": 1.32,
+      "avg": 1.29,
       "trend": "stable"
     },
     "temperature": {
       "min": 19.6,
-      "max": 20.6,
+      "max": 20.8,
       "avg": 20.0,
       "trend": "stable"
     },
     "wind": {
       "min": 2.1,
       "max": 7.0,
-      "avg": 4.6,
+      "avg": 4.4,
       "trend": "stable"
     }
   },
   "safety_summary": {
-    "safe": 12,
+    "safe": 13,
     "caution": 4,
     "warning": 0,
     "danger": 0
   },
   "best_day": {
     "date": "2026-02-19",
-    "wave": 0.98,
-    "temp": 20.4,
+    "wave": 0.94,
+    "temp": 20.8,
     "safety": "safe"
   },
   "worst_day": {
     "date": "2026-02-19",
-    "wave": 0.98,
+    "wave": 0.94,
     "safety": "safe"
   }
 }
