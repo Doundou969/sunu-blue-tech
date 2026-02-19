@@ -1,7 +1,7 @@
 {
   "zone": "FOUNDIOUGNE",
   "period": "7 jours",
-  "data_points": 14,
+  "data_points": 15,
   "history": [
     {
       "timestamp": "2026-02-19T01:16:18.582446",
@@ -10,6 +10,16 @@
       "temp": 22.0,
       "current": 0.0,
       "wind": 3.3,
+      "safety_level": "safe",
+      "fish_level": "good"
+    },
+    {
+      "timestamp": "2026-02-19T06:52:17.308474",
+      "date": "2026-02-19",
+      "wave": 1.5,
+      "temp": 22.0,
+      "current": 0.0,
+      "wind": 3.4,
       "safety_level": "safe",
       "fish_level": "good"
     },
@@ -160,12 +170,12 @@
     "wind": {
       "min": 2.8,
       "max": 7.1,
-      "avg": 4.3,
+      "avg": 4.2,
       "trend": "stable"
     }
   },
   "safety_summary": {
-    "safe": 14,
+    "safe": 15,
     "caution": 0,
     "warning": 0,
     "danger": 0

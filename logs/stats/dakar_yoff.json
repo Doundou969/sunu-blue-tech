@@ -1,7 +1,7 @@
 {
   "zone": "DAKAR-YOFF",
   "period": "7 jours",
-  "data_points": 14,
+  "data_points": 15,
   "history": [
     {
       "timestamp": "2026-02-19T01:16:18.582446",
@@ -10,6 +10,16 @@
       "temp": 20.4,
       "current": 0.14,
       "wind": 4.1,
+      "safety_level": "safe",
+      "fish_level": "good"
+    },
+    {
+      "timestamp": "2026-02-19T06:52:17.308474",
+      "date": "2026-02-19",
+      "wave": 1.0,
+      "temp": 20.3,
+      "current": 0.1,
+      "wind": 2.1,
       "safety_level": "safe",
       "fish_level": "good"
     },
@@ -148,24 +158,24 @@
     "waves": {
       "min": 1.0,
       "max": 1.72,
-      "avg": 1.36,
+      "avg": 1.34,
       "trend": "stable"
     },
     "temperature": {
       "min": 19.6,
       "max": 20.6,
-      "avg": 19.9,
+      "avg": 20.0,
       "trend": "stable"
     },
     "wind": {
-      "min": 3.1,
+      "min": 2.1,
       "max": 7.0,
-      "avg": 4.6,
+      "avg": 4.4,
       "trend": "stable"
     }
   },
   "safety_summary": {
-    "safe": 10,
+    "safe": 11,
     "caution": 4,
     "warning": 0,
     "danger": 0
