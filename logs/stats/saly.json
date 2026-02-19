@@ -1,7 +1,7 @@
 {
   "zone": "SALY",
   "period": "7 jours",
-  "data_points": 15,
+  "data_points": 16,
   "history": [
     {
       "timestamp": "2026-02-19T01:16:18.582446",
@@ -20,6 +20,16 @@
       "temp": 20.3,
       "current": 0.02,
       "wind": 3.7,
+      "safety_level": "safe",
+      "fish_level": "excellent"
+    },
+    {
+      "timestamp": "2026-02-19T12:41:53.399107",
+      "date": "2026-02-19",
+      "wave": 0.32,
+      "temp": 20.4,
+      "current": 0.04,
+      "wind": 1.9,
       "safety_level": "safe",
       "fish_level": "excellent"
     },
@@ -156,9 +166,9 @@
   ],
   "statistics": {
     "waves": {
-      "min": 0.33,
+      "min": 0.32,
       "max": 0.5,
-      "avg": 0.42,
+      "avg": 0.41,
       "trend": "stable"
     },
     "temperature": {
@@ -168,14 +178,14 @@
       "trend": "stable"
     },
     "wind": {
-      "min": 2.0,
+      "min": 1.9,
       "max": 7.2,
-      "avg": 5.2,
+      "avg": 5.0,
       "trend": "stable"
     }
   },
   "safety_summary": {
-    "safe": 15,
+    "safe": 16,
     "caution": 0,
     "warning": 0,
     "danger": 0
@@ -187,8 +197,8 @@
     "safety": "safe"
   },
   "worst_day": {
-    "date": "2026-02-18",
-    "wave": 0.33,
+    "date": "2026-02-19",
+    "wave": 0.32,
     "safety": "safe"
   }
 }
