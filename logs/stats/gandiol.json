@@ -4,9 +4,9 @@
   "data_points": 18,
   "history": [
     {
-      "timestamp": "2026-02-20T18:36:28.841178",
+      "timestamp": "2026-02-20T22:30:41.625563",
       "date": "2026-02-20",
-      "wave": 0.77,
+      "wave": 0.85,
       "temp": 19.8,
       "current": 0.12,
       "wind": 2.1,
@@ -188,7 +188,7 @@
     "waves": {
       "min": 0.64,
       "max": 1.07,
-      "avg": 0.82,
+      "avg": 0.83,
       "trend": "stable"
     },
     "temperature": {
