@@ -5,11 +5,11 @@
     "data_points": 18,
     "history": [
       {
-        "timestamp": "2026-02-20T12:37:43.122732",
+        "timestamp": "2026-02-20T18:36:28.841178",
         "date": "2026-02-20",
-        "wave": 0.8,
-        "temp": 19.0,
-        "current": 0.14,
+        "wave": 0.83,
+        "temp": 19.3,
+        "current": 0.11,
         "wind": 2.1,
         "safety_level": "safe",
         "fish_level": "excellent"
@@ -194,7 +194,7 @@
       },
       "temperature": {
         "min": 18.2,
-        "max": 19.1,
+        "max": 19.3,
         "avg": 18.5,
         "trend": "stable"
       },
@@ -229,11 +229,11 @@
     "data_points": 18,
     "history": [
       {
-        "timestamp": "2026-02-20T12:37:43.122732",
+        "timestamp": "2026-02-20T18:36:28.841178",
         "date": "2026-02-20",
-        "wave": 0.75,
-        "temp": 19.4,
-        "current": 0.13,
+        "wave": 0.77,
+        "temp": 19.8,
+        "current": 0.12,
         "wind": 2.1,
         "safety_level": "safe",
         "fish_level": "excellent"
@@ -418,7 +418,7 @@
       },
       "temperature": {
         "min": 19.0,
-        "max": 19.7,
+        "max": 19.8,
         "avg": 19.2,
         "trend": "stable"
       },
@@ -453,12 +453,12 @@
     "data_points": 18,
     "history": [
       {
-        "timestamp": "2026-02-20T12:37:43.122732",
+        "timestamp": "2026-02-20T18:36:28.841178",
         "date": "2026-02-20",
-        "wave": 0.91,
-        "temp": 19.5,
-        "current": 0.12,
-        "wind": 4.0,
+        "wave": 0.97,
+        "temp": 20.3,
+        "current": 0.08,
+        "wind": 4.7,
         "safety_level": "safe",
         "fish_level": "excellent"
       },
@@ -642,14 +642,14 @@
       },
       "temperature": {
         "min": 18.6,
-        "max": 19.7,
-        "avg": 19.0,
+        "max": 20.3,
+        "avg": 19.1,
         "trend": "stable"
       },
       "wind": {
         "min": 3.6,
         "max": 7.4,
-        "avg": 6.0,
+        "avg": 6.1,
         "trend": "hausse"
       }
     },
@@ -660,9 +660,9 @@
       "danger": 0
     },
     "best_day": {
-      "date": "2026-02-19",
-      "wave": 0.84,
-      "temp": 19.7,
+      "date": "2026-02-20",
+      "wave": 0.97,
+      "temp": 20.3,
       "safety": "safe"
     },
     "worst_day": {
@@ -677,12 +677,12 @@
     "data_points": 18,
     "history": [
       {
-        "timestamp": "2026-02-20T12:37:43.122732",
+        "timestamp": "2026-02-20T18:36:28.841178",
         "date": "2026-02-20",
-        "wave": 0.79,
-        "temp": 20.2,
-        "current": 0.15,
-        "wind": 4.1,
+        "wave": 0.83,
+        "temp": 20.7,
+        "current": 0.12,
+        "wind": 4.7,
         "safety_level": "safe",
         "fish_level": "excellent"
       },
@@ -861,17 +861,17 @@
       "waves": {
         "min": 0.73,
         "max": 1.27,
-        "avg": 0.94,
+        "avg": 0.95,
         "trend": "stable"
       },
       "temperature": {
         "min": 19.8,
-        "max": 20.5,
-        "avg": 20.0,
+        "max": 20.7,
+        "avg": 20.1,
         "trend": "stable"
       },
       "wind": {
-        "min": 4.1,
+        "min": 4.2,
         "max": 8.3,
         "avg": 5.7,
         "trend": "hausse"
@@ -901,11 +901,11 @@
     "data_points": 18,
     "history": [
       {
-        "timestamp": "2026-02-20T12:37:43.122732",
+        "timestamp": "2026-02-20T18:36:28.841178",
         "date": "2026-02-20",
-        "wave": 1.04,
-        "temp": 20.4,
-        "current": 0.2,
+        "wave": 1.1,
+        "temp": 21.0,
+        "current": 0.22,
         "wind": 3.1,
         "safety_level": "safe",
         "fish_level": "excellent"
@@ -1090,7 +1090,7 @@
       },
       "temperature": {
         "min": 19.6,
-        "max": 20.8,
+        "max": 21.0,
         "avg": 20.1,
         "trend": "stable"
       },
@@ -1125,11 +1125,11 @@
     "data_points": 18,
     "history": [
       {
-        "timestamp": "2026-02-20T12:37:43.122732",
+        "timestamp": "2026-02-20T18:36:28.841178",
         "date": "2026-02-20",
-        "wave": 0.79,
-        "temp": 20.2,
-        "current": 0.22,
+        "wave": 0.82,
+        "temp": 20.9,
+        "current": 0.18,
         "wind": 3.1,
         "safety_level": "safe",
         "fish_level": "excellent"
@@ -1309,7 +1309,7 @@
       "waves": {
         "min": 0.72,
         "max": 1.25,
-        "avg": 0.94,
+        "avg": 0.95,
         "trend": "stable"
       },
       "temperature": {
@@ -1349,11 +1349,11 @@
     "data_points": 18,
     "history": [
       {
-        "timestamp": "2026-02-20T12:37:43.122732",
+        "timestamp": "2026-02-20T18:36:28.841178",
         "date": "2026-02-20",
-        "wave": 0.79,
-        "temp": 20.2,
-        "current": 0.22,
+        "wave": 0.82,
+        "temp": 20.9,
+        "current": 0.18,
         "wind": 3.1,
         "safety_level": "safe",
         "fish_level": "excellent"
@@ -1533,7 +1533,7 @@
       "waves": {
         "min": 0.72,
         "max": 1.25,
-        "avg": 0.94,
+        "avg": 0.95,
         "trend": "stable"
       },
       "temperature": {
@@ -1573,12 +1573,12 @@
     "data_points": 18,
     "history": [
       {
-        "timestamp": "2026-02-20T12:37:43.122732",
+        "timestamp": "2026-02-20T18:36:28.841178",
         "date": "2026-02-20",
-        "wave": 0.6,
-        "temp": 19.9,
-        "current": 0.08,
-        "wind": 1.4,
+        "wave": 0.62,
+        "temp": 20.6,
+        "current": 0.02,
+        "wind": 5.1,
         "safety_level": "safe",
         "fish_level": "excellent"
       },
@@ -1762,14 +1762,14 @@
       },
       "temperature": {
         "min": 19.0,
-        "max": 20.5,
-        "avg": 19.5,
+        "max": 20.6,
+        "avg": 19.6,
         "trend": "stable"
       },
       "wind": {
         "min": 0.8,
         "max": 7.9,
-        "avg": 5.2,
+        "avg": 5.4,
         "trend": "hausse"
       }
     },
@@ -1797,12 +1797,12 @@
     "data_points": 18,
     "history": [
       {
-        "timestamp": "2026-02-20T12:37:43.122732",
+        "timestamp": "2026-02-20T18:36:28.841178",
         "date": "2026-02-20",
         "wave": 1.5,
-        "temp": 20.5,
-        "current": 0.07,
-        "wind": 6.7,
+        "temp": 21.2,
+        "current": 0.02,
+        "wind": 3.6,
         "safety_level": "safe",
         "fish_level": "good"
       },
@@ -1987,13 +1987,13 @@
       "temperature": {
         "min": 20.0,
         "max": 21.2,
-        "avg": 20.3,
+        "avg": 20.4,
         "trend": "stable"
       },
       "wind": {
         "min": 3.1,
         "max": 7.2,
-        "avg": 5.6,
+        "avg": 5.5,
         "trend": "stable"
       }
     },
@@ -2004,7 +2004,7 @@
       "danger": 0
     },
     "best_day": {
-      "date": "2026-02-19",
+      "date": "2026-02-20",
       "wave": 1.5,
       "temp": 21.2,
       "safety": "safe"
@@ -2021,12 +2021,12 @@
     "data_points": 18,
     "history": [
       {
-        "timestamp": "2026-02-20T12:37:43.122732",
+        "timestamp": "2026-02-20T18:36:28.841178",
         "date": "2026-02-20",
-        "wave": 0.44,
-        "temp": 20.3,
-        "current": 0.05,
-        "wind": 1.6,
+        "wave": 0.48,
+        "temp": 20.7,
+        "current": 0.04,
+        "wind": 6.1,
         "safety_level": "safe",
         "fish_level": "excellent"
       },
@@ -2217,8 +2217,8 @@
       "wind": {
         "min": 1.1,
         "max": 7.2,
-        "avg": 4.9,
-        "trend": "hausse"
+        "avg": 5.2,
+        "trend": "stable"
       }
     },
     "safety_summary": {
@@ -2245,12 +2245,12 @@
     "data_points": 18,
     "history": [
       {
-        "timestamp": "2026-02-20T12:37:43.122732",
+        "timestamp": "2026-02-20T18:36:28.841178",
         "date": "2026-02-20",
-        "wave": 0.34,
-        "temp": 20.3,
-        "current": 0.08,
-        "wind": 1.0,
+        "wave": 0.38,
+        "temp": 21.0,
+        "current": 0.04,
+        "wind": 6.0,
         "safety_level": "safe",
         "fish_level": "excellent"
       },
@@ -2435,14 +2435,14 @@
       "temperature": {
         "min": 20.0,
         "max": 21.0,
-        "avg": 20.3,
+        "avg": 20.4,
         "trend": "stable"
       },
       "wind": {
         "min": 0.9,
         "max": 7.3,
-        "avg": 4.9,
-        "trend": "hausse"
+        "avg": 5.2,
+        "trend": "stable"
       }
     },
     "safety_summary": {
@@ -2469,12 +2469,12 @@
     "data_points": 18,
     "history": [
       {
-        "timestamp": "2026-02-20T12:37:43.122732",
+        "timestamp": "2026-02-20T18:36:28.841178",
         "date": "2026-02-20",
-        "wave": 0.34,
-        "temp": 20.3,
-        "current": 0.08,
-        "wind": 2.2,
+        "wave": 0.38,
+        "temp": 21.0,
+        "current": 0.04,
+        "wind": 5.8,
         "safety_level": "safe",
         "fish_level": "excellent"
       },
@@ -2659,14 +2659,14 @@
       "temperature": {
         "min": 20.0,
         "max": 21.0,
-        "avg": 20.3,
+        "avg": 20.4,
         "trend": "stable"
       },
       "wind": {
         "min": 1.9,
         "max": 7.2,
-        "avg": 4.9,
-        "trend": "hausse"
+        "avg": 5.1,
+        "trend": "stable"
       }
     },
     "safety_summary": {
@@ -2693,12 +2693,12 @@
     "data_points": 18,
     "history": [
       {
-        "timestamp": "2026-02-20T12:37:43.122732",
+        "timestamp": "2026-02-20T18:36:28.841178",
         "date": "2026-02-20",
-        "wave": 0.22,
-        "temp": 22.4,
-        "current": 0.03,
-        "wind": 4.7,
+        "wave": 0.25,
+        "temp": 22.8,
+        "current": 0.06,
+        "wind": 5.0,
         "safety_level": "safe",
         "fish_level": "excellent"
       },
@@ -2917,7 +2917,7 @@
     "data_points": 18,
     "history": [
       {
-        "timestamp": "2026-02-20T12:37:43.122732",
+        "timestamp": "2026-02-20T18:36:28.841178",
         "date": "2026-02-20",
         "wave": 1.5,
         "temp": 22.0,
@@ -3141,12 +3141,12 @@
     "data_points": 18,
     "history": [
       {
-        "timestamp": "2026-02-20T12:37:43.122732",
+        "timestamp": "2026-02-20T18:36:28.841178",
         "date": "2026-02-20",
-        "wave": 0.33,
-        "temp": 22.5,
-        "current": 0.02,
-        "wind": 1.3,
+        "wave": 0.31,
+        "temp": 22.9,
+        "current": 0.07,
+        "wind": 6.3,
         "safety_level": "safe",
         "fish_level": "excellent"
       },
@@ -3330,15 +3330,15 @@
       },
       "temperature": {
         "min": 22.3,
-        "max": 22.8,
+        "max": 22.9,
         "avg": 22.5,
         "trend": "stable"
       },
       "wind": {
         "min": 1.2,
         "max": 6.9,
-        "avg": 3.9,
-        "trend": "stable"
+        "avg": 4.1,
+        "trend": "baisse"
       }
     },
     "safety_summary": {
@@ -3365,12 +3365,12 @@
     "data_points": 18,
     "history": [
       {
-        "timestamp": "2026-02-20T12:37:43.122732",
+        "timestamp": "2026-02-20T18:36:28.841178",
         "date": "2026-02-20",
-        "wave": 0.39,
-        "temp": 24.1,
-        "current": 0.05,
-        "wind": 3.8,
+        "wave": 0.38,
+        "temp": 24.8,
+        "current": 0.04,
+        "wind": 4.3,
         "safety_level": "safe",
         "fish_level": "good"
       },
@@ -3547,14 +3547,14 @@
     ],
     "statistics": {
       "waves": {
-        "min": 0.39,
+        "min": 0.38,
         "max": 0.64,
-        "avg": 0.52,
+        "avg": 0.51,
         "trend": "stable"
       },
       "temperature": {
         "min": 23.5,
-        "max": 24.5,
+        "max": 24.8,
         "avg": 23.9,
         "trend": "stable"
       },
@@ -3579,7 +3579,7 @@
     },
     "worst_day": {
       "date": "2026-02-20",
-      "wave": 0.39,
+      "wave": 0.38,
       "safety": "safe"
     }
   },
@@ -3589,11 +3589,11 @@
     "data_points": 18,
     "history": [
       {
-        "timestamp": "2026-02-20T12:37:43.122732",
+        "timestamp": "2026-02-20T18:36:28.841178",
         "date": "2026-02-20",
-        "wave": 0.3,
-        "temp": 24.9,
-        "current": 0.06,
+        "wave": 0.29,
+        "temp": 25.3,
+        "current": 0.03,
         "wind": 2.1,
         "safety_level": "safe",
         "fish_level": "good"
@@ -3771,14 +3771,14 @@
     ],
     "statistics": {
       "waves": {
-        "min": 0.3,
+        "min": 0.29,
         "max": 0.5,
         "avg": 0.4,
         "trend": "stable"
       },
       "temperature": {
         "min": 24.3,
-        "max": 25.2,
+        "max": 25.3,
         "avg": 24.6,
         "trend": "stable"
       },
@@ -3803,7 +3803,7 @@
     },
     "worst_day": {
       "date": "2026-02-20",
-      "wave": 0.3,
+      "wave": 0.29,
       "safety": "safe"
     }
   },
@@ -3813,12 +3813,12 @@
     "data_points": 18,
     "history": [
       {
-        "timestamp": "2026-02-20T12:37:43.122732",
+        "timestamp": "2026-02-20T18:36:28.841178",
         "date": "2026-02-20",
-        "wave": 0.38,
-        "temp": 24.1,
-        "current": 0.03,
-        "wind": 2.2,
+        "wave": 0.35,
+        "temp": 24.5,
+        "current": 0.01,
+        "wind": 5.1,
         "safety_level": "safe",
         "fish_level": "good"
       },
@@ -3995,21 +3995,21 @@
     ],
     "statistics": {
       "waves": {
-        "min": 0.38,
+        "min": 0.35,
         "max": 0.61,
-        "avg": 0.48,
+        "avg": 0.47,
         "trend": "stable"
       },
       "temperature": {
         "min": 23.8,
-        "max": 24.3,
+        "max": 24.5,
         "avg": 24.0,
         "trend": "stable"
       },
       "wind": {
         "min": 0.9,
         "max": 7.0,
-        "avg": 3.2,
+        "avg": 3.4,
         "trend": "stable"
       }
     },
@@ -4027,7 +4027,7 @@
     },
     "worst_day": {
       "date": "2026-02-20",
-      "wave": 0.38,
+      "wave": 0.35,
       "safety": "safe"
     }
   }

@@ -4,12 +4,12 @@
   "data_points": 18,
   "history": [
     {
-      "timestamp": "2026-02-20T12:37:43.122732",
+      "timestamp": "2026-02-20T18:36:28.841178",
       "date": "2026-02-20",
-      "wave": 0.34,
-      "temp": 20.3,
-      "current": 0.08,
-      "wind": 1.0,
+      "wave": 0.38,
+      "temp": 21.0,
+      "current": 0.04,
+      "wind": 6.0,
       "safety_level": "safe",
       "fish_level": "excellent"
     },
@@ -194,14 +194,14 @@
     "temperature": {
       "min": 20.0,
       "max": 21.0,
-      "avg": 20.3,
+      "avg": 20.4,
       "trend": "stable"
     },
     "wind": {
       "min": 0.9,
       "max": 7.3,
-      "avg": 4.9,
-      "trend": "hausse"
+      "avg": 5.2,
+      "trend": "stable"
     }
   },
   "safety_summary": {
