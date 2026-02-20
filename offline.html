@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0056b3">
+    <title>Hors ligne - PecheurConnect 🇸🇳</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0056b3 0%, #003d7a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: white;
+        }
+        
+        .container {
+            max-width: 500px;
+            text-align: center;
+        }
+        
+        .icon {
+            font-size: 120px;
+            margin-bottom: 30px;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+        }
+        
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+        
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 16px 32px;
+            background: white;
+            color: #0056b3;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+        
+        .info-box {
+            background: rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 40px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .info-box h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+        
+        .info-box ul {
+            list-style: none;
+            font-size: 14px;
+            line-height: 2;
+        }
+        
+        .info-box li::before {
+            content: '✓ ';
+            color: #4caf50;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 600px) {
+            .icon { font-size: 80px; }
+            h1 { font-size: 32px; }
+            p { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🌊</div>
+        
+        <h1>Vous êtes hors ligne</h1>
+        
+        <p>
+            Impossible de se connecter à Internet pour récupérer les dernières données.<br>
+            Les informations en cache peuvent être consultées.
+        </p>
+        
+        <div class="btn-group">
+            <button class="btn" onclick="tryReload()">🔄 Réessayer</button>
+            <a href="./index.html" class="btn btn-secondary">🗺️ Voir les données en cache</a>
+        </div>
+        
+        <div class="info-box">
+            <h3>💡 En mode hors ligne, vous pouvez :</h3>
+            <ul>
+                <li>Consulter la dernière carte chargée</li>
+                <li>Voir l'historique en cache</li>
+                <li>Accéder aux recommandations de sécurité</li>
+                <li>Consulter le guide de pêche</li>
+            </ul>
+        </div>
+        
+        <div style="margin-top: 40px; font-size: 13px; opacity: 0.7;">
+            PecheurConnect v3.0 🇸🇳<br>
+            Sécurité Maritime - Sénégal
+        </div>
+    </div>
+    
+    <script>
+        function tryReload() {
+            if (navigator.onLine) {
+                window.location.reload();
+            } else {
+                alert('Toujours hors ligne. Vérifiez votre connexion Internet.');
+            }
+        }
+        
+        // Auto-reload quand connexion revient
+        window.addEventListener('online', () => {
+            setTimeout(() => {
+                window.location.href = './index.html';
+            }, 1000);
+        });
+        
+        // Afficher statut connexion
+        window.addEventListener('load', () => {
+            if (navigator.onLine) {
+                document.querySelector('h1').textContent = 'Reconnexion...';
+                setTimeout(() => window.location.reload(), 1500);
+            }
+        });
+    </script>
+</body>
+</html>
