@@ -3,131 +3,241 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comparateur - PecheurConnect 🇸🇳</title>
+    <meta name="theme-color" content="#0056b3">
+    <title>Comparateur - PecheurConnect v3.0 🇸🇳</title>
+    
+    <link rel="manifest" href="./manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --primary: #0056b3;
-            --safe: #28a745;
-            --caution: #ffc107;
-            --warning: #ff9800;
-            --danger: #d32f2f;
+            --primary-dk: #003d7a;
+            --accent: #00c8ff;
+            --safe: #00c853;
+            --caution: #ffd600;
+            --warning: #ff6d00;
+            --danger: #d50000;
+            --dark: #0a1628;
+            --bg: #f0f4f8;
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
             min-height: 100vh;
-            padding: 20px;
         }
         
-        .container {
+        /* ======================================== TOPBAR */
+        .topbar {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dk) 100%);
+            padding: 0 30px;
+            box-shadow: 0 4px 20px rgba(0,86,179,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .topbar-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+        
+        .topbar-brand {
+            font-family: 'Syne', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .topbar-nav {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .topbar-nav a {
+            color: rgba(255,255,255,0.75);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 6px 14px;
+            border-radius: 20px;
+            transition: all 0.2s;
+        }
+        
+        .topbar-nav a:hover,
+        .topbar-nav a.active {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        
+        /* ======================================== PAGE */
+        .page {
             max-width: 1200px;
             margin: 0 auto;
+            padding: 30px 20px;
         }
         
-        .header {
+        .page-header {
             background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            border-radius: 14px;
+            padding: 40px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
             margin-bottom: 30px;
             text-align: center;
         }
         
-        .header h1 {
-            font-size: 36px;
+        .page-header h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: 42px;
+            font-weight: 800;
             color: var(--primary);
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            letter-spacing: -1px;
         }
         
-        .header .subtitle {
+        .page-header .subtitle {
             font-size: 18px;
             color: #666;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
         
         .question {
+            font-family: 'Syne', sans-serif;
             font-size: 28px;
-            font-weight: 800;
+            font-weight: 700;
             color: var(--primary);
-            margin: 20px 0;
         }
         
-        .back-btn {
-            display: inline-block;
+        /* ======================================== FILTERS */
+        .filters-card {
+            background: white;
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+        
+        .filters-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+        
+        .filter-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+        
+        .filter-group select,
+        .filter-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e8ecf0;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .filter-group select:focus,
+        .filter-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 25px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
             background: var(--primary);
             color: white;
-            padding: 10px 20px;
-            border-radius: 25px;
-            text-decoration: none;
-            font-weight: 600;
-            margin-top: 10px;
-            transition: transform 0.2s;
+            box-shadow: 0 4px 16px rgba(0,86,179,0.3);
         }
         
-        .back-btn:hover {
-            transform: scale(1.05);
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,86,179,0.4);
         }
         
-        .recommendations {
+        /* ======================================== ZONES */
+        .zones-grid {
             display: grid;
             gap: 20px;
         }
         
         .zone-card {
             background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+            border-radius: 14px;
+            padding: 28px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
             display: flex;
             align-items: center;
-            gap: 25px;
-            transition: transform 0.2s;
+            gap: 24px;
+            transition: all 0.3s;
             position: relative;
             overflow: hidden;
         }
         
         .zone-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 35px rgba(0,0,0,0.2);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
         }
         
-        .zone-card.rank-1 {
-            border-left: 6px solid gold;
-        }
-        
-        .zone-card.rank-2 {
-            border-left: 6px solid silver;
-        }
-        
-        .zone-card.rank-3 {
-            border-left: 6px solid #cd7f32;
-        }
+        .zone-card.rank-1 { border-left: 6px solid gold; }
+        .zone-card.rank-2 { border-left: 6px solid silver; }
+        .zone-card.rank-3 { border-left: 6px solid #cd7f32; }
         
         .rank-badge {
-            font-size: 48px;
+            font-family: 'Syne', sans-serif;
+            font-size: 56px;
             font-weight: 900;
-            color: #f0f0f0;
-            min-width: 80px;
+            min-width: 90px;
             text-align: center;
         }
         
         .zone-card.rank-1 .rank-badge {
-            color: gold;
-            text-shadow: 2px 2px 4px rgba(255, 215, 0, 0.3);
+            background: linear-gradient(135deg, gold, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .zone-card.rank-2 .rank-badge {
             color: silver;
-            text-shadow: 2px 2px 4px rgba(192, 192, 192, 0.3);
         }
         
         .zone-card.rank-3 .rank-badge {
             color: #cd7f32;
-            text-shadow: 2px 2px 4px rgba(205, 127, 50, 0.3);
         }
         
         .zone-info {
@@ -135,41 +245,43 @@
         }
         
         .zone-name {
+            font-family: 'Syne', sans-serif;
             font-size: 24px;
             font-weight: 800;
             color: var(--primary);
-            margin-bottom: 5px;
+            margin-bottom: 6px;
         }
         
         .zone-region {
-            font-size: 14px;
+            font-size: 13px;
             color: #999;
-            margin-bottom: 15px;
+            margin-bottom: 14px;
         }
         
-        .score-bar {
-            background: #f0f0f0;
-            height: 30px;
-            border-radius: 15px;
+        .score-bar-wrap {
+            background: #f0f4f8;
+            height: 32px;
+            border-radius: 16px;
             overflow: hidden;
             position: relative;
-            margin-bottom: 15px;
+            margin-bottom: 14px;
         }
         
         .score-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--safe) 0%, #4CAF50 100%);
+            background: linear-gradient(90deg, var(--safe), #4caf50);
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            padding: 0 15px;
-            transition: width 1s ease;
+            padding: 0 16px;
+            transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .score-value {
-            color: white;
-            font-weight: 800;
+            font-family: 'Syne', sans-serif;
             font-size: 16px;
+            font-weight: 800;
+            color: white;
         }
         
         .reasons {
@@ -179,31 +291,29 @@
         }
         
         .reason-tag {
-            background: #e3f2fd;
-            color: var(--primary);
             padding: 6px 12px;
-            border-radius: 15px;
-            font-size: 13px;
+            border-radius: 20px;
+            font-size: 12px;
             font-weight: 600;
         }
         
         .reason-tag.positive {
             background: #e8f5e9;
-            color: var(--safe);
+            color: #2e7d32;
         }
         
         .reason-tag.warning {
-            background: #fff3e0;
-            color: var(--warning);
+            background: #fff8e1;
+            color: #f57f17;
         }
         
         .zone-metrics {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 2px solid #f0f0f0;
+            gap: 14px;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 2px solid #f5f5f5;
         }
         
         .metric {
@@ -211,7 +321,8 @@
         }
         
         .metric-value {
-            font-size: 20px;
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
             font-weight: 800;
             color: var(--primary);
         }
@@ -219,84 +330,71 @@
         .metric-label {
             font-size: 11px;
             color: #999;
-            text-transform: uppercase;
+            margin-top: 2px;
+        }
+        
+        .zone-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
         }
         
         .action-btn {
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        
+        .action-btn-primary {
             background: var(--primary);
             color: white;
-            padding: 12px 25px;
-            border-radius: 25px;
-            text-decoration: none;
-            font-weight: 700;
-            display: inline-block;
-            transition: all 0.2s;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
+        }
+        
+        .action-btn-secondary {
+            background: #25D366;
+            color: white;
         }
         
         .action-btn:hover {
             transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(0, 86, 179, 0.3);
         }
         
-        .filters {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-        
-        .filter-group {
-            margin-bottom: 15px;
-        }
-        
-        .filter-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--primary);
-        }
-        
-        .filter-group input,
-        .filter-group select {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-        
+        /* ======================================== LOADING */
         .loading {
             text-align: center;
-            padding: 60px;
-            background: white;
-            border-radius: 15px;
+            padding: 80px 20px;
         }
         
         .spinner {
             width: 60px;
             height: 60px;
-            border: 6px solid #f3f3f3;
-            border-top: 6px solid var(--primary);
+            border: 6px solid #f0f4f8;
+            border-top-color: var(--primary);
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 24px;
         }
         
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
         }
         
+        /* ======================================== RESPONSIVE */
         @media (max-width: 768px) {
+            .topbar-nav { display: none; }
+            .page { padding: 16px 12px; }
+            .page-header { padding: 24px; }
+            .page-header h1 { font-size: 28px; }
             .zone-card {
                 flex-direction: column;
                 text-align: center;
             }
-            
             .zone-metrics {
                 grid-template-columns: 1fr;
             }
@@ -304,277 +402,262 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🎯 Comparateur Intelligent</h1>
-            <p class="subtitle">Analyse temps réel de toutes les zones</p>
-            <div class="question">Où pêcher aujourd'hui ?</div>
-            <a href="./index.html" class="back-btn">← Retour à la carte</a>
-        </div>
-        
-        <div class="filters">
-            <h3 style="margin-bottom: 15px; color: var(--primary);">Filtres & Préférences</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                <div class="filter-group">
-                    <label>🗺️ Région préférée</label>
-                    <select id="regionFilter">
-                        <option value="all">Toutes les régions</option>
-                        <option value="Nord">Nord</option>
-                        <option value="Grande Côte">Grande Côte</option>
-                        <option value="Dakar">Dakar</option>
-                        <option value="Petite Côte">Petite Côte</option>
-                        <option value="Sine Saloum">Sine Saloum</option>
-                        <option value="Casamance">Casamance</option>
-                    </select>
-                </div>
-                
-                <div class="filter-group">
-                    <label>📍 Distance max (km)</label>
-                    <input type="number" id="distanceFilter" value="100" min="5" max="500">
-                </div>
-                
-                <div class="filter-group">
-                    <label>🎯 Priorité</label>
-                    <select id="priorityFilter">
-                        <option value="safety">Sécurité maximale</option>
-                        <option value="fish">Meilleure pêche</option>
-                        <option value="balanced">Équilibré</option>
-                    </select>
-                </div>
-            </div>
-            <button class="action-btn" onclick="applyFilters()" style="margin-top: 15px;">Appliquer les filtres</button>
-        </div>
-        
-        <div id="loading" class="loading">
-            <div class="spinner"></div>
-            <p>Analyse des zones en cours...</p>
-        </div>
-        
-        <div id="recommendations" class="recommendations" style="display: none;"></div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="topbar-inner">
+        <a href="./index.html" class="topbar-brand">🌊 PecheurConnect</a>
+        <nav class="topbar-nav">
+            <a href="./index.html">🗺️ Carte</a>
+            <a href="./history.html">📊 Historique</a>
+            <a href="./comparator.html" class="active">🎯 Comparer</a>
+            <a href="./export.html">📄 Export</a>
+            <a href="./alerts-settings.html">🔔 Alertes</a>
+            <a href="./admin.html">🏛️ Admin</a>
+        </nav>
+    </div>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+    
+    <!-- Header -->
+    <div class="page-header">
+        <h1>🎯 Comparateur Intelligent</h1>
+        <p class="subtitle">Analyse temps réel de toutes les zones</p>
+        <div class="question">Où pêcher aujourd'hui ?</div>
     </div>
     
-    <script>
-        let allZones = [];
-        let userLocation = { lat: 14.7167, lon: -17.4677 }; // Dakar par défaut
+    <!-- Filters -->
+    <div class="filters-card">
+        <div class="filters-title">🔧 Filtres & Préférences</div>
+        <div class="filters-grid">
+            <div class="filter-group">
+                <label>🗺️ Région préférée</label>
+                <select id="regionFilter">
+                    <option value="all">Toutes les régions</option>
+                    <option value="Nord">Nord</option>
+                    <option value="Grande Côte">Grande Côte</option>
+                    <option value="Dakar">Dakar</option>
+                    <option value="Petite Côte">Petite Côte</option>
+                    <option value="Sine Saloum">Sine Saloum</option>
+                    <option value="Casamance">Casamance</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label>📍 Distance max (km)</label>
+                <input type="number" id="distanceFilter" value="100" min="5" max="500">
+            </div>
+            
+            <div class="filter-group">
+                <label>🎯 Priorité</label>
+                <select id="priorityFilter">
+                    <option value="balanced">Équilibré</option>
+                    <option value="safety">Sécurité maximale</option>
+                    <option value="fish">Meilleure pêche</option>
+                </select>
+            </div>
+        </div>
+        <button class="btn btn-primary" onclick="applyFilters()" style="margin-top:20px; width:100%;">
+            ✨ Appliquer les filtres
+        </button>
+    </div>
+    
+    <!-- Loading -->
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p style="color:#888; font-size:16px;">Analyse des zones en cours...</p>
+    </div>
+    
+    <!-- Results -->
+    <div id="results" class="zones-grid" style="display:none;"></div>
+    
+</div>
+
+<script>
+let allZones = [];
+let userLocation = { lat: 14.7167, lon: -17.4677 }; // Dakar par défaut
+
+async function init() {
+    try {
+        const response = await fetch('./data.json?v=' + Date.now());
+        allZones = await response.json();
         
-        async function init() {
-            try {
-                const response = await fetch('./data.json?v=' + Date.now());
-                allZones = await response.json();
-                
-                // Demander localisation utilisateur
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        (position) => {
-                            userLocation = {
-                                lat: position.coords.latitude,
-                                lon: position.coords.longitude
-                            };
-                            displayRecommendations();
-                        },
-                        () => {
-                            displayRecommendations();
-                        }
-                    );
-                } else {
+        // Géolocalisation
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                pos => {
+                    userLocation = { lat: pos.coords.latitude, lon: pos.coords.longitude };
                     displayRecommendations();
-                }
-                
-            } catch (error) {
-                console.error('Erreur:', error);
-                document.getElementById('loading').innerHTML = 
-                    '<p style="color: var(--danger);">❌ Erreur de chargement</p>';
-            }
-        }
-        
-        function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; // Rayon Terre en km
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                     Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                     Math.sin(dLon/2) * Math.sin(dLon/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c;
-        }
-        
-        function calculateZoneScore(zone, priority = 'balanced') {
-            let score = 0;
-            let reasons = [];
-            
-            // Sécurité (0-40 points)
-            const safetyScores = { safe: 40, caution: 25, warning: 10, danger: 0 };
-            const safetyScore = safetyScores[zone.safety_level] || 0;
-            score += safetyScore;
-            
-            if (safetyScore >= 40) {
-                reasons.push({ text: '🟢 Zone sûre', type: 'positive' });
-            } else if (safetyScore >= 25) {
-                reasons.push({ text: '🟡 Vigilance requise', type: 'warning' });
-            }
-            
-            // Pêche (0-30 points)
-            const fishScores = { excellent: 30, good: 20, moderate: 10, poor: 5 };
-            const fishScore = fishScores[zone.fish_level] || 0;
-            score += fishScore;
-            
-            if (fishScore >= 20) {
-                reasons.push({ text: '🐟 Excellente pêche', type: 'positive' });
-            }
-            
-            // Conditions météo (0-20 points)
-            let weatherScore = 20;
-            
-            if (zone.v_now < 1.0) {
-                weatherScore = 20;
-                reasons.push({ text: '🌊 Mer très calme', type: 'positive' });
-            } else if (zone.v_now < 1.5) {
-                weatherScore = 15;
-                reasons.push({ text: '🌊 Mer calme', type: 'positive' });
-            } else if (zone.v_now < 2.0) {
-                weatherScore = 10;
-            } else {
-                weatherScore = 5;
-                reasons.push({ text: '⚠️ Mer agitée', type: 'warning' });
-            }
-            
-            if (zone.wind_speed && zone.wind_speed < 8) {
-                weatherScore += 5;
-                reasons.push({ text: '🌬️ Vent favorable', type: 'positive' });
-            }
-            
-            score += weatherScore;
-            
-            // Distance (0-10 points)
-            const distance = calculateDistance(
-                userLocation.lat, userLocation.lon,
-                zone.lat, zone.lon
+                },
+                () => displayRecommendations()
             );
-            
-            let distanceScore = Math.max(0, 10 - (distance / 10));
-            score += distanceScore;
-            
-            if (distance < 20) {
-                reasons.push({ text: `📍 Proche (${Math.round(distance)}km)`, type: 'positive' });
-            }
-            
-            // Ajuster selon priorité
-            if (priority === 'safety') {
-                score = safetyScore * 2 + fishScore * 0.5 + weatherScore;
-            } else if (priority === 'fish') {
-                score = fishScore * 2 + safetyScore + weatherScore * 0.5;
-            }
-            
-            return {
-                zone: zone.zone,
-                region: zone.region,
-                score: Math.min(100, Math.round(score)),
-                distance: Math.round(distance),
-                reasons: reasons,
-                data: zone
-            };
+        } else {
+            displayRecommendations();
         }
+    } catch (error) {
+        console.error('Erreur:', error);
+        document.getElementById('loading').innerHTML = '<p style="color:#d32f2f;">❌ Erreur de chargement</p>';
+    }
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+             Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+             Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
+
+function calculateZoneScore(zone, priority = 'balanced') {
+    let score = 0;
+    let reasons = [];
+    
+    const safetyScores = { safe: 40, caution: 25, warning: 10, danger: 0 };
+    const safetyScore = safetyScores[zone.safety_level] || 0;
+    score += safetyScore;
+    
+    if (safetyScore >= 40) reasons.push({ text: '🟢 Zone sûre', type: 'positive' });
+    else if (safetyScore >= 25) reasons.push({ text: '🟡 Vigilance requise', type: 'warning' });
+    
+    const fishScores = { excellent: 30, good: 20, moderate: 10, poor: 5 };
+    const fishScore = fishScores[zone.fish_level] || 0;
+    score += fishScore;
+    
+    if (fishScore >= 20) reasons.push({ text: '🐟 Excellente pêche', type: 'positive' });
+    
+    let weatherScore = 20;
+    if (zone.v_now < 1.0) {
+        weatherScore = 20;
+        reasons.push({ text: '🌊 Mer très calme', type: 'positive' });
+    } else if (zone.v_now < 1.5) {
+        weatherScore = 15;
+        reasons.push({ text: '🌊 Mer calme', type: 'positive' });
+    } else if (zone.v_now < 2.0) {
+        weatherScore = 10;
+    } else {
+        weatherScore = 5;
+        reasons.push({ text: '⚠️ Mer agitée', type: 'warning' });
+    }
+    
+    if (zone.wind_speed && zone.wind_speed < 8) {
+        weatherScore += 5;
+        reasons.push({ text: '🌬️ Vent favorable', type: 'positive' });
+    }
+    
+    score += weatherScore;
+    
+    const distance = calculateDistance(userLocation.lat, userLocation.lon, zone.lat, zone.lon);
+    let distanceScore = Math.max(0, 10 - (distance / 10));
+    score += distanceScore;
+    
+    if (distance < 20) {
+        reasons.push({ text: `📍 Proche (${Math.round(distance)}km)`, type: 'positive' });
+    }
+    
+    if (priority === 'safety') {
+        score = safetyScore * 2 + fishScore * 0.5 + weatherScore;
+    } else if (priority === 'fish') {
+        score = fishScore * 2 + safetyScore + weatherScore * 0.5;
+    }
+    
+    return {
+        zone: zone.zone,
+        region: zone.region,
+        score: Math.min(100, Math.round(score)),
+        distance: Math.round(distance),
+        reasons: reasons,
+        data: zone
+    };
+}
+
+function displayRecommendations() {
+    const priority = document.getElementById('priorityFilter').value;
+    const regionFilter = document.getElementById('regionFilter').value;
+    const maxDistance = parseInt(document.getElementById('distanceFilter').value);
+    
+    let filtered = allZones.filter(zone => {
+        const distance = calculateDistance(userLocation.lat, userLocation.lon, zone.lat, zone.lon);
+        if (distance > maxDistance) return false;
+        if (regionFilter !== 'all' && zone.region !== regionFilter) return false;
+        return true;
+    });
+    
+    let scored = filtered.map(zone => calculateZoneScore(zone, priority));
+    scored.sort((a, b) => b.score - a.score);
+    
+    const container = document.getElementById('results');
+    container.innerHTML = '';
+    
+    scored.slice(0, 10).forEach((item, index) => {
+        const rank = index + 1;
+        const rankClass = rank <= 3 ? `rank-${rank}` : '';
+        const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
         
-        function displayRecommendations() {
-            const priority = document.getElementById('priorityFilter').value;
-            const regionFilter = document.getElementById('regionFilter').value;
-            const maxDistance = parseInt(document.getElementById('distanceFilter').value);
-            
-            // Filtrer zones
-            let filtered = allZones.filter(zone => {
-                const distance = calculateDistance(
-                    userLocation.lat, userLocation.lon,
-                    zone.lat, zone.lon
-                );
+        const card = document.createElement('div');
+        card.className = `zone-card ${rankClass}`;
+        
+        card.innerHTML = `
+            <div class="rank-badge">${medal}</div>
+            <div class="zone-info">
+                <div class="zone-name">${item.zone}</div>
+                <div class="zone-region">📍 ${item.region} — ${item.distance} km</div>
                 
-                if (distance > maxDistance) return false;
-                if (regionFilter !== 'all' && zone.region !== regionFilter) return false;
-                
-                return true;
-            });
-            
-            // Calculer scores
-            let scored = filtered.map(zone => calculateZoneScore(zone, priority));
-            
-            // Trier par score
-            scored.sort((a, b) => b.score - a.score);
-            
-            // Afficher top 10
-            const container = document.getElementById('recommendations');
-            container.innerHTML = '';
-            
-            scored.slice(0, 10).forEach((item, index) => {
-                const rank = index + 1;
-                const rankClass = rank <= 3 ? `rank-${rank}` : '';
-                
-                const card = document.createElement('div');
-                card.className = `zone-card ${rankClass}`;
-                
-                const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
-                
-                card.innerHTML = `
-                    <div class="rank-badge">${medal}</div>
-                    <div class="zone-info">
-                        <div class="zone-name">${item.zone}</div>
-                        <div class="zone-region">📍 ${item.region} - ${item.distance} km</div>
-                        
-                        <div class="score-bar">
-                            <div class="score-fill" style="width: ${item.score}%">
-                                <span class="score-value">${item.score}/100</span>
-                            </div>
-                        </div>
-                        
-                        <div class="reasons">
-                            ${item.reasons.map(r => 
-                                `<span class="reason-tag ${r.type}">${r.text}</span>`
-                            ).join('')}
-                        </div>
-                        
-                        <div class="zone-metrics">
-                            <div class="metric">
-                                <div class="metric-value">${item.data.v_now}m</div>
-                                <div class="metric-label">Vagues</div>
-                            </div>
-                            <div class="metric">
-                                <div class="metric-value">${item.data.t_now}°C</div>
-                                <div class="metric-label">Température</div>
-                            </div>
-                            <div class="metric">
-                                <div class="metric-value">${item.data.wind_speed || 'N/A'}</div>
-                                <div class="metric-label">Vent (m/s)</div>
-                            </div>
-                        </div>
+                <div class="score-bar-wrap">
+                    <div class="score-fill" style="width:${item.score}%">
+                        <span class="score-value">${item.score}/100</span>
                     </div>
-                    <div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
-                        <button class="action-btn" onclick="showOnMap(${item.data.lat}, ${item.data.lon})">
-                            Voir sur carte
-                        </button>
-                        <a href="https://wa.me/?text=PecheurConnect recommande ${item.zone} aujourd'hui ! Score: ${item.score}/100 🎣" 
-                           class="action-btn" style="background: #25D366; font-size: 12px; padding: 8px 15px;">
-                            Partager
-                        </a>
-                    </div>
-                `;
+                </div>
                 
-                container.appendChild(card);
-            });
-            
-            document.getElementById('loading').style.display = 'none';
-            container.style.display = 'grid';
-        }
+                <div class="reasons">
+                    ${item.reasons.map(r => `<span class="reason-tag ${r.type}">${r.text}</span>`).join('')}
+                </div>
+                
+                <div class="zone-metrics">
+                    <div class="metric">
+                        <div class="metric-value">${item.data.v_now}m</div>
+                        <div class="metric-label">Vagues</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">${item.data.t_now}°C</div>
+                        <div class="metric-label">Température</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value">${item.data.wind_speed || 'N/A'}</div>
+                        <div class="metric-label">Vent (m/s)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="zone-actions">
+                <a href="./index.html?lat=${item.data.lat}&lon=${item.data.lon}&zoom=12" class="action-btn action-btn-primary">
+                    🗺️ Voir sur carte
+                </a>
+                <a href="https://wa.me/?text=${encodeURIComponent(`PecheurConnect recommande ${item.zone} aujourd'hui ! Score: ${item.score}/100 🎣`)}" 
+                   class="action-btn action-btn-secondary" target="_blank">
+                    📱 Partager
+                </a>
+            </div>
+        `;
         
-        function applyFilters() {
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('recommendations').style.display = 'none';
-            
-            setTimeout(displayRecommendations, 500);
-        }
-        
-        function showOnMap(lat, lon) {
-            window.location.href = `./index.html?lat=${lat}&lon=${lon}&zoom=12`;
-        }
-        
-        init();
-    </script>
+        container.appendChild(card);
+    });
+    
+    document.getElementById('loading').style.display = 'none';
+    container.style.display = 'grid';
+}
+
+function applyFilters() {
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('results').style.display = 'none';
+    setTimeout(displayRecommendations, 500);
+}
+
+init();
+</script>
+
 </body>
 </html>
