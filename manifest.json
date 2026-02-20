@@ -1,16 +1,16 @@
 {
   "name": "PecheurConnect - Sécurité Maritime Sénégal",
   "short_name": "PecheurConnect",
-  "description": "Surveillance maritime en temps réel pour les pêcheurs sénégalais",
+  "description": "Système de sécurité maritime en temps réel pour les pêcheurs sénégalais. 18 zones surveillées, alertes météo, historique et prévisions.",
   "start_url": "./index.html",
-  "scope": "./",
   "display": "standalone",
-  "orientation": "portrait-primary",
-  "background_color": "#0056b3",
+  "background_color": "#0a1628",
   "theme_color": "#0056b3",
-  "lang": "fr-SN",
+  "orientation": "any",
+  "scope": "./",
+  "lang": "fr-FR",
   "dir": "ltr",
-  "categories": ["navigation", "weather", "utilities"],
+  "categories": ["weather", "navigation", "utilities", "productivity"],
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/2965/2965315.png",
@@ -35,35 +35,49 @@
     {
       "src": "https://via.placeholder.com/540x720/0056b3/ffffff?text=PecheurConnect",
       "sizes": "540x720",
-      "type": "image/png"
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "https://via.placeholder.com/1280x720/0056b3/ffffff?text=PecheurConnect",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
     }
   ],
   "shortcuts": [
     {
-      "name": "Carte Maritime",
+      "name": "Carte",
       "short_name": "Carte",
-      "description": "Voir la carte des zones de pêche",
+      "description": "Voir la carte des zones",
       "url": "./index.html",
-      "icons": [
-        {
-          "src": "https://cdn-icons-png.flaticon.com/128/854/854878.png",
-          "sizes": "128x128"
-        }
-      ]
+      "icons": [{ "src": "https://cdn-icons-png.flaticon.com/128/2965/2965315.png", "sizes": "128x128" }]
     },
     {
-      "name": "Signaler un danger",
-      "short_name": "Signaler",
-      "description": "Signaler un danger via WhatsApp",
-      "url": "./index.html#report",
-      "icons": [
-        {
-          "src": "https://cdn-icons-png.flaticon.com/128/5968/5968841.png",
-          "sizes": "128x128"
-        }
-      ]
+      "name": "Historique",
+      "short_name": "Stats",
+      "description": "Consulter l'historique",
+      "url": "./history.html",
+      "icons": [{ "src": "https://cdn-icons-png.flaticon.com/128/2965/2965315.png", "sizes": "128x128" }]
+    },
+    {
+      "name": "Comparateur",
+      "short_name": "Comparer",
+      "description": "Comparer les zones",
+      "url": "./comparator.html",
+      "icons": [{ "src": "https://cdn-icons-png.flaticon.com/128/2965/2965315.png", "sizes": "128x128" }]
     }
   ],
+  "share_target": {
+    "action": "./index.html",
+    "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
   "related_applications": [],
   "prefer_related_applications": false
 }
