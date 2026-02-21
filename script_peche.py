@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-PecheurConnect v2.1 - Système complet avec historique
+PecheurConnect v2.1 - Système complet avec historique + Bot Telegram
 Auteur: PecheurConnect Team
 Date: 2026
 """
@@ -30,6 +30,7 @@ OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
 WORLDTIDES_API_KEY = os.getenv("WORLDTIDES_API_KEY")
 TG_TOKEN = os.getenv("TG_TOKEN")
 TG_ID = os.getenv("TG_ID")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")  # Pour le bot interactif
 
 # 18 ZONES ÉTENDUES
 ZONES = {
@@ -616,7 +617,7 @@ def save_data(data):
 
 
 def send_telegram(data):
-    """Envoie alerte Telegram"""
+    """Envoie alerte Telegram (notifications simples)"""
     if not TG_TOKEN or not TG_ID:
         return
     
@@ -637,7 +638,12 @@ def send_telegram(data):
         message += "\n"
     
     message += f"🕐 {data[0]['date']} UTC\n"
-    message += f"📊 Historique: https://doundou969.github.io/sunu-blue-tech/history.html"
+    
+    # Ajouter info bot interactif si configuré
+    if TELEGRAM_BOT_TOKEN:
+        message += "\n🤖 *Bot interactif disponible!*\n"
+        message += "Tapez /start pour commencer\n"
+        message += "Tapez /conditions pour voir toutes les zones"
     
     try:
         requests.post(
@@ -650,6 +656,42 @@ def send_telegram(data):
         pass
 
 
+def send_bot_broadcast(data):
+    """Diffuse les nouvelles données via le bot (optionnel)"""
+    if not TELEGRAM_BOT_TOKEN or not TG_ID:
+        return
+    
+    # Créer un résumé court pour broadcast
+    safe_count = len([z for z in data if z["safety_level"] == "safe"])
+    danger_count = len([z for z in data if z["safety_level"] in ["danger", "warning"]])
+    
+    # Trouver les 3 meilleures zones
+    best_zones = sorted(data, key=lambda x: x["v_now"])[:3]
+    
+    message = "🌊 *MISE À JOUR MÉTÉO MARINE* 🌊\n\n"
+    message += f"✅ Zones sûres: {safe_count}/{len(data)}\n"
+    
+    if danger_count > 0:
+        message += f"⚠️ Zones à risque: {danger_count}\n"
+    
+    message += "\n🏆 *MEILLEURES ZONES:*\n"
+    for i, zone in enumerate(best_zones, 1):
+        message += f"{i}. {zone['zone']}: {zone['v_now']}m\n"
+    
+    message += f"\n📅 {datetime.now().strftime('%d/%m/%Y %H:%M')}\n"
+    message += "\nTapez /conditions pour plus de détails"
+    
+    try:
+        requests.post(
+            f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage",
+            data={"chat_id": TG_ID, "text": message, "parse_mode": "Markdown"},
+            timeout=10
+        )
+        log("Broadcast bot envoyé", "SUCCESS")
+    except Exception as e:
+        log(f"Erreur broadcast: {str(e)[:50]}", "WARNING")
+
+
 # ============================================================================
 # FONCTION PRINCIPALE
 # ============================================================================
@@ -659,8 +701,8 @@ def main():
     start = datetime.now()
     
     log("=" * 60)
-    log("PECHEURCONNECT v2.1 - AVEC HISTORIQUE")
-    log("18 zones | Météo | Historique 7 jours")
+    log("PECHEURCONNECT v2.1 - AVEC HISTORIQUE + BOT")
+    log("18 zones | Météo | Historique 7 jours | Bot Telegram")
     log("=" * 60)
     
     data = fetch_data()
@@ -679,10 +721,27 @@ def main():
     # Générer statistiques
     generate_all_stats()
     
-    send_telegram(data)
+    # Envoyer notifications
+    send_telegram(data)  # Notification simple
+    
+    # Broadcast via bot interactif (si configuré)
+    if TELEGRAM_BOT_TOKEN:
+        send_bot_broadcast(data)
     
     duration = (datetime.now() - start).total_seconds()
     log(f"Terminé en {duration:.2f}s", "SUCCESS")
+    
+    # Info sur le bot
+    if TELEGRAM_BOT_TOKEN:
+        log("=" * 60)
+        log("🤖 BOT TELEGRAM INTERACTIF ACTIVÉ", "SUCCESS")
+        log("Les pêcheurs peuvent consulter les données à tout moment!", "INFO")
+        log("Commandes: /start, /conditions, /zone, /alertes, etc.", "INFO")
+    else:
+        log("=" * 60)
+        log("💡 Bot Telegram non configuré", "INFO")
+        log("Ajoutez TELEGRAM_BOT_TOKEN dans .env pour l'activer", "INFO")
+    
     log("=" * 60)
 
 
