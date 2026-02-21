@@ -1,0 +1,376 @@
+# 🚀 DÉMARRAGE RAPIDE - PECHEURCONNECT v2.1
+
+## ⚡ INSTALLATION EN 5 MINUTES
+
+### 1️⃣ Prérequis (2 min)
+
+```bash
+# Vérifier Python
+python3 --version  # Besoin de 3.11+
+
+# Installer les dépendances
+pip install -r requirements_bot.txt
+```
+
+---
+
+### 2️⃣ Configuration (2 min)
+
+```bash
+# Copier le template
+cp .env.example .env
+
+# Éditer avec vos identifiants
+nano .env
+```
+
+**Identifiants nécessaires :**
+
+```env
+# 1. Copernicus Marine (GRATUIT)
+# Inscription: https://data.marine.copernicus.eu/register
+COPERNICUS_USERNAME=votre_email@example.com
+COPERNICUS_PASSWORD=votre_mot_de_passe
+
+# 2. Bot Telegram (GRATUIT)
+# Créer avec @BotFather sur Telegram
+TELEGRAM_BOT_TOKEN=123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11
+
+# 3. Channel Telegram pour notifications (OPTIONNEL)
+TELEGRAM_CHAT_ID=-1001234567890
+```
+
+---
+
+### 3️⃣ Test (30 secondes)
+
+```bash
+# Tester la configuration
+python3 test_bot_config.py
+```
+
+Vous devriez voir :
+```
+✅ COPERNICUS_USERNAME: votre_em...
+✅ TELEGRAM_BOT_TOKEN: 12345...
+✅ Bot connecté: PecheurConnect
+✅ Toutes les dépendances installées
+```
+
+---
+
+### 4️⃣ Premier lancement (30 secondes)
+
+```bash
+# Rendre les scripts exécutables
+chmod +x start.sh daemon.sh
+
+# Lancer le système
+./start.sh
+```
+
+**Vous verrez :**
+```
+[22:30:00] ℹ️ Connexion à Copernicus...
+[22:30:02] ✅ Connecté
+[22:30:02] ℹ️ Traitement SAINT-LOUIS...
+[22:30:20] ✅   🟢 SÛR | 🌊0.92m | 🌡️19.3°C
+...
+[22:35:41] ✅ data.json sauvegardé (18 zones)
+[22:35:41] 🤖 Bot Telegram démarré...
+```
+
+---
+
+## 🎯 UTILISATION
+
+### Mode interactif (pour tester)
+
+```bash
+./start.sh
+```
+
+- Collecte les données
+- Lance le bot
+- Reste en premier plan
+- Ctrl+C pour arrêter
+
+### Mode daemon (production)
+
+```bash
+# Démarrer
+./daemon.sh start
+
+# Vérifier le statut
+./daemon.sh status
+
+# Voir les logs en temps réel
+./daemon.sh logs
+
+# Arrêter
+./daemon.sh stop
+
+# Redémarrer
+./daemon.sh restart
+```
+
+---
+
+## 📱 UTILISER LE BOT TELEGRAM
+
+### 1. Trouver votre bot
+- Ouvrir Telegram
+- Chercher le nom que vous avez donné (@votre_bot)
+- Cliquer sur "Démarrer"
+
+### 2. Commandes principales
+
+```
+/start          → Accueil
+/conditions     → Voir les 18 zones
+/zone kayar     → Info sur Kayar
+/alertes        → Zones dangereuses
+/meilleures     → Top 5 zones
+/regions        → Menu par région
+/historique mbour → Historique 7 jours
+/help           → Aide complète
+```
+
+### 3. Exemple de conversation
+
+```
+Vous: /zone dakar-yoff
+
+Bot: 📍 ZONE: DAKAR-YOFF
+     ━━━━━━━━━━━━━━━━━
+     🟢 SÛR
+     └ 🌊 Vagues: 1.17m
+     └ 🌡️ Température: 21.0°C
+     └ 🌬️ Vent: 4.1m/s
+     └ 💡 Conditions idéales
+     
+     📅 Mise à jour: 20/02 22:30
+     
+     [📊 Historique] [🔄 Actualiser]
+```
+
+---
+
+## 🔧 AUTOMATISATION
+
+### Collecte automatique toutes les 6 heures
+
+Le daemon configure automatiquement un cron job :
+
+```bash
+# Vérifier le cron
+crontab -l
+
+# Vous devriez voir :
+0 */6 * * * cd /chemin/projet && python3 script_peche_complet.py
+```
+
+### Collecte manuelle
+
+```bash
+# Via le daemon
+./daemon.sh collect
+
+# Ou directement
+python3 script_peche_complet.py
+```
+
+---
+
+## 📊 FICHIERS GÉNÉRÉS
+
+```
+pecheurconnect/
+├── data.json                    # Données actuelles
+├── logs/
+│   ├── history/
+│   │   ├── 2026-02-20.json     # Historique par jour
+│   │   ├── 2026-02-21.json
+│   │   └── ...
+│   ├── stats/
+│   │   ├── kayar.json          # Stats par zone
+│   │   ├── dakar_yoff.json
+│   │   └── all_zones.json      # Stats globales
+│   ├── bot.log                  # Logs du bot
+│   └── collector.log            # Logs collecte
+└── pecheurconnect.pid           # PID du daemon
+```
+
+---
+
+## 🐛 DÉPANNAGE
+
+### Le bot ne répond pas
+
+```bash
+# 1. Vérifier le statut
+./daemon.sh status
+
+# 2. Voir les logs
+./daemon.sh logs
+
+# 3. Redémarrer
+./daemon.sh restart
+```
+
+### Erreur "Invalid token"
+
+```bash
+# Vérifier le token dans .env
+cat .env | grep TELEGRAM_BOT_TOKEN
+
+# Re-tester
+python3 test_bot_config.py
+```
+
+### Pas de données
+
+```bash
+# Collecter manuellement
+python3 script_peche_complet.py
+
+# Vérifier data.json
+cat data.json
+```
+
+### Erreur Copernicus
+
+```bash
+# Vérifier les identifiants
+cat .env | grep COPERNICUS
+
+# Tester la connexion
+python3 -c "
+import copernicusmarine as cm
+import os
+cm.login(
+    username=os.getenv('COPERNICUS_USERNAME'),
+    password=os.getenv('COPERNICUS_PASSWORD')
+)
+print('✓ Connexion réussie')
+"
+```
+
+---
+
+## 📈 SURVEILLANCE
+
+### Logs en temps réel
+
+```bash
+# Bot
+tail -f logs/bot.log
+
+# Collecte
+tail -f logs/collector.log
+
+# Les deux
+tail -f logs/*.log
+```
+
+### Vérifier les dernières données
+
+```bash
+# Dernière mise à jour
+stat data.json
+
+# Nombre de zones
+cat data.json | python3 -c "import json, sys; print(len(json.load(sys.stdin)))"
+
+# Zones dangereuses
+cat data.json | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+danger = [z for z in data if z['safety_level'] in ['danger', 'warning']]
+print(f'{len(danger)} zones à risque')
+"
+```
+
+---
+
+## 🎨 PERSONNALISATION
+
+### Changer l'intervalle de collecte
+
+```bash
+# Éditer le cron (4 heures au lieu de 6)
+crontab -e
+
+# Changer de :
+0 */6 * * *
+
+# À :
+0 */4 * * *
+```
+
+### Ajouter une zone
+
+```python
+# Dans script_peche_complet.py
+ZONES = {
+    # ... zones existantes ...
+    "MA-NOUVELLE-ZONE": {
+        "lat": 14.50,
+        "lon": -17.00,
+        "desc": "Description",
+        "region": "Région"
+    }
+}
+```
+
+### Modifier les seuils de sécurité
+
+```python
+# Dans script_peche_complet.py
+def calculate_safety_level(wave, current):
+    if wave > 3.0 or current > 1.0:
+        return "🔴 DANGER", "danger", "#d32f2f"
+    elif wave > 2.1 or current > 0.6:  # Modifier ces valeurs
+        return "🟠 PRUDENCE", "warning", "#ff9800"
+    # ...
+```
+
+---
+
+## ✅ CHECKLIST DE PRODUCTION
+
+- [ ] .env configuré avec tous les identifiants
+- [ ] test_bot_config.py réussi
+- [ ] Première collecte réussie (data.json créé)
+- [ ] Bot Telegram répond à /start
+- [ ] Daemon lancé en arrière-plan
+- [ ] Cron job configuré
+- [ ] Logs surveillés
+- [ ] Backup quotidien configuré
+- [ ] Monitoring en place
+
+---
+
+## 🆘 SUPPORT
+
+**Documentation complète :**
+- README.md
+- GUIDE_BOT_TELEGRAM.md
+
+**Contact :**
+- Telegram: @PecheurConnectSupport
+- Email: support@pecheurconnect.sn
+
+---
+
+## 🎉 C'EST PRÊT !
+
+Votre système PecheurConnect est maintenant opérationnel !
+
+Les pêcheurs peuvent :
+- ✅ Consulter les conditions 24/7 via le bot
+- ✅ Recevoir des alertes automatiques
+- ✅ Voir l'historique sur 7 jours
+- ✅ Trouver les meilleures zones
+
+**Bonne pêche ! 🐟🌊**
