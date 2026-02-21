@@ -4,14 +4,14 @@
   "data_points": 18,
   "history": [
     {
-      "timestamp": "2026-02-21T01:48:46.202860",
+      "timestamp": "2026-02-21T06:35:07.719369",
       "date": "2026-02-21",
-      "wave": 0.39,
-      "temp": 24.3,
-      "current": 0.1,
-      "wind": 3.1,
+      "wave": 0.44,
+      "temp": 24.0,
+      "current": 0.08,
+      "wind": 2.7,
       "safety_level": "safe",
-      "fish_level": "good"
+      "fish_level": "excellent"
     },
     {
       "timestamp": "2026-02-19T01:16:18.582446",
@@ -186,7 +186,7 @@
   ],
   "statistics": {
     "waves": {
-      "min": 0.39,
+      "min": 0.43,
       "max": 0.64,
       "avg": 0.52,
       "trend": "stable"
@@ -217,8 +217,8 @@
     "safety": "safe"
   },
   "worst_day": {
-    "date": "2026-02-21",
-    "wave": 0.39,
+    "date": "2026-02-19",
+    "wave": 0.43,
     "safety": "safe"
   }
 }
