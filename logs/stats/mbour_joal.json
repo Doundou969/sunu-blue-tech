@@ -4,12 +4,12 @@
   "data_points": 16,
   "history": [
     {
-      "timestamp": "2026-02-23T00:48:39.721465",
+      "timestamp": "2026-02-23T01:03:50.627403",
       "date": "2026-02-23",
       "wave": 0.78,
       "temp": 21.1,
       "current": 0.03,
-      "wind": 4.4,
+      "wind": 3.9,
       "safety_level": "safe",
       "fish_level": "excellent"
     },
@@ -180,7 +180,7 @@
     "wind": {
       "min": 1.1,
       "max": 7.2,
-      "avg": 4.9,
+      "avg": 4.8,
       "trend": "stable"
     }
   },

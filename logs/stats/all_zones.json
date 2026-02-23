@@ -5,7 +5,7 @@
     "data_points": 16,
     "history": [
       {
-        "timestamp": "2026-02-23T00:48:39.721465",
+        "timestamp": "2026-02-23T01:03:50.627403",
         "date": "2026-02-23",
         "wave": 1.37,
         "temp": 19.1,
@@ -209,7 +209,7 @@
     "data_points": 16,
     "history": [
       {
-        "timestamp": "2026-02-23T00:48:39.721465",
+        "timestamp": "2026-02-23T01:03:50.627403",
         "date": "2026-02-23",
         "wave": 1.29,
         "temp": 19.8,
@@ -413,12 +413,12 @@
     "data_points": 16,
     "history": [
       {
-        "timestamp": "2026-02-23T00:48:39.721465",
+        "timestamp": "2026-02-23T01:03:50.627403",
         "date": "2026-02-23",
         "wave": 1.66,
         "temp": 19.9,
         "current": 0.07,
-        "wind": 4.5,
+        "wind": 5.9,
         "safety_level": "caution",
         "fish_level": "good"
       },
@@ -589,7 +589,7 @@
       "wind": {
         "min": 3.6,
         "max": 7.4,
-        "avg": 5.9,
+        "avg": 6.0,
         "trend": "hausse"
       }
     },
@@ -617,12 +617,12 @@
     "data_points": 16,
     "history": [
       {
-        "timestamp": "2026-02-23T00:48:39.721465",
+        "timestamp": "2026-02-23T01:03:50.627403",
         "date": "2026-02-23",
         "wave": 1.44,
         "temp": 20.4,
         "current": 0.06,
-        "wind": 4.9,
+        "wind": 4.7,
         "safety_level": "safe",
         "fish_level": "good"
       },
@@ -821,7 +821,7 @@
     "data_points": 16,
     "history": [
       {
-        "timestamp": "2026-02-23T00:48:39.721465",
+        "timestamp": "2026-02-23T01:03:50.627403",
         "date": "2026-02-23",
         "wave": 1.79,
         "temp": 20.6,
@@ -1025,7 +1025,7 @@
     "data_points": 16,
     "history": [
       {
-        "timestamp": "2026-02-23T00:48:39.721465",
+        "timestamp": "2026-02-23T01:03:50.627403",
         "date": "2026-02-23",
         "wave": 1.27,
         "temp": 20.7,
@@ -1229,7 +1229,7 @@
     "data_points": 16,
     "history": [
       {
-        "timestamp": "2026-02-23T00:48:39.721465",
+        "timestamp": "2026-02-23T01:03:50.627403",
         "date": "2026-02-23",
         "wave": 1.27,
         "temp": 20.7,
@@ -1433,12 +1433,12 @@
     "data_points": 16,
     "history": [
       {
-        "timestamp": "2026-02-23T00:48:39.721465",
+        "timestamp": "2026-02-23T01:03:50.627403",
         "date": "2026-02-23",
         "wave": 0.87,
         "temp": 20.4,
         "current": 0.04,
-        "wind": 4.0,
+        "wind": 4.6,
         "safety_level": "safe",
         "fish_level": "excellent"
       },
@@ -1637,7 +1637,7 @@
     "data_points": 16,
     "history": [
       {
-        "timestamp": "2026-02-23T00:48:39.721465",
+        "timestamp": "2026-02-23T01:03:50.627403",
         "date": "2026-02-23",
         "wave": 1.5,
         "temp": 21.0,
@@ -1841,12 +1841,12 @@
     "data_points": 16,
     "history": [
       {
-        "timestamp": "2026-02-23T00:48:39.721465",
+        "timestamp": "2026-02-23T01:03:50.627403",
         "date": "2026-02-23",
         "wave": 0.78,
         "temp": 21.1,
         "current": 0.03,
-        "wind": 4.4,
+        "wind": 3.9,
         "safety_level": "safe",
         "fish_level": "excellent"
       },
@@ -2017,7 +2017,7 @@
       "wind": {
         "min": 1.1,
         "max": 7.2,
-        "avg": 4.9,
+        "avg": 4.8,
         "trend": "stable"
       }
     },
@@ -2045,7 +2045,7 @@
     "data_points": 16,
     "history": [
       {
-        "timestamp": "2026-02-23T00:48:39.721465",
+        "timestamp": "2026-02-23T01:03:50.627403",
         "date": "2026-02-23",
         "wave": 0.6,
         "temp": 21.1,
@@ -2249,12 +2249,12 @@
     "data_points": 16,
     "history": [
       {
-        "timestamp": "2026-02-23T00:48:39.721465",
+        "timestamp": "2026-02-23T01:03:50.627403",
         "date": "2026-02-23",
         "wave": 0.6,
         "temp": 21.1,
         "current": 0.06,
-        "wind": 3.4,
+        "wind": 3.8,
         "safety_level": "safe",
         "fish_level": "excellent"
       },
@@ -2453,12 +2453,12 @@
     "data_points": 16,
     "history": [
       {
-        "timestamp": "2026-02-23T00:48:39.721465",
+        "timestamp": "2026-02-23T01:03:50.627403",
         "date": "2026-02-23",
         "wave": 0.41,
         "temp": 23.0,
         "current": 0.02,
-        "wind": 4.1,
+        "wind": 3.7,
         "safety_level": "safe",
         "fish_level": "excellent"
       },
@@ -2657,12 +2657,12 @@
     "data_points": 16,
     "history": [
       {
-        "timestamp": "2026-02-23T00:48:39.721465",
+        "timestamp": "2026-02-23T01:03:50.627403",
         "date": "2026-02-23",
         "wave": 1.5,
         "temp": 22.0,
         "current": 0.0,
-        "wind": 3.9,
+        "wind": 3.5,
         "safety_level": "safe",
         "fish_level": "good"
       },
@@ -2861,12 +2861,12 @@
     "data_points": 16,
     "history": [
       {
-        "timestamp": "2026-02-23T00:48:39.721465",
+        "timestamp": "2026-02-23T01:03:50.627403",
         "date": "2026-02-23",
         "wave": 0.55,
         "temp": 23.2,
         "current": 0.01,
-        "wind": 5.2,
+        "wind": 4.5,
         "safety_level": "safe",
         "fish_level": "excellent"
       },
@@ -3037,7 +3037,7 @@
       "wind": {
         "min": 1.2,
         "max": 6.9,
-        "avg": 4.4,
+        "avg": 4.3,
         "trend": "stable"
       }
     },
@@ -3065,7 +3065,7 @@
     "data_points": 16,
     "history": [
       {
-        "timestamp": "2026-02-23T00:48:39.721465",
+        "timestamp": "2026-02-23T01:03:50.627403",
         "date": "2026-02-23",
         "wave": 0.72,
         "temp": 24.5,
@@ -3269,7 +3269,7 @@
     "data_points": 16,
     "history": [
       {
-        "timestamp": "2026-02-23T00:48:39.721465",
+        "timestamp": "2026-02-23T01:03:50.627403",
         "date": "2026-02-23",
         "wave": 0.55,
         "temp": 25.2,
@@ -3473,7 +3473,7 @@
     "data_points": 16,
     "history": [
       {
-        "timestamp": "2026-02-23T00:48:39.721465",
+        "timestamp": "2026-02-23T01:03:50.627403",
         "date": "2026-02-23",
         "wave": 0.66,
         "temp": 24.6,
