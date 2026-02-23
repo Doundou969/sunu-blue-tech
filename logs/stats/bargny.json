@@ -6,10 +6,10 @@
   "data_points": 16,
   "history": [
     {
-      "timestamp": "2026-02-23T18:01:02.677706",
+      "timestamp": "2026-02-23T18:52:16.376181",
       "date": "2026-02-23",
       "wave": 1.4,
-      "temp": 20.8,
+      "temp": 21.3,
       "wind": 6.7,
       "current": 0.05,
       "safety": "safe",
@@ -191,8 +191,8 @@
     },
     "temperature": {
       "min": 20.0,
-      "max": 21.2,
-      "avg": 20.36,
+      "max": 21.3,
+      "avg": 20.39,
       "trend": "stable"
     },
     "wind": {
@@ -217,7 +217,7 @@
   "best_day": {
     "date": "2026-02-23",
     "wave": 1.4,
-    "temp": 20.8,
+    "temp": 21.3,
     "safety": "safe"
   },
   "worst_day": {
