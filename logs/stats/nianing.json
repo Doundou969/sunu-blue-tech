@@ -1,15 +1,15 @@
 {
   "zone": "NIANING",
   "period": "7 jours",
-  "data_points": 18,
+  "data_points": 16,
   "history": [
     {
-      "timestamp": "2026-02-22T18:25:01.427034",
-      "date": "2026-02-22",
-      "wave": 0.59,
-      "temp": 21.5,
-      "current": 0.13,
-      "wind": 6.9,
+      "timestamp": "2026-02-23T00:48:39.721465",
+      "date": "2026-02-23",
+      "wave": 0.6,
+      "temp": 21.1,
+      "current": 0.06,
+      "wind": 3.6,
       "safety_level": "safe",
       "fish_level": "excellent"
     },
@@ -162,50 +162,30 @@
       "wind": 4.1,
       "safety_level": "safe",
       "fish_level": "excellent"
-    },
-    {
-      "timestamp": "2026-02-16T22:35:32.906963",
-      "date": "2026-02-16",
-      "wave": 0.46,
-      "temp": 20.2,
-      "current": 0.13,
-      "wind": 7.3,
-      "safety_level": "safe",
-      "fish_level": "excellent"
-    },
-    {
-      "timestamp": "2026-02-16T23:49:26.922392",
-      "date": "2026-02-16",
-      "wave": 0.46,
-      "temp": 20.2,
-      "current": 0.13,
-      "wind": 7.0,
-      "safety_level": "safe",
-      "fish_level": "excellent"
     }
   ],
   "statistics": {
     "waves": {
       "min": 0.31,
-      "max": 0.59,
+      "max": 0.6,
       "avg": 0.41,
       "trend": "stable"
     },
     "temperature": {
       "min": 20.0,
-      "max": 21.5,
+      "max": 21.1,
       "avg": 20.4,
       "trend": "stable"
     },
     "wind": {
       "min": 0.9,
-      "max": 7.3,
-      "avg": 5.2,
+      "max": 7.1,
+      "avg": 4.8,
       "trend": "stable"
     }
   },
   "safety_summary": {
-    "safe": 18,
+    "safe": 16,
     "caution": 0,
     "warning": 0,
     "danger": 0

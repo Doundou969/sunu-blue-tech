@@ -1,15 +1,15 @@
 {
   "zone": "PALMARIN",
   "period": "7 jours",
-  "data_points": 18,
+  "data_points": 16,
   "history": [
     {
-      "timestamp": "2026-02-22T18:25:01.427034",
-      "date": "2026-02-22",
-      "wave": 0.38,
-      "temp": 23.2,
-      "current": 0.05,
-      "wind": 6.0,
+      "timestamp": "2026-02-23T00:48:39.721465",
+      "date": "2026-02-23",
+      "wave": 0.41,
+      "temp": 23.0,
+      "current": 0.02,
+      "wind": 4.1,
       "safety_level": "safe",
       "fish_level": "excellent"
     },
@@ -162,50 +162,30 @@
       "wind": 4.2,
       "safety_level": "safe",
       "fish_level": "excellent"
-    },
-    {
-      "timestamp": "2026-02-16T22:35:32.906963",
-      "date": "2026-02-16",
-      "wave": 0.29,
-      "temp": 22.4,
-      "current": 0.09,
-      "wind": 5.6,
-      "safety_level": "safe",
-      "fish_level": "excellent"
-    },
-    {
-      "timestamp": "2026-02-16T23:49:26.922392",
-      "date": "2026-02-16",
-      "wave": 0.29,
-      "temp": 22.4,
-      "current": 0.09,
-      "wind": 4.7,
-      "safety_level": "safe",
-      "fish_level": "excellent"
     }
   ],
   "statistics": {
     "waves": {
       "min": 0.19,
-      "max": 0.38,
+      "max": 0.41,
       "avg": 0.27,
       "trend": "stable"
     },
     "temperature": {
       "min": 22.1,
-      "max": 23.2,
+      "max": 23.0,
       "avg": 22.4,
       "trend": "stable"
     },
     "wind": {
       "min": 3.6,
       "max": 7.1,
-      "avg": 5.0,
+      "avg": 4.8,
       "trend": "stable"
     }
   },
   "safety_summary": {
-    "safe": 18,
+    "safe": 16,
     "caution": 0,
     "warning": 0,
     "danger": 0

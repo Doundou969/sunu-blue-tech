@@ -1,15 +1,15 @@
 {
   "zone": "GANDIOL",
   "period": "7 jours",
-  "data_points": 18,
+  "data_points": 16,
   "history": [
     {
-      "timestamp": "2026-02-22T18:25:01.427034",
-      "date": "2026-02-22",
-      "wave": 1.25,
-      "temp": 20.0,
-      "current": 0.09,
-      "wind": 2.1,
+      "timestamp": "2026-02-23T00:48:39.721465",
+      "date": "2026-02-23",
+      "wave": 1.29,
+      "temp": 19.8,
+      "current": 0.05,
+      "wind": 3.1,
       "safety_level": "safe",
       "fish_level": "good"
     },
@@ -162,50 +162,30 @@
       "wind": 2.1,
       "safety_level": "safe",
       "fish_level": "excellent"
-    },
-    {
-      "timestamp": "2026-02-16T22:35:32.906963",
-      "date": "2026-02-16",
-      "wave": 1.07,
-      "temp": 19.3,
-      "current": 0.14,
-      "wind": 3.1,
-      "safety_level": "safe",
-      "fish_level": "good"
-    },
-    {
-      "timestamp": "2026-02-16T23:49:26.922392",
-      "date": "2026-02-16",
-      "wave": 1.07,
-      "temp": 19.3,
-      "current": 0.14,
-      "wind": 2.1,
-      "safety_level": "safe",
-      "fish_level": "good"
     }
   ],
   "statistics": {
     "waves": {
       "min": 0.64,
-      "max": 1.25,
-      "avg": 0.85,
+      "max": 1.29,
+      "avg": 0.83,
       "trend": "stable"
     },
     "temperature": {
       "min": 19.0,
-      "max": 20.0,
+      "max": 19.8,
       "avg": 19.2,
       "trend": "stable"
     },
     "wind": {
       "min": 1.0,
       "max": 6.3,
-      "avg": 3.1,
-      "trend": "stable"
+      "avg": 3.2,
+      "trend": "hausse"
     }
   },
   "safety_summary": {
-    "safe": 18,
+    "safe": 16,
     "caution": 0,
     "warning": 0,
     "danger": 0

@@ -1,15 +1,15 @@
 {
   "zone": "SAINT-LOUIS",
   "period": "7 jours",
-  "data_points": 18,
+  "data_points": 16,
   "history": [
     {
-      "timestamp": "2026-02-22T18:25:01.427034",
-      "date": "2026-02-22",
-      "wave": 1.33,
-      "temp": 19.4,
-      "current": 0.08,
-      "wind": 2.1,
+      "timestamp": "2026-02-23T00:48:39.721465",
+      "date": "2026-02-23",
+      "wave": 1.37,
+      "temp": 19.1,
+      "current": 0.04,
+      "wind": 3.1,
       "safety_level": "safe",
       "fish_level": "good"
     },
@@ -162,50 +162,30 @@
       "wind": 2.1,
       "safety_level": "safe",
       "fish_level": "excellent"
-    },
-    {
-      "timestamp": "2026-02-16T22:35:32.906963",
-      "date": "2026-02-16",
-      "wave": 1.15,
-      "temp": 18.7,
-      "current": 0.14,
-      "wind": 3.1,
-      "safety_level": "safe",
-      "fish_level": "good"
-    },
-    {
-      "timestamp": "2026-02-16T23:49:26.922392",
-      "date": "2026-02-16",
-      "wave": 1.15,
-      "temp": 18.7,
-      "current": 0.14,
-      "wind": 2.1,
-      "safety_level": "safe",
-      "fish_level": "good"
     }
   ],
   "statistics": {
     "waves": {
       "min": 0.68,
-      "max": 1.33,
-      "avg": 0.91,
+      "max": 1.37,
+      "avg": 0.89,
       "trend": "stable"
     },
     "temperature": {
       "min": 18.2,
-      "max": 19.4,
+      "max": 19.1,
       "avg": 18.5,
       "trend": "stable"
     },
     "wind": {
       "min": 1.0,
       "max": 6.4,
-      "avg": 3.3,
+      "avg": 3.4,
       "trend": "stable"
     }
   },
   "safety_summary": {
-    "safe": 18,
+    "safe": 16,
     "caution": 0,
     "warning": 0,
     "danger": 0
