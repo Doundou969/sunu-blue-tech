@@ -1,187 +1,211 @@
 {
   "zone": "RUFISQUE",
+  "description": "Rufisque",
+  "region": "Dakar",
   "period": "7 jours",
   "data_points": 16,
   "history": [
     {
-      "timestamp": "2026-02-23T12:43:43.511083",
+      "timestamp": "2026-02-23T17:40:49.501453",
       "date": "2026-02-23",
-      "wave": 0.84,
+      "wave": 0.82,
       "temp": 20.2,
+      "wind": 8.2,
       "current": 0.05,
-      "wind": 4.4,
-      "safety_level": "safe",
-      "fish_level": "excellent"
+      "safety": "safe",
+      "fish_level": "excellent",
+      "danger_score": 9
     },
     {
       "timestamp": "2026-02-19T01:16:18.582446",
       "date": "2026-02-19",
       "wave": 0.58,
       "temp": 19.5,
-      "current": 0.06,
       "wind": 5.7,
-      "safety_level": "safe",
-      "fish_level": "excellent"
+      "current": 0.06,
+      "safety": "safe",
+      "fish_level": "excellent",
+      "danger_score": 28
     },
     {
       "timestamp": "2026-02-19T06:52:17.308474",
       "date": "2026-02-19",
       "wave": 0.59,
       "temp": 19.5,
-      "current": 0.04,
       "wind": 3.9,
-      "safety_level": "safe",
-      "fish_level": "excellent"
+      "current": 0.04,
+      "safety": "safe",
+      "fish_level": "excellent",
+      "danger_score": 27
     },
     {
       "timestamp": "2026-02-19T12:41:53.399107",
       "date": "2026-02-19",
       "wave": 0.55,
       "temp": 19.7,
-      "current": 0.07,
       "wind": 0.8,
-      "safety_level": "safe",
-      "fish_level": "excellent"
+      "current": 0.07,
+      "safety": "safe",
+      "fish_level": "excellent",
+      "danger_score": 27
     },
     {
       "timestamp": "2026-02-19T18:43:16.178181",
       "date": "2026-02-19",
       "wave": 0.53,
       "temp": 20.5,
-      "current": 0.04,
       "wind": 5.3,
-      "safety_level": "safe",
-      "fish_level": "excellent"
+      "current": 0.04,
+      "safety": "safe",
+      "fish_level": "excellent",
+      "danger_score": 25
     },
     {
       "timestamp": "2026-02-18T01:01:30.367708",
       "date": "2026-02-18",
       "wave": 0.66,
       "temp": 19.4,
-      "current": 0.09,
       "wind": 5.5,
-      "safety_level": "safe",
-      "fish_level": "excellent"
+      "current": 0.09,
+      "safety": "safe",
+      "fish_level": "excellent",
+      "danger_score": 29
     },
     {
       "timestamp": "2026-02-18T01:17:06.326649",
       "date": "2026-02-18",
       "wave": 0.66,
       "temp": 19.4,
-      "current": 0.09,
       "wind": 5.5,
-      "safety_level": "safe",
-      "fish_level": "excellent"
+      "current": 0.09,
+      "safety": "safe",
+      "fish_level": "excellent",
+      "danger_score": 29
     },
     {
       "timestamp": "2026-02-18T06:54:19.104731",
       "date": "2026-02-18",
       "wave": 0.63,
       "temp": 19.1,
-      "current": 0.07,
       "wind": 5.3,
-      "safety_level": "safe",
-      "fish_level": "excellent"
+      "current": 0.07,
+      "safety": "safe",
+      "fish_level": "excellent",
+      "danger_score": 29
     },
     {
       "timestamp": "2026-02-18T12:42:25.301963",
       "date": "2026-02-18",
       "wave": 0.59,
       "temp": 19.3,
-      "current": 0.09,
       "wind": 3.8,
-      "safety_level": "safe",
-      "fish_level": "excellent"
+      "current": 0.09,
+      "safety": "safe",
+      "fish_level": "excellent",
+      "danger_score": 29
     },
     {
       "timestamp": "2026-02-18T18:42:51.725881",
       "date": "2026-02-18",
       "wave": 0.55,
       "temp": 20.1,
-      "current": 0.12,
       "wind": 5.8,
-      "safety_level": "safe",
-      "fish_level": "excellent"
+      "current": 0.12,
+      "safety": "safe",
+      "fish_level": "excellent",
+      "danger_score": 27
     },
     {
       "timestamp": "2026-02-17T00:54:02.914224",
       "date": "2026-02-17",
       "wave": 0.78,
       "temp": 19.2,
-      "current": 0.06,
       "wind": 7.9,
-      "safety_level": "safe",
-      "fish_level": "excellent"
+      "current": 0.06,
+      "safety": "safe",
+      "fish_level": "excellent",
+      "danger_score": 30
     },
     {
       "timestamp": "2026-02-17T01:15:05.184598",
       "date": "2026-02-17",
       "wave": 0.78,
       "temp": 19.2,
-      "current": 0.06,
       "wind": 6.5,
-      "safety_level": "safe",
-      "fish_level": "excellent"
+      "current": 0.06,
+      "safety": "safe",
+      "fish_level": "excellent",
+      "danger_score": 30
     },
     {
       "timestamp": "2026-02-17T06:50:14.708906",
       "date": "2026-02-17",
       "wave": 0.74,
       "temp": 19.0,
-      "current": 0.07,
       "wind": 4.8,
-      "safety_level": "safe",
-      "fish_level": "excellent"
+      "current": 0.07,
+      "safety": "safe",
+      "fish_level": "excellent",
+      "danger_score": 30
     },
     {
       "timestamp": "2026-02-17T12:40:56.246511",
       "date": "2026-02-17",
       "wave": 0.72,
       "temp": 19.2,
-      "current": 0.1,
       "wind": 4.0,
-      "safety_level": "safe",
-      "fish_level": "excellent"
+      "current": 0.1,
+      "safety": "safe",
+      "fish_level": "excellent",
+      "danger_score": 30
     },
     {
       "timestamp": "2026-02-17T15:55:17.716501",
       "date": "2026-02-17",
       "wave": 0.68,
       "temp": 19.2,
-      "current": 0.1,
       "wind": 5.2,
-      "safety_level": "safe",
-      "fish_level": "excellent"
+      "current": 0.1,
+      "safety": "safe",
+      "fish_level": "excellent",
+      "danger_score": 30
     },
     {
       "timestamp": "2026-02-17T18:46:19.799425",
       "date": "2026-02-17",
       "wave": 0.65,
       "temp": 20.1,
-      "current": 0.13,
       "wind": 7.1,
-      "safety_level": "safe",
-      "fish_level": "excellent"
+      "current": 0.13,
+      "safety": "safe",
+      "fish_level": "excellent",
+      "danger_score": 28
     }
   ],
   "statistics": {
     "waves": {
       "min": 0.53,
-      "max": 0.84,
+      "max": 0.82,
       "avg": 0.66,
       "trend": "stable"
     },
     "temperature": {
       "min": 19.0,
       "max": 20.5,
-      "avg": 19.5,
+      "avg": 19.54,
       "trend": "stable"
     },
     "wind": {
       "min": 0.8,
-      "max": 7.9,
-      "avg": 5.1,
-      "trend": "hausse"
+      "max": 8.2,
+      "avg": 5.33,
+      "trend": "stable"
+    },
+    "current": {
+      "min": 0.04,
+      "max": 0.13,
+      "avg": 0.08,
+      "trend": "stable"
     }
   },
   "safety_summary": {
@@ -197,8 +221,8 @@
     "safety": "safe"
   },
   "worst_day": {
-    "date": "2026-02-19",
-    "wave": 0.53,
+    "date": "2026-02-23",
+    "wave": 0.82,
     "safety": "safe"
   }
 }
