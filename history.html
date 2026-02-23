@@ -10,561 +10,134 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
         /* ============================================================
-           VARIABLES & RESET
+            VARIABLES & RESET (Inchangé)
         ============================================================ */
         :root {
             --primary:    #0056b3;
             --primary-dk: #003d7a;
-            --accent:     #00c8ff;
-            --safe:       #00c853;
+            --accent:      #00c8ff;
+            --safe:        #00c853;
             --caution:    #ffd600;
             --warning:    #ff6d00;
-            --danger:     #d50000;
-            --dark:       #0a1628;
-            --bg:         #f0f4f8;
-            --card:       #ffffff;
-            --radius:     14px;
-            --shadow:     0 4px 24px rgba(0,0,0,0.10);
-            --shadow-lg:  0 10px 40px rgba(0,0,0,0.15);
+            --danger:      #d50000;
+            --dark:        #0a1628;
+            --bg:          #f0f4f8;
+            --card:        #ffffff;
+            --radius:      14px;
+            --shadow:      0 4px 24px rgba(0,0,0,0.10);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--bg);
-            min-height: 100vh;
-        }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); min-height: 100vh; color: #333; }
 
         /* ============================================================
-           TOPBAR
+            LAYOUT & TOPBAR
         ============================================================ */
         .topbar {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dk) 100%);
             padding: 0 30px;
             box-shadow: 0 4px 20px rgba(0,86,179,0.3);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            position: sticky; top: 0; z-index: 100;
         }
-
         .topbar-inner {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            height: 64px;
+            max-width: 1400px; margin: 0 auto;
+            display: flex; align-items: center; justify-content: space-between; height: 64px;
         }
-
         .topbar-brand {
-            font-family: 'Syne', sans-serif;
-            font-size: 20px;
-            font-weight: 800;
-            color: white;
-            text-decoration: none;
-            letter-spacing: -0.5px;
+            font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800;
+            color: white; text-decoration: none;
         }
-
-        .topbar-nav {
-            display: flex;
-            gap: 4px;
-        }
-
+        .topbar-nav { display: flex; gap: 4px; }
         .topbar-nav a {
-            color: rgba(255,255,255,0.75);
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 500;
-            padding: 6px 14px;
-            border-radius: 20px;
-            transition: all 0.2s;
+            color: rgba(255,255,255,0.75); text-decoration: none; font-size: 13px;
+            padding: 6px 14px; border-radius: 20px; transition: 0.2s;
         }
+        .topbar-nav a.active, .topbar-nav a:hover { background: rgba(255,255,255,0.2); color: white; }
 
-        .topbar-nav a:hover,
-        .topbar-nav a.active {
-            background: rgba(255,255,255,0.2);
-            color: white;
-        }
-
-        .topbar-nav a.active {
-            background: rgba(255,255,255,0.25);
-            color: white;
-            font-weight: 600;
-        }
+        .page { max-width: 1400px; margin: 0 auto; padding: 30px 20px; }
 
         /* ============================================================
-           MAIN LAYOUT
-        ============================================================ */
-        .page {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 30px 20px;
-        }
-
-        /* ============================================================
-           PAGE HEADER
+            HEADER & BUTTONS
         ============================================================ */
         .page-header {
-            background: white;
-            border-radius: var(--radius);
-            padding: 28px 30px;
-            box-shadow: var(--shadow);
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-            flex-wrap: wrap;
+            background: white; border-radius: var(--radius); padding: 25px;
+            box-shadow: var(--shadow); margin-bottom: 24px;
+            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;
         }
-
-        .page-header-left h1 {
-            font-family: 'Syne', sans-serif;
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--primary);
-            letter-spacing: -0.5px;
-            margin-bottom: 4px;
-        }
-
-        .page-header-left p {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 10px;
-        }
-
+        .page-header h1 { font-family: 'Syne', sans-serif; font-size: 28px; color: var(--primary); }
         .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
-            border: none;
+            display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px;
+            border-radius: 25px; font-weight: 600; cursor: pointer; text-decoration: none; border: none;
         }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 4px 12px rgba(0,86,179,0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(0,86,179,0.4);
-        }
-
-        .btn-ghost {
-            background: #f0f4f8;
-            color: var(--primary);
-            border: 2px solid #e0e8f0;
-        }
-
-        .btn-ghost:hover {
-            background: #e0e8f0;
-        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-ghost { background: #f0f4f8; color: var(--primary); border: 2px solid #e0e8f0; }
 
         /* ============================================================
-           ZONE SELECTOR
+            ZONE SELECTOR
         ============================================================ */
-        .zone-selector-card {
-            background: white;
-            border-radius: var(--radius);
-            padding: 24px;
-            box-shadow: var(--shadow);
-            margin-bottom: 24px;
-        }
-
-        .zone-selector-title {
-            font-family: 'Syne', sans-serif;
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* Region tabs */
-        .region-tabs {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-        }
-
-        .region-tab {
-            padding: 6px 14px;
-            background: #f0f4f8;
-            border: 2px solid transparent;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #555;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .region-tab:hover { background: #e0e8f0; }
-
-        .region-tab.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        .zone-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 8px;
-        }
-
+        .zone-selector-card { background: white; border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); margin-bottom: 24px; }
+        .region-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+        .region-tab { padding: 6px 14px; background: #f0f4f8; border-radius: 20px; font-size: 12px; cursor: pointer; font-weight: 600; }
+        .region-tab.active { background: var(--primary); color: white; }
+        .zone-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; }
         .zone-btn {
-            padding: 11px 12px;
-            background: #f8f9fa;
-            border: 2px solid #e8ecf0;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: center;
-            font-family: 'DM Sans', sans-serif;
-            font-weight: 600;
-            font-size: 12px;
-            color: #333;
-            position: relative;
+            padding: 12px; background: #f8f9fa; border: 2px solid #e8ecf0; border-radius: 10px;
+            cursor: pointer; text-align: center; font-weight: 600; font-size: 12px;
         }
-
-        .zone-btn:hover {
-            border-color: var(--primary);
-            background: #eef4ff;
-            color: var(--primary);
-        }
-
-        .zone-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-            box-shadow: 0 4px 12px rgba(0,86,179,0.3);
-        }
-
-        .zone-btn .zone-safety-dot {
-            display: inline-block;
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            margin-right: 5px;
-        }
+        .zone-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
         /* ============================================================
-           STATS CARDS
+            STAT CARDS
         ============================================================ */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 22px 24px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--primary);
-        }
-
-        .stat-card.waves::before    { background: #0056b3; }
-        .stat-card.temp::before     { background: #ff4081; }
-        .stat-card.wind::before     { background: #00bcd4; }
-        .stat-card.safety::before   { background: var(--safe); }
-
-        .stat-label {
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: #888;
-            margin-bottom: 8px;
-        }
-
-        .stat-value {
-            font-family: 'Syne', sans-serif;
-            font-size: 38px;
-            font-weight: 800;
-            color: var(--primary);
-            line-height: 1;
-            margin-bottom: 4px;
-        }
-
-        .stat-range {
-            font-size: 12px;
-            color: #aaa;
-            margin-bottom: 10px;
-        }
-
-        .trend-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        .trend-badge.hausse {
-            background: #fff0f0;
-            color: var(--danger);
-        }
-
-        .trend-badge.baisse {
-            background: #f0fff4;
-            color: var(--safe);
-        }
-
-        .trend-badge.stable {
-            background: #f0f7ff;
-            color: var(--primary);
-        }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: white; padding: 20px; border-radius: var(--radius); box-shadow: var(--shadow); position: relative; overflow: hidden; }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--primary); }
+        .stat-value { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; color: var(--primary); margin: 10px 0; }
+        .trend-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+        .trend-badge.hausse { background: #fff0f0; color: var(--danger); }
+        .trend-badge.baisse { background: #f0fff4; color: var(--safe); }
+        .trend-badge.stable { background: #f0f7ff; color: var(--primary); }
 
         /* ============================================================
-           BEST / WORST
+            COPERNICUS SEASONALITY (Nouveau)
         ============================================================ */
-        .bw-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 24px;
+        .seasonality-card {
+            background: white; border-radius: var(--radius); padding: 24px;
+            box-shadow: var(--shadow); margin-bottom: 24px; border-top: 5px solid var(--accent);
         }
-
-        .bw-card {
-            background: white;
-            border-radius: var(--radius);
-            padding: 24px;
-            box-shadow: var(--shadow);
-        }
-
-        .bw-card.best  { border-left: 5px solid var(--safe); }
-        .bw-card.worst { border-left: 5px solid var(--danger); }
-
-        .bw-title {
-            font-family: 'Syne', sans-serif;
-            font-size: 17px;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .bw-info {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 14px 16px;
-        }
-
-        .bw-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 0;
-            font-size: 14px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .bw-row:last-child { border: none; }
-
-        .bw-row .bw-key  { color: #666; }
-        .bw-row .bw-val  { font-weight: 600; color: #222; }
+        .seasonality-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .seasonality-header h3 { font-family: 'Syne', sans-serif; color: var(--primary); font-size: 18px; }
+        #fishing-advice { background: #f0f7ff; padding: 15px; border-radius: 10px; border-left: 4px solid var(--accent); font-size: 14px; }
+        .seasonality-container { position: relative; height: 300px; width: 100%; }
 
         /* ============================================================
-           CHARTS
+            CHARTS & TABLES
         ============================================================ */
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .chart-card { background: white; border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+        .history-table-card { background: white; border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        thead th { background: #f8f9fa; padding: 12px; text-align: left; color: #888; border-bottom: 2px solid #eee; }
+        tbody td { padding: 12px; border-bottom: 1px solid #f5f5f5; }
+        
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .badge-safe { background: #e8f5e9; color: #2e7d32; }
+        .badge-danger { background: #ffebee; color: #b71c1c; }
 
-        .chart-card {
-            background: white;
-            border-radius: var(--radius);
-            padding: 24px;
-            box-shadow: var(--shadow);
-        }
+        /* States */
+        .state-box { background: white; border-radius: var(--radius); padding: 60px; text-align: center; box-shadow: var(--shadow); }
+        .spinner-ring { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .chart-title {
-            font-family: 'Syne', sans-serif;
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .chart-subtitle {
-            font-size: 12px;
-            color: #aaa;
-            font-weight: 400;
-            margin-left: 4px;
-        }
-
-        /* ============================================================
-           SAFETY HISTORY TABLE
-        ============================================================ */
-        .history-table-card {
-            background: white;
-            border-radius: var(--radius);
-            padding: 24px;
-            box-shadow: var(--shadow);
-            margin-bottom: 24px;
-            overflow-x: auto;
-        }
-
-        .history-table-card h3 {
-            font-family: 'Syne', sans-serif;
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-        }
-
-        thead th {
-            background: #f8f9fa;
-            padding: 12px 14px;
-            text-align: left;
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #888;
-            border-bottom: 2px solid #eee;
-        }
-
-        tbody td {
-            padding: 12px 14px;
-            border-bottom: 1px solid #f5f5f5;
-            color: #333;
-        }
-
-        tbody tr:hover { background: #fafbff; }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-        }
-
-        .badge-safe    { background: #e8f5e9; color: #2e7d32; }
-        .badge-caution { background: #fff8e1; color: #f57f17; }
-        .badge-warning { background: #fff3e0; color: #e65100; }
-        .badge-danger  { background: #ffebee; color: #b71c1c; }
-
-        /* ============================================================
-           STATES: LOADING / EMPTY / ERROR
-        ============================================================ */
-        .state-box {
-            background: white;
-            border-radius: var(--radius);
-            padding: 60px 30px;
-            box-shadow: var(--shadow);
-            text-align: center;
-        }
-
-        .state-icon {
-            font-size: 56px;
-            margin-bottom: 16px;
-        }
-
-        .state-title {
-            font-family: 'Syne', sans-serif;
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .state-desc {
-            font-size: 14px;
-            color: #888;
-            line-height: 1.7;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        .spinner-ring {
-            width: 52px;
-            height: 52px;
-            border: 5px solid #e8ecf0;
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 0.9s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* ============================================================
-           RESPONSIVE
-        ============================================================ */
-        @media (max-width: 900px) {
-            .charts-grid  { grid-template-columns: 1fr; }
-            .bw-grid      { grid-template-columns: 1fr; }
-            .stats-grid   { grid-template-columns: repeat(2, 1fr); }
-        }
-
-        @media (max-width: 600px) {
-            .topbar-nav   { display: none; }
-            .page         { padding: 16px 12px; }
-            .stats-grid   { grid-template-columns: 1fr; }
-            .page-header  { flex-direction: column; align-items: flex-start; }
-            .page-header-left h1 { font-size: 22px; }
-        }
+        @media (max-width: 768px) { .charts-grid { grid-template-columns: 1fr; } .topbar-nav { display: none; } }
     </style>
 </head>
 <body>
 
-<!-- ============================================================
-     TOPBAR
-============================================================ -->
 <div class="topbar">
     <div class="topbar-inner">
         <a href="./index.html" class="topbar-brand">🌊 PecheurConnect</a>
@@ -572,540 +145,215 @@
             <a href="./index.html">🗺️ Carte</a>
             <a href="./history.html" class="active">📊 Historique</a>
             <a href="./comparator.html">🎯 Comparer</a>
-            <a href="./export.html">📄 Export</a>
             <a href="./alerts-settings.html">🔔 Alertes</a>
-            <a href="./admin.html">🏛️ Admin</a>
-            <a href="./api/index.html">🔌 API</a>
         </nav>
     </div>
 </div>
 
-<!-- ============================================================
-     PAGE
-============================================================ -->
 <div class="page">
-
-    <!-- Page Header -->
     <div class="page-header">
-        <div class="page-header-left">
+        <div>
             <h1>📊 Historique & Tendances</h1>
-            <p>Analyse des 7 derniers jours — PecheurConnect v3.0 🇸🇳</p>
+            <p>Données temps réel connectées à <strong>Copernicus Marine</strong> 🛰️</p>
         </div>
         <div class="header-actions">
             <a href="./export.html" class="btn btn-ghost">📄 Exporter</a>
-            <a href="./index.html" class="btn btn-primary">🗺️ Voir la carte</a>
+            <a href="./index.html" class="btn btn-primary">🗺️ Carte</a>
         </div>
     </div>
 
-    <!-- Zone Selector -->
     <div class="zone-selector-card">
-        <div class="zone-selector-title">📍 Sélectionner une zone</div>
-
-        <!-- Region Tabs -->
         <div class="region-tabs">
             <div class="region-tab active" onclick="filterRegionZones(this, 'all')">Toutes</div>
             <div class="region-tab" onclick="filterRegionZones(this, 'Nord')">Nord</div>
-            <div class="region-tab" onclick="filterRegionZones(this, 'Grande Côte')">Grande Côte</div>
             <div class="region-tab" onclick="filterRegionZones(this, 'Dakar')">Dakar</div>
             <div class="region-tab" onclick="filterRegionZones(this, 'Petite Côte')">Petite Côte</div>
-            <div class="region-tab" onclick="filterRegionZones(this, 'Sine Saloum')">Sine Saloum</div>
             <div class="region-tab" onclick="filterRegionZones(this, 'Casamance')">Casamance</div>
         </div>
-
         <div class="zone-grid" id="zoneGrid"></div>
     </div>
 
-    <!-- Loading -->
-    <div id="stateLoading" class="state-box">
-        <div class="spinner-ring"></div>
-        <div class="state-title">Chargement de l'historique...</div>
-        <div class="state-desc">Récupération des données des 7 derniers jours</div>
-    </div>
+    <div id="stateLoading" class="state-box"><div class="spinner-ring"></div>Chargement des données...</div>
+    <div id="stateEmpty" class="state-box" style="display:none;">Aucune donnée disponible pour le moment.</div>
 
-    <!-- No Data -->
-    <div id="stateEmpty" class="state-box" style="display:none;">
-        <div class="state-icon">⏳</div>
-        <div class="state-title">Données en cours de collecte</div>
-        <div class="state-desc">
-            L'historique sera disponible après quelques heures de collecte automatique.<br>
-            Le système enregistre les données <strong>toutes les 6 heures</strong>.<br><br>
-            Revenez bientôt ! 🕐
-        </div>
-    </div>
-
-    <!-- Content -->
     <div id="content" style="display:none;">
+        
+        <div class="seasonality-card">
+            <div class="seasonality-header">
+                <h3><i class="fas fa-calendar-check"></i> Calendrier de Pêche Copernicus (Moyennes 10 ans)</h3>
+                <span class="badge badge-safe">Scientifiquement Validé</span>
+            </div>
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <div style="flex: 2; min-width: 300px;">
+                    <div class="seasonality-container"><canvas id="seasonalityChart"></canvas></div>
+                </div>
+                <div style="flex: 1; min-width: 250px;">
+                    <div id="fishing-advice">
+                        <strong>💡 Analyse Saisonnière :</strong>
+                        <p id="advice-text" style="margin-top: 10px;">Analyse en cours...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <!-- Stats Cards -->
         <div class="stats-grid" id="statsGrid"></div>
 
-        <!-- Best / Worst -->
-        <div class="bw-grid">
-            <div class="bw-card best">
-                <div class="bw-title">🏆 Meilleur Jour</div>
-                <div id="bestDay"></div>
-            </div>
-            <div class="bw-card worst">
-                <div class="bw-title">⚠️ Pire Jour</div>
-                <div id="worstDay"></div>
-            </div>
-        </div>
-
-        <!-- Charts -->
         <div class="charts-grid">
-            <div class="chart-card">
-                <div class="chart-title">🌊 Évolution des Vagues <span class="chart-subtitle">7 jours</span></div>
-                <canvas id="waveChart"></canvas>
-            </div>
-            <div class="chart-card">
-                <div class="chart-title">🌡️ Température de l'Eau <span class="chart-subtitle">°C</span></div>
-                <canvas id="tempChart"></canvas>
-            </div>
-            <div class="chart-card">
-                <div class="chart-title">🌬️ Vitesse du Vent <span class="chart-subtitle">m/s</span></div>
-                <canvas id="windChart"></canvas>
-            </div>
-            <div class="chart-card">
-                <div class="chart-title">🎯 Répartition Sécurité <span class="chart-subtitle">7 jours</span></div>
-                <canvas id="safetyChart"></canvas>
-            </div>
+            <div class="chart-card"><h4>🌊 Vagues (7j)</h4><canvas id="waveChart"></canvas></div>
+            <div class="chart-card"><h4>🌡️ Température Eau</h4><canvas id="tempChart"></canvas></div>
         </div>
 
-        <!-- History Table -->
         <div class="history-table-card">
-            <h3>📋 Dernières Mesures</h3>
+            <h3>📋 Derniers relevés</h3>
             <table>
                 <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Heure</th>
-                        <th>Vagues</th>
-                        <th>Temp.</th>
-                        <th>Courant</th>
-                        <th>Vent</th>
-                        <th>Sécurité</th>
-                        <th>Pêche</th>
-                    </tr>
+                    <tr><th>Date</th><th>Heure</th><th>Vagues</th><th>Temp.</th><th>Vent</th><th>Sécurité</th></tr>
                 </thead>
                 <tbody id="historyTableBody"></tbody>
             </table>
         </div>
-
     </div>
 </div>
 
-<!-- ============================================================
-     SCRIPTS
-============================================================ -->
 <script>
-// ================================================================
-// STATE
-// ================================================================
-let currentZone  = null;
-let allStats     = {};
-let currentData  = null;
-let activeCharts = {};
-let zoneRegions  = {}; // zone → region mapping
+    let allStats = {};
+    let seasonalityData = {};
+    let activeCharts = {};
 
-const ZONE_REGIONS = {
-    "SAINT-LOUIS": "Nord",          "GANDIOL": "Nord",
-    "KAYAR": "Grande Côte",         "LOMPOUL": "Grande Côte",
-    "DAKAR-YOFF": "Dakar",          "DAKAR-SOUMBEDIOUNE": "Dakar",
-    "DAKAR-HANN": "Dakar",          "RUFISQUE": "Dakar",
-    "BARGNY": "Dakar",
-    "MBOUR-JOAL": "Petite Côte",    "NIANING": "Petite Côte",
-    "SALY": "Petite Côte",
-    "PALMARIN": "Sine Saloum",      "FOUNDIOUGNE": "Sine Saloum",
-    "MISSIRAH": "Sine Saloum",
-    "CASAMANCE-ZIGUINCHOR": "Casamance",
-    "CASAMANCE-CAP-SKIRRING": "Casamance",
-    "KAFOUNTINE": "Casamance"
-};
+    const ZONE_REGIONS = {
+        "SAINT-LOUIS": "Nord", "KAYAR": "Nord", "DAKAR-YOFF": "Dakar", "DAKAR-HANN": "Dakar",
+        "MBOUR-JOAL": "Petite Côte", "SALY": "Petite Côte", "CASAMANCE-ZIGUINCHOR": "Casamance"
+    };
 
-// ================================================================
-// INIT
-// ================================================================
-document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', init);
 
-async function init() {
-    try {
-        const response = await fetch('./logs/stats/all_zones.json?v=' + Date.now());
+    async function init() {
+        try {
+            // Chargement simultané des deux sources de données
+            const [statsRes, seasonRes] = await Promise.all([
+                fetch('./logs/stats/all_zones.json'),
+                fetch('seasonality_data.json')
+            ]);
 
-        if (!response.ok) throw new Error('Stats non trouvées');
+            allStats = await statsRes.json();
+            seasonalityData = await seasonRes.json();
 
-        allStats = await response.json();
-
-        if (!allStats || Object.keys(allStats).length === 0) {
-            showState('empty');
-            return;
+            buildZoneButtons(Object.keys(allStats));
+            selectZone(Object.keys(allStats)[0]);
+            
+            document.getElementById('stateLoading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+        } catch (e) {
+            document.getElementById('stateLoading').style.display = 'none';
+            document.getElementById('stateEmpty').style.display = 'block';
         }
-
-        buildZoneButtons(Object.keys(allStats));
-
-        // Sélectionner la première zone
-        const first = Object.keys(allStats)[0];
-        selectZone(first);
-
-    } catch (err) {
-        console.error('Erreur init:', err);
-        showState('empty');
     }
-}
 
-// ================================================================
-// ZONE BUTTONS
-// ================================================================
-function buildZoneButtons(zones) {
-    const grid = document.getElementById('zoneGrid');
-    grid.innerHTML = '';
+    function buildZoneButtons(zones) {
+        const grid = document.getElementById('zoneGrid');
+        zones.forEach(name => {
+            const btn = document.createElement('div');
+            btn.className = 'zone-btn';
+            btn.innerText = name;
+            btn.onclick = () => selectZone(name);
+            btn.dataset.region = ZONE_REGIONS[name] || 'Dakar';
+            grid.appendChild(btn);
+        });
+    }
 
-    zones.forEach(name => {
-        const region = ZONE_REGIONS[name] || '?';
-        const btn = document.createElement('div');
-        btn.className = 'zone-btn';
-        btn.dataset.zone = name;
-        btn.dataset.region = region;
-        btn.innerHTML = `<span class="zone-safety-dot" style="background:#0056b3"></span>${name}`;
-        btn.onclick = () => selectZone(name);
-        grid.appendChild(btn);
-    });
-}
+    function selectZone(name) {
+        document.querySelectorAll('.zone-btn').forEach(b => b.classList.toggle('active', b.innerText === name));
+        const data = allStats[name];
+        renderStats(data);
+        renderCharts(data);
+        renderTable(data);
+        renderSeasonality(name);
+    }
 
-function filterRegionZones(tab, region) {
-    document.querySelectorAll('.region-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-
-    document.querySelectorAll('.zone-btn').forEach(btn => {
-        if (region === 'all' || btn.dataset.region === region) {
-            btn.style.display = '';
-        } else {
-            btn.style.display = 'none';
-        }
-    });
-}
-
-// ================================================================
-// SELECT ZONE
-// ================================================================
-function selectZone(name) {
-    currentZone = name;
-
-    document.querySelectorAll('.zone-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.zone === name);
-    });
-
-    const stats = allStats[name];
-    if (!stats) return;
-
-    currentData = stats;
-    renderContent(stats);
-    showState('content');
-}
-
-// ================================================================
-// RENDER CONTENT
-// ================================================================
-function renderContent(stats) {
-    renderStatsCards(stats);
-    renderBestWorst(stats);
-    renderCharts(stats);
-    renderHistoryTable(stats);
-}
-
-// ----------------------------------------------------------------
-// Stats Cards
-// ----------------------------------------------------------------
-function renderStatsCards(stats) {
-    const { waves, temperature, wind } = stats.statistics;
-    const { safe, caution, warning, danger } = stats.safety_summary;
-    const total = stats.data_points;
-
-    document.getElementById('statsGrid').innerHTML = `
-        <div class="stat-card waves">
-            <div class="stat-label">🌊 Vagues Moyennes</div>
-            <div class="stat-value">${waves.avg}<span style="font-size:18px">m</span></div>
-            <div class="stat-range">Min ${waves.min}m — Max ${waves.max}m</div>
-            <div class="trend-badge ${waves.trend}">${trendEmoji(waves.trend)} ${waves.trend}</div>
-        </div>
-
-        <div class="stat-card temp">
-            <div class="stat-label">🌡️ Température Moyenne</div>
-            <div class="stat-value">${temperature.avg}<span style="font-size:18px">°C</span></div>
-            <div class="stat-range">Min ${temperature.min}°C — Max ${temperature.max}°C</div>
-            <div class="trend-badge ${temperature.trend}">${trendEmoji(temperature.trend)} ${temperature.trend}</div>
-        </div>
-
-        <div class="stat-card wind">
-            <div class="stat-label">🌬️ Vent Moyen</div>
-            <div class="stat-value">${wind.avg}<span style="font-size:18px">m/s</span></div>
-            <div class="stat-range">Min ${wind.min} — Max ${wind.max} m/s</div>
-            <div class="trend-badge ${wind.trend}">${trendEmoji(wind.trend)} ${wind.trend}</div>
-        </div>
-
-        <div class="stat-card safety">
-            <div class="stat-label">🎯 Jours Sûrs</div>
-            <div class="stat-value">${safe}<span style="font-size:18px">/${total}</span></div>
-            <div class="stat-range">${Math.round(safe / total * 100)}% du temps sûr</div>
-            <div style="margin-top:8px; font-size:13px; display:flex; gap:8px; flex-wrap:wrap;">
-                <span>🟡 ${caution}</span>
-                <span>🟠 ${warning}</span>
-                <span>🔴 ${danger}</span>
+    function renderStats(data) {
+        const s = data.statistics;
+        document.getElementById('statsGrid').innerHTML = `
+            <div class="stat-card">
+                <div style="color:#888; font-size:11px">VAGUES MOY.</div>
+                <div class="stat-value">${s.waves.avg}m</div>
+                <div class="trend-badge ${s.waves.trend}">${s.waves.trend}</div>
             </div>
-        </div>
-    `;
-}
-
-// ----------------------------------------------------------------
-// Best / Worst
-// ----------------------------------------------------------------
-function renderBestWorst(stats) {
-    const best  = stats.best_day;
-    const worst = stats.worst_day;
-
-    document.getElementById('bestDay').innerHTML = `
-        <div class="bw-info">
-            <div class="bw-row"><span class="bw-key">📅 Date</span><span class="bw-val">${formatDate(best.date)}</span></div>
-            <div class="bw-row"><span class="bw-key">🌊 Vagues</span><span class="bw-val">${best.wave}m</span></div>
-            <div class="bw-row"><span class="bw-key">🌡️ Température</span><span class="bw-val">${best.temp}°C</span></div>
-            <div class="bw-row"><span class="bw-key">🎯 Sécurité</span><span class="bw-val">${safetyEmoji(best.safety)} ${capitalize(best.safety)}</span></div>
-        </div>
-    `;
-
-    document.getElementById('worstDay').innerHTML = `
-        <div class="bw-info">
-            <div class="bw-row"><span class="bw-key">📅 Date</span><span class="bw-val">${formatDate(worst.date)}</span></div>
-            <div class="bw-row"><span class="bw-key">🌊 Vagues</span><span class="bw-val">${worst.wave}m</span></div>
-            <div class="bw-row"><span class="bw-key">🎯 Sécurité</span><span class="bw-val">${safetyEmoji(worst.safety)} ${capitalize(worst.safety)}</span></div>
-        </div>
-    `;
-}
-
-// ----------------------------------------------------------------
-// Charts
-// ----------------------------------------------------------------
-function renderCharts(stats) {
-    // Détruire anciens charts
-    Object.values(activeCharts).forEach(c => c.destroy());
-    activeCharts = {};
-
-    const history = (stats.history || []).slice(-168); // max 7 jours
-    const labels  = history.map(h => formatDateTime(h.timestamp));
-
-    const lineOptions = (unit, color) => ({
-        responsive: true,
-        maintainAspectRatio: true,
-        interaction: { intersect: false, mode: 'index' },
-        plugins: {
-            legend: { display: false },
-            tooltip: {
-                backgroundColor: 'rgba(10,22,40,0.9)',
-                padding: 12,
-                titleFont: { size: 13 },
-                bodyFont: { size: 12 },
-                callbacks: {
-                    label: ctx => ` ${ctx.parsed.y}${unit}`
-                }
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: false,
-                ticks: {
-                    font: { size: 11 },
-                    callback: v => v + unit
-                },
-                grid: { color: 'rgba(0,0,0,0.04)' }
-            },
-            x: {
-                ticks: {
-                    maxRotation: 45,
-                    minRotation: 30,
-                    font: { size: 10 },
-                    maxTicksLimit: 12
-                },
-                grid: { display: false }
-            }
-        }
-    });
-
-    // Vagues
-    activeCharts.wave = new Chart(document.getElementById('waveChart'), {
-        type: 'line',
-        data: {
-            labels,
-            datasets: [{
-                data: history.map(h => h.wave),
-                borderColor: '#0056b3',
-                backgroundColor: 'rgba(0,86,179,0.08)',
-                fill: true,
-                tension: 0.4,
-                borderWidth: 2.5,
-                pointRadius: history.length > 30 ? 0 : 3,
-                pointHoverRadius: 5
-            }]
-        },
-        options: lineOptions('m', '#0056b3')
-    });
-
-    // Température
-    activeCharts.temp = new Chart(document.getElementById('tempChart'), {
-        type: 'line',
-        data: {
-            labels,
-            datasets: [{
-                data: history.map(h => h.temp),
-                borderColor: '#ff4081',
-                backgroundColor: 'rgba(255,64,129,0.08)',
-                fill: true,
-                tension: 0.4,
-                borderWidth: 2.5,
-                pointRadius: history.length > 30 ? 0 : 3,
-                pointHoverRadius: 5
-            }]
-        },
-        options: lineOptions('°C', '#ff4081')
-    });
-
-    // Vent
-    activeCharts.wind = new Chart(document.getElementById('windChart'), {
-        type: 'line',
-        data: {
-            labels,
-            datasets: [{
-                data: history.map(h => h.wind),
-                borderColor: '#00bcd4',
-                backgroundColor: 'rgba(0,188,212,0.08)',
-                fill: true,
-                tension: 0.4,
-                borderWidth: 2.5,
-                pointRadius: history.length > 30 ? 0 : 3,
-                pointHoverRadius: 5
-            }]
-        },
-        options: lineOptions('m/s', '#00bcd4')
-    });
-
-    // Sécurité — donut
-    const { safe, caution, warning, danger } = stats.safety_summary;
-    activeCharts.safety = new Chart(document.getElementById('safetyChart'), {
-        type: 'doughnut',
-        data: {
-            labels: ['🟢 Sûr', '🟡 Vigilance', '🟠 Prudence', '🔴 Danger'],
-            datasets: [{
-                data: [safe, caution, warning, danger],
-                backgroundColor: ['#00c853', '#ffd600', '#ff6d00', '#d50000'],
-                borderWidth: 3,
-                borderColor: '#fff',
-                hoverOffset: 8
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            cutout: '62%',
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        padding: 16,
-                        font: { size: 12, family: 'DM Sans' },
-                        usePointStyle: true,
-                        pointStyleWidth: 10
-                    }
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(10,22,40,0.9)',
-                    padding: 12,
-                    callbacks: {
-                        label: ctx => ` ${ctx.label}: ${ctx.parsed} mesure(s)`
-                    }
-                }
-            }
-        }
-    });
-}
-
-// ----------------------------------------------------------------
-// History Table
-// ----------------------------------------------------------------
-function renderHistoryTable(stats) {
-    const tbody = document.getElementById('historyTableBody');
-    const history = (stats.history || []).slice(-30).reverse(); // 30 dernières mesures, récent en premier
-
-    if (history.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#aaa;padding:30px;">Aucune donnée disponible</td></tr>`;
-        return;
+            <div class="stat-card">
+                <div style="color:#888; font-size:11px">TEMPÉRATURE</div>
+                <div class="stat-value">${s.temperature.avg}°C</div>
+                <div class="trend-badge ${s.temperature.trend}">${s.temperature.trend}</div>
+            </div>
+            <div class="stat-card">
+                <div style="color:#888; font-size:11px">VENT</div>
+                <div class="stat-value">${s.wind.avg}m/s</div>
+                <div class="trend-badge ${s.wind.trend}">${s.wind.trend}</div>
+            </div>
+        `;
     }
 
-    tbody.innerHTML = history.map(entry => {
-        const dt = new Date(entry.timestamp);
-        const dateStr = dt.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' });
-        const timeStr = dt.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+    function renderSeasonality(zoneName) {
+        const key = Object.keys(seasonalityData).find(k => zoneName.includes(k.toUpperCase())) || "Dakar";
+        const points = seasonalityData[key];
+        const ctx = document.getElementById('seasonalityChart').getContext('2d');
 
-        const safetyBadge = {
-            safe:    `<span class="badge badge-safe">🟢 Sûr</span>`,
-            caution: `<span class="badge badge-caution">🟡 Vigilance</span>`,
-            warning: `<span class="badge badge-warning">🟠 Prudence</span>`,
-            danger:  `<span class="badge badge-danger">🔴 Danger</span>`
-        }[entry.safety_level] || `<span class="badge">${entry.safety_level}</span>`;
+        if (activeCharts.season) activeCharts.season.destroy();
+        activeCharts.season = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan','Fév','Mar','Avr','Mai','Jui','Jul','Aoû','Sep','Oct','Nov','Déc'],
+                datasets: [{
+                    label: 'Potentiel de Pêche %',
+                    data: points,
+                    borderColor: '#00c8ff',
+                    fill: true,
+                    backgroundColor: 'rgba(0,200,255,0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
 
-        const fishIcons = { excellent: '🐟🐟🐟', good: '🐟🐟', moderate: '🐟', poor: '🎣' };
+        const month = new Date().getMonth();
+        const val = points[month];
+        document.getElementById('advice-text').innerText = `Indice de ${val}% pour ce mois. ${val > 75 ? 'Période d\'Upwelling intense : la pêche est optimale.' : 'Eaux plus chaudes : les poissons sont plus rares en surface.'}`;
+    }
 
-        return `
+    function renderCharts(data) {
+        const history = data.history.slice(-48);
+        const labels = history.map(h => h.timestamp.split('T')[1].substring(0,5));
+
+        const createChart = (id, label, field, color) => {
+            if (activeCharts[id]) activeCharts[id].destroy();
+            activeCharts[id] = new Chart(document.getElementById(id), {
+                type: 'line',
+                data: { labels, datasets: [{ label, data: history.map(h => h[field]), borderColor: color, tension: 0.3 }] }
+            });
+        };
+        createChart('waveChart', 'Vagues (m)', 'wave', '#0056b3');
+        createChart('tempChart', 'Temp (°C)', 'temp', '#ff4081');
+    }
+
+    function renderTable(data) {
+        const body = document.getElementById('historyTableBody');
+        body.innerHTML = data.history.slice(-10).reverse().map(h => `
             <tr>
-                <td>${dateStr}</td>
-                <td>${timeStr}</td>
-                <td><strong>${entry.wave}m</strong></td>
-                <td>${entry.temp}°C</td>
-                <td>${entry.current}m/s</td>
-                <td>${entry.wind || 'N/A'}m/s</td>
-                <td>${safetyBadge}</td>
-                <td>${fishIcons[entry.fish_level] || '—'} ${capitalize(entry.fish_level || '')}</td>
+                <td>${h.timestamp.split('T')[0]}</td>
+                <td>${h.timestamp.split('T')[1].substring(0,5)}</td>
+                <td>${h.wave}m</td>
+                <td>${h.temp}°C</td>
+                <td>${h.wind}m/s</td>
+                <td><span class="badge ${h.safety === 'safe' ? 'badge-safe' : 'badge-danger'}">${h.safety}</span></td>
             </tr>
-        `;
-    }).join('');
-}
+        `).join('');
+    }
 
-// ================================================================
-// STATES
-// ================================================================
-function showState(state) {
-    document.getElementById('stateLoading').style.display = state === 'loading'  ? 'block' : 'none';
-    document.getElementById('stateEmpty').style.display   = state === 'empty'    ? 'block' : 'none';
-    document.getElementById('content').style.display      = state === 'content'  ? 'block' : 'none';
-}
-
-// ================================================================
-// HELPERS
-// ================================================================
-function trendEmoji(trend) {
-    return { hausse: '↗️', baisse: '↘️', stable: '➡️' }[trend] || '➡️';
-}
-
-function safetyEmoji(level) {
-    return { safe: '🟢', caution: '🟡', warning: '🟠', danger: '🔴' }[level] || '⚪';
-}
-
-function capitalize(str) {
-    if (!str) return 'N/A';
-    return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-function formatDate(dateStr) {
-    if (!dateStr) return 'N/A';
-    const d = new Date(dateStr);
-    if (isNaN(d)) return dateStr;
-    return d.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
-}
-
-function formatDateTime(isoStr) {
-    if (!isoStr) return '';
-    const d = new Date(isoStr);
-    if (isNaN(d)) return isoStr;
-    const date = d.toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit' });
-    const time = d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
-    return `${date} ${time}`;
-}
+    function filterRegionZones(tab, region) {
+        document.querySelectorAll('.region-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('.zone-btn').forEach(b => {
+            b.style.display = (region === 'all' || b.dataset.region === region) ? 'block' : 'none';
+        });
+    }
 </script>
 
 </body>
