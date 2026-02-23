@@ -5,12 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="PecheurConnect — Sécurité maritime en temps réel pour les pêcheurs sénégalais. 18 zones surveillées 24h/24.">
     <meta name="theme-color" content="#0a1628">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <!-- ✅ CORRECTION : apple-mobile-web-app-capable déprécié remplacé -->
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="PecheurConnect">
-    <meta property="og:title" content="PecheurConnect 🇸🇳">
+
+    <meta property="og:title"       content="PecheurConnect 🇸🇳">
     <meta property="og:description" content="Sécurité maritime en temps réel — 18 zones au Sénégal">
-    <meta property="og:type" content="website">
+    <meta property="og:type"        content="website">
 
     <title>PecheurConnect v3.0 🇸🇳 | Sécurité Maritime Sénégal</title>
 
@@ -209,6 +212,16 @@
             border-radius: 20px;
         }
 
+        /* Indicateur SW */
+        .sw-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.55);
+        }
+
         .brand-chips {
             display: flex;
             gap: 7px;
@@ -234,6 +247,17 @@
             background: var(--accent2);
             animation: pulse-live 2s ease infinite;
         }
+
+        .sw-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #888;
+            transition: background 0.3s;
+        }
+        .sw-dot.online  { background: var(--safe); }
+        .sw-dot.offline { background: var(--danger); }
+        .sw-dot.loading { background: var(--caution); animation: pulse-live 1s ease infinite; }
 
         @keyframes pulse-live {
             0%, 100% { opacity: 1; transform: scale(1); }
@@ -794,6 +818,11 @@
             <div class="chip">🗺️ <span id="regionCount">6 régions</span></div>
             <div class="chip">🕐 <span id="lastUpdate">--:--</span> UTC</div>
         </div>
+        <!-- Indicateur SW -->
+        <div class="sw-indicator">
+            <div class="sw-dot loading" id="swDot"></div>
+            <span id="swLabel">Service Worker...</span>
+        </div>
     </div>
 
     <!-- Navigation -->
@@ -828,13 +857,13 @@
     <div class="filter-card">
         <div class="filter-label">Filtrer par région</div>
         <div class="filter-pills">
-            <div class="pill active" data-region="all"         onclick="doFilter(this)">Tout</div>
-            <div class="pill"        data-region="Nord"        onclick="doFilter(this)">Nord</div>
-            <div class="pill"        data-region="Grande Côte" onclick="doFilter(this)">G.Côte</div>
-            <div class="pill"        data-region="Dakar"       onclick="doFilter(this)">Dakar</div>
-            <div class="pill"        data-region="Petite Côte" onclick="doFilter(this)">P.Côte</div>
-            <div class="pill"        data-region="Sine Saloum" onclick="doFilter(this)">S.Saloum</div>
-            <div class="pill"        data-region="Casamance"   onclick="doFilter(this)">Casamance</div>
+            <div class="pill active" data-region="all"          onclick="doFilter(this)">Tout</div>
+            <div class="pill"        data-region="Nord"         onclick="doFilter(this)">Nord</div>
+            <div class="pill"        data-region="Grande Côte"  onclick="doFilter(this)">G.Côte</div>
+            <div class="pill"        data-region="Dakar"        onclick="doFilter(this)">Dakar</div>
+            <div class="pill"        data-region="Petite Côte"  onclick="doFilter(this)">P.Côte</div>
+            <div class="pill"        data-region="Sine Saloum"  onclick="doFilter(this)">S.Saloum</div>
+            <div class="pill"        data-region="Casamance"    onclick="doFilter(this)">Casamance</div>
         </div>
     </div>
 
@@ -885,7 +914,7 @@
      FABs
 ============================================================ -->
 <div class="fab-group">
-    <a  class="fab fab-wa"  href="https://wa.me/221777020818" target="_blank" title="Contact / SOS">📱</a>
+    <a      class="fab fab-wa"  href="https://wa.me/221777020818" target="_blank" title="Contact / SOS">📱</a>
     <button class="fab fab-ref" onclick="doRefresh()"  title="Actualiser">🔄</button>
     <button class="fab fab-loc" onclick="doLocate()"   title="Ma position">📍</button>
 </div>
@@ -924,16 +953,16 @@
    STATE
 ================================================================ */
 let map, clusterLayer;
-let allZones   = [];
-let markerMap  = {};
+let allZones    = [];
+let markerMap   = {};
 let activeCharts = {};
-let userMarker = null;
+let userMarker  = null;
 let deferredPWA = null;
 
 const LANG_LABELS = {
     fr: { safe:'SÛR',  caution:'VIGILANCE', warning:'PRUDENCE', danger:'DANGER' },
-    wo: { safe:'BAAX', caution:'SEET',      warning:'BÀYYI',   danger:'ÑAX'    },
-    en: { safe:'SAFE', caution:'CAUTION',   warning:'WARNING', danger:'DANGER' }
+    wo: { safe:'BAAX', caution:'SEET',      warning:'BÀYYI',    danger:'ÑAX'   },
+    en: { safe:'SAFE', caution:'CAUTION',   warning:'WARNING',  danger:'DANGER'}
 };
 
 let currentLang = localStorage.getItem('pc_lang') || 'fr';
@@ -946,6 +975,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initMap();
     initPWA();
     initOffline();
+    initServiceWorker(); // ← CORRECTION : SW séparé et complet
     loadData();
 });
 
@@ -954,13 +984,12 @@ document.addEventListener('DOMContentLoaded', () => {
 ================================================================ */
 function initMap() {
     map = L.map('map', {
-        center:         [14.6, -16.9],
-        zoom:           7,
-        zoomControl:    false,
+        center:          [14.6, -16.9],
+        zoom:            7,
+        zoomControl:     false,
         attributionControl: true
     });
 
-    // Fond de carte sombre
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
         attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a> © <a href="https://carto.com">CARTO</a> | PecheurConnect v3.0',
         subdomains:  'abcd',
@@ -969,22 +998,20 @@ function initMap() {
 
     L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-    // Cluster
     clusterLayer = L.markerClusterGroup({
-        maxClusterRadius: 55,
-        spiderfyOnMaxZoom: true,
+        maxClusterRadius:    55,
+        spiderfyOnMaxZoom:   true,
         showCoverageOnHover: false,
-        iconCreateFunction: cluster => {
+        iconCreateFunction:  cluster => {
             const n = cluster.getChildCount();
             return L.divIcon({
                 html: `<div style="
-                    width:42px; height:42px; border-radius:50%;
+                    width:42px;height:42px;border-radius:50%;
                     background:linear-gradient(135deg,#0056b3,#003d7a);
                     border:2.5px solid rgba(255,255,255,0.85);
                     box-shadow:0 4px 14px rgba(0,0,0,0.5);
-                    display:flex; align-items:center; justify-content:center;
-                    font-family:Syne,sans-serif; font-weight:800; font-size:14px;
-                    color:white;
+                    display:flex;align-items:center;justify-content:center;
+                    font-family:Syne,sans-serif;font-weight:800;font-size:14px;color:white;
                 ">${n}</div>`,
                 className: '',
                 iconSize:   [42, 42],
@@ -994,6 +1021,116 @@ function initMap() {
     });
 
     map.addLayer(clusterLayer);
+}
+
+/* ================================================================
+   SERVICE WORKER — CORRECTION COMPLÈTE
+   Résout : "message channel closed before a response was received"
+================================================================ */
+function initServiceWorker() {
+    if (!('serviceWorker' in navigator)) {
+        updateSwStatus('offline', 'SW non supporté');
+        return;
+    }
+
+    navigator.serviceWorker.register('./sw.js')
+        .then(reg => {
+            console.log('[SW] Enregistré :', reg.scope);
+            updateSwStatus('online', 'SW actif');
+
+            // Écouter les mises à jour disponibles
+            reg.addEventListener('updatefound', () => {
+                const newSW = reg.installing;
+                newSW.addEventListener('statechange', () => {
+                    if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+                        console.log('[SW] Nouvelle version disponible');
+                    }
+                });
+            });
+
+            // Demander la version du SW (après activation)
+            navigator.serviceWorker.ready.then(() => {
+                envoyerMessageSW({ type: 'GET_VERSION' })
+                    .then(res => {
+                        if (res?.version) {
+                            updateSwStatus('online', res.version);
+                        }
+                    })
+                    .catch(() => {
+                        // SW actif mais ne répond pas à GET_VERSION — pas critique
+                        updateSwStatus('online', 'SW actif');
+                    });
+            });
+        })
+        .catch(err => {
+            console.warn('[SW] Erreur enregistrement :', err);
+            updateSwStatus('offline', 'SW inactif');
+        });
+
+    // ✅ CORRECTION PRINCIPALE :
+    // Écouter les messages du SW (DATA_UPDATED depuis sync background)
+    // Sans ce listener, le navigateur lève l'erreur "message channel closed"
+    navigator.serviceWorker.addEventListener('message', event => {
+        const data = event.data;
+        if (!data) return;
+
+        switch (data.type) {
+            case 'DATA_UPDATED':
+                console.log('[SW→Page] Nouvelles données disponibles, rechargement...');
+                loadData(); // Rafraîchir la carte automatiquement
+                break;
+
+            case 'CACHE_STATUS':
+                console.log('[SW→Page] Statut cache :', data);
+                break;
+
+            default:
+                // Absorber les messages inconnus sans lever d'erreur
+                console.debug('[SW→Page] Message reçu :', data);
+        }
+    });
+}
+
+/**
+ * ✅ CORRECTION : Envoyer un message au SW via MessageChannel
+ * Évite "message channel closed before a response was received"
+ * en gérant proprement le port et le timeout.
+ */
+function envoyerMessageSW(message, timeoutMs = 5000) {
+    return new Promise((resolve, reject) => {
+        if (!navigator.serviceWorker.controller) {
+            reject(new Error('Aucun SW actif'));
+            return;
+        }
+
+        const channel = new MessageChannel();
+
+        // Timeout silencieux pour ne pas bloquer l'app
+        const timer = setTimeout(() => {
+            channel.port1.onmessage = null; // nettoyage
+            reject(new Error('SW timeout'));
+        }, timeoutMs);
+
+        channel.port1.onmessage = event => {
+            clearTimeout(timer);
+            channel.port1.onmessage = null; // nettoyage
+            if (event.data?.success === false) {
+                reject(new Error(event.data.error || 'Erreur SW'));
+            } else {
+                resolve(event.data);
+            }
+        };
+
+        // Transfert du port2 au SW
+        navigator.serviceWorker.controller.postMessage(message, [channel.port2]);
+    });
+}
+
+function updateSwStatus(state, label) {
+    const dot = document.getElementById('swDot');
+    const lbl = document.getElementById('swLabel');
+    if (dot) dot.className = `sw-dot ${state}`;
+    if (lbl) lbl.textContent = label || state;
 }
 
 /* ================================================================
@@ -1016,7 +1153,7 @@ async function loadData() {
         hideLoading();
 
     } catch (err) {
-        console.warn('Réseau indisponible, chargement cache:', err);
+        console.warn('[App] Réseau indisponible, chargement cache :', err);
         setLsStatus('⚠️ Mode hors ligne...');
         await loadCache();
         hideLoading();
@@ -1026,7 +1163,7 @@ async function loadData() {
 async function loadCache() {
     try {
         if (!('caches' in window)) return;
-        const cache = await caches.open('pc-data-v1');
+        const cache = await caches.open('pecheurconnect-v3.0.0-data');
         const res   = await cache.match('./data.json');
         if (!res) return;
         allZones = await res.json();
@@ -1034,7 +1171,7 @@ async function loadCache() {
         updateStats(allZones);
         updateChips(allZones);
     } catch (e) {
-        console.warn('Cache indisponible:', e);
+        console.warn('[App] Cache indisponible :', e);
     }
 }
 
@@ -1084,31 +1221,35 @@ function renderMarkers(zones) {
    BUILD POPUP
 ================================================================ */
 function buildPopup(z) {
-    const label  = (LANG_LABELS[currentLang] || LANG_LABELS.fr)[z.safety_level] || z.safety_level.toUpperCase();
+    const labels    = LANG_LABELS[currentLang] || LANG_LABELS.fr;
+    const label     = labels[z.safety_level] || z.safety_level.toUpperCase();
     const shareText = encodeURIComponent(
-        'PecheurConnect 🇸🇳\n' + z.zone + ' - ' + z.safety +
+        'PecheurConnect 🇸🇳\n' +
+        z.zone + ' — ' + z.safety +
         '\n🌊 ' + z.v_now + 'm | 🌡️ ' + z.t_now + '°C | 🌬️ ' + (z.wind_speed || 'N/A') + 'm/s' +
         '\nhttps://doundou969.github.io/sunu-blue-tech/'
     );
 
     const wSection = (z.weather_desc && z.weather_desc !== 'Non disponible') ? `
         <div class="pu-weather">
-            <div class="pu-wrow"><span>☁️ Météo</span>      <b>${z.weather_desc}</b></div>
-            <div class="pu-wrow"><span>👁️ Visibilité</span> <b>${z.visibility   || 'N/A'} km</b></div>
-            <div class="pu-wrow"><span>💧 Humidité</span>   <b>${z.humidity     || 'N/A'} %</b></div>
-            <div class="pu-wrow"><span>🌧️ Pluie</span>      <b>${z.precipitation || 0} mm/h</b></div>
+            <div class="pu-wrow"><span>☁️ Météo</span>       <b>${z.weather_desc}</b></div>
+            <div class="pu-wrow"><span>👁️ Visibilité</span>  <b>${z.visibility    ?? 'N/A'} km</b></div>
+            <div class="pu-wrow"><span>💧 Humidité</span>    <b>${z.humidity      ?? 'N/A'} %</b></div>
+            <div class="pu-wrow"><span>🌧️ Pluie</span>       <b>${z.precipitation ?? 0} mm/h</b></div>
         </div>
     ` : '';
 
-    const rSection = z.recommendations && z.recommendations.length ? `
+    const rSection = (z.recommendations && z.recommendations.length) ? `
         <div class="pu-recs">
             ${z.recommendations.slice(0, 3).map(r => `<div class="pu-rec">→ ${r}</div>`).join('')}
         </div>
     ` : '';
 
-    const fSection = z.forecast && z.forecast.length ? `
+    const fSection = (z.forecast && z.forecast.length) ? `
         <div style="margin-top:12px;">
-            <div style="font-size:11px;font-weight:700;color:#0056b3;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;">📈 Prévisions 24h</div>
+            <div style="font-size:11px;font-weight:700;color:#0056b3;text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;">
+                📈 Prévisions 24h
+            </div>
             <canvas id="fc_${z.zone.replace(/\W/g,'_')}" height="75"></canvas>
         </div>
     ` : '';
@@ -1134,7 +1275,7 @@ function buildPopup(z) {
                         <div class="pu-mlbl">🧭 Courant</div>
                     </div>
                     <div class="pu-metric">
-                        <div class="pu-mval">${z.wind_speed || 'N/A'}</div>
+                        <div class="pu-mval">${z.wind_speed ?? 'N/A'}</div>
                         <div class="pu-mlbl">🌬️ Vent m/s</div>
                     </div>
                 </div>
@@ -1224,7 +1365,7 @@ function updateStats(zones) {
 }
 
 function updateChips(zones) {
-    document.getElementById('zoneCount').textContent   = zones.length + ' zones';
+    document.getElementById('zoneCount').textContent = zones.length + ' zones';
     const regions = new Set(zones.map(z => z.region));
     document.getElementById('regionCount').textContent = regions.size + ' régions';
 }
@@ -1236,17 +1377,14 @@ function doFilter(el) {
     document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
     el.classList.add('active');
 
-    const region = el.dataset.region;
+    const region   = el.dataset.region;
+    const filtered = region === 'all' ? allZones : allZones.filter(z => z.region === region);
 
-    if (region === 'all') {
-        renderMarkers(allZones);
-    } else {
-        const filtered = allZones.filter(z => z.region === region);
-        renderMarkers(filtered);
-        if (filtered.length) {
-            const bounds = L.latLngBounds(filtered.map(z => [z.lat, z.lon]));
-            map.fitBounds(bounds, { padding: [70, 70], maxZoom: 11 });
-        }
+    renderMarkers(filtered);
+
+    if (region !== 'all' && filtered.length) {
+        const bounds = L.latLngBounds(filtered.map(z => [z.lat, z.lon]));
+        map.fitBounds(bounds, { padding: [70, 70], maxZoom: 11 });
     }
 }
 
@@ -1281,8 +1419,11 @@ function doLocate() {
             if (userMarker) map.removeLayer(userMarker);
 
             userMarker = L.circleMarker([lat, lon], {
-                radius: 10, color: '#00d4ff', fillColor: '#00d4ff',
-                fillOpacity: 0.35, weight: 2
+                radius:      10,
+                color:       '#00d4ff',
+                fillColor:   '#00d4ff',
+                fillOpacity: 0.35,
+                weight:      2
             }).addTo(map).bindPopup('📍 Votre position').openPopup();
 
             map.flyTo([lat, lon], 11, { duration: 1.5 });
@@ -1334,25 +1475,17 @@ function hideInstall() {
 ================================================================ */
 function initOffline() {
     const bar = document.getElementById('offlineBar');
-    window.addEventListener('offline', () => bar.classList.add('show'));
-    window.addEventListener('online',  () => bar.classList.remove('show'));
+    window.addEventListener('offline', () => { bar.classList.add('show'); updateSwStatus('offline', 'Hors ligne'); });
+    window.addEventListener('online',  () => { bar.classList.remove('show'); updateSwStatus('online', 'En ligne'); });
     if (!navigator.onLine) bar.classList.add('show');
-}
-
-/* ================================================================
-   SERVICE WORKER
-================================================================ */
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js')
-        .then(() => console.log('[SW] Registered'))
-        .catch(e  => console.warn('[SW] Error:', e));
 }
 
 /* ================================================================
    LOADING HELPERS
 ================================================================ */
 function setLsStatus(msg) {
-    document.getElementById('lsStatus').textContent = msg;
+    const el = document.getElementById('lsStatus');
+    if (el) el.textContent = msg;
 }
 
 function showLoading(msg) {
@@ -1372,11 +1505,11 @@ function hideLoading() {
 ================================================================ */
 function darken(hex) {
     if (!hex || hex.length < 7) return '#000';
-    const n = parseInt(hex.replace('#',''), 16);
-    const r = Math.max(0, (n >> 16)         - 45);
-    const g = Math.max(0, ((n >> 8) & 0xff) - 45);
-    const b = Math.max(0, (n & 0xff)         - 45);
-    return '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('');
+    const n = parseInt(hex.replace('#', ''), 16);
+    const r = Math.max(0, (n >> 16)          - 45);
+    const g = Math.max(0, ((n >> 8) & 0xff)  - 45);
+    const b = Math.max(0, (n & 0xff)          - 45);
+    return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
 }
 
 function sleep(ms) {
