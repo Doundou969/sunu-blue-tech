@@ -1141,7 +1141,7 @@ async function loadData() {
     setLsStatus('Chargement des 18 zones...');
 
     try {
-        const res = await fetch('./data.json?v=' + Date.now());
+        const res = await fetch('./data.json');
         if (!res.ok) throw new Error('HTTP ' + res.status);
 
         allZones = await res.json();
