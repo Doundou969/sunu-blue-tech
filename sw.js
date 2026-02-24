@@ -4,7 +4,7 @@
  * Corrections : listener message manquant, gestion erreurs fetch améliorée
  */
 
-const CACHE_VERSION = 'pecheurconnect-v3.0.0';
+const CACHE_VERSION = 'pecheurconnect-v3.0.1';
 const CACHE_STATIC  = `${CACHE_VERSION}-static`;
 const CACHE_DYNAMIC = `${CACHE_VERSION}-dynamic`;
 const CACHE_DATA    = `${CACHE_VERSION}-data`;
