@@ -3,14 +3,14 @@
   "description": "Gandiol",
   "region": "Nord",
   "period": "7 jours",
-  "data_points": 16,
+  "data_points": 10,
   "history": [
     {
-      "timestamp": "2026-02-23T18:52:16.376181",
-      "date": "2026-02-23",
+      "timestamp": "2026-02-24T00:39:46.480942",
+      "date": "2026-02-24",
       "wave": 1.22,
-      "temp": 20.0,
-      "wind": 1.0,
+      "temp": 19.8,
+      "wind": 2.1,
       "current": 0.07,
       "safety": "safe",
       "fish_level": "good",
@@ -114,91 +114,25 @@
       "safety": "safe",
       "fish_level": "excellent",
       "danger_score": 28
-    },
-    {
-      "timestamp": "2026-02-17T00:54:02.914224",
-      "date": "2026-02-17",
-      "wave": 0.99,
-      "temp": 19.1,
-      "wind": 1.0,
-      "current": 0.09,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 33
-    },
-    {
-      "timestamp": "2026-02-17T01:15:05.184598",
-      "date": "2026-02-17",
-      "wave": 0.99,
-      "temp": 19.1,
-      "wind": 6.3,
-      "current": 0.09,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 33
-    },
-    {
-      "timestamp": "2026-02-17T06:50:14.708906",
-      "date": "2026-02-17",
-      "wave": 0.91,
-      "temp": 19.0,
-      "wind": 5.8,
-      "current": 0.06,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 32
-    },
-    {
-      "timestamp": "2026-02-17T12:40:56.246511",
-      "date": "2026-02-17",
-      "wave": 0.89,
-      "temp": 19.0,
-      "wind": 4.1,
-      "current": 0.07,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 32
-    },
-    {
-      "timestamp": "2026-02-17T15:55:17.716501",
-      "date": "2026-02-17",
-      "wave": 0.84,
-      "temp": 19.0,
-      "wind": 5.1,
-      "current": 0.07,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 31
-    },
-    {
-      "timestamp": "2026-02-17T18:46:19.799425",
-      "date": "2026-02-17",
-      "wave": 0.8,
-      "temp": 19.4,
-      "wind": 2.1,
-      "current": 0.08,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 30
     }
   ],
   "statistics": {
     "waves": {
       "min": 0.64,
       "max": 1.22,
-      "avg": 0.82,
+      "avg": 0.77,
       "trend": "stable"
     },
     "temperature": {
       "min": 19.0,
-      "max": 20.0,
-      "avg": 19.24,
+      "max": 19.8,
+      "avg": 19.3,
       "trend": "stable"
     },
     "wind": {
-      "min": 1.0,
-      "max": 6.3,
-      "avg": 3.08,
+      "min": 2.1,
+      "max": 4.1,
+      "avg": 2.6,
       "trend": "hausse"
     },
     "current": {
@@ -209,7 +143,7 @@
     }
   },
   "safety_summary": {
-    "safe": 16,
+    "safe": 10,
     "caution": 0,
     "warning": 0,
     "danger": 0
@@ -221,7 +155,7 @@
     "safety": "safe"
   },
   "worst_day": {
-    "date": "2026-02-23",
+    "date": "2026-02-24",
     "wave": 1.22,
     "safety": "safe"
   }

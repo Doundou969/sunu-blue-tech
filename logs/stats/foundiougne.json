@@ -3,14 +3,14 @@
   "description": "Foundiougne",
   "region": "Sine Saloum",
   "period": "7 jours",
-  "data_points": 16,
+  "data_points": 10,
   "history": [
     {
-      "timestamp": "2026-02-23T18:52:16.376181",
-      "date": "2026-02-23",
+      "timestamp": "2026-02-24T00:39:46.480942",
+      "date": "2026-02-24",
       "wave": 1.0,
       "temp": 24.0,
-      "wind": 4.1,
+      "wind": 3.8,
       "current": 0.35,
       "safety": "safe",
       "fish_level": "excellent",
@@ -114,108 +114,42 @@
       "safety": "safe",
       "fish_level": "good",
       "danger_score": 31
-    },
-    {
-      "timestamp": "2026-02-17T00:54:02.914224",
-      "date": "2026-02-17",
-      "wave": 1.5,
-      "temp": 22.0,
-      "wind": 3.0,
-      "current": 0.0,
-      "safety": "safe",
-      "fish_level": "good",
-      "danger_score": 31
-    },
-    {
-      "timestamp": "2026-02-17T01:15:05.184598",
-      "date": "2026-02-17",
-      "wave": 1.5,
-      "temp": 22.0,
-      "wind": 3.3,
-      "current": 0.0,
-      "safety": "safe",
-      "fish_level": "good",
-      "danger_score": 31
-    },
-    {
-      "timestamp": "2026-02-17T06:50:14.708906",
-      "date": "2026-02-17",
-      "wave": 1.5,
-      "temp": 22.0,
-      "wind": 4.3,
-      "current": 0.0,
-      "safety": "safe",
-      "fish_level": "good",
-      "danger_score": 31
-    },
-    {
-      "timestamp": "2026-02-17T12:40:56.246511",
-      "date": "2026-02-17",
-      "wave": 1.5,
-      "temp": 22.0,
-      "wind": 7.1,
-      "current": 0.0,
-      "safety": "safe",
-      "fish_level": "good",
-      "danger_score": 31
-    },
-    {
-      "timestamp": "2026-02-17T15:55:17.716501",
-      "date": "2026-02-17",
-      "wave": 1.5,
-      "temp": 22.0,
-      "wind": 6.0,
-      "current": 0.0,
-      "safety": "safe",
-      "fish_level": "good",
-      "danger_score": 31
-    },
-    {
-      "timestamp": "2026-02-17T18:46:19.799425",
-      "date": "2026-02-17",
-      "wave": 1.5,
-      "temp": 22.0,
-      "wind": 5.1,
-      "current": 0.0,
-      "safety": "safe",
-      "fish_level": "good",
-      "danger_score": 31
     }
   ],
   "statistics": {
     "waves": {
       "min": 1.0,
       "max": 1.5,
-      "avg": 1.47,
+      "avg": 1.45,
       "trend": "stable"
     },
     "temperature": {
       "min": 22.0,
       "max": 24.0,
-      "avg": 22.12,
-      "trend": "stable"
+      "avg": 22.2,
+      "trend": "baisse"
     },
     "wind": {
       "min": 2.8,
-      "max": 7.1,
-      "avg": 4.56,
+      "max": 5.7,
+      "avg": 4.38,
       "trend": "hausse"
     },
     "current": {
       "min": 0.0,
       "max": 0.35,
-      "avg": 0.02,
+      "avg": 0.03,
       "trend": "stable"
     }
   },
   "safety_summary": {
-    "safe": 16,
+    "safe": 10,
     "caution": 0,
     "warning": 0,
     "danger": 0
   },
   "best_day": {
-    "date": "2026-02-23",
+    "date": "2026-02-24",
     "wave": 1.0,
     "temp": 24.0,
     "safety": "safe"
