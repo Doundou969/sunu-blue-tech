@@ -4,7 +4,7 @@
  * Corrections : listener message manquant, gestion erreurs fetch améliorée
  */
 
-const CACHE_VERSION = 'pecheurconnect-v3.0.1';
+const CACHE_VERSION = 'pecheurconnect-v3.0.2';
 const CACHE_STATIC  = `${CACHE_VERSION}-static`;
 const CACHE_DYNAMIC = `${CACHE_VERSION}-dynamic`;
 const CACHE_DATA    = `${CACHE_VERSION}-data`;
@@ -88,25 +88,36 @@ self.addEventListener('fetch', event => {
  * Utilisé pour les données JSON / Copernicus
  */
 async function networkFirstStrategy(request) {
+    // URL propre sans query string pour le cache (evite les mismatches avec ?v=timestamp)
+    const urlClean = new URL(request.url);
+    urlClean.search = '';
+    const cacheKey = urlClean.toString();
+
     try {
         const networkResponse = await fetch(request);
 
-        // Ne cacher que les réponses valides
+        // Ne cacher que les reponses valides — stocker SANS le ?v=timestamp
         if (networkResponse && networkResponse.ok) {
             const cache = await caches.open(CACHE_DATA);
-            cache.put(request, networkResponse.clone());
+            cache.put(cacheKey, networkResponse.clone());
         }
         return networkResponse;
 
     } catch (err) {
-        console.warn('[SW] Réseau indisponible, lecture du cache pour :', request.url);
-        const cached = await caches.match(request);
+        console.warn('[SW] Reseau indisponible, lecture du cache pour :', cacheKey);
 
-        if (cached) return cached;
+        // Chercher avec l'URL propre (sans ?v=...) puis fallback
+        const cached = await caches.match(cacheKey)
+            || await caches.match(request);
 
-        // Retourner une réponse JSON vide mais valide pour ne pas bloquer l'app
+        if (cached) {
+            console.log('[SW] Donnees servies depuis le cache :', cacheKey);
+            return cached;
+        }
+
+        // Reponse JSON vide valide pour ne pas bloquer l'app
         return new Response(
-            JSON.stringify({ error: 'offline', message: 'Données non disponibles hors ligne' }),
+            JSON.stringify({ error: 'offline', message: 'Donnees non disponibles hors ligne' }),
             {
                 status: 503,
                 headers: { 'Content-Type': 'application/json' }
