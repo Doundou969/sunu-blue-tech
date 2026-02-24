@@ -4,7 +4,7 @@
  * Corrections : listener message manquant, gestion erreurs fetch améliorée
  */
 
-const CACHE_VERSION = 'pecheurconnect-v3.0.2';
+const CACHE_VERSION = 'pecheurconnect-v3.0.3';
 const CACHE_STATIC  = `${CACHE_VERSION}-static`;
 const CACHE_DYNAMIC = `${CACHE_VERSION}-dynamic`;
 const CACHE_DATA    = `${CACHE_VERSION}-data`;
@@ -17,8 +17,8 @@ const STATIC_ASSETS = [
     './alerts-settings.html',
     './offline.html',
     './manifest.json',
-    './assets/icons/icon-192x192.png',
-    './assets/icons/badge-72x72.png'
+    './icon-192.png',
+    './icon-512.png'
 ];
 
 // ================================================================
