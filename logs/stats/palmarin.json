@@ -3,18 +3,18 @@
   "description": "Palmarin",
   "region": "Sine Saloum",
   "period": "7 jours",
-  "data_points": 10,
+  "data_points": 5,
   "history": [
     {
-      "timestamp": "2026-02-24T16:07:41.688376",
-      "date": "2026-02-24",
-      "wave": 0.33,
-      "temp": 22.6,
-      "wind": 1.0,
-      "current": 0.04,
+      "timestamp": "2026-02-25T01:19:12.140397",
+      "date": "2026-02-25",
+      "wave": 0.42,
+      "temp": 22.8,
+      "wind": 5.1,
+      "current": 0.06,
       "safety": "safe",
       "fish_level": "excellent",
-      "danger_score": 4
+      "danger_score": 5
     },
     {
       "timestamp": "2026-02-19T01:16:18.582446",
@@ -59,91 +59,36 @@
       "safety": "safe",
       "fish_level": "excellent",
       "danger_score": 17
-    },
-    {
-      "timestamp": "2026-02-18T01:01:30.367708",
-      "date": "2026-02-18",
-      "wave": 0.24,
-      "temp": 22.4,
-      "wind": 5.0,
-      "current": 0.03,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 18
-    },
-    {
-      "timestamp": "2026-02-18T01:17:06.326649",
-      "date": "2026-02-18",
-      "wave": 0.24,
-      "temp": 22.4,
-      "wind": 5.0,
-      "current": 0.03,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 18
-    },
-    {
-      "timestamp": "2026-02-18T06:54:19.104731",
-      "date": "2026-02-18",
-      "wave": 0.26,
-      "temp": 22.2,
-      "wind": 5.2,
-      "current": 0.04,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 19
-    },
-    {
-      "timestamp": "2026-02-18T12:42:25.301963",
-      "date": "2026-02-18",
-      "wave": 0.33,
-      "temp": 22.2,
-      "wind": 5.5,
-      "current": 0.04,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 19
-    },
-    {
-      "timestamp": "2026-02-18T18:42:51.725881",
-      "date": "2026-02-18",
-      "wave": 0.21,
-      "temp": 22.6,
-      "wind": 5.7,
-      "current": 0.05,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 17
     }
   ],
   "statistics": {
     "waves": {
       "min": 0.19,
-      "max": 0.33,
-      "avg": 0.25,
+      "max": 0.42,
+      "avg": 0.26,
       "trend": "stable"
     },
     "temperature": {
-      "min": 22.2,
+      "min": 22.3,
       "max": 22.8,
-      "avg": 22.43,
+      "avg": 22.54,
       "trend": "stable"
     },
     "wind": {
-      "min": 1.0,
+      "min": 3.6,
       "max": 6.3,
-      "avg": 4.52,
+      "avg": 4.58,
       "trend": "hausse"
     },
     "current": {
-      "min": 0.03,
+      "min": 0.05,
       "max": 0.06,
-      "avg": 0.05,
+      "avg": 0.06,
       "trend": "stable"
     }
   },
   "safety_summary": {
-    "safe": 10,
+    "safe": 5,
     "caution": 0,
     "warning": 0,
     "danger": 0
@@ -155,8 +100,8 @@
     "safety": "safe"
   },
   "worst_day": {
-    "date": "2026-02-24",
-    "wave": 0.33,
+    "date": "2026-02-25",
+    "wave": 0.42,
     "safety": "safe"
   }
 }

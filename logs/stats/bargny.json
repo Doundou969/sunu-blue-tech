@@ -3,18 +3,18 @@
   "description": "Bargny",
   "region": "Dakar",
   "period": "7 jours",
-  "data_points": 10,
+  "data_points": 5,
   "history": [
     {
-      "timestamp": "2026-02-24T16:07:41.688376",
-      "date": "2026-02-24",
+      "timestamp": "2026-02-25T01:19:12.140397",
+      "date": "2026-02-25",
       "wave": 1.4,
-      "temp": 20.8,
-      "wind": 3.1,
-      "current": 0.07,
+      "temp": 21.0,
+      "wind": 8.2,
+      "current": 0.13,
       "safety": "safe",
       "fish_level": "good",
-      "danger_score": 15
+      "danger_score": 16
     },
     {
       "timestamp": "2026-02-19T01:16:18.582446",
@@ -59,99 +59,44 @@
       "safety": "safe",
       "fish_level": "good",
       "danger_score": 33
-    },
-    {
-      "timestamp": "2026-02-18T01:01:30.367708",
-      "date": "2026-02-18",
-      "wave": 1.5,
-      "temp": 20.3,
-      "wind": 5.1,
-      "current": 0.12,
-      "safety": "safe",
-      "fish_level": "good",
-      "danger_score": 36
-    },
-    {
-      "timestamp": "2026-02-18T01:17:06.326649",
-      "date": "2026-02-18",
-      "wave": 1.5,
-      "temp": 20.3,
-      "wind": 5.7,
-      "current": 0.12,
-      "safety": "safe",
-      "fish_level": "good",
-      "danger_score": 36
-    },
-    {
-      "timestamp": "2026-02-18T06:54:19.104731",
-      "date": "2026-02-18",
-      "wave": 1.5,
-      "temp": 20.0,
-      "wind": 4.1,
-      "current": 0.1,
-      "safety": "safe",
-      "fish_level": "good",
-      "danger_score": 37
-    },
-    {
-      "timestamp": "2026-02-18T12:42:25.301963",
-      "date": "2026-02-18",
-      "wave": 1.5,
-      "temp": 20.1,
-      "wind": 7.2,
-      "current": 0.13,
-      "safety": "safe",
-      "fish_level": "good",
-      "danger_score": 37
-    },
-    {
-      "timestamp": "2026-02-18T18:42:51.725881",
-      "date": "2026-02-18",
-      "wave": 1.5,
-      "temp": 20.8,
-      "wind": 5.1,
-      "current": 0.13,
-      "safety": "safe",
-      "fish_level": "good",
-      "danger_score": 36
     }
   ],
   "statistics": {
     "waves": {
       "min": 1.4,
       "max": 1.5,
-      "avg": 1.49,
+      "avg": 1.48,
       "trend": "stable"
     },
     "temperature": {
-      "min": 20.0,
+      "min": 20.3,
       "max": 21.2,
-      "avg": 20.46,
-      "trend": "stable"
+      "avg": 20.66,
+      "trend": "hausse"
     },
     "wind": {
-      "min": 3.1,
-      "max": 7.2,
-      "avg": 5.4,
-      "trend": "stable"
+      "min": 4.1,
+      "max": 8.2,
+      "avg": 6.38,
+      "trend": "baisse"
     },
     "current": {
       "min": 0.03,
       "max": 0.13,
-      "avg": 0.09,
+      "avg": 0.07,
       "trend": "stable"
     }
   },
   "safety_summary": {
-    "safe": 10,
+    "safe": 5,
     "caution": 0,
     "warning": 0,
     "danger": 0
   },
   "best_day": {
-    "date": "2026-02-24",
+    "date": "2026-02-25",
     "wave": 1.4,
-    "temp": 20.8,
+    "temp": 21.0,
     "safety": "safe"
   },
   "worst_day": {

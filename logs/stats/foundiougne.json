@@ -3,14 +3,14 @@
   "description": "Foundiougne",
   "region": "Sine Saloum",
   "period": "7 jours",
-  "data_points": 10,
+  "data_points": 5,
   "history": [
     {
-      "timestamp": "2026-02-24T16:07:41.688376",
-      "date": "2026-02-24",
+      "timestamp": "2026-02-25T01:19:12.140397",
+      "date": "2026-02-25",
       "wave": 1.0,
       "temp": 24.0,
-      "wind": 4.6,
+      "wind": 4.9,
       "current": 0.35,
       "safety": "safe",
       "fish_level": "excellent",
@@ -59,97 +59,42 @@
       "safety": "safe",
       "fish_level": "good",
       "danger_score": 31
-    },
-    {
-      "timestamp": "2026-02-18T01:01:30.367708",
-      "date": "2026-02-18",
-      "wave": 1.5,
-      "temp": 22.0,
-      "wind": 4.7,
-      "current": 0.0,
-      "safety": "safe",
-      "fish_level": "good",
-      "danger_score": 31
-    },
-    {
-      "timestamp": "2026-02-18T01:17:06.326649",
-      "date": "2026-02-18",
-      "wave": 1.5,
-      "temp": 22.0,
-      "wind": 4.7,
-      "current": 0.0,
-      "safety": "safe",
-      "fish_level": "good",
-      "danger_score": 31
-    },
-    {
-      "timestamp": "2026-02-18T06:54:19.104731",
-      "date": "2026-02-18",
-      "wave": 1.5,
-      "temp": 22.0,
-      "wind": 4.4,
-      "current": 0.0,
-      "safety": "safe",
-      "fish_level": "good",
-      "danger_score": 31
-    },
-    {
-      "timestamp": "2026-02-18T12:42:25.301963",
-      "date": "2026-02-18",
-      "wave": 1.5,
-      "temp": 22.0,
-      "wind": 5.7,
-      "current": 0.0,
-      "safety": "safe",
-      "fish_level": "good",
-      "danger_score": 31
-    },
-    {
-      "timestamp": "2026-02-18T18:42:51.725881",
-      "date": "2026-02-18",
-      "wave": 1.5,
-      "temp": 22.0,
-      "wind": 2.8,
-      "current": 0.0,
-      "safety": "safe",
-      "fish_level": "good",
-      "danger_score": 31
     }
   ],
   "statistics": {
     "waves": {
       "min": 1.0,
       "max": 1.5,
-      "avg": 1.45,
-      "trend": "stable"
+      "avg": 1.4,
+      "trend": "hausse"
     },
     "temperature": {
       "min": 22.0,
       "max": 24.0,
-      "avg": 22.2,
+      "avg": 22.4,
       "trend": "baisse"
     },
     "wind": {
-      "min": 2.8,
-      "max": 5.7,
-      "avg": 4.46,
-      "trend": "stable"
+      "min": 3.3,
+      "max": 5.6,
+      "avg": 4.52,
+      "trend": "hausse"
     },
     "current": {
       "min": 0.0,
       "max": 0.35,
-      "avg": 0.03,
-      "trend": "stable"
+      "avg": 0.07,
+      "trend": "baisse"
     }
   },
   "safety_summary": {
-    "safe": 10,
+    "safe": 5,
     "caution": 0,
     "warning": 0,
     "danger": 0
   },
   "best_day": {
-    "date": "2026-02-24",
+    "date": "2026-02-25",
     "wave": 1.0,
     "temp": 24.0,
     "safety": "safe"
