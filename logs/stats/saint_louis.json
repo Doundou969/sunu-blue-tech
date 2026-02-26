@@ -3,105 +3,61 @@
   "description": "Ndar - Nord",
   "region": "Nord",
   "period": "7 jours",
-  "data_points": 5,
+  "data_points": 1,
   "history": [
     {
-      "timestamp": "2026-02-25T18:55:13.459791",
-      "date": "2026-02-25",
-      "wave": 1.45,
-      "temp": 19.5,
-      "wind": 5.1,
-      "current": 0.19,
-      "safety": "safe",
+      "timestamp": "2026-02-26T01:10:36.340507",
+      "date": "2026-02-26",
+      "wave": 2.01,
+      "temp": 19.3,
+      "wind": 7.9,
+      "current": 0.26,
+      "safety": "caution",
       "fish_level": "good",
-      "danger_score": 18
-    },
-    {
-      "timestamp": "2026-02-19T01:16:18.582446",
-      "date": "2026-02-19",
-      "wave": 0.79,
-      "temp": 18.4,
-      "wind": 4.9,
-      "current": 0.07,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 32
-    },
-    {
-      "timestamp": "2026-02-19T06:52:17.308474",
-      "date": "2026-02-19",
-      "wave": 0.76,
-      "temp": 18.7,
-      "wind": 2.1,
-      "current": 0.1,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 32
-    },
-    {
-      "timestamp": "2026-02-19T12:41:53.399107",
-      "date": "2026-02-19",
-      "wave": 0.73,
-      "temp": 18.9,
-      "wind": 2.1,
-      "current": 0.14,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 32
-    },
-    {
-      "timestamp": "2026-02-19T18:43:16.178181",
-      "date": "2026-02-19",
-      "wave": 0.73,
-      "temp": 19.1,
-      "wind": 4.1,
-      "current": 0.06,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 30
+      "danger_score": 25
     }
   ],
   "statistics": {
     "waves": {
-      "min": 0.73,
-      "max": 1.45,
-      "avg": 0.89,
-      "trend": "baisse"
+      "min": 2.01,
+      "max": 2.01,
+      "avg": 2.01,
+      "trend": "stable"
     },
     "temperature": {
-      "min": 18.4,
-      "max": 19.5,
-      "avg": 18.92,
+      "min": 19.3,
+      "max": 19.3,
+      "avg": 19.3,
       "trend": "stable"
     },
     "wind": {
-      "min": 2.1,
-      "max": 5.1,
-      "avg": 3.66,
-      "trend": "baisse"
+      "min": 7.9,
+      "max": 7.9,
+      "avg": 7.9,
+      "trend": "stable"
     },
     "current": {
-      "min": 0.06,
-      "max": 0.19,
-      "avg": 0.11,
+      "min": 0.26,
+      "max": 0.26,
+      "avg": 0.26,
       "trend": "stable"
     }
   },
   "safety_summary": {
-    "safe": 5,
-    "caution": 0,
+    "safe": 0,
+    "caution": 1,
     "warning": 0,
     "danger": 0
   },
   "best_day": {
-    "date": "2026-02-19",
-    "wave": 0.73,
-    "temp": 18.9,
-    "safety": "safe"
+    "date": "2026-02-26",
+    "wave": 2.01,
+    "temp": 19.3,
+    "safety": "caution"
   },
   "worst_day": {
-    "date": "2026-02-25",
-    "wave": 1.45,
-    "safety": "safe"
+    "date": "2026-02-26",
+    "wave": 2.01,
+    "safety": "caution"
   }
 }

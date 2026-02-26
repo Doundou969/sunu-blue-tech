@@ -3,105 +3,61 @@
   "description": "Ziguinchor",
   "region": "Casamance",
   "period": "7 jours",
-  "data_points": 5,
+  "data_points": 1,
   "history": [
     {
-      "timestamp": "2026-02-25T18:55:13.459791",
-      "date": "2026-02-25",
-      "wave": 0.67,
-      "temp": 24.5,
-      "wind": 5.0,
-      "current": 0.09,
-      "safety": "safe",
-      "fish_level": "good",
-      "danger_score": 8
-    },
-    {
-      "timestamp": "2026-02-19T01:16:18.582446",
-      "date": "2026-02-19",
-      "wave": 0.54,
-      "temp": 23.8,
-      "wind": 1.6,
-      "current": 0.11,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 20
-    },
-    {
-      "timestamp": "2026-02-19T06:52:17.308474",
-      "date": "2026-02-19",
-      "wave": 0.56,
-      "temp": 23.9,
-      "wind": 4.2,
-      "current": 0.08,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 19
-    },
-    {
-      "timestamp": "2026-02-19T12:41:53.399107",
-      "date": "2026-02-19",
-      "wave": 0.44,
-      "temp": 24.0,
-      "wind": 3.9,
-      "current": 0.1,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 18
-    },
-    {
-      "timestamp": "2026-02-19T18:43:16.178181",
-      "date": "2026-02-19",
-      "wave": 0.43,
+      "timestamp": "2026-02-26T01:10:36.340507",
+      "date": "2026-02-26",
+      "wave": 0.85,
       "temp": 24.2,
-      "wind": 3.9,
+      "wind": 4.1,
       "current": 0.11,
       "safety": "safe",
       "fish_level": "good",
-      "danger_score": 18
+      "danger_score": 10
     }
   ],
   "statistics": {
     "waves": {
-      "min": 0.43,
-      "max": 0.67,
-      "avg": 0.53,
-      "trend": "baisse"
+      "min": 0.85,
+      "max": 0.85,
+      "avg": 0.85,
+      "trend": "stable"
     },
     "temperature": {
-      "min": 23.8,
-      "max": 24.5,
-      "avg": 24.08,
+      "min": 24.2,
+      "max": 24.2,
+      "avg": 24.2,
       "trend": "stable"
     },
     "wind": {
-      "min": 1.6,
-      "max": 5.0,
-      "avg": 3.72,
+      "min": 4.1,
+      "max": 4.1,
+      "avg": 4.1,
       "trend": "stable"
     },
     "current": {
-      "min": 0.08,
+      "min": 0.11,
       "max": 0.11,
-      "avg": 0.1,
+      "avg": 0.11,
       "trend": "stable"
     }
   },
   "safety_summary": {
-    "safe": 5,
+    "safe": 1,
     "caution": 0,
     "warning": 0,
     "danger": 0
   },
   "best_day": {
-    "date": "2026-02-19",
-    "wave": 0.44,
-    "temp": 24.0,
+    "date": "2026-02-26",
+    "wave": 0.85,
+    "temp": 24.2,
     "safety": "safe"
   },
   "worst_day": {
-    "date": "2026-02-25",
-    "wave": 0.67,
+    "date": "2026-02-26",
+    "wave": 0.85,
     "safety": "safe"
   }
 }

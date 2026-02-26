@@ -3,105 +3,61 @@
   "description": "Soumbédioune",
   "region": "Dakar",
   "period": "7 jours",
-  "data_points": 5,
+  "data_points": 1,
   "history": [
     {
-      "timestamp": "2026-02-25T18:55:13.459791",
-      "date": "2026-02-25",
-      "wave": 1.21,
-      "temp": 20.2,
-      "wind": 6.2,
-      "current": 0.26,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 17
-    },
-    {
-      "timestamp": "2026-02-19T01:16:18.582446",
-      "date": "2026-02-19",
-      "wave": 0.76,
-      "temp": 20.6,
-      "wind": 4.1,
-      "current": 0.14,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 29
-    },
-    {
-      "timestamp": "2026-02-19T06:52:17.308474",
-      "date": "2026-02-19",
-      "wave": 0.78,
-      "temp": 20.3,
-      "wind": 3.1,
-      "current": 0.15,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 30
-    },
-    {
-      "timestamp": "2026-02-19T12:41:53.399107",
-      "date": "2026-02-19",
-      "wave": 0.75,
-      "temp": 20.3,
-      "wind": 6.2,
-      "current": 0.18,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 30
-    },
-    {
-      "timestamp": "2026-02-19T18:43:16.178181",
-      "date": "2026-02-19",
-      "wave": 0.72,
-      "temp": 20.8,
-      "wind": 2.1,
+      "timestamp": "2026-02-26T01:10:36.340507",
+      "date": "2026-02-26",
+      "wave": 1.59,
+      "temp": 19.7,
+      "wind": 4.0,
       "current": 0.17,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 29
+      "safety": "caution",
+      "fish_level": "good",
+      "danger_score": 19
     }
   ],
   "statistics": {
     "waves": {
-      "min": 0.72,
-      "max": 1.21,
-      "avg": 0.84,
-      "trend": "baisse"
+      "min": 1.59,
+      "max": 1.59,
+      "avg": 1.59,
+      "trend": "stable"
     },
     "temperature": {
-      "min": 20.2,
-      "max": 20.8,
-      "avg": 20.44,
-      "trend": "hausse"
+      "min": 19.7,
+      "max": 19.7,
+      "avg": 19.7,
+      "trend": "stable"
     },
     "wind": {
-      "min": 2.1,
-      "max": 6.2,
-      "avg": 4.34,
-      "trend": "baisse"
+      "min": 4.0,
+      "max": 4.0,
+      "avg": 4.0,
+      "trend": "stable"
     },
     "current": {
-      "min": 0.14,
-      "max": 0.26,
-      "avg": 0.18,
+      "min": 0.17,
+      "max": 0.17,
+      "avg": 0.17,
       "trend": "stable"
     }
   },
   "safety_summary": {
-    "safe": 5,
-    "caution": 0,
+    "safe": 0,
+    "caution": 1,
     "warning": 0,
     "danger": 0
   },
   "best_day": {
-    "date": "2026-02-19",
-    "wave": 0.72,
-    "temp": 20.8,
-    "safety": "safe"
+    "date": "2026-02-26",
+    "wave": 1.59,
+    "temp": 19.7,
+    "safety": "caution"
   },
   "worst_day": {
-    "date": "2026-02-25",
-    "wave": 1.21,
-    "safety": "safe"
+    "date": "2026-02-26",
+    "wave": 1.59,
+    "safety": "caution"
   }
 }

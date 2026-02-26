@@ -3,105 +3,61 @@
   "description": "Mbour-Joal",
   "region": "Petite Côte",
   "period": "7 jours",
-  "data_points": 5,
+  "data_points": 1,
   "history": [
     {
-      "timestamp": "2026-02-25T18:55:13.459791",
-      "date": "2026-02-25",
-      "wave": 0.69,
-      "temp": 20.9,
-      "wind": 8.9,
-      "current": 0.1,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 8
-    },
-    {
-      "timestamp": "2026-02-19T01:16:18.582446",
-      "date": "2026-02-19",
-      "wave": 0.47,
-      "temp": 20.4,
-      "wind": 4.9,
-      "current": 0.03,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 24
-    },
-    {
-      "timestamp": "2026-02-19T06:52:17.308474",
-      "date": "2026-02-19",
-      "wave": 0.46,
-      "temp": 20.3,
-      "wind": 3.7,
-      "current": 0.04,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 24
-    },
-    {
-      "timestamp": "2026-02-19T12:41:53.399107",
-      "date": "2026-02-19",
-      "wave": 0.42,
-      "temp": 20.4,
-      "wind": 1.1,
-      "current": 0.06,
-      "safety": "safe",
-      "fish_level": "excellent",
-      "danger_score": 24
-    },
-    {
-      "timestamp": "2026-02-19T18:43:16.178181",
-      "date": "2026-02-19",
-      "wave": 0.41,
+      "timestamp": "2026-02-26T01:10:36.340507",
+      "date": "2026-02-26",
+      "wave": 0.9,
       "temp": 20.7,
-      "wind": 7,
-      "current": 0.08,
+      "wind": 6.9,
+      "current": 0.11,
       "safety": "safe",
       "fish_level": "excellent",
-      "danger_score": 24
+      "danger_score": 11
     }
   ],
   "statistics": {
     "waves": {
-      "min": 0.41,
-      "max": 0.69,
-      "avg": 0.49,
-      "trend": "baisse"
+      "min": 0.9,
+      "max": 0.9,
+      "avg": 0.9,
+      "trend": "stable"
     },
     "temperature": {
-      "min": 20.3,
-      "max": 20.9,
-      "avg": 20.54,
+      "min": 20.7,
+      "max": 20.7,
+      "avg": 20.7,
       "trend": "stable"
     },
     "wind": {
-      "min": 1.1,
-      "max": 8.9,
-      "avg": 5.12,
-      "trend": "baisse"
+      "min": 6.9,
+      "max": 6.9,
+      "avg": 6.9,
+      "trend": "stable"
     },
     "current": {
-      "min": 0.03,
-      "max": 0.1,
-      "avg": 0.06,
+      "min": 0.11,
+      "max": 0.11,
+      "avg": 0.11,
       "trend": "stable"
     }
   },
   "safety_summary": {
-    "safe": 5,
+    "safe": 1,
     "caution": 0,
     "warning": 0,
     "danger": 0
   },
   "best_day": {
-    "date": "2026-02-19",
-    "wave": 0.41,
+    "date": "2026-02-26",
+    "wave": 0.9,
     "temp": 20.7,
     "safety": "safe"
   },
   "worst_day": {
-    "date": "2026-02-25",
-    "wave": 0.69,
+    "date": "2026-02-26",
+    "wave": 0.9,
     "safety": "safe"
   }
 }
