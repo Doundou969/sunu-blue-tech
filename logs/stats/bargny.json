@@ -6,11 +6,11 @@
   "data_points": 1,
   "history": [
     {
-      "timestamp": "2026-02-26T01:10:36.340507",
+      "timestamp": "2026-02-26T06:51:44.036418",
       "date": "2026-02-26",
       "wave": 1.4,
-      "temp": 21.0,
-      "wind": 7.7,
+      "temp": 20.7,
+      "wind": 5.9,
       "current": 0.13,
       "safety": "safe",
       "fish_level": "good",
@@ -25,15 +25,15 @@
       "trend": "stable"
     },
     "temperature": {
-      "min": 21.0,
-      "max": 21.0,
-      "avg": 21.0,
+      "min": 20.7,
+      "max": 20.7,
+      "avg": 20.7,
       "trend": "stable"
     },
     "wind": {
-      "min": 7.7,
-      "max": 7.7,
-      "avg": 7.7,
+      "min": 5.9,
+      "max": 5.9,
+      "avg": 5.9,
       "trend": "stable"
     },
     "current": {
@@ -52,7 +52,7 @@
   "best_day": {
     "date": "2026-02-26",
     "wave": 1.4,
-    "temp": 21.0,
+    "temp": 20.7,
     "safety": "safe"
   },
   "worst_day": {
