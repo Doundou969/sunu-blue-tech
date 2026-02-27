@@ -1,16 +1,18 @@
 name: PecheurConnect Update
 
 on:
-  workflow_dispatch: # Permet de lancer manuellement depuis l'onglet Actions
+  workflow_dispatch:
   schedule:
-    - cron: "0 */6 * * *" # Exécution toutes les 6 heures (aligné sur Copernicus)
+    - cron: "0 */6 * * *"  # Toutes les 6h UTC
 
 jobs:
   update-data:
     runs-on: ubuntu-latest
+    timeout-minutes: 30  # ✅ Évite les jobs bloqués indéfiniment
+
     permissions:
-      contents: write # Autorise le bot à pousser les fichiers data.json et logs
-    
+      contents: write
+
     steps:
       - name: 📥 Checkout
         uses: actions/checkout@v4
@@ -19,7 +21,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: 'pip' # Accélère les exécutions futures
+          cache: "pip"  # Cache basé sur requirements.txt automatiquement
 
       - name: 📁 Prepare Directories
         run: mkdir -p logs/history logs/stats
@@ -27,35 +29,41 @@ jobs:
       - name: 📦 Install dependencies
         run: |
           python -m pip install --upgrade pip
-          # Installation forcée des modules nécessaires pour PecheurConnect v3.0
-          pip install aiohttp requests numpy copernicusmarine
+          pip install -r requirements.txt  # ✅ Versions épinglées, cache efficace
 
       - name: 🌊 Run PecheurConnect Script
+        timeout-minutes: 20  # ✅ Timeout spécifique au script
         env:
-          TG_TOKEN: ${{ secrets.TG_TOKEN }}
-          TG_ID: ${{ secrets.TG_ID }}
+          # ✅ Secrets unifiés — cohérents avec le script optimisé
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_ID:               ${{ secrets.TG_ID }}
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
           OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
         run: python script_peche.py
 
-      - name: ✅ Verify Output
+      - name: ✅ Verify Outputs
         run: |
-          if [ -f data.json ]; then
-            echo "✅ data.json généré avec succès."
-          else
-            echo "❌ Erreur : data.json introuvable."
-            exit 1
-          fi
+          for f in data.json seasonality_data.json; do
+            if [ -f "$f" ]; then
+              echo "✅ $f généré ($(wc -c < $f) octets)"
+            else
+              echo "⚠️  $f absent — non bloquant"
+            fi
+          done
 
-      - name: 💾 Commit and Push Changes
+          # Seul data.json est obligatoire
+          [ -f data.json ] || { echo "❌ data.json manquant — arrêt."; exit 1; }
+
+      - name: 💾 Commit and Push
         run: |
-          git config user.name "PecheurConnect Bot"
+          git config user.name  "PecheurConnect Bot"
           git config user.email "bot@pecheurconnect.sn"
-          
-          # Ajout de data.json, des statistiques et de l'historique
-          git add data.json logs/ seasonality_data.json
-          
-          # Commit seulement s'il y a des changements pour éviter les erreurs de pipeline
-          git diff --quiet && git diff --staged --quiet || (git commit -m "🌊 Update $(date -u '+%Y-%m-%d %H:%M UTC')" && git push)
+
+          # ✅ Logs exclus du commit — seulement les données utiles
+          git add data.json
+          [ -f seasonality_data.json ] && git add seasonality_data.json
+
+          git diff --staged --quiet || \
+            git commit -m "🌊 Update $(date -u '+%Y-%m-%d %H:%M UTC')" && \
+            git push
