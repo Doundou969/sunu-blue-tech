@@ -1,54 +1,61 @@
 name: PecheurConnect Update
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # Permet de lancer manuellement depuis l'onglet Actions
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: "0 */6 * * *" # Exécution toutes les 6 heures (aligné sur Copernicus)
 
 jobs:
   update-data:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: write # Autorise le bot à pousser les fichiers data.json et logs
     
     steps:
       - name: 📥 Checkout
         uses: actions/checkout@v4
-      
+
       - name: 🐍 Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      
+          cache: 'pip' # Accélère les exécutions futures
+
+      - name: 📁 Prepare Directories
+        run: mkdir -p logs/history logs/stats
+
       - name: 📦 Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      
-      - name: 🌊 Run script
+          # Installation forcée des modules nécessaires pour PecheurConnect v3.0
+          pip install aiohttp requests numpy copernicusmarine
+
+      - name: 🌊 Run PecheurConnect Script
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           TG_ID: ${{ secrets.TG_ID }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
           OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
-          WORLDTIDES_API_KEY: ${{ secrets.WORLDTIDES_API_KEY }}
         run: python script_peche.py
-      
-      - name: ✅ Verify output
+
+      - name: ✅ Verify Output
         run: |
           if [ -f data.json ]; then
-            echo "✅ data.json créé"
-            ls -lh data.json
+            echo "✅ data.json généré avec succès."
           else
-            echo "❌ data.json manquant"
+            echo "❌ Erreur : data.json introuvable."
             exit 1
           fi
-      
-      - name: 💾 Commit and Push
+
+      - name: 💾 Commit and Push Changes
         run: |
           git config user.name "PecheurConnect Bot"
           git config user.email "bot@pecheurconnect.sn"
-          git add data.json logs/
-          git diff --quiet && git diff --staged --quiet || git commit -m "🌊 Update $(date -u '+%Y-%m-%d %H:%M UTC')"
-          git push || echo "Rien à pusher"
+          
+          # Ajout de data.json, des statistiques et de l'historique
+          git add data.json logs/ seasonality_data.json
+          
+          # Commit seulement s'il y a des changements pour éviter les erreurs de pipeline
+          git diff --quiet && git diff --staged --quiet || (git commit -m "🌊 Update $(date -u '+%Y-%m-%d %H:%M UTC')" && git push)
