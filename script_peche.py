@@ -62,17 +62,47 @@ logger = setup_logging()
 # ============================================================================
 
 def load_secrets() -> dict:
-    """Charge et valide les variables d'environnement critiques."""
+    """
+    Charge et valide les variables d'environnement critiques.
+    Supporte plusieurs noms de variables pour la compatibilité
+    avec les différentes configurations GitHub Actions.
+    """
+    # Telegram : supporte TELEGRAM_BOT_TOKEN et TG_TOKEN (ancien nom)
+    telegram_token = (
+        os.getenv("TELEGRAM_BOT_TOKEN") or
+        os.getenv("TG_TOKEN")           # fallback ancien secret
+    )
+    telegram_chat = (
+        os.getenv("TG_ID") or
+        os.getenv("TELEGRAM_CHAT_ID")   # fallback
+    )
+
     secrets = {
         "COPERNICUS_USER":  os.getenv("COPERNICUS_USERNAME"),
         "COPERNICUS_PASS":  os.getenv("COPERNICUS_PASSWORD"),
         "OPENWEATHER_KEY":  os.getenv("OPENWEATHER_API_KEY"),
-        "TELEGRAM_TOKEN":   os.getenv("TELEGRAM_BOT_TOKEN"),
-        "TELEGRAM_CHAT_ID": os.getenv("TG_ID"),
+        "TELEGRAM_TOKEN":   telegram_token,
+        "TELEGRAM_CHAT_ID": telegram_chat,
     }
+
     missing = [k for k, v in secrets.items() if not v]
     if missing:
         logger.warning(f"Secrets manquants : {missing} — certaines fonctions seront désactivées.")
+    else:
+        logger.info("✅ Tous les secrets chargés avec succès.")
+
+    # Diagnostic Telegram spécifique pour aider au débogage
+    if not telegram_token:
+        logger.warning(
+            "Telegram désactivé. Vérifiez que le secret 'TELEGRAM_BOT_TOKEN' "
+            "(ou 'TG_TOKEN') est défini dans GitHub Settings → Secrets and variables → Actions"
+        )
+    if not telegram_chat:
+        logger.warning(
+            "Chat ID Telegram manquant. Vérifiez que le secret 'TG_ID' "
+            "est défini dans GitHub Settings → Secrets and variables → Actions"
+        )
+
     return secrets
 
 
@@ -89,7 +119,12 @@ try:
     logger.info("Bibliothèque copernicusmarine chargée avec succès.")
 except ImportError:
     COPERNICUS_AVAILABLE = False
-    logger.warning("copernicusmarine absente — mode simulation activé.")
+    logger.warning("copernicusmarine introuvable — mode simulation activé.")
+except Exception as _cop_err:
+    # La lib est installée mais crashe à l'import (conflit dépendances, etc.)
+    # Le message d'erreur exact aide au diagnostic
+    COPERNICUS_AVAILABLE = False
+    logger.warning(f"copernicusmarine présente mais non initialisable ({type(_cop_err).__name__}: {_cop_err}) — mode simulation activé.")
 
 
 # ============================================================================
