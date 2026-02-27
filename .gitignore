@@ -1,193 +1,30 @@
 # ============================================================
-# PecheurConnect v3.0 - .gitignore
+# PecheurConnect — .gitignore
 # ============================================================
 
-# ============================================================
+# Secrets locaux — NE JAMAIS COMMITTER
+.env
+
+# Logs rotatifs — committé via workflow uniquement si nécessaire
+logs/pecheur_connect.log*
+
 # Python
-# ============================================================
 __pycache__/
 *.py[cod]
-*$py.class
-*.so
+*.pyo
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
 *.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-pip-log.txt
-pip-delete-this-directory.txt
-
-# ============================================================
-# Virtual Environments
-# ============================================================
+dist/
+build/
+.venv/
 venv/
 env/
-ENV/
-.venv
-.env
 
-# ============================================================
-# Environment Variables
-# ============================================================
-.env
-.env.local
-.env.*.local
-*.env
-.envrc
+# OS
+.DS_Store
+Thumbs.db
 
-# ============================================================
-# IDE & Editors
-# ============================================================
+# IDE
 .vscode/
 .idea/
 *.swp
-*.swo
-*~
-.DS_Store
-Thumbs.db
-*.sublime-project
-*.sublime-workspace
-.project
-.settings/
-.classpath
-
-# ============================================================
-# Logs
-# ============================================================
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-logs/*.txt
-logs/backups/*.json
-logs/history/*.json
-logs/stats/*.json
-
-# Exceptions - garder structure
-!logs/.gitkeep
-!logs/backups/.gitkeep
-!logs/history/.gitkeep
-!logs/stats/.gitkeep
-
-# ============================================================
-# Données temporaires
-# ============================================================
-data_local.json
-data_backup_*.json
-test_*.json
-tmp/
-temp/
-*.tmp
-*.bak
-*.cache
-
-# ============================================================
-# Node / NPM
-# ============================================================
-node_modules/
-package-lock.json
-yarn.lock
-.npm
-.yarn/
-
-# ============================================================
-# OS Files
-# ============================================================
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-desktop.ini
-
-# ============================================================
-# Secrets & Config (IMPORTANT!)
-# ============================================================
-config.ini
-secrets.json
-credentials.json
-*.pem
-*.key
-*.cert
-.credentials
-.secrets
-
-# ============================================================
-# Backup & Archives
-# ============================================================
-*.zip
-*.tar
-*.tar.gz
-*.rar
-*.7z
-backup/
-archives/
-
-# ============================================================
-# Test & Coverage
-# ============================================================
-.coverage
-.pytest_cache/
-htmlcov/
-.tox/
-.hypothesis/
-.mypy_cache/
-.dmypy.json
-dmypy.json
-
-# ============================================================
-# Documentation générée
-# ============================================================
-docs/_build/
-site/
-
-# ============================================================
-# Fichiers spécifiques projet
-# ============================================================
-# Données générées (garder data.json pour GitHub Pages)
-# data.json - NE PAS IGNORER
-
-# Mais ignorer backups
-data_*.json
-
-# Certificats Copernicus (si stockés localement)
-copernicus_*.txt
-
-# Tests locaux
-test_copernicus.py
-test_openweather.py
-playground.py
-scratch.py
-
-# ============================================================
-# GitHub Actions artifacts
-# ============================================================
-.github/workflows/artifacts/
-
-# ============================================================
-# PWA / Service Worker
-# ============================================================
-# Ne pas ignorer sw.js, manifest.json, offline.html
-
-# ============================================================
-# Autres
-# ============================================================
-*.sqlite
-*.db
-*.sqlite3
-.pytest_cache
-.benchmarks
