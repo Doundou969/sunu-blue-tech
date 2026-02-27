@@ -6,40 +6,40 @@
   "data_points": 1,
   "history": [
     {
-      "timestamp": "2026-02-26T18:42:20.482187",
-      "date": "2026-02-26",
-      "wave": 1.06,
-      "temp": 24.4,
-      "wind": 8.9,
-      "current": 0.11,
+      "timestamp": "2026-02-27T01:10:15.742215",
+      "date": "2026-02-27",
+      "wave": 1.25,
+      "temp": 24.2,
+      "wind": 8.6,
+      "current": 0.16,
       "safety": "safe",
       "fish_level": "moderate",
-      "danger_score": 12
+      "danger_score": 15
     }
   ],
   "statistics": {
     "waves": {
-      "min": 1.06,
-      "max": 1.06,
-      "avg": 1.06,
+      "min": 1.25,
+      "max": 1.25,
+      "avg": 1.25,
       "trend": "stable"
     },
     "temperature": {
-      "min": 24.4,
-      "max": 24.4,
-      "avg": 24.4,
+      "min": 24.2,
+      "max": 24.2,
+      "avg": 24.2,
       "trend": "stable"
     },
     "wind": {
-      "min": 8.9,
-      "max": 8.9,
-      "avg": 8.9,
+      "min": 8.6,
+      "max": 8.6,
+      "avg": 8.6,
       "trend": "stable"
     },
     "current": {
-      "min": 0.11,
-      "max": 0.11,
-      "avg": 0.11,
+      "min": 0.16,
+      "max": 0.16,
+      "avg": 0.16,
       "trend": "stable"
     }
   },
@@ -50,14 +50,14 @@
     "danger": 0
   },
   "best_day": {
-    "date": "2026-02-26",
-    "wave": 1.06,
-    "temp": 24.4,
+    "date": "2026-02-27",
+    "wave": 1.25,
+    "temp": 24.2,
     "safety": "safe"
   },
   "worst_day": {
-    "date": "2026-02-26",
-    "wave": 1.06,
+    "date": "2026-02-27",
+    "wave": 1.25,
     "safety": "safe"
   }
 }
