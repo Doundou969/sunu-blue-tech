@@ -5,34 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="PecheurConnect — Sécurité maritime en temps réel pour les pêcheurs sénégalais. 18 zones surveillées 24h/24.">
     <meta name="theme-color" content="#0a1628">
-
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="PecheurConnect">
-
     <meta property="og:title"       content="PecheurConnect 🇸🇳">
     <meta property="og:description" content="Sécurité maritime en temps réel — 18 zones au Sénégal">
     <meta property="og:type"        content="website">
 
     <title>PecheurConnect v3.0 🇸🇳 | Sécurité Maritime Sénégal</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
-
     <link rel="manifest" href="./manifest.json">
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
 
     <style>
         :root {
             --primary:    #0056b3;
             --primary-dk: #003d7a;
             --primary-lt: #1a73e8;
-            --accent:      #00d4ff;
+            --accent:     #00d4ff;
             --accent2:    #00ff9d;
-            --safe:        #00c853;
+            --safe:       #00c853;
             --caution:    #ffd600;
             --warning:    #ff6d00;
             --danger:     #d50000;
@@ -52,69 +49,93 @@
 
         #map { position: fixed; inset: 0; z-index: 1; }
 
-        /* LOADING SCREEN */
+        /* ── LOADING ── */
         #loadingScreen {
             position: fixed; inset: 0; z-index: 9999; background: var(--dark);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: opacity 0.7s ease, visibility 0.7s ease;
         }
-        #loadingScreen.hide { opacity: 0; visibility: hidden; }
-        .ls-wave { font-size: 52px; margin-bottom: 12px; animation: bob 2s ease-in-out infinite; }
-        @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        #loadingScreen.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+        .ls-wave  { font-size: 52px; margin-bottom: 12px; animation: bob 2s ease-in-out infinite; }
+        @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
         .ls-title { font-family: 'Syne', sans-serif; font-size: 30px; font-weight: 800; color: white; margin-bottom: 6px; }
         .ls-bar-wrap { width: 220px; height: 3px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; margin-bottom: 14px; }
         .ls-bar { height: 100%; width: 0; background: linear-gradient(90deg, var(--primary-lt), var(--accent)); animation: bar-fill 2.2s ease forwards; }
         @keyframes bar-fill { 0% { width: 0%; } 100% { width: 100%; } }
+        .ls-status { font-size: 12px; color: var(--text-dim); }
 
-        /* PANELS */
+        /* ── PANELS ── */
         .left-panel { position: fixed; top: 16px; left: 16px; z-index: 500; width: 302px; display: flex; flex-direction: column; gap: 10px; }
         .brand-card { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dk) 100%); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,0.12); }
         .brand-name { font-family: 'Syne', sans-serif; font-size: 19px; font-weight: 800; color: white; }
         .nav-card { background: var(--panel); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-radius: var(--radius); padding: 10px; box-shadow: var(--shadow); border: 1px solid var(--border); display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; padding: 9px 4px; border-radius: var(--radius-sm); background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.72); text-decoration: none; font-size: 10px; }
-        .nav-item.current { background: rgba(0,86,179,0.4); border-color: var(--primary-lt); color: white; }
-        
-        /* FILTERS & SEARCH */
-        .filter-card, .search-card { background: var(--panel); backdrop-filter: blur(18px); border-radius: var(--radius); padding: 12px; border: 1px solid var(--border); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; padding: 9px 4px; border-radius: var(--radius-sm); background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.72); text-decoration: none; font-size: 10px; transition: background 0.2s; }
+        .nav-item.current, .nav-item:hover { background: rgba(0,86,179,0.4); color: white; }
+        .filter-card, .search-card { background: var(--panel); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-radius: var(--radius); padding: 12px; border: 1px solid var(--border); }
         .filter-pills { display: flex; flex-wrap: wrap; gap: 5px; }
-        .pill { padding: 5px 11px; background: rgba(255,255,255,0.07); border-radius: 20px; font-size: 11px; cursor: pointer; }
+        .pill { padding: 5px 11px; background: rgba(255,255,255,0.07); border-radius: 20px; font-size: 11px; cursor: pointer; transition: background 0.2s; user-select: none; }
         .pill.active { background: var(--primary); color: white; }
         .search-input { width: 100%; background: transparent; border: none; color: white; outline: none; font-size: 13px; }
+        .search-input::placeholder { color: var(--text-dim); }
 
-        /* STATS */
-        .stats-panel { position: fixed; bottom: 24px; left: 16px; z-index: 500; background: var(--panel); backdrop-filter: blur(18px); border-radius: var(--radius); padding: 14px; min-width: 272px; }
+        /* ── STATS ── */
+        .stats-panel { position: fixed; bottom: 24px; left: 16px; z-index: 500; background: var(--panel); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-radius: var(--radius); padding: 14px; min-width: 272px; border: 1px solid var(--border); box-shadow: var(--shadow); }
         .safety-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
         .safety-box { background: rgba(255,255,255,0.05); border-radius: var(--radius-sm); padding: 9px 5px; text-align: center; }
         .safety-num { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; }
-        .safety-num.s { color: var(--safe); } .safety-num.d { color: var(--danger); }
-        .safety-lbl { font-size: 9px; color: var(--text-dim); text-transform: uppercase; }
+        .safety-lbl { font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
 
-        /* FABs */
+        /* ── SCORE MOYEN ── */
+        .score-avg { margin-top: 10px; background: rgba(255,255,255,0.05); border-radius: var(--radius-sm); padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+        .score-avg-val { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; color: var(--accent2); }
+
+        /* ── FABs ── */
         .fab-group { position: fixed; right: 16px; bottom: 24px; z-index: 500; display: flex; flex-direction: column; gap: 10px; }
-        .fab { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 19px; cursor: pointer; border: none; box-shadow: var(--shadow); }
-        .fab-wa { background: #25D366; color: white; text-decoration: none; }
+        .fab { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 19px; cursor: pointer; border: none; box-shadow: var(--shadow); transition: transform 0.15s; }
+        .fab:hover { transform: scale(1.08); }
+        .fab-wa  { background: #25D366; color: white; text-decoration: none; }
         .fab-ref { background: var(--primary); color: white; }
 
-        /* MARKERS & POPUPS */
-        .mk-bubble { background: transparent; }
-        .mk-inner { color: white; padding: 7px; border-radius: 22px; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 13px; border: 2.5px solid white; text-align: center; min-width: 60px; box-shadow: var(--shadow); }
-        .leaflet-popup-content-wrapper { border-radius: 14px !important; padding: 0 !important; overflow: hidden; background: white !important; }
-        .pu { color: #333; }
-        .pu-head { padding: 15px; color: white; }
-        .pu-body { padding: 15px; }
-        .pu-metric { background: #f4f7fb; border-radius: 8px; padding: 10px; text-align: center; }
-        .pu-mval { font-size: 20px; font-weight: 800; color: var(--primary); font-family: 'Syne'; }
-        .pu-safety { padding: 10px; border-radius: 8px; color: white; text-align: center; font-weight: 800; margin: 10px 0; }
-        .pu-btn { display: block; padding: 10px; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 12px; margin-top: 5px; }
+        /* ── MARKERS ── */
+        .mk-bubble { background: transparent; border: none !important; }
+        .mk-inner {
+            color: white; padding: 6px 10px; border-radius: 22px;
+            font-family: 'Syne', sans-serif; font-weight: 800; font-size: 12px;
+            border: 2.5px solid rgba(255,255,255,0.7); text-align: center;
+            min-width: 62px; box-shadow: var(--shadow);
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .mk-wave { font-size: 15px; line-height: 1.1; }
+        .mk-name { font-size: 7px; opacity: 0.85; white-space: nowrap; max-width: 80px; overflow: hidden; text-overflow: ellipsis; }
+
+        /* ── POPUPS ── */
+        .leaflet-popup-content-wrapper { border-radius: 14px !important; padding: 0 !important; overflow: hidden; background: white !important; box-shadow: 0 12px 40px rgba(0,0,0,0.25) !important; }
+        .leaflet-popup-content { margin: 0 !important; }
+        .leaflet-popup-tip-container { display: none; }
+        .pu { color: #222; font-family: 'DM Sans', sans-serif; min-width: 240px; }
+        .pu-head { padding: 14px 16px; color: white; }
+        .pu-head-name { font-weight: 800; font-size: 17px; font-family: 'Syne', sans-serif; }
+        .pu-head-desc { font-size: 11px; opacity: 0.85; margin-top: 2px; }
+        .pu-body { padding: 14px 16px; }
+        .pu-metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+        .pu-metric { background: #f0f4fb; border-radius: 8px; padding: 9px 5px; text-align: center; }
+        .pu-mval { font-size: 18px; font-weight: 800; color: var(--primary); font-family: 'Syne', sans-serif; }
+        .pu-mlbl { font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
+        .pu-safety { padding: 9px; border-radius: 8px; color: white; text-align: center; font-weight: 700; font-size: 13px; margin-bottom: 10px; }
+        .pu-score { text-align: center; font-size: 12px; color: #555; margin-bottom: 10px; }
+        .pu-score b { color: var(--primary); font-size: 15px; }
+        .pu-source { text-align: center; font-size: 10px; color: #aaa; margin-bottom: 10px; }
+        .pu-btn { display: block; padding: 10px; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 12px; }
         .pu-btn-wa { background: #25D366; color: white; }
 
-        /* SW INDICATOR */
+        /* ── INDICATORS ── */
         .sw-indicator { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--text-dim); margin-top: 8px; }
-        .sw-dot { width: 6px; height: 6px; border-radius: 50%; background: #888; }
+        .sw-dot { width: 6px; height: 6px; border-radius: 50%; background: #888; transition: background 0.4s; }
         .sw-dot.online { background: var(--safe); }
         .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 
+        /* ── RESPONSIVE ── */
         @media (max-width: 768px) {
             .left-panel { left: 10px; right: 10px; width: auto; }
             .stats-panel { right: 70px; left: 10px; min-width: auto; }
@@ -123,6 +144,7 @@
 </head>
 <body>
 
+<!-- LOADING -->
 <div id="loadingScreen">
     <div class="ls-wave">🌊</div>
     <div class="ls-title">PecheurConnect</div>
@@ -132,18 +154,22 @@
 
 <div id="map"></div>
 
+<!-- PANNEAU GAUCHE -->
 <div class="left-panel">
+
     <div class="brand-card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
             <span class="brand-name">🌊 PecheurConnect</span>
-            <span style="font-size:10px; background:rgba(255,255,255,0.2); padding:2px 6px; border-radius:10px">v3.0</span>
+            <span style="font-size:10px; background:rgba(255,255,255,0.2); padding:2px 7px; border-radius:10px">v3.0</span>
         </div>
-        <div style="display:flex; gap:5px; font-size:11px">
+        <div style="display:flex; gap:5px; font-size:11px; flex-wrap:wrap;">
             <div style="background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:10px">🕑 <span id="lastUpdate">--:--</span></div>
             <div style="background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:10px">📍 Sénégal</div>
+            <div style="background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:10px" id="srcBadge">🛰️ --</div>
         </div>
         <div class="sw-indicator">
-            <div class="sw-dot" id="swDot"></div> <span id="swLabel">Service Worker...</span>
+            <div class="sw-dot" id="swDot"></div>
+            <span id="swLabel">Service Worker...</span>
         </div>
     </div>
 
@@ -155,147 +181,331 @@
     </div>
 
     <div class="filter-card">
-        <div class="filter-pills">
-            <div class="pill active" data-region="all" onclick="doFilter(this)">Tout</div>
-            <div class="pill" data-region="Nord" onclick="doFilter(this)">Nord</div>
-            <div class="pill" data-region="Dakar" onclick="doFilter(this)">Dakar</div>
-            <div class="pill" data-region="Petite Côte" onclick="doFilter(this)">P.Côte</div>
-            <div class="pill" data-region="Casamance" onclick="doFilter(this)">Casamance</div>
+        <div class="filter-pills" id="filterPills">
+            <div class="pill active" data-region="all"         onclick="doFilter(this)">Tout</div>
+            <div class="pill" data-region="Nord"               onclick="doFilter(this)">Nord</div>
+            <div class="pill" data-region="Grande Côte"        onclick="doFilter(this)">Grande Côte</div>
+            <div class="pill" data-region="Dakar"              onclick="doFilter(this)">Dakar</div>
+            <div class="pill" data-region="Petite Côte"        onclick="doFilter(this)">P.Côte</div>
+            <div class="pill" data-region="Sine-Saloum"        onclick="doFilter(this)">Sine-Saloum</div>
+            <div class="pill" data-region="Casamance"          onclick="doFilter(this)">Casamance</div>
         </div>
     </div>
 
     <div class="search-card">
-        <input type="text" id="searchInput" class="search-input" placeholder="Rechercher une zone..." oninput="doSearch(this.value)">
+        <input type="text" id="searchInput" class="search-input"
+               placeholder="🔍 Rechercher une zone..."
+               oninput="doSearch(this.value)">
     </div>
+
 </div>
 
+<!-- STATS BAS GAUCHE -->
 <div class="stats-panel">
     <div style="display:flex; align-items:center; gap:5px; margin-bottom:10px; font-size:11px; color:var(--accent2)">
-        <div class="live-dot"></div> Direct Mer
+        <div class="live-dot"></div> Direct Mer — <span id="zoneCount">--</span> zones
     </div>
     <div class="safety-row">
-        <div class="safety-box"><div class="safety-num s" id="cntSafe">0</div><div class="safety-lbl">Sûr</div></div>
-        <div class="safety-box"><div class="safety-num" id="cntCaution" style="color:var(--caution)">0</div><div class="safety-lbl">Vig.</div></div>
-        <div class="safety-box"><div class="safety-num" id="cntWarning" style="color:var(--warning)">0</div><div class="safety-lbl">Prud.</div></div>
-        <div class="safety-box"><div class="safety-num d" id="cntDanger">0</div><div class="safety-lbl">Danger</div></div>
+        <div class="safety-box">
+            <div class="safety-num" style="color:var(--safe)"    id="cntSafe">0</div>
+            <div class="safety-lbl">Sûr</div>
+        </div>
+        <div class="safety-box">
+            <div class="safety-num" style="color:var(--caution)" id="cntCaution">0</div>
+            <div class="safety-lbl">Vigilance</div>
+        </div>
+        <div class="safety-box">
+            <div class="safety-num" style="color:var(--warning)" id="cntWarning">0</div>
+            <div class="safety-lbl">Prudence</div>
+        </div>
+        <div class="safety-box">
+            <div class="safety-num" style="color:var(--danger)"  id="cntDanger">0</div>
+            <div class="safety-lbl">Danger</div>
+        </div>
+    </div>
+    <div class="score-avg">
+        <span style="color:var(--text-dim); font-size:11px">Score pêche moyen</span>
+        <span class="score-avg-val" id="scoreAvg">--</span>
     </div>
 </div>
 
+<!-- FABs -->
 <div class="fab-group">
-    <a class="fab fab-wa" href="https://wa.me/221777020818" target="_blank">📱</a>
-    <button class="fab fab-ref" onclick="location.reload()">🔄</button>
+    <a class="fab fab-wa" href="https://wa.me/221777020818" target="_blank" title="SOS WhatsApp">📱</a>
+    <button class="fab fab-ref" onclick="location.reload()" title="Actualiser">🔄</button>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
 <script>
-    let map, clusterLayer, allZones = [];
+// ============================================================
+// COORDONNÉES — 18 zones complètes (synchronisées avec script_peche.py)
+// ============================================================
+const COORDS = {
+    "SAINT-LOUIS":           { lat: 16.05, lon: -16.65 },
+    "GANDON":                { lat: 16.00, lon: -16.50 },
+    "SAINT-LOUIS-HYDROBASE": { lat: 16.10, lon: -16.48 },
+    "POTOU":                 { lat: 15.70, lon: -16.55 },
+    "LOMPOUL":               { lat: 15.45, lon: -16.70 },
+    "KAYAR":                 { lat: 14.95, lon: -17.35 },
+    "DAKAR-YOFF":            { lat: 14.80, lon: -17.65 },
+    "DAKAR-SOUMBEDIOUNE":    { lat: 14.68, lon: -17.44 },
+    "DAKAR-HANN":            { lat: 14.72, lon: -17.38 },
+    "THIAROYE-SUR-MER":      { lat: 14.75, lon: -17.40 },
+    "MBOUR-JOAL":            { lat: 14.35, lon: -17.15 },
+    "JOAL-FADIOUTH":         { lat: 14.16, lon: -16.85 },
+    "PALMARIN":              { lat: 14.00, lon: -16.80 },
+    "NDANGANE":              { lat: 13.75, lon: -16.65 },
+    "DJIFER":                { lat: 13.60, lon: -16.75 },
+    "KAFOUNTINE":            { lat: 12.90, lon: -16.75 },
+    "CASAMANCE-ZIGUINCHOR":  { lat: 12.50, lon: -16.95 },
+    "CAP-SKIRRING":          { lat: 12.39, lon: -16.74 },
+};
 
-    // Initialisation
-    document.addEventListener('DOMContentLoaded', () => {
-        initMap();
-        loadData();
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js').then(() => {
+// ============================================================
+// ÉTAT GLOBAL
+// ============================================================
+let map, clusterLayer;
+let allZones  = [];   // tableau normalisé depuis data.json v3.0
+let metaData  = {};
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+    initMap();
+    loadData();
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js')
+            .then(() => {
                 document.getElementById('swDot').classList.add('online');
                 document.getElementById('swLabel').innerText = "Mode Hors-ligne OK";
-            });
-        }
-    });
-
-    function initMap() {
-        map = L.map('map', { center: [14.6, -17.2], zoom: 8, zoomControl: false });
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-            attribution: '© OpenStreetMap | PecheurConnect'
-        }).addTo(map);
-
-        clusterLayer = L.markerClusterGroup({
-            iconCreateFunction: (cluster) => L.divIcon({
-                html: `<div class="mk-inner" style="background:var(--primary)">${cluster.getChildCount()}</div>`,
-                className: 'mk-bubble', iconSize: [40, 40]
             })
-        }).addTo(map);
-    }
-
-    async function loadData() {
-        try {
-            const res = await fetch('data.json');
-            allZones = await res.json();
-            renderMarkers(allZones);
-            updateStats(allZones);
-            if(allZones.length > 0) document.getElementById('lastUpdate').innerText = allZones[0].date.split(' ')[1];
-            
-            setTimeout(() => document.getElementById('loadingScreen').classList.add('hide'), 1000);
-        } catch (e) {
-            document.getElementById('lsStatus').innerText = "Erreur de chargement...";
-        }
-    }
-
-    function renderMarkers(data) {
-        clusterLayer.clearLayers();
-        data.forEach(z => {
-            const color = z.safety_level === 'danger' ? 'var(--danger)' : (z.safety_level === 'warning' ? 'var(--warning)' : 'var(--safe)');
-            const icon = L.divIcon({
-                className: 'mk-bubble',
-                html: `<div class="mk-inner" style="background:${color}"><div style="font-size:15px">${z.v_now}m</div><div style="font-size:8px">${z.zone}</div></div>`
+            .catch(() => {
+                document.getElementById('swLabel').innerText = "Hors-ligne indisponible";
             });
+    }
+});
 
-            const lat = getCoords(z.zone).lat;
-            const lon = getCoords(z.zone).lon;
-            const marker = L.marker([lat, lon], { icon });
+// ============================================================
+// CARTE LEAFLET
+// ============================================================
+function initMap() {
+    map = L.map('map', { center: [14.3, -16.9], zoom: 7, zoomControl: false });
 
-            marker.bindPopup(`
-                <div class="pu">
-                    <div class="pu-head" style="background:${color}">
-                        <div style="font-weight:800; font-size:18px">${z.zone}</div>
-                        <div style="font-size:11px opacity:0.8">${z.region}</div>
-                    </div>
-                    <div class="pu-body">
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
-                            <div class="pu-metric"><div class="pu-mval">${z.v_now}m</div><div style="font-size:10px">Houle</div></div>
-                            <div class="pu-metric"><div class="pu-mval">${z.t_now}°</div><div style="font-size:10px">Mer</div></div>
-                        </div>
-                        <div class="pu-safety" style="background:${color}">${z.safety}</div>
-                        <div style="text-align:center; font-size:12px; color:#666; margin-bottom:10px">🐟 Indice Pêche: <b>${z.fish_index}/100</b></div>
-                        <a href="https://wa.me/221777020818" class="pu-btn pu-btn-wa">Partager sur WhatsApp</a>
-                    </div>
-                </div>
-            `, { maxWidth: 280 });
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '© OpenStreetMap contributors | © CARTO | PecheurConnect',
+        maxZoom: 18
+    }).addTo(map);
 
-            clusterLayer.addLayer(marker);
+    clusterLayer = L.markerClusterGroup({
+        iconCreateFunction: (cluster) => L.divIcon({
+            html: `<div class="mk-inner" style="background:var(--primary); font-size:14px">${cluster.getChildCount()}</div>`,
+            className: 'mk-bubble',
+            iconSize: [44, 44]
+        }),
+        disableClusteringAtZoom: 10
+    });
+    clusterLayer.addTo(map);
+}
+
+// ============================================================
+// CHARGEMENT data.json v3.0
+// ============================================================
+async function loadData() {
+    try {
+        document.getElementById('lsStatus').innerText = "Chargement des données marines...";
+        const res  = await fetch('data.json');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+
+        // ── Parsing du format v3.0 ──
+        // Structure : { meta:{...}, stats:{...}, zones:{ ZONE_NAME: {...} } }
+        metaData = json.meta || {};
+        const zonesObj = json.zones || {};
+
+        // Normaliser en tableau pour faciliter les opérations
+        allZones = Object.entries(zonesObj).map(([name, data]) => ({
+            zone:     name,
+            region:   data.region,
+            desc:     data.desc,
+            lat:      data.lat,
+            lon:      data.lon,
+            // Indices halieutiques
+            securite_code:  data.indices?.securite_code  || "safe",
+            securite_texte: data.indices?.securite_texte || "—",
+            peche_score:    data.indices?.peche_score    || 0,
+            peche_texte:    data.indices?.peche_texte    || "—",
+            wave:           data.indices?.wave           || 0,
+            temp:           data.indices?.temp           || 0,
+            current:        data.indices?.current        || 0,
+            // Sources
+            source_ow:  data.openweather?.source  || "simulation",
+            source_cop: data.copernicus?.source   || "simulation",
+            updated_at: data.updated_at || "",
+        }));
+
+        renderMarkers(allZones);
+        updateStats(allZones, json.stats);
+        updateMeta(metaData);
+
+        setTimeout(() => document.getElementById('loadingScreen').classList.add('hide'), 900);
+
+    } catch (e) {
+        console.error("Erreur loadData:", e);
+        document.getElementById('lsStatus').innerText = "⚠️ Erreur de chargement — vérifiez data.json";
+    }
+}
+
+// ============================================================
+// AFFICHAGE DES MARQUEURS
+// ============================================================
+function renderMarkers(zones) {
+    clusterLayer.clearLayers();
+
+    zones.forEach(z => {
+        const coords = COORDS[z.zone];
+        if (!coords) {
+            console.warn(`Coordonnées manquantes pour : ${z.zone}`);
+            return;
+        }
+
+        const color = secColor(z.securite_code);
+
+        const icon = L.divIcon({
+            className: 'mk-bubble',
+            html: `
+                <div class="mk-inner" style="background:${color}">
+                    <div class="mk-wave">${z.wave.toFixed(1)}m</div>
+                    <div class="mk-name">${z.zone}</div>
+                </div>`,
+            iconSize:   [72, 44],
+            iconAnchor: [36, 44],
         });
-    }
 
-    function updateStats(data) {
-        document.getElementById('cntSafe').innerText = data.filter(z => z.safety_level === 'safe').length;
-        document.getElementById('cntCaution').innerText = data.filter(z => z.safety_level === 'warning').length;
-        document.getElementById('cntWarning').innerText = data.filter(z => z.safety_level === 'caution').length;
-        document.getElementById('cntDanger').innerText = data.filter(z => z.safety_level === 'danger').length;
-    }
+        const marker = L.marker([coords.lat, coords.lon], { icon });
 
-    function doFilter(el) {
-        document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-        el.classList.add('active');
-        const reg = el.getAttribute('data-region');
-        renderMarkers(reg === 'all' ? allZones : allZones.filter(z => z.region === reg));
-    }
+        // Score affiché sur 10 (correct — pas de conversion ×10)
+        const scoreBar = scoreBarHtml(z.peche_score);
+        const sourceLabel = z.source_cop === 'copernicus'
+            ? '🛰️ Copernicus + OpenWeather'
+            : z.source_ow === 'openweather'
+                ? '☁️ OpenWeather (simulation Copernicus)'
+                : '🔬 Mode Simulation';
 
-    function doSearch(q) {
-        const filtered = allZones.filter(z => z.zone.toLowerCase().includes(q.toLowerCase()));
-        renderMarkers(filtered);
-    }
+        const updatedLabel = z.updated_at
+            ? new Date(z.updated_at).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})
+            : '--';
 
-    function getCoords(name) {
-        const db = {
-            "SAINT-LOUIS": {lat:16.05, lon:-16.50},
-            "KAYAR": {lat:14.92, lon:-17.12},
-            "DAKAR-YOFF": {lat:14.76, lon:-17.48},
-            "MBOUR-JOAL": {lat:14.30, lon:-17.00},
-            "CASAMANCE-ZIGUINCHOR": {lat:12.58, lon:-16.27}
-        };
-        return db[name] || {lat: 14.6, lon: -17.2};
+        marker.bindPopup(`
+            <div class="pu">
+                <div class="pu-head" style="background:${color}">
+                    <div class="pu-head-name">${z.zone}</div>
+                    <div class="pu-head-desc">${z.region} — ${z.desc}</div>
+                </div>
+                <div class="pu-body">
+                    <div class="pu-metrics">
+                        <div class="pu-metric">
+                            <div class="pu-mval">${z.wave.toFixed(1)}m</div>
+                            <div class="pu-mlbl">Houle</div>
+                        </div>
+                        <div class="pu-metric">
+                            <div class="pu-mval">${z.temp.toFixed(1)}°</div>
+                            <div class="pu-mlbl">SST</div>
+                        </div>
+                        <div class="pu-metric">
+                            <div class="pu-mval">${z.current.toFixed(2)}</div>
+                            <div class="pu-mlbl">m/s</div>
+                        </div>
+                    </div>
+                    <div class="pu-safety" style="background:${color}">${z.securite_texte}</div>
+                    <div class="pu-score">
+                        🎣 Indice Pêche : <b>${z.peche_score}/10</b>
+                        ${scoreBar}
+                    </div>
+                    <div class="pu-source">${sourceLabel} · ${updatedLabel}</div>
+                    <a href="https://wa.me/221777020818?text=Zone+${encodeURIComponent(z.zone)}+:+${encodeURIComponent(z.securite_texte)}"
+                       class="pu-btn pu-btn-wa" target="_blank">📱 Partager sur WhatsApp</a>
+                </div>
+            </div>
+        `, { maxWidth: 290 });
+
+        clusterLayer.addLayer(marker);
+    });
+}
+
+// ============================================================
+// MISE À JOUR DES STATS
+// ============================================================
+function updateStats(zones, stats) {
+    // Compteurs de sécurité — directement depuis les zones normalisées
+    document.getElementById('cntSafe').innerText    = zones.filter(z => z.securite_code === 'safe').length;
+    document.getElementById('cntCaution').innerText = zones.filter(z => z.securite_code === 'caution').length;
+    document.getElementById('cntWarning').innerText = zones.filter(z => z.securite_code === 'warning').length;
+    document.getElementById('cntDanger').innerText  = zones.filter(z => z.securite_code === 'danger').length;
+    document.getElementById('zoneCount').innerText  = zones.length;
+
+    // Score moyen — depuis stats ou calculé localement si absent
+    const avg = stats?.score_moyen
+        ?? (zones.reduce((s, z) => s + z.peche_score, 0) / (zones.length || 1)).toFixed(1);
+    document.getElementById('scoreAvg').innerText = `${avg}/10`;
+}
+
+function updateMeta(meta) {
+    if (meta.generated_at) {
+        const d = new Date(meta.generated_at);
+        document.getElementById('lastUpdate').innerText =
+            d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
     }
+    if (meta.sources && meta.sources.length) {
+        const hasCop = meta.sources.includes('copernicus');
+        document.getElementById('srcBadge').innerText = hasCop ? '🛰️ Copernicus' : '☁️ Simulation';
+    }
+}
+
+// ============================================================
+// FILTRES ET RECHERCHE
+// ============================================================
+function doFilter(el) {
+    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    const reg = el.getAttribute('data-region');
+    const filtered = reg === 'all' ? allZones : allZones.filter(z => z.region === reg);
+    renderMarkers(filtered);
+    updateStats(filtered, null);
+}
+
+function doSearch(q) {
+    const lq = q.toLowerCase().trim();
+    const filtered = lq
+        ? allZones.filter(z =>
+            z.zone.toLowerCase().includes(lq) ||
+            z.region.toLowerCase().includes(lq) ||
+            z.desc.toLowerCase().includes(lq))
+        : allZones;
+    renderMarkers(filtered);
+}
+
+// ============================================================
+// UTILITAIRES
+// ============================================================
+function secColor(code) {
+    return code === 'danger'  ? 'var(--danger)'
+         : code === 'warning' ? 'var(--warning)'
+         : code === 'caution' ? 'var(--caution)'
+         : 'var(--safe)';
+}
+
+function scoreBarHtml(score) {
+    const pct   = Math.round((score / 10) * 100);
+    const color = score >= 7 ? '#00c853' : score >= 4 ? '#ffd600' : '#d50000';
+    return `
+        <div style="margin-top:6px; height:4px; background:#eee; border-radius:4px; overflow:hidden">
+            <div style="width:${pct}%; height:100%; background:${color}; border-radius:4px; transition:width 0.6s"></div>
+        </div>`;
+}
 </script>
 </body>
 </html>
