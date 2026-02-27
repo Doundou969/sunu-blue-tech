@@ -1,83 +1,19 @@
 {
-  "name": "PecheurConnect - Sécurité Maritime Sénégal",
-  "short_name": "PecheurConnect",
-  "description": "Système de sécurité maritime en temps réel pour les pêcheurs sénégalais. 18 zones surveillées, alertes météo, historique et prévisions.",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#0a1628",
-  "theme_color": "#0056b3",
-  "orientation": "any",
-  "scope": "./",
-  "lang": "fr-FR",
-  "dir": "ltr",
-  "categories": ["weather", "navigation", "utilities", "productivity"],
+  "short_name": "PêcheurConnect",
+  "name": "PecheurConnect v3.0 — Sécurité Maritime Sénégal",
+  "description": "Sécurité maritime et météo en temps réel pour les pêcheurs du Sénégal.",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2965/2965315.png",
-      "sizes": "512x512",
-      "type": "image/png",
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230a1628'/><text y='.75em' x='5' font-size='80'>🌊</text></svg>",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
-    },
-    {
-      "src": "https://cdn-icons-png.flaticon.com/256/2965/2965315.png",
-      "sizes": "256x256",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "https://cdn-icons-png.flaticon.com/128/2965/2965315.png",
-      "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "any"
     }
   ],
-  "screenshots": [
-    {
-      "src": "https://via.placeholder.com/540x720/0056b3/ffffff?text=PecheurConnect",
-      "sizes": "540x720",
-      "type": "image/png",
-      "form_factor": "narrow"
-    },
-    {
-      "src": "https://via.placeholder.com/1280x720/0056b3/ffffff?text=PecheurConnect",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Carte",
-      "short_name": "Carte",
-      "description": "Voir la carte des zones",
-      "url": "./index.html",
-      "icons": [{ "src": "https://cdn-icons-png.flaticon.com/128/2965/2965315.png", "sizes": "128x128" }]
-    },
-    {
-      "name": "Historique",
-      "short_name": "Stats",
-      "description": "Consulter l'historique",
-      "url": "./history.html",
-      "icons": [{ "src": "https://cdn-icons-png.flaticon.com/128/2965/2965315.png", "sizes": "128x128" }]
-    },
-    {
-      "name": "Comparateur",
-      "short_name": "Comparer",
-      "description": "Comparer les zones",
-      "url": "./comparator.html",
-      "icons": [{ "src": "https://cdn-icons-png.flaticon.com/128/2965/2965315.png", "sizes": "128x128" }]
-    }
-  ],
-  "share_target": {
-    "action": "./index.html",
-    "method": "GET",
-    "enctype": "application/x-www-form-urlencoded",
-    "params": {
-      "title": "title",
-      "text": "text",
-      "url": "url"
-    }
-  },
-  "related_applications": [],
-  "prefer_related_applications": false
+  "start_url": "./index.html",
+  "display": "standalone",
+  "theme_color": "#0a1628",
+  "background_color": "#0a1628",
+  "orientation": "portrait",
+  "categories": ["weather", "navigation", "safety"]
 }
