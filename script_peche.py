@@ -21,6 +21,14 @@ from dataclasses import dataclass, asdict
 from concurrent.futures import ThreadPoolExecutor
 from typing import Optional
 
+# Charge automatiquement le fichier .env en développement local
+# En production (GitHub Actions), les variables sont injectées directement
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # python-dotenv absent — normal en CI si non installé
+
 # ============================================================================
 # 1. CONFIGURATION ET LOGGING
 # ============================================================================
