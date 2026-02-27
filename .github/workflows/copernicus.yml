@@ -8,7 +8,7 @@ on:
 jobs:
   update-data:
     runs-on: ubuntu-latest
-    timeout-minutes: 30  # ✅ Évite les jobs bloqués indéfiniment
+    timeout-minutes: 30
 
     permissions:
       contents: write
@@ -21,7 +21,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: "pip"  # Cache basé sur requirements.txt automatiquement
+          cache: "pip"
 
       - name: 📁 Prepare Directories
         run: mkdir -p logs/history logs/stats
@@ -29,41 +29,77 @@ jobs:
       - name: 📦 Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt  # ✅ Versions épinglées, cache efficace
+          pip install -r requirements.txt
+
+      - name: 🔍 Debug secrets (noms uniquement, jamais les valeurs)
+        run: |
+          echo "TELEGRAM_BOT_TOKEN défini : ${{ secrets.TELEGRAM_BOT_TOKEN != '' }}"
+          echo "TG_ID défini             : ${{ secrets.TG_ID != '' }}"
+          echo "COPERNICUS_USERNAME      : ${{ secrets.COPERNICUS_USERNAME != '' }}"
+          echo "OPENWEATHER_API_KEY      : ${{ secrets.OPENWEATHER_API_KEY != '' }}"
 
       - name: 🌊 Run PecheurConnect Script
-        timeout-minutes: 20  # ✅ Timeout spécifique au script
+        timeout-minutes: 20
         env:
-          # ✅ Secrets unifiés — cohérents avec le script optimisé
+          # ── Telegram ──────────────────────────────────────────────
+          # Le script accepte TELEGRAM_BOT_TOKEN ou TG_TOKEN (fallback)
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TG_ID:               ${{ secrets.TG_ID }}
+          TG_TOKEN:           ${{ secrets.TG_TOKEN }}           # ancien nom — conservé pour compatibilité
+          TG_ID:              ${{ secrets.TG_ID }}
+          # ── Copernicus ────────────────────────────────────────────
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
+          # ── OpenWeather ───────────────────────────────────────────
           OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
         run: python script_peche.py
 
       - name: ✅ Verify Outputs
         run: |
-          for f in data.json seasonality_data.json; do
-            if [ -f "$f" ]; then
-              echo "✅ $f généré ($(wc -c < $f) octets)"
-            else
-              echo "⚠️  $f absent — non bloquant"
-            fi
-          done
-
-          # Seul data.json est obligatoire
-          [ -f data.json ] || { echo "❌ data.json manquant — arrêt."; exit 1; }
+          if [ -f data.json ]; then
+            echo "✅ data.json généré ($(wc -c < data.json) octets)"
+            # Afficher les stats sans exposer de données sensibles
+            python -c "
+          import json
+          with open('data.json') as f:
+              d = json.load(f)
+          s = d.get('stats', {})
+          print(f\"  Zones : {d['meta']['total_zones']}\")
+          print(f\"  Score moyen : {s.get('score_moyen', '?')}/10\")
+          print(f\"  Danger : {s.get('zones_count', {}).get('danger', 0)} zones\")
+          print(f\"  Sources : {d['meta']['sources']}\")
+            "
+          else
+            echo "❌ data.json manquant — arrêt."
+            exit 1
+          fi
 
       - name: 💾 Commit and Push
         run: |
           git config user.name  "PecheurConnect Bot"
           git config user.email "bot@pecheurconnect.sn"
 
-          # ✅ Logs exclus du commit — seulement les données utiles
           git add data.json
-          [ -f seasonality_data.json ] && git add seasonality_data.json
+          [ -f seasonality_data.json ] && git add seasonality_data.json || true
 
           git diff --staged --quiet || \
             git commit -m "🌊 Update $(date -u '+%Y-%m-%d %H:%M UTC')" && \
             git push
+
+      - name: 🔔 Notify failure on Telegram
+        if: failure()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_TOKEN:           ${{ secrets.TG_TOKEN }}
+          TG_ID:              ${{ secrets.TG_ID }}
+        run: |
+          TOKEN="${TELEGRAM_BOT_TOKEN:-$TG_TOKEN}"
+          if [ -n "$TOKEN" ] && [ -n "$TG_ID" ]; then
+            curl -s -X POST "https://api.telegram.org/bot${TOKEN}/sendMessage" \
+              -d chat_id="${TG_ID}" \
+              -d parse_mode="HTML" \
+              -d text="⚠️ <b>PecheurConnect</b> — Échec du workflow GitHub Actions
+          🕑 $(date -u '+%Y-%m-%d %H:%M UTC')
+          🔗 Vérifiez les logs : ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          else
+            echo "Telegram non configuré — notification ignorée."
+          fi
