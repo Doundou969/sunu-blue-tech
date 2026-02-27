@@ -141,11 +141,17 @@ def calculate_indices(wave: float, temp: float, current: float) -> IndicesMariti
     Returns:
         IndicesMaritime avec codes de sécurité et score de pêche
     """
-    # --- Sécurité ---
+    # --- Sécurité — 4 niveaux cohérents avec le frontend ---
+    # safe     : wave <= 1.0 m  → 🟢 Mer calme
+    # caution  : wave <= 1.5 m  → 🟡 Mer agitée légère
+    # warning  : wave <= 2.5 m  → 🟠 Mer formée
+    # danger   : wave >  2.5 m  → 🔴 Mer agitée / dangereuse
     if wave > 2.5:
         s_text, s_code = "🔴 DANGER — Mer agitée", "danger"
     elif wave > 1.5:
-        s_text, s_code = "🟡 PRUDENCE — Mer formée", "caution"
+        s_text, s_code = "🟠 PRUDENCE — Mer formée", "warning"
+    elif wave > 1.0:
+        s_text, s_code = "🟡 VIGILANCE — Mer légèrement agitée", "caution"
     else:
         s_text, s_code = "🟢 FAVORABLE — Mer calme", "safe"
 
@@ -426,6 +432,7 @@ def save_data_json(results: list[dict]) -> None:
             "zones_danger":  danger_zones,
             "zones_count":   {
                 "danger":  sum(1 for r in results if r["indices"]["securite_code"] == "danger"),
+                "warning": sum(1 for r in results if r["indices"]["securite_code"] == "warning"),
                 "caution": sum(1 for r in results if r["indices"]["securite_code"] == "caution"),
                 "safe":    sum(1 for r in results if r["indices"]["securite_code"] == "safe"),
             }
@@ -492,8 +499,9 @@ def build_telegram_report(results: list[dict], stats: dict) -> str:
 
     lines.append("")
     lines.append(
-        f"✅ Safe: {stats['zones_count']['safe']} | "
-        f"⚠️ Caution: {stats['zones_count']['caution']} | "
+        f"🟢 Safe: {stats['zones_count']['safe']} | "
+        f"🟡 Vigilance: {stats['zones_count']['caution']} | "
+        f"🟠 Prudence: {stats['zones_count']['warning']} | "
         f"🔴 Danger: {stats['zones_count']['danger']}"
     )
 
@@ -547,6 +555,7 @@ async def main():
         "zones_danger": [r["zone"] for r in results if r["indices"]["securite_code"] == "danger"],
         "zones_count":  {
             "danger":  sum(1 for r in results if r["indices"]["securite_code"] == "danger"),
+            "warning": sum(1 for r in results if r["indices"]["securite_code"] == "warning"),
             "caution": sum(1 for r in results if r["indices"]["securite_code"] == "caution"),
             "safe":    sum(1 for r in results if r["indices"]["securite_code"] == "safe"),
         }
