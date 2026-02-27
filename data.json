@@ -6,12 +6,12 @@
     "v_now": 1.1,
     "t_now": 20.5,
     "c_now": 0.25,
-    "wind_speed": 3.09,
-    "weather_desc": "couvert",
+    "wind_speed": 5.14,
+    "weather_desc": "ciel dégagé",
     "safety": "🟢 SÛR",
     "safety_level": "safe",
     "fish_index": 80,
-    "date": "27/02 06:39"
+    "date": "27/02 12:33"
   },
   {
     "zone": "KAYAR",
@@ -20,12 +20,12 @@
     "v_now": 1.1,
     "t_now": 20.5,
     "c_now": 0.25,
-    "wind_speed": 11.19,
-    "weather_desc": "couvert",
+    "wind_speed": 9.13,
+    "weather_desc": "peu nuageux",
     "safety": "🟢 SÛR",
     "safety_level": "safe",
     "fish_index": 80,
-    "date": "27/02 06:39"
+    "date": "27/02 12:33"
   },
   {
     "zone": "DAKAR-YOFF",
@@ -34,12 +34,12 @@
     "v_now": 1.1,
     "t_now": 20.5,
     "c_now": 0.25,
-    "wind_speed": 5.14,
+    "wind_speed": 9.77,
     "weather_desc": "ciel dégagé",
     "safety": "🟢 SÛR",
     "safety_level": "safe",
     "fish_index": 80,
-    "date": "27/02 06:39"
+    "date": "27/02 12:33"
   },
   {
     "zone": "MBOUR-JOAL",
@@ -48,12 +48,12 @@
     "v_now": 1.1,
     "t_now": 20.5,
     "c_now": 0.25,
-    "wind_speed": 7.63,
-    "weather_desc": "couvert",
+    "wind_speed": 6.68,
+    "weather_desc": "partiellement nuageux",
     "safety": "🟢 SÛR",
     "safety_level": "safe",
     "fish_index": 80,
-    "date": "27/02 06:39"
+    "date": "27/02 12:33"
   },
   {
     "zone": "CASAMANCE-ZIGUINCHOR",
@@ -62,11 +62,11 @@
     "v_now": 1.1,
     "t_now": 20.5,
     "c_now": 0.25,
-    "wind_speed": 6.6,
-    "weather_desc": "nuageux",
+    "wind_speed": 8.06,
+    "weather_desc": "couvert",
     "safety": "🟢 SÛR",
     "safety_level": "safe",
     "fish_index": 80,
-    "date": "27/02 06:39"
+    "date": "27/02 12:33"
   }
 ]
