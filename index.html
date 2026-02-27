@@ -3,62 +3,299 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PecheurConnect - Tableau de Bord</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body class="bg-slate-900 text-white font-sans">
+    <meta name="description" content="PecheurConnect — Sécurité maritime en temps réel pour les pêcheurs sénégalais. 18 zones surveillées 24h/24.">
+    <meta name="theme-color" content="#0a1628">
 
-    <nav class="p-4 bg-blue-800 shadow-lg mb-6">
-        <h1 class="text-2xl font-bold text-center">🌊 PECHEURCONNECT v3.1</h1>
-        <p class="text-center text-xs opacity-80">Données Copernicus Marine & OpenWeather</p>
-    </nav>
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="PecheurConnect">
 
-    <main class="container mx-auto px-4">
-        <div id="status-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            </div>
+    <meta property="og:title"       content="PecheurConnect 🇸🇳">
+    <meta property="og:description" content="Sécurité maritime en temps réel — 18 zones au Sénégal">
+    <meta property="og:type"        content="website">
 
-        <div class="mt-10 bg-slate-800 p-6 rounded-xl shadow-xl">
-            <h2 class="text-xl font-semibold mb-4 text-blue-400">📈 Tendances des Vagues (7 derniers jours)</h2>
-            <canvas id="trendChart" class="w-full h-64"></canvas>
-        </div>
-    </main>
+    <title>PecheurConnect v3.0 🇸🇳 | Sécurité Maritime Sénégal</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
 
-    <script>
-        // Fonction pour charger les données
-        async function loadDashboard() {
-            try {
-                const response = await fetch('data.json');
-                const data = await response.json();
-                const grid = document.getElementById('status-grid');
+    <link rel="manifest" href="./manifest.json">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0"></script>
 
-                data.forEach(zone => {
-                    const card = document.createElement('div');
-                    card.className = "p-5 rounded-lg border-l-8 bg-slate-800 " + 
-                                   (zone.safety_level === 'safe' ? 'border-green-500' : 'border-red-500');
-                    
-                    card.innerHTML = `
-                        <div class="flex justify-between items-start">
-                            <h3 class="text-lg font-bold">${zone.zone}</h3>
-                            <span class="text-xs px-2 py-1 bg-slate-700 rounded">${zone.region}</span>
-                        </div>
-                        <p class="text-3xl font-black my-2">${zone.v_now}m <span class="text-sm font-normal text-slate-400">🌊</span></p>
-                        <div class="flex justify-between text-sm">
-                            <span>🌡️ ${zone.t_now}°C</span>
-                            <span>💨 ${zone.wind_speed}m/s</span>
-                        </div>
-                        <div class="mt-4 font-bold text-center py-2 rounded bg-slate-900">
-                            ${zone.safety}
-                        </div>
-                    `;
-                    grid.appendChild(card);
-                });
-            } catch (err) {
-                console.error("Erreur de chargement des données:", err);
-            }
+    <style>
+        :root {
+            --primary:    #0056b3;
+            --primary-dk: #003d7a;
+            --primary-lt: #1a73e8;
+            --accent:      #00d4ff;
+            --accent2:    #00ff9d;
+            --safe:        #00c853;
+            --caution:    #ffd600;
+            --warning:    #ff6d00;
+            --danger:     #d50000;
+            --dark:       #0a1628;
+            --panel:      rgba(8,18,36,0.88);
+            --border:     rgba(255,255,255,0.10);
+            --text:       rgba(255,255,255,0.90);
+            --text-dim:   rgba(255,255,255,0.50);
+            --radius:     12px;
+            --radius-sm:  8px;
+            --shadow:     0 8px 32px rgba(0,0,0,0.35);
+            --shadow-sm:  0 3px 12px rgba(0,0,0,0.25);
         }
 
-        loadDashboard();
-    </script>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; overflow: hidden; background: var(--dark); color: var(--text); font-family: 'DM Sans', sans-serif; }
+
+        #map { position: fixed; inset: 0; z-index: 1; }
+
+        /* LOADING SCREEN */
+        #loadingScreen {
+            position: fixed; inset: 0; z-index: 9999; background: var(--dark);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.7s ease, visibility 0.7s ease;
+        }
+        #loadingScreen.hide { opacity: 0; visibility: hidden; }
+        .ls-wave { font-size: 52px; margin-bottom: 12px; animation: bob 2s ease-in-out infinite; }
+        @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        .ls-title { font-family: 'Syne', sans-serif; font-size: 30px; font-weight: 800; color: white; margin-bottom: 6px; }
+        .ls-bar-wrap { width: 220px; height: 3px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; margin-bottom: 14px; }
+        .ls-bar { height: 100%; width: 0; background: linear-gradient(90deg, var(--primary-lt), var(--accent)); animation: bar-fill 2.2s ease forwards; }
+        @keyframes bar-fill { 0% { width: 0%; } 100% { width: 100%; } }
+
+        /* PANELS */
+        .left-panel { position: fixed; top: 16px; left: 16px; z-index: 500; width: 302px; display: flex; flex-direction: column; gap: 10px; }
+        .brand-card { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dk) 100%); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,0.12); }
+        .brand-name { font-family: 'Syne', sans-serif; font-size: 19px; font-weight: 800; color: white; }
+        .nav-card { background: var(--panel); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-radius: var(--radius); padding: 10px; box-shadow: var(--shadow); border: 1px solid var(--border); display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; padding: 9px 4px; border-radius: var(--radius-sm); background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.72); text-decoration: none; font-size: 10px; }
+        .nav-item.current { background: rgba(0,86,179,0.4); border-color: var(--primary-lt); color: white; }
+        
+        /* FILTERS & SEARCH */
+        .filter-card, .search-card { background: var(--panel); backdrop-filter: blur(18px); border-radius: var(--radius); padding: 12px; border: 1px solid var(--border); }
+        .filter-pills { display: flex; flex-wrap: wrap; gap: 5px; }
+        .pill { padding: 5px 11px; background: rgba(255,255,255,0.07); border-radius: 20px; font-size: 11px; cursor: pointer; }
+        .pill.active { background: var(--primary); color: white; }
+        .search-input { width: 100%; background: transparent; border: none; color: white; outline: none; font-size: 13px; }
+
+        /* STATS */
+        .stats-panel { position: fixed; bottom: 24px; left: 16px; z-index: 500; background: var(--panel); backdrop-filter: blur(18px); border-radius: var(--radius); padding: 14px; min-width: 272px; }
+        .safety-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .safety-box { background: rgba(255,255,255,0.05); border-radius: var(--radius-sm); padding: 9px 5px; text-align: center; }
+        .safety-num { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; }
+        .safety-num.s { color: var(--safe); } .safety-num.d { color: var(--danger); }
+        .safety-lbl { font-size: 9px; color: var(--text-dim); text-transform: uppercase; }
+
+        /* FABs */
+        .fab-group { position: fixed; right: 16px; bottom: 24px; z-index: 500; display: flex; flex-direction: column; gap: 10px; }
+        .fab { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 19px; cursor: pointer; border: none; box-shadow: var(--shadow); }
+        .fab-wa { background: #25D366; color: white; text-decoration: none; }
+        .fab-ref { background: var(--primary); color: white; }
+
+        /* MARKERS & POPUPS */
+        .mk-bubble { background: transparent; }
+        .mk-inner { color: white; padding: 7px; border-radius: 22px; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 13px; border: 2.5px solid white; text-align: center; min-width: 60px; box-shadow: var(--shadow); }
+        .leaflet-popup-content-wrapper { border-radius: 14px !important; padding: 0 !important; overflow: hidden; background: white !important; }
+        .pu { color: #333; }
+        .pu-head { padding: 15px; color: white; }
+        .pu-body { padding: 15px; }
+        .pu-metric { background: #f4f7fb; border-radius: 8px; padding: 10px; text-align: center; }
+        .pu-mval { font-size: 20px; font-weight: 800; color: var(--primary); font-family: 'Syne'; }
+        .pu-safety { padding: 10px; border-radius: 8px; color: white; text-align: center; font-weight: 800; margin: 10px 0; }
+        .pu-btn { display: block; padding: 10px; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 12px; margin-top: 5px; }
+        .pu-btn-wa { background: #25D366; color: white; }
+
+        /* SW INDICATOR */
+        .sw-indicator { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--text-dim); margin-top: 8px; }
+        .sw-dot { width: 6px; height: 6px; border-radius: 50%; background: #888; }
+        .sw-dot.online { background: var(--safe); }
+        .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+
+        @media (max-width: 768px) {
+            .left-panel { left: 10px; right: 10px; width: auto; }
+            .stats-panel { right: 70px; left: 10px; min-width: auto; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="loadingScreen">
+    <div class="ls-wave">🌊</div>
+    <div class="ls-title">PecheurConnect</div>
+    <div class="ls-bar-wrap"><div class="ls-bar"></div></div>
+    <div class="ls-status" id="lsStatus">Connexion aux satellites...</div>
+</div>
+
+<div id="map"></div>
+
+<div class="left-panel">
+    <div class="brand-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
+            <span class="brand-name">🌊 PecheurConnect</span>
+            <span style="font-size:10px; background:rgba(255,255,255,0.2); padding:2px 6px; border-radius:10px">v3.0</span>
+        </div>
+        <div style="display:flex; gap:5px; font-size:11px">
+            <div style="background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:10px">🕑 <span id="lastUpdate">--:--</span></div>
+            <div style="background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:10px">📍 Sénégal</div>
+        </div>
+        <div class="sw-indicator">
+            <div class="sw-dot" id="swDot"></div> <span id="swLabel">Service Worker...</span>
+        </div>
+    </div>
+
+    <div class="nav-card">
+        <a class="nav-item current" href="#">🗺️<br>Carte</a>
+        <a class="nav-item" href="history.html">📊<br>Stats</a>
+        <a class="nav-item" href="alerts-settings.html">🔔<br>Alertes</a>
+        <a class="nav-item" href="https://wa.me/221777020818">📱<br>SOS</a>
+    </div>
+
+    <div class="filter-card">
+        <div class="filter-pills">
+            <div class="pill active" data-region="all" onclick="doFilter(this)">Tout</div>
+            <div class="pill" data-region="Nord" onclick="doFilter(this)">Nord</div>
+            <div class="pill" data-region="Dakar" onclick="doFilter(this)">Dakar</div>
+            <div class="pill" data-region="Petite Côte" onclick="doFilter(this)">P.Côte</div>
+            <div class="pill" data-region="Casamance" onclick="doFilter(this)">Casamance</div>
+        </div>
+    </div>
+
+    <div class="search-card">
+        <input type="text" id="searchInput" class="search-input" placeholder="Rechercher une zone..." oninput="doSearch(this.value)">
+    </div>
+</div>
+
+<div class="stats-panel">
+    <div style="display:flex; align-items:center; gap:5px; margin-bottom:10px; font-size:11px; color:var(--accent2)">
+        <div class="live-dot"></div> Direct Mer
+    </div>
+    <div class="safety-row">
+        <div class="safety-box"><div class="safety-num s" id="cntSafe">0</div><div class="safety-lbl">Sûr</div></div>
+        <div class="safety-box"><div class="safety-num" id="cntCaution" style="color:var(--caution)">0</div><div class="safety-lbl">Vig.</div></div>
+        <div class="safety-box"><div class="safety-num" id="cntWarning" style="color:var(--warning)">0</div><div class="safety-lbl">Prud.</div></div>
+        <div class="safety-box"><div class="safety-num d" id="cntDanger">0</div><div class="safety-lbl">Danger</div></div>
+    </div>
+</div>
+
+<div class="fab-group">
+    <a class="fab fab-wa" href="https://wa.me/221777020818" target="_blank">📱</a>
+    <button class="fab fab-ref" onclick="location.reload()">🔄</button>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+<script>
+    let map, clusterLayer, allZones = [];
+
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', () => {
+        initMap();
+        loadData();
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js').then(() => {
+                document.getElementById('swDot').classList.add('online');
+                document.getElementById('swLabel').innerText = "Mode Hors-ligne OK";
+            });
+        }
+    });
+
+    function initMap() {
+        map = L.map('map', { center: [14.6, -17.2], zoom: 8, zoomControl: false });
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '© OpenStreetMap | PecheurConnect'
+        }).addTo(map);
+
+        clusterLayer = L.markerClusterGroup({
+            iconCreateFunction: (cluster) => L.divIcon({
+                html: `<div class="mk-inner" style="background:var(--primary)">${cluster.getChildCount()}</div>`,
+                className: 'mk-bubble', iconSize: [40, 40]
+            })
+        }).addTo(map);
+    }
+
+    async function loadData() {
+        try {
+            const res = await fetch('data.json');
+            allZones = await res.json();
+            renderMarkers(allZones);
+            updateStats(allZones);
+            if(allZones.length > 0) document.getElementById('lastUpdate').innerText = allZones[0].date.split(' ')[1];
+            
+            setTimeout(() => document.getElementById('loadingScreen').classList.add('hide'), 1000);
+        } catch (e) {
+            document.getElementById('lsStatus').innerText = "Erreur de chargement...";
+        }
+    }
+
+    function renderMarkers(data) {
+        clusterLayer.clearLayers();
+        data.forEach(z => {
+            const color = z.safety_level === 'danger' ? 'var(--danger)' : (z.safety_level === 'warning' ? 'var(--warning)' : 'var(--safe)');
+            const icon = L.divIcon({
+                className: 'mk-bubble',
+                html: `<div class="mk-inner" style="background:${color}"><div style="font-size:15px">${z.v_now}m</div><div style="font-size:8px">${z.zone}</div></div>`
+            });
+
+            const lat = getCoords(z.zone).lat;
+            const lon = getCoords(z.zone).lon;
+            const marker = L.marker([lat, lon], { icon });
+
+            marker.bindPopup(`
+                <div class="pu">
+                    <div class="pu-head" style="background:${color}">
+                        <div style="font-weight:800; font-size:18px">${z.zone}</div>
+                        <div style="font-size:11px opacity:0.8">${z.region}</div>
+                    </div>
+                    <div class="pu-body">
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
+                            <div class="pu-metric"><div class="pu-mval">${z.v_now}m</div><div style="font-size:10px">Houle</div></div>
+                            <div class="pu-metric"><div class="pu-mval">${z.t_now}°</div><div style="font-size:10px">Mer</div></div>
+                        </div>
+                        <div class="pu-safety" style="background:${color}">${z.safety}</div>
+                        <div style="text-align:center; font-size:12px; color:#666; margin-bottom:10px">🐟 Indice Pêche: <b>${z.fish_index}/100</b></div>
+                        <a href="https://wa.me/221777020818" class="pu-btn pu-btn-wa">Partager sur WhatsApp</a>
+                    </div>
+                </div>
+            `, { maxWidth: 280 });
+
+            clusterLayer.addLayer(marker);
+        });
+    }
+
+    function updateStats(data) {
+        document.getElementById('cntSafe').innerText = data.filter(z => z.safety_level === 'safe').length;
+        document.getElementById('cntCaution').innerText = data.filter(z => z.safety_level === 'warning').length;
+        document.getElementById('cntWarning').innerText = data.filter(z => z.safety_level === 'caution').length;
+        document.getElementById('cntDanger').innerText = data.filter(z => z.safety_level === 'danger').length;
+    }
+
+    function doFilter(el) {
+        document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+        el.classList.add('active');
+        const reg = el.getAttribute('data-region');
+        renderMarkers(reg === 'all' ? allZones : allZones.filter(z => z.region === reg));
+    }
+
+    function doSearch(q) {
+        const filtered = allZones.filter(z => z.zone.toLowerCase().includes(q.toLowerCase()));
+        renderMarkers(filtered);
+    }
+
+    function getCoords(name) {
+        const db = {
+            "SAINT-LOUIS": {lat:16.05, lon:-16.50},
+            "KAYAR": {lat:14.92, lon:-17.12},
+            "DAKAR-YOFF": {lat:14.76, lon:-17.48},
+            "MBOUR-JOAL": {lat:14.30, lon:-17.00},
+            "CASAMANCE-ZIGUINCHOR": {lat:12.58, lon:-16.27}
+        };
+        return db[name] || {lat: 14.6, lon: -17.2};
+    }
+</script>
 </body>
 </html>
