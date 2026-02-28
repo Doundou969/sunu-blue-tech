@@ -1,22 +1,22 @@
 # ============================================================
 # PecheurConnect v3.0 — Requirements
-# Généré pour Python 3.11 / Ubuntu Latest (GitHub Actions)
-# Mise à jour : 2025-06
-# Pour régénérer : pip-compile requirements.in
+# Python 3.11 / Ubuntu Latest (GitHub Actions)
 # ============================================================
 
 # --- Core Async ---
-aiohttp==3.9.5          # Client HTTP async — appels OpenWeather + Telegram
+aiohttp==3.9.5
 
 # --- Variables d'environnement (tests locaux) ---
-python-dotenv==1.0.1    # Chargement .env en local uniquement
+python-dotenv==1.0.1
 
 # --- Données Marines & Copernicus ---
-copernicusmarine==1.3.3 # API Copernicus Marine Service
-xarray==2024.2.0        # Manipulation des datasets NetCDF/Zarr
-zarr==2.17.1            # Backend streaming pour copernicusmarine
-numpy==1.26.4           # Calculs vectoriels (indices halieutiques)
-pandas==2.2.1           # Agrégation temporelle des séries marines
+# Note : 1.3.3 est yanked (retirée par le mainteneur).
+# On utilise >=1.3.4 pour prendre la première version stable suivante.
+# Si vous connaissez la version exacte disponible sur votre machine,
+# remplacez par copernicusmarine==X.Y.Z
+copernicusmarine>=1.3.4
 
-# --- Lecture fichiers .nc locaux (optionnel — commenter si inutile) ---
-# netCDF4==1.6.5
+xarray==2024.2.0
+zarr==2.17.1
+numpy==1.26.4
+pandas==2.2.1
