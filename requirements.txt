@@ -1,6 +1,7 @@
 # ============================================================
 # PecheurConnect v3.0 — Requirements
 # Python 3.11 / Ubuntu Latest (GitHub Actions)
+# Mis à jour : fix conflit numcodecs/zarr/copernicusmarine
 # ============================================================
 
 # --- Core Async ---
@@ -10,13 +11,14 @@ aiohttp==3.9.5
 python-dotenv==1.0.1
 
 # --- Données Marines & Copernicus ---
-# Note : 1.3.3 est yanked (retirée par le mainteneur).
-# On utilise >=1.3.4 pour prendre la première version stable suivante.
-# Si vous connaissez la version exacte disponible sur votre machine,
-# remplacez par copernicusmarine==X.Y.Z
-copernicusmarine>=1.3.4
+# copernicusmarine 2.3.0 requiert numcodecs>=0.12 compatible
+# Ne pas épingler zarr ni numcodecs — laisser pip résoudre le conflit
+copernicusmarine==2.3.0
 
+# --- Traitement données ---
 xarray==2024.2.0
-zarr==2.17.1
 numpy==1.26.4
 pandas==2.2.1
+
+# zarr et numcodecs NON épinglés — versions résolues par copernicusmarine
+# zarr==2.17.1 causait : ImportError: cannot import name 'cbuffer_sizes'
