@@ -64,6 +64,10 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TG_TOKEN:           ${{ secrets.TG_TOKEN }}
           TG_ID:              ${{ secrets.TG_ID }}
+          # copernicusmarine v2.x lit ces noms exactement
+          COPERNICUSMARINE_SERVICE_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
+          COPERNICUSMARINE_SERVICE_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
+          # Fallback anciens noms pour compatibilité script
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
           OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
