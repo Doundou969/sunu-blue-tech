@@ -3,7 +3,7 @@ name: PecheurConnect Update
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 */6 * * *"  # Toutes les 6h UTC
+    - cron: "0 */6 * * *"
 
 jobs:
   update-data:
@@ -31,25 +31,41 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: 🔍 Debug secrets (noms uniquement, jamais les valeurs)
+      - name: 🔍 Debug secrets (noms uniquement)
         run: |
           echo "TELEGRAM_BOT_TOKEN défini : ${{ secrets.TELEGRAM_BOT_TOKEN != '' }}"
           echo "TG_ID défini             : ${{ secrets.TG_ID != '' }}"
           echo "COPERNICUS_USERNAME      : ${{ secrets.COPERNICUS_USERNAME != '' }}"
           echo "OPENWEATHER_API_KEY      : ${{ secrets.OPENWEATHER_API_KEY != '' }}"
 
+      - name: 🔬 Diagnostic copernicusmarine
+        run: |
+          echo "=== Version installée ==="
+          pip show copernicusmarine | grep -E "Name|Version|Location"
+          echo ""
+          echo "=== Test import direct ==="
+          python -c "
+          import sys
+          print('Python:', sys.version)
+          try:
+              import copernicusmarine as cm
+              print('OK Import — version:', cm.__version__)
+          except ImportError as e:
+              print('FAIL ImportError:', e)
+          except Exception as e:
+              import traceback
+              print('FAIL', type(e).__name__, ':', e)
+              traceback.print_exc()
+          "
+
       - name: 🌊 Run PecheurConnect Script
         timeout-minutes: 20
         env:
-          # ── Telegram ──────────────────────────────────────────────
-          # Le script accepte TELEGRAM_BOT_TOKEN ou TG_TOKEN (fallback)
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TG_TOKEN:           ${{ secrets.TG_TOKEN }}           # ancien nom — conservé pour compatibilité
+          TG_TOKEN:           ${{ secrets.TG_TOKEN }}
           TG_ID:              ${{ secrets.TG_ID }}
-          # ── Copernicus ────────────────────────────────────────────
           COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
           COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
-          # ── OpenWeather ───────────────────────────────────────────
           OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
         run: python script_peche.py
 
@@ -57,7 +73,6 @@ jobs:
         run: |
           if [ -f data.json ]; then
             echo "✅ data.json généré ($(wc -c < data.json) octets)"
-            # Afficher les stats sans exposer de données sensibles
             python -c "
           import json
           with open('data.json') as f:
@@ -77,10 +92,8 @@ jobs:
         run: |
           git config user.name  "PecheurConnect Bot"
           git config user.email "bot@pecheurconnect.sn"
-
           git add data.json
           [ -f seasonality_data.json ] && git add seasonality_data.json || true
-
           git diff --staged --quiet || \
             git commit -m "🌊 Update $(date -u '+%Y-%m-%d %H:%M UTC')" && \
             git push
@@ -97,9 +110,9 @@ jobs:
             curl -s -X POST "https://api.telegram.org/bot${TOKEN}/sendMessage" \
               -d chat_id="${TG_ID}" \
               -d parse_mode="HTML" \
-              -d text="⚠️ <b>PecheurConnect</b> — Échec du workflow GitHub Actions
+              -d text="⚠️ <b>PecheurConnect</b> — Échec workflow
           🕑 $(date -u '+%Y-%m-%d %H:%M UTC')
-          🔗 Vérifiez les logs : ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          🔗 ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           else
-            echo "Telegram non configuré — notification ignorée."
+            echo "Telegram non configuré."
           fi
