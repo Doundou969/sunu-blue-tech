@@ -1,23 +1,23 @@
 {
   "meta": {
     "version": "3.0",
-    "generated_at": "2026-02-27T23:58:13.815491Z",
+    "generated_at": "2026-02-28T00:58:22.269705Z",
     "total_zones": 18,
     "sources": [
       "simulation"
     ]
   },
   "stats": {
-    "score_moyen": 7.06,
-    "score_max": 9.0,
-    "score_min": 5.3,
+    "score_moyen": 7.29,
+    "score_max": 9.4,
+    "score_min": 5.4,
     "zones_danger": [
       "CASAMANCE-ZIGUINCHOR"
     ],
     "zones_count": {
       "danger": 1,
-      "warning": 6,
-      "caution": 3,
+      "warning": 4,
+      "caution": 5,
       "safe": 8
     }
   },
@@ -31,11 +31,11 @@
       "openweather": {
         "source": "openweather",
         "temp_air": 18.02,
-        "wind_speed": 6.17,
-        "wave_height": 0.94,
-        "humidity": 82,
+        "wind_speed": 3.09,
+        "wave_height": 0.24,
+        "humidity": 88,
         "weather_id": 800,
-        "timestamp": "2026-02-27T23:58:11.763406"
+        "timestamp": "2026-02-28T00:58:20.213071"
       },
       "copernicus": {
         "source": "simulation",
@@ -44,18 +44,18 @@
         "wave_height": 0.56,
         "current_speed": 0.251,
         "wind_speed": 3.12,
-        "timestamp": "2026-02-27T23:58:11.650514"
+        "timestamp": "2026-02-28T00:58:20.101958"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
         "securite_code": "safe",
-        "peche_score": 8.3,
+        "peche_score": 9.4,
         "peche_texte": "🎣 Excellentes conditions de pêche",
-        "wave": 0.94,
+        "wave": 0.24,
         "temp": 24.94,
         "current": 0.251
       },
-      "updated_at": "2026-02-27T23:58:11.763482"
+      "updated_at": "2026-02-28T00:58:20.213141"
     },
     "GANDON": {
       "zone": "GANDON",
@@ -66,11 +66,11 @@
       "openweather": {
         "source": "openweather",
         "temp_air": 18.01,
-        "wind_speed": 6.17,
-        "wave_height": 0.94,
-        "humidity": 82,
+        "wind_speed": 3.09,
+        "wave_height": 0.24,
+        "humidity": 88,
         "weather_id": 800,
-        "timestamp": "2026-02-27T23:58:11.763009"
+        "timestamp": "2026-02-28T00:58:20.215027"
       },
       "copernicus": {
         "source": "simulation",
@@ -79,18 +79,18 @@
         "wave_height": 1.17,
         "current_speed": 0.489,
         "wind_speed": 3.42,
-        "timestamp": "2026-02-27T23:58:11.650928"
+        "timestamp": "2026-02-28T00:58:20.102278"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
         "securite_code": "safe",
-        "peche_score": 7.1,
+        "peche_score": 8.2,
         "peche_texte": "🎣 Excellentes conditions de pêche",
-        "wave": 0.94,
+        "wave": 0.24,
         "temp": 25.94,
         "current": 0.489
       },
-      "updated_at": "2026-02-27T23:58:11.763076"
+      "updated_at": "2026-02-28T00:58:20.215099"
     },
     "SAINT-LOUIS-HYDROBASE": {
       "zone": "SAINT-LOUIS-HYDROBASE",
@@ -101,11 +101,11 @@
       "openweather": {
         "source": "openweather",
         "temp_air": 18.01,
-        "wind_speed": 6.17,
-        "wave_height": 0.94,
-        "humidity": 82,
+        "wind_speed": 3.09,
+        "wave_height": 0.24,
+        "humidity": 88,
         "weather_id": 800,
-        "timestamp": "2026-02-27T23:58:11.755954"
+        "timestamp": "2026-02-28T00:58:20.214238"
       },
       "copernicus": {
         "source": "simulation",
@@ -114,18 +114,18 @@
         "wave_height": 0.5,
         "current_speed": 0.381,
         "wind_speed": 3.91,
-        "timestamp": "2026-02-27T23:58:11.651132"
+        "timestamp": "2026-02-28T00:58:20.102466"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
         "securite_code": "safe",
-        "peche_score": 8.0,
+        "peche_score": 9.1,
         "peche_texte": "🎣 Excellentes conditions de pêche",
-        "wave": 0.94,
+        "wave": 0.24,
         "temp": 25.52,
         "current": 0.381
       },
-      "updated_at": "2026-02-27T23:58:11.756208"
+      "updated_at": "2026-02-28T00:58:20.214301"
     },
     "POTOU": {
       "zone": "POTOU",
@@ -135,12 +135,12 @@
       "lon": -16.55,
       "openweather": {
         "source": "openweather",
-        "temp_air": 17.72,
-        "wind_speed": 7.82,
-        "wave_height": 1.52,
-        "humidity": 85,
+        "temp_air": 17.65,
+        "wind_speed": 7.58,
+        "wave_height": 1.42,
+        "humidity": 87,
         "weather_id": 800,
-        "timestamp": "2026-02-27T23:58:11.767176"
+        "timestamp": "2026-02-28T00:58:20.209104"
       },
       "copernicus": {
         "source": "simulation",
@@ -149,18 +149,18 @@
         "wave_height": 1.05,
         "current_speed": 0.291,
         "wind_speed": 7.28,
-        "timestamp": "2026-02-27T23:58:11.651327"
+        "timestamp": "2026-02-28T00:58:20.102650"
       },
       "indices": {
-        "securite_texte": "🟠 PRUDENCE — Mer formée",
-        "securite_code": "warning",
-        "peche_score": 6.5,
+        "securite_texte": "🟡 VIGILANCE — Mer légèrement agitée",
+        "securite_code": "caution",
+        "peche_score": 6.6,
         "peche_texte": "🎣 Conditions acceptables",
-        "wave": 1.52,
+        "wave": 1.42,
         "temp": 22.22,
         "current": 0.291
       },
-      "updated_at": "2026-02-27T23:58:11.767271"
+      "updated_at": "2026-02-28T00:58:20.209362"
     },
     "LOMPOUL": {
       "zone": "LOMPOUL",
@@ -170,12 +170,12 @@
       "lon": -16.7,
       "openweather": {
         "source": "openweather",
-        "temp_air": 17.7,
-        "wind_speed": 7.76,
-        "wave_height": 1.49,
-        "humidity": 86,
+        "temp_air": 17.63,
+        "wind_speed": 7.71,
+        "wave_height": 1.47,
+        "humidity": 87,
         "weather_id": 800,
-        "timestamp": "2026-02-27T23:58:11.759472"
+        "timestamp": "2026-02-28T00:58:20.211001"
       },
       "copernicus": {
         "source": "simulation",
@@ -184,18 +184,18 @@
         "wave_height": 0.95,
         "current_speed": 0.172,
         "wind_speed": 2.6,
-        "timestamp": "2026-02-27T23:58:11.651501"
+        "timestamp": "2026-02-28T00:58:20.102836"
       },
       "indices": {
         "securite_texte": "🟡 VIGILANCE — Mer légèrement agitée",
         "securite_code": "caution",
         "peche_score": 6.8,
         "peche_texte": "🎣 Conditions acceptables",
-        "wave": 1.49,
+        "wave": 1.47,
         "temp": 26.26,
         "current": 0.172
       },
-      "updated_at": "2026-02-27T23:58:11.759589"
+      "updated_at": "2026-02-28T00:58:20.211072"
     },
     "KAYAR": {
       "zone": "KAYAR",
@@ -206,11 +206,11 @@
       "openweather": {
         "source": "openweather",
         "temp_air": 18.54,
-        "wind_speed": 9.45,
-        "wave_height": 2.21,
-        "humidity": 82,
+        "wind_speed": 9.6,
+        "wave_height": 2.29,
+        "humidity": 83,
         "weather_id": 800,
-        "timestamp": "2026-02-27T23:58:11.762740"
+        "timestamp": "2026-02-28T00:58:20.220497"
       },
       "copernicus": {
         "source": "simulation",
@@ -219,18 +219,18 @@
         "wave_height": 0.74,
         "current_speed": 0.267,
         "wind_speed": 5.12,
-        "timestamp": "2026-02-27T23:58:11.651700"
+        "timestamp": "2026-02-28T00:58:20.103015"
       },
       "indices": {
         "securite_texte": "🟠 PRUDENCE — Mer formée",
         "securite_code": "warning",
-        "peche_score": 6.1,
+        "peche_score": 6.0,
         "peche_texte": "🎣 Conditions acceptables",
-        "wave": 2.21,
+        "wave": 2.29,
         "temp": 25.3,
         "current": 0.267
       },
-      "updated_at": "2026-02-27T23:58:11.762898"
+      "updated_at": "2026-02-28T00:58:20.220564"
     },
     "DAKAR-YOFF": {
       "zone": "DAKAR-YOFF",
@@ -240,12 +240,12 @@
       "lon": -17.65,
       "openweather": {
         "source": "openweather",
-        "temp_air": 19.14,
-        "wind_speed": 5.14,
-        "wave_height": 0.66,
-        "humidity": 72,
+        "temp_air": 18.14,
+        "wind_speed": 4.12,
+        "wave_height": 0.42,
+        "humidity": 82,
         "weather_id": 800,
-        "timestamp": "2026-02-27T23:58:12.791910"
+        "timestamp": "2026-02-28T00:58:21.235690"
       },
       "copernicus": {
         "source": "simulation",
@@ -254,18 +254,18 @@
         "wave_height": 1.25,
         "current_speed": 0.47,
         "wind_speed": 4.15,
-        "timestamp": "2026-02-27T23:58:12.769722"
+        "timestamp": "2026-02-28T00:58:21.222813"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
         "securite_code": "safe",
-        "peche_score": 8.0,
+        "peche_score": 8.4,
         "peche_texte": "🎣 Excellentes conditions de pêche",
-        "wave": 0.66,
+        "wave": 0.42,
         "temp": 25.15,
         "current": 0.47
       },
-      "updated_at": "2026-02-27T23:58:12.791982"
+      "updated_at": "2026-02-28T00:58:21.235801"
     },
     "DAKAR-SOUMBEDIOUNE": {
       "zone": "DAKAR-SOUMBEDIOUNE",
@@ -276,11 +276,11 @@
       "openweather": {
         "source": "openweather",
         "temp_air": 18.49,
-        "wind_speed": 5.14,
-        "wave_height": 0.66,
-        "humidity": 85,
+        "wind_speed": 4.47,
+        "wave_height": 0.5,
+        "humidity": 86,
         "weather_id": 800,
-        "timestamp": "2026-02-27T23:58:12.786489"
+        "timestamp": "2026-02-28T00:58:21.234126"
       },
       "copernicus": {
         "source": "simulation",
@@ -289,18 +289,18 @@
         "wave_height": 0.83,
         "current_speed": 0.442,
         "wind_speed": 2.86,
-        "timestamp": "2026-02-27T23:58:12.770051"
+        "timestamp": "2026-02-28T00:58:21.223131"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
         "securite_code": "safe",
-        "peche_score": 7.6,
+        "peche_score": 7.9,
         "peche_texte": "🎣 Excellentes conditions de pêche",
-        "wave": 0.66,
+        "wave": 0.5,
         "temp": 26.11,
         "current": 0.442
       },
-      "updated_at": "2026-02-27T23:58:12.786599"
+      "updated_at": "2026-02-28T00:58:21.234258"
     },
     "DAKAR-HANN": {
       "zone": "DAKAR-HANN",
@@ -311,11 +311,11 @@
       "openweather": {
         "source": "openweather",
         "temp_air": 18.54,
-        "wind_speed": 5.14,
-        "wave_height": 0.66,
-        "humidity": 85,
+        "wind_speed": 4.47,
+        "wave_height": 0.5,
+        "humidity": 86,
         "weather_id": 800,
-        "timestamp": "2026-02-27T23:58:12.783537"
+        "timestamp": "2026-02-28T00:58:21.235165"
       },
       "copernicus": {
         "source": "simulation",
@@ -324,18 +324,18 @@
         "wave_height": 1.68,
         "current_speed": 0.205,
         "wind_speed": 4.01,
-        "timestamp": "2026-02-27T23:58:12.770522"
+        "timestamp": "2026-02-28T00:58:21.223369"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
         "securite_code": "safe",
-        "peche_score": 8.2,
+        "peche_score": 8.5,
         "peche_texte": "🎣 Excellentes conditions de pêche",
-        "wave": 0.66,
+        "wave": 0.5,
         "temp": 23.03,
         "current": 0.205
       },
-      "updated_at": "2026-02-27T23:58:12.783685"
+      "updated_at": "2026-02-28T00:58:21.235225"
     },
     "THIAROYE-SUR-MER": {
       "zone": "THIAROYE-SUR-MER",
@@ -346,11 +346,11 @@
       "openweather": {
         "source": "openweather",
         "temp_air": 18.45,
-        "wind_speed": 5.14,
-        "wave_height": 0.66,
-        "humidity": 85,
+        "wind_speed": 4.47,
+        "wave_height": 0.5,
+        "humidity": 86,
         "weather_id": 800,
-        "timestamp": "2026-02-27T23:58:12.784147"
+        "timestamp": "2026-02-28T00:58:21.235914"
       },
       "copernicus": {
         "source": "simulation",
@@ -359,18 +359,18 @@
         "wave_height": 0.89,
         "current_speed": 0.113,
         "wind_speed": 5.12,
-        "timestamp": "2026-02-27T23:58:12.770771"
+        "timestamp": "2026-02-28T00:58:21.223590"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
         "securite_code": "safe",
-        "peche_score": 8.7,
+        "peche_score": 8.9,
         "peche_texte": "🎣 Excellentes conditions de pêche",
-        "wave": 0.66,
+        "wave": 0.5,
         "temp": 23.9,
         "current": 0.113
       },
-      "updated_at": "2026-02-27T23:58:12.784208"
+      "updated_at": "2026-02-28T00:58:21.235972"
     },
     "MBOUR-JOAL": {
       "zone": "MBOUR-JOAL",
@@ -380,12 +380,12 @@
       "lon": -17.15,
       "openweather": {
         "source": "openweather",
-        "temp_air": 18.58,
-        "wind_speed": 9.51,
-        "wave_height": 2.24,
-        "humidity": 80,
-        "weather_id": 802,
-        "timestamp": "2026-02-27T23:58:12.783902"
+        "temp_air": 18.46,
+        "wind_speed": 9.37,
+        "wave_height": 2.18,
+        "humidity": 82,
+        "weather_id": 800,
+        "timestamp": "2026-02-28T00:58:21.234879"
       },
       "copernicus": {
         "source": "simulation",
@@ -394,18 +394,18 @@
         "wave_height": 0.54,
         "current_speed": 0.171,
         "wind_speed": 3.13,
-        "timestamp": "2026-02-27T23:58:12.770992"
+        "timestamp": "2026-02-28T00:58:21.223841"
       },
       "indices": {
         "securite_texte": "🟠 PRUDENCE — Mer formée",
         "securite_code": "warning",
-        "peche_score": 5.3,
+        "peche_score": 5.4,
         "peche_texte": "🎣 Conditions acceptables",
-        "wave": 2.24,
+        "wave": 2.18,
         "temp": 22.25,
         "current": 0.171
       },
-      "updated_at": "2026-02-27T23:58:12.783973"
+      "updated_at": "2026-02-28T00:58:21.234992"
     },
     "JOAL-FADIOUTH": {
       "zone": "JOAL-FADIOUTH",
@@ -415,12 +415,12 @@
       "lon": -16.85,
       "openweather": {
         "source": "openweather",
-        "temp_air": 18.52,
-        "wind_speed": 8.12,
-        "wave_height": 1.64,
-        "humidity": 72,
-        "weather_id": 802,
-        "timestamp": "2026-02-27T23:58:12.790973"
+        "temp_air": 18.21,
+        "wind_speed": 7.75,
+        "wave_height": 1.49,
+        "humidity": 75,
+        "weather_id": 800,
+        "timestamp": "2026-02-28T00:58:21.234484"
       },
       "copernicus": {
         "source": "simulation",
@@ -429,18 +429,18 @@
         "wave_height": 0.74,
         "current_speed": 0.453,
         "wind_speed": 2.72,
-        "timestamp": "2026-02-27T23:58:12.771217"
+        "timestamp": "2026-02-28T00:58:21.224076"
       },
       "indices": {
-        "securite_texte": "🟠 PRUDENCE — Mer formée",
-        "securite_code": "warning",
-        "peche_score": 6.3,
+        "securite_texte": "🟡 VIGILANCE — Mer légèrement agitée",
+        "securite_code": "caution",
+        "peche_score": 6.6,
         "peche_texte": "🎣 Conditions acceptables",
-        "wave": 1.64,
+        "wave": 1.49,
         "temp": 23.55,
         "current": 0.453
       },
-      "updated_at": "2026-02-27T23:58:12.791085"
+      "updated_at": "2026-02-28T00:58:21.234567"
     },
     "PALMARIN": {
       "zone": "PALMARIN",
@@ -450,12 +450,12 @@
       "lon": -16.8,
       "openweather": {
         "source": "openweather",
-        "temp_air": 18.81,
-        "wind_speed": 7.74,
-        "wave_height": 1.49,
-        "humidity": 70,
-        "weather_id": 802,
-        "timestamp": "2026-02-27T23:58:13.805251"
+        "temp_air": 18.56,
+        "wind_speed": 7.62,
+        "wave_height": 1.44,
+        "humidity": 73,
+        "weather_id": 800,
+        "timestamp": "2026-02-28T00:58:22.260053"
       },
       "copernicus": {
         "source": "simulation",
@@ -464,18 +464,18 @@
         "wave_height": 1.48,
         "current_speed": 0.408,
         "wind_speed": 7.03,
-        "timestamp": "2026-02-27T23:58:13.794376"
+        "timestamp": "2026-02-28T00:58:22.238134"
       },
       "indices": {
         "securite_texte": "🟡 VIGILANCE — Mer légèrement agitée",
         "securite_code": "caution",
-        "peche_score": 5.9,
+        "peche_score": 6.0,
         "peche_texte": "🎣 Conditions acceptables",
-        "wave": 1.49,
+        "wave": 1.44,
         "temp": 26.99,
         "current": 0.408
       },
-      "updated_at": "2026-02-27T23:58:13.805381"
+      "updated_at": "2026-02-28T00:58:22.260219"
     },
     "NDANGANE": {
       "zone": "NDANGANE",
@@ -485,12 +485,12 @@
       "lon": -16.65,
       "openweather": {
         "source": "openweather",
-        "temp_air": 19.34,
-        "wind_speed": 6.91,
-        "wave_height": 1.18,
-        "humidity": 58,
-        "weather_id": 803,
-        "timestamp": "2026-02-27T23:58:13.806081"
+        "temp_air": 18.99,
+        "wind_speed": 7.35,
+        "wave_height": 1.34,
+        "humidity": 63,
+        "weather_id": 800,
+        "timestamp": "2026-02-28T00:58:22.260127"
       },
       "copernicus": {
         "source": "simulation",
@@ -499,18 +499,18 @@
         "wave_height": 0.81,
         "current_speed": 0.18,
         "wind_speed": 7.36,
-        "timestamp": "2026-02-27T23:58:13.794706"
+        "timestamp": "2026-02-28T00:58:22.238374"
       },
       "indices": {
         "securite_texte": "🟡 VIGILANCE — Mer légèrement agitée",
         "securite_code": "caution",
-        "peche_score": 7.3,
+        "peche_score": 7.0,
         "peche_texte": "🎣 Excellentes conditions de pêche",
-        "wave": 1.18,
+        "wave": 1.34,
         "temp": 26.21,
         "current": 0.18
       },
-      "updated_at": "2026-02-27T23:58:13.806144"
+      "updated_at": "2026-02-28T00:58:22.260255"
     },
     "DJIFER": {
       "zone": "DJIFER",
@@ -520,12 +520,12 @@
       "lon": -16.75,
       "openweather": {
         "source": "openweather",
-        "temp_air": 19.5,
-        "wind_speed": 8.72,
-        "wave_height": 1.89,
-        "humidity": 70,
-        "weather_id": 803,
-        "timestamp": "2026-02-27T23:58:13.806957"
+        "temp_air": 19.34,
+        "wind_speed": 8.89,
+        "wave_height": 1.96,
+        "humidity": 72,
+        "weather_id": 801,
+        "timestamp": "2026-02-28T00:58:22.267513"
       },
       "copernicus": {
         "source": "simulation",
@@ -534,18 +534,18 @@
         "wave_height": 0.85,
         "current_speed": 0.396,
         "wind_speed": 7.95,
-        "timestamp": "2026-02-27T23:58:13.794940"
+        "timestamp": "2026-02-28T00:58:22.238609"
       },
       "indices": {
         "securite_texte": "🟠 PRUDENCE — Mer formée",
         "securite_code": "warning",
-        "peche_score": 6.3,
+        "peche_score": 6.2,
         "peche_texte": "🎣 Conditions acceptables",
-        "wave": 1.89,
+        "wave": 1.96,
         "temp": 25.93,
         "current": 0.396
       },
-      "updated_at": "2026-02-27T23:58:13.807020"
+      "updated_at": "2026-02-28T00:58:22.267580"
     },
     "KAFOUNTINE": {
       "zone": "KAFOUNTINE",
@@ -555,12 +555,12 @@
       "lon": -16.75,
       "openweather": {
         "source": "openweather",
-        "temp_air": 20.09,
-        "wind_speed": 9.04,
-        "wave_height": 2.03,
-        "humidity": 69,
-        "weather_id": 803,
-        "timestamp": "2026-02-27T23:58:13.813352"
+        "temp_air": 19.96,
+        "wind_speed": 8.67,
+        "wave_height": 1.86,
+        "humidity": 68,
+        "weather_id": 802,
+        "timestamp": "2026-02-28T00:58:22.265059"
       },
       "copernicus": {
         "source": "simulation",
@@ -569,18 +569,18 @@
         "wave_height": 0.64,
         "current_speed": 0.446,
         "wind_speed": 7.74,
-        "timestamp": "2026-02-27T23:58:13.795164"
+        "timestamp": "2026-02-28T00:58:22.238847"
       },
       "indices": {
         "securite_texte": "🟠 PRUDENCE — Mer formée",
         "securite_code": "warning",
-        "peche_score": 5.7,
+        "peche_score": 6.0,
         "peche_texte": "🎣 Conditions acceptables",
-        "wave": 2.03,
+        "wave": 1.86,
         "temp": 23.62,
         "current": 0.446
       },
-      "updated_at": "2026-02-27T23:58:13.813417"
+      "updated_at": "2026-02-28T00:58:22.265125"
     },
     "CASAMANCE-ZIGUINCHOR": {
       "zone": "CASAMANCE-ZIGUINCHOR",
@@ -591,11 +591,11 @@
       "openweather": {
         "source": "openweather",
         "temp_air": 21.12,
-        "wind_speed": 10.81,
-        "wave_height": 2.9,
-        "humidity": 72,
-        "weather_id": 804,
-        "timestamp": "2026-02-27T23:58:13.812926"
+        "wind_speed": 10.64,
+        "wave_height": 2.81,
+        "humidity": 71,
+        "weather_id": 801,
+        "timestamp": "2026-02-28T00:58:22.265533"
       },
       "copernicus": {
         "source": "simulation",
@@ -604,18 +604,18 @@
         "wave_height": 1.41,
         "current_speed": 0.29,
         "wind_speed": 4.99,
-        "timestamp": "2026-02-27T23:58:13.795393"
+        "timestamp": "2026-02-28T00:58:22.239065"
       },
       "indices": {
         "securite_texte": "🔴 DANGER — Mer agitée",
         "securite_code": "danger",
         "peche_score": 5.9,
         "peche_texte": "🎣 Conditions acceptables",
-        "wave": 2.9,
+        "wave": 2.81,
         "temp": 24.63,
         "current": 0.29
       },
-      "updated_at": "2026-02-27T23:58:13.813000"
+      "updated_at": "2026-02-28T00:58:22.265591"
     },
     "CAP-SKIRRING": {
       "zone": "CAP-SKIRRING",
@@ -626,11 +626,11 @@
       "openweather": {
         "source": "openweather",
         "temp_air": 21,
-        "wind_speed": 3.09,
-        "wave_height": 0.24,
+        "wind_speed": 5.14,
+        "wave_height": 0.66,
         "humidity": 78,
         "weather_id": 800,
-        "timestamp": "2026-02-27T23:58:13.807807"
+        "timestamp": "2026-02-28T00:58:22.264726"
       },
       "copernicus": {
         "source": "simulation",
@@ -639,18 +639,18 @@
         "wave_height": 0.55,
         "current_speed": 0.294,
         "wind_speed": 2.04,
-        "timestamp": "2026-02-27T23:58:13.795634"
+        "timestamp": "2026-02-28T00:58:22.239281"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
         "securite_code": "safe",
-        "peche_score": 9.0,
+        "peche_score": 8.3,
         "peche_texte": "🎣 Excellentes conditions de pêche",
-        "wave": 0.24,
+        "wave": 0.66,
         "temp": 23.16,
         "current": 0.294
       },
-      "updated_at": "2026-02-27T23:58:13.807872"
+      "updated_at": "2026-02-28T00:58:22.264856"
     }
   }
 }
