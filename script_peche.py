@@ -361,6 +361,9 @@ async def fetch_copernicus(lat: float, lon: float) -> dict:
 
     def _blocking_fetch():
         try:
+            now = datetime.utcnow()
+            # API v2.x : credentials lus automatiquement depuis
+            # COPERNICUS_USERNAME / COPERNICUS_PASSWORD (variables d'env)
             ds = cm.open_dataset(
                 dataset_id        = "cmems_mod_glo_phy-cur_anfc_0.083deg_PT6H-i",
                 variables         = ["uo", "vo", "thetao"],
@@ -368,14 +371,16 @@ async def fetch_copernicus(lat: float, lon: float) -> dict:
                 maximum_latitude  = lat + 0.1,
                 minimum_longitude = lon - 0.1,
                 maximum_longitude = lon + 0.1,
-                start_datetime    = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S"),
-                end_datetime      = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S"),
-                username          = user,
-                password          = pwd,
+                start_datetime    = now.strftime("%Y-%m-%dT%H:%M:%S"),
+                end_datetime      = now.strftime("%Y-%m-%dT%H:%M:%S"),
             )
-            uo  = float(ds["uo"].mean().values)
-            vo  = float(ds["vo"].mean().values)
-            sst = float(ds["thetao"].mean().values)
+
+            # Sélection première valeur temporelle disponible
+            ds_sel = ds.isel(time=0) if "time" in ds.dims else ds
+
+            uo  = float(ds_sel["uo"].mean().values)
+            vo  = float(ds_sel["vo"].mean().values)
+            sst = float(ds_sel["thetao"].mean().values)
             current_speed = round(float(np.sqrt(uo**2 + vo**2)), 3)
 
             return {
@@ -384,7 +389,7 @@ async def fetch_copernicus(lat: float, lon: float) -> dict:
                 "current_speed": current_speed,
                 "current_u":     round(uo, 3),
                 "current_v":     round(vo, 3),
-                "timestamp":     datetime.utcnow().isoformat()
+                "timestamp":     now.isoformat()
             }
         except Exception as e:
             logger.error(f"Copernicus fetch error : {e}")
