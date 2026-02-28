@@ -1,7 +1,7 @@
 {
   "meta": {
     "version": "3.0",
-    "generated_at": "2026-02-28T01:35:43.477881Z",
+    "generated_at": "2026-02-28T01:42:21.880052Z",
     "total_zones": 18,
     "sources": [
       "simulation"
@@ -33,7 +33,7 @@
         "wave_height": 0.24,
         "humidity": 88,
         "weather_id": 800,
-        "timestamp": "2026-02-28T01:35:41.382681"
+        "timestamp": "2026-02-28T01:42:09.006486"
       },
       "copernicus": {
         "source": "simulation",
@@ -42,7 +42,7 @@
         "wave_height": 0.56,
         "current_speed": 0.251,
         "wind_speed": 3.12,
-        "timestamp": "2026-02-28T01:35:41.241347"
+        "timestamp": "2026-02-28T01:42:12.828958"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
@@ -53,7 +53,7 @@
         "temp": 24.94,
         "current": 0.251
       },
-      "updated_at": "2026-02-28T01:35:41.382851"
+      "updated_at": "2026-02-28T01:42:12.829435"
     },
     "GANDON": {
       "zone": "GANDON",
@@ -68,7 +68,7 @@
         "wave_height": 0.24,
         "humidity": 88,
         "weather_id": 800,
-        "timestamp": "2026-02-28T01:35:41.386353"
+        "timestamp": "2026-02-28T01:42:09.009391"
       },
       "copernicus": {
         "source": "simulation",
@@ -77,7 +77,7 @@
         "wave_height": 1.17,
         "current_speed": 0.489,
         "wind_speed": 3.42,
-        "timestamp": "2026-02-28T01:35:41.241589"
+        "timestamp": "2026-02-28T01:42:12.787358"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
@@ -88,7 +88,7 @@
         "temp": 25.94,
         "current": 0.489
       },
-      "updated_at": "2026-02-28T01:35:41.386416"
+      "updated_at": "2026-02-28T01:42:12.787497"
     },
     "SAINT-LOUIS-HYDROBASE": {
       "zone": "SAINT-LOUIS-HYDROBASE",
@@ -103,7 +103,7 @@
         "wave_height": 0.24,
         "humidity": 88,
         "weather_id": 800,
-        "timestamp": "2026-02-28T01:35:41.391598"
+        "timestamp": "2026-02-28T01:42:09.012441"
       },
       "copernicus": {
         "source": "simulation",
@@ -112,7 +112,7 @@
         "wave_height": 0.5,
         "current_speed": 0.381,
         "wind_speed": 3.91,
-        "timestamp": "2026-02-28T01:35:41.241783"
+        "timestamp": "2026-02-28T01:42:12.829340"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
@@ -123,7 +123,7 @@
         "temp": 25.52,
         "current": 0.381
       },
-      "updated_at": "2026-02-28T01:35:41.391662"
+      "updated_at": "2026-02-28T01:42:12.829510"
     },
     "POTOU": {
       "zone": "POTOU",
@@ -138,7 +138,7 @@
         "wave_height": 1.31,
         "humidity": 88,
         "weather_id": 800,
-        "timestamp": "2026-02-28T01:35:41.390174"
+        "timestamp": "2026-02-28T01:42:09.008258"
       },
       "copernicus": {
         "source": "simulation",
@@ -147,7 +147,7 @@
         "wave_height": 1.05,
         "current_speed": 0.291,
         "wind_speed": 7.28,
-        "timestamp": "2026-02-28T01:35:41.242086"
+        "timestamp": "2026-02-28T01:42:12.829172"
       },
       "indices": {
         "securite_texte": "🟡 VIGILANCE — Mer légèrement agitée",
@@ -158,7 +158,7 @@
         "temp": 22.22,
         "current": 0.291
       },
-      "updated_at": "2026-02-28T01:35:41.390253"
+      "updated_at": "2026-02-28T01:42:12.829484"
     },
     "LOMPOUL": {
       "zone": "LOMPOUL",
@@ -173,7 +173,7 @@
         "wave_height": 1.41,
         "humidity": 88,
         "weather_id": 802,
-        "timestamp": "2026-02-28T01:35:41.391869"
+        "timestamp": "2026-02-28T01:42:09.019776"
       },
       "copernicus": {
         "source": "simulation",
@@ -182,7 +182,7 @@
         "wave_height": 0.95,
         "current_speed": 0.172,
         "wind_speed": 2.6,
-        "timestamp": "2026-02-28T01:35:41.242272"
+        "timestamp": "2026-02-28T01:42:12.860416"
       },
       "indices": {
         "securite_texte": "🟡 VIGILANCE — Mer légèrement agitée",
@@ -193,7 +193,7 @@
         "temp": 26.26,
         "current": 0.172
       },
-      "updated_at": "2026-02-28T01:35:41.391929"
+      "updated_at": "2026-02-28T01:42:12.860499"
     },
     "KAYAR": {
       "zone": "KAYAR",
@@ -208,7 +208,7 @@
         "wave_height": 2.36,
         "humidity": 84,
         "weather_id": 800,
-        "timestamp": "2026-02-28T01:35:41.385460"
+        "timestamp": "2026-02-28T01:42:09.007127"
       },
       "copernicus": {
         "source": "simulation",
@@ -217,7 +217,7 @@
         "wave_height": 0.74,
         "current_speed": 0.267,
         "wind_speed": 5.12,
-        "timestamp": "2026-02-28T01:35:41.242440"
+        "timestamp": "2026-02-28T01:42:12.871827"
       },
       "indices": {
         "securite_texte": "🟠 PRUDENCE — Mer formée",
@@ -228,7 +228,7 @@
         "temp": 25.3,
         "current": 0.267
       },
-      "updated_at": "2026-02-28T01:35:41.385530"
+      "updated_at": "2026-02-28T01:42:12.871915"
     },
     "DAKAR-YOFF": {
       "zone": "DAKAR-YOFF",
@@ -243,7 +243,7 @@
         "wave_height": 0.42,
         "humidity": 88,
         "weather_id": 800,
-        "timestamp": "2026-02-28T01:35:42.431098"
+        "timestamp": "2026-02-28T01:42:13.910617"
       },
       "copernicus": {
         "source": "simulation",
@@ -252,7 +252,7 @@
         "wave_height": 1.25,
         "current_speed": 0.47,
         "wind_speed": 4.15,
-        "timestamp": "2026-02-28T01:35:42.394222"
+        "timestamp": "2026-02-28T01:42:17.575476"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
@@ -263,7 +263,7 @@
         "temp": 25.15,
         "current": 0.47
       },
-      "updated_at": "2026-02-28T01:35:42.431558"
+      "updated_at": "2026-02-28T01:42:17.575626"
     },
     "DAKAR-SOUMBEDIOUNE": {
       "zone": "DAKAR-SOUMBEDIOUNE",
@@ -278,7 +278,7 @@
         "wave_height": 0.42,
         "humidity": 87,
         "weather_id": 800,
-        "timestamp": "2026-02-28T01:35:42.431358"
+        "timestamp": "2026-02-28T01:42:13.912725"
       },
       "copernicus": {
         "source": "simulation",
@@ -287,7 +287,7 @@
         "wave_height": 0.83,
         "current_speed": 0.442,
         "wind_speed": 2.86,
-        "timestamp": "2026-02-28T01:35:42.394535"
+        "timestamp": "2026-02-28T01:42:17.575024"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
@@ -298,7 +298,7 @@
         "temp": 26.11,
         "current": 0.442
       },
-      "updated_at": "2026-02-28T01:35:42.431722"
+      "updated_at": "2026-02-28T01:42:17.575550"
     },
     "DAKAR-HANN": {
       "zone": "DAKAR-HANN",
@@ -313,7 +313,7 @@
         "wave_height": 0.42,
         "humidity": 87,
         "weather_id": 800,
-        "timestamp": "2026-02-28T01:35:42.431658"
+        "timestamp": "2026-02-28T01:42:13.912465"
       },
       "copernicus": {
         "source": "simulation",
@@ -322,7 +322,7 @@
         "wave_height": 1.68,
         "current_speed": 0.205,
         "wind_speed": 4.01,
-        "timestamp": "2026-02-28T01:35:42.394786"
+        "timestamp": "2026-02-28T01:42:17.575314"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
@@ -333,7 +333,7 @@
         "temp": 23.03,
         "current": 0.205
       },
-      "updated_at": "2026-02-28T01:35:42.431831"
+      "updated_at": "2026-02-28T01:42:17.575600"
     },
     "THIAROYE-SUR-MER": {
       "zone": "THIAROYE-SUR-MER",
@@ -348,7 +348,7 @@
         "wave_height": 0.42,
         "humidity": 87,
         "weather_id": 800,
-        "timestamp": "2026-02-28T01:35:42.432233"
+        "timestamp": "2026-02-28T01:42:13.916540"
       },
       "copernicus": {
         "source": "simulation",
@@ -357,7 +357,7 @@
         "wave_height": 0.89,
         "current_speed": 0.113,
         "wind_speed": 5.12,
-        "timestamp": "2026-02-28T01:35:42.395043"
+        "timestamp": "2026-02-28T01:42:17.574021"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
@@ -368,7 +368,7 @@
         "temp": 23.9,
         "current": 0.113
       },
-      "updated_at": "2026-02-28T01:35:42.432292"
+      "updated_at": "2026-02-28T01:42:17.574155"
     },
     "MBOUR-JOAL": {
       "zone": "MBOUR-JOAL",
@@ -383,7 +383,7 @@
         "wave_height": 2.26,
         "humidity": 84,
         "weather_id": 800,
-        "timestamp": "2026-02-28T01:35:42.431908"
+        "timestamp": "2026-02-28T01:42:13.917449"
       },
       "copernicus": {
         "source": "simulation",
@@ -392,7 +392,7 @@
         "wave_height": 0.54,
         "current_speed": 0.171,
         "wind_speed": 3.13,
-        "timestamp": "2026-02-28T01:35:42.395291"
+        "timestamp": "2026-02-28T01:42:17.085081"
       },
       "indices": {
         "securite_texte": "🟠 PRUDENCE — Mer formée",
@@ -403,7 +403,7 @@
         "temp": 22.25,
         "current": 0.171
       },
-      "updated_at": "2026-02-28T01:35:42.431963"
+      "updated_at": "2026-02-28T01:42:17.085172"
     },
     "JOAL-FADIOUTH": {
       "zone": "JOAL-FADIOUTH",
@@ -418,7 +418,7 @@
         "wave_height": 1.55,
         "humidity": 77,
         "weather_id": 800,
-        "timestamp": "2026-02-28T01:35:42.434937"
+        "timestamp": "2026-02-28T01:42:13.921719"
       },
       "copernicus": {
         "source": "simulation",
@@ -427,7 +427,7 @@
         "wave_height": 0.74,
         "current_speed": 0.453,
         "wind_speed": 2.72,
-        "timestamp": "2026-02-28T01:35:42.395542"
+        "timestamp": "2026-02-28T01:42:17.055066"
       },
       "indices": {
         "securite_texte": "🟠 PRUDENCE — Mer formée",
@@ -438,7 +438,7 @@
         "temp": 23.55,
         "current": 0.453
       },
-      "updated_at": "2026-02-28T01:35:42.435008"
+      "updated_at": "2026-02-28T01:42:17.055169"
     },
     "PALMARIN": {
       "zone": "PALMARIN",
@@ -453,7 +453,7 @@
         "wave_height": 1.72,
         "humidity": 74,
         "weather_id": 801,
-        "timestamp": "2026-02-28T01:35:43.473153"
+        "timestamp": "2026-02-28T01:42:18.614034"
       },
       "copernicus": {
         "source": "simulation",
@@ -462,7 +462,7 @@
         "wave_height": 1.48,
         "current_speed": 0.408,
         "wind_speed": 7.03,
-        "timestamp": "2026-02-28T01:35:43.437228"
+        "timestamp": "2026-02-28T01:42:21.445702"
       },
       "indices": {
         "securite_texte": "🟠 PRUDENCE — Mer formée",
@@ -473,7 +473,7 @@
         "temp": 26.99,
         "current": 0.408
       },
-      "updated_at": "2026-02-28T01:35:43.473350"
+      "updated_at": "2026-02-28T01:42:21.445790"
     },
     "NDANGANE": {
       "zone": "NDANGANE",
@@ -488,7 +488,7 @@
         "wave_height": 1.46,
         "humidity": 67,
         "weather_id": 802,
-        "timestamp": "2026-02-28T01:35:43.473544"
+        "timestamp": "2026-02-28T01:42:18.616723"
       },
       "copernicus": {
         "source": "simulation",
@@ -497,7 +497,7 @@
         "wave_height": 0.81,
         "current_speed": 0.18,
         "wind_speed": 7.36,
-        "timestamp": "2026-02-28T01:35:43.437475"
+        "timestamp": "2026-02-28T01:42:21.877850"
       },
       "indices": {
         "securite_texte": "🟡 VIGILANCE — Mer légèrement agitée",
@@ -508,7 +508,7 @@
         "temp": 26.21,
         "current": 0.18
       },
-      "updated_at": "2026-02-28T01:35:43.473615"
+      "updated_at": "2026-02-28T01:42:21.878133"
     },
     "DJIFER": {
       "zone": "DJIFER",
@@ -523,7 +523,7 @@
         "wave_height": 2.1,
         "humidity": 72,
         "weather_id": 803,
-        "timestamp": "2026-02-28T01:35:43.475337"
+        "timestamp": "2026-02-28T01:42:18.617276"
       },
       "copernicus": {
         "source": "simulation",
@@ -532,7 +532,7 @@
         "wave_height": 0.85,
         "current_speed": 0.396,
         "wind_speed": 7.95,
-        "timestamp": "2026-02-28T01:35:43.437719"
+        "timestamp": "2026-02-28T01:42:21.767430"
       },
       "indices": {
         "securite_texte": "🟠 PRUDENCE — Mer formée",
@@ -543,7 +543,7 @@
         "temp": 25.93,
         "current": 0.396
       },
-      "updated_at": "2026-02-28T01:35:43.475396"
+      "updated_at": "2026-02-28T01:42:21.767547"
     },
     "KAFOUNTINE": {
       "zone": "KAFOUNTINE",
@@ -558,7 +558,7 @@
         "wave_height": 1.62,
         "humidity": 66,
         "weather_id": 802,
-        "timestamp": "2026-02-28T01:35:43.474801"
+        "timestamp": "2026-02-28T01:42:18.619691"
       },
       "copernicus": {
         "source": "simulation",
@@ -567,7 +567,7 @@
         "wave_height": 0.64,
         "current_speed": 0.446,
         "wind_speed": 7.74,
-        "timestamp": "2026-02-28T01:35:43.437941"
+        "timestamp": "2026-02-28T01:42:21.767308"
       },
       "indices": {
         "securite_texte": "🟠 PRUDENCE — Mer formée",
@@ -578,7 +578,7 @@
         "temp": 23.62,
         "current": 0.446
       },
-      "updated_at": "2026-02-28T01:35:43.474871"
+      "updated_at": "2026-02-28T01:42:21.767517"
     },
     "CASAMANCE-ZIGUINCHOR": {
       "zone": "CASAMANCE-ZIGUINCHOR",
@@ -593,7 +593,7 @@
         "wave_height": 2.41,
         "humidity": 71,
         "weather_id": 802,
-        "timestamp": "2026-02-28T01:35:43.474217"
+        "timestamp": "2026-02-28T01:42:18.620620"
       },
       "copernicus": {
         "source": "simulation",
@@ -602,7 +602,7 @@
         "wave_height": 1.41,
         "current_speed": 0.29,
         "wind_speed": 4.99,
-        "timestamp": "2026-02-28T01:35:43.438255"
+        "timestamp": "2026-02-28T01:42:21.878295"
       },
       "indices": {
         "securite_texte": "🟠 PRUDENCE — Mer formée",
@@ -613,7 +613,7 @@
         "temp": 24.63,
         "current": 0.29
       },
-      "updated_at": "2026-02-28T01:35:43.474285"
+      "updated_at": "2026-02-28T01:42:21.878378"
     },
     "CAP-SKIRRING": {
       "zone": "CAP-SKIRRING",
@@ -628,7 +628,7 @@
         "wave_height": 1.7,
         "humidity": 67,
         "weather_id": 803,
-        "timestamp": "2026-02-28T01:35:43.475761"
+        "timestamp": "2026-02-28T01:42:18.645448"
       },
       "copernicus": {
         "source": "simulation",
@@ -637,7 +637,7 @@
         "wave_height": 0.55,
         "current_speed": 0.294,
         "wind_speed": 2.04,
-        "timestamp": "2026-02-28T01:35:43.438697"
+        "timestamp": "2026-02-28T01:42:21.791846"
       },
       "indices": {
         "securite_texte": "🟠 PRUDENCE — Mer formée",
@@ -648,7 +648,7 @@
         "temp": 23.16,
         "current": 0.294
       },
-      "updated_at": "2026-02-28T01:35:43.475819"
+      "updated_at": "2026-02-28T01:42:21.791966"
     }
   }
 }
