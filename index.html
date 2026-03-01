@@ -1,510 +1,666 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="PecheurConnect — Sécurité maritime en temps réel pour les pêcheurs sénégalais. 18 zones surveillées 24h/24.">
-    <meta name="theme-color" content="#0a1628">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="PecheurConnect">
-    <meta property="og:title"       content="PecheurConnect 🇸🇳">
-    <meta property="og:description" content="Sécurité maritime en temps réel — 18 zones au Sénégal">
-    <meta property="og:type"        content="website">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PecheurConnect v3.0 — Plateforme Maritime Sénégal</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg:#070d18; --bg2:#0d1525; --bg3:#111e35;
+  --surface:rgba(13,21,37,0.95); --border:rgba(255,255,255,0.07); --border-act:rgba(0,200,180,0.35);
+  --text:#e8edf5; --text2:#8a9bb5; --text3:#4a5a74;
+  --teal:#00c8b4; --teal-dim:rgba(0,200,180,0.12);
+  --amber:#f5a623; --amber-dim:rgba(245,166,35,0.12);
+  --coral:#ff5252; --coral-dim:rgba(255,82,82,0.12);
+  --safe:#00e676; --caution:#ffea00; --warning:#ff9100; --danger:#ff1744;
+  --sidebar-w:260px; --topbar-h:64px;
+  --radius:14px; --radius-sm:8px;
+  --shadow:0 16px 48px rgba(0,0,0,0.5); --shadow-sm:0 4px 16px rgba(0,0,0,0.3);
+  --glow-teal:0 0 24px rgba(0,200,180,0.2);
+}
+[data-theme="light"] {
+  --bg:#f0f4f8; --bg2:#ffffff; --bg3:#e8edf5;
+  --surface:rgba(255,255,255,0.97); --border:rgba(0,0,0,0.08); --border-act:rgba(0,100,150,0.3);
+  --text:#0d1525; --text2:#4a5a74; --text3:#8a9bb5;
+  --teal:#006b60; --teal-dim:rgba(0,107,96,0.08);
+  --shadow:0 8px 32px rgba(0,0,0,0.12); --shadow-sm:0 2px 8px rgba(0,0,0,0.08);
+  --glow-teal:0 0 16px rgba(0,107,96,0.1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{font-size:15px;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column;}
 
-    <title>PecheurConnect v3.0 🇸🇳 | Sécurité Maritime Sénégal</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
-    <link rel="manifest" href="./manifest.json">
+/* TOPBAR */
+.topbar{height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);backdrop-filter:blur(20px);display:flex;align-items:center;padding:0 24px;gap:20px;z-index:200;flex-shrink:0;}
+.brand-wave{font-size:26px;filter:drop-shadow(0 0 8px rgba(0,200,180,.5));}
+.brand-text{font-family:'Fraunces',serif;font-size:20px;font-weight:700;letter-spacing:-.3px;}
+.brand-tag{font-size:10px;font-family:'DM Mono',monospace;color:var(--teal);background:var(--teal-dim);border:1px solid rgba(0,200,180,.2);padding:2px 7px;border-radius:4px;}
+.topbar-center{flex:1;display:flex;justify-content:center;}
+.live-indicator{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);font-family:'DM Mono',monospace;}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--safe);box-shadow:0 0 8px var(--safe);animation:pulse-dot 2s infinite;}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.topbar-right{display:flex;align-items:center;gap:12px;flex:0 0 auto;}
+.lang-switch{display:flex;background:var(--bg3);border-radius:20px;padding:3px;gap:2px;border:1px solid var(--border);}
+.lang-btn{padding:4px 11px;border-radius:16px;font-size:11px;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--text2);transition:all .2s;}
+.lang-btn.active{background:var(--teal);color:white;}
+.theme-btn{width:36px;height:36px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.theme-btn:hover{border-color:var(--teal);box-shadow:var(--glow-teal);}
+.topbar-time{font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);background:var(--bg3);padding:6px 12px;border-radius:8px;border:1px solid var(--border);}
 
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+/* LAYOUT */
+.app-body{display:flex;flex:1;overflow:hidden;}
 
-    <style>
-        :root {
-            --primary:    #0056b3;
-            --primary-dk: #003d7a;
-            --primary-lt: #1a73e8;
-            --accent:     #00d4ff;
-            --accent2:    #00ff9d;
-            --safe:       #00c853;
-            --caution:    #ffd600;
-            --warning:    #ff6d00;
-            --danger:     #d50000;
-            --dark:       #0a1628;
-            --panel:      rgba(8,18,36,0.88);
-            --border:     rgba(255,255,255,0.10);
-            --text:       rgba(255,255,255,0.90);
-            --text-dim:   rgba(255,255,255,0.50);
-            --radius:     12px;
-            --radius-sm:  8px;
-            --shadow:     0 8px 32px rgba(0,0,0,0.35);
-            --shadow-sm:  0 3px 12px rgba(0,0,0,0.25);
-        }
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);backdrop-filter:blur(20px);display:flex;flex-direction:column;z-index:100;flex-shrink:0;}
+.nav-section{padding:20px 14px 8px;}
+.nav-label{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);padding:0 10px;margin-bottom:8px;}
+.nav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:var(--radius-sm);cursor:pointer;transition:all .2s;position:relative;color:var(--text2);font-size:13.5px;font-weight:500;margin-bottom:2px;text-decoration:none;}
+.nav-item:hover{background:var(--teal-dim);color:var(--text);}
+.nav-item.active{background:var(--teal-dim);color:var(--teal);border:1px solid var(--border-act);}
+.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:60%;background:var(--teal);border-radius:0 3px 3px 0;}
+.nav-icon{font-size:17px;flex-shrink:0;}
+.nav-badge{margin-left:auto;background:var(--danger);color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;font-family:'DM Mono',monospace;}
+.sidebar-stats{margin:auto 0 0;padding:16px;border-top:1px solid var(--border);}
+.stat-mini{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:12px;}
+.stat-mini-val{font-family:'DM Mono',monospace;font-weight:500;}
+.stat-mini-val.safe{color:var(--safe);}.stat-mini-val.caution{color:var(--caution);}.stat-mini-val.warning{color:var(--warning);}.stat-mini-val.danger{color:var(--danger);}
 
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; overflow: hidden; background: var(--dark); color: var(--text); font-family: 'DM Sans', sans-serif; }
+/* CONTENT */
+.content{flex:1;overflow:hidden;position:relative;}
+.page{display:none;height:100%;overflow:hidden;}
+.page.active{display:flex;flex-direction:column;}
 
-        #map { position: fixed; inset: 0; z-index: 1; }
+/* DASHBOARD */
+.dashboard-layout{display:grid;grid-template-columns:1fr 340px;height:100%;overflow:hidden;}
+#map{position:relative;z-index:1;height:100%;}
+.map-overlay-top{position:absolute;top:16px;left:16px;right:16px;z-index:10;display:flex;gap:10px;pointer-events:none;}
+.map-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);backdrop-filter:blur(16px);padding:10px 14px;pointer-events:all;}
+.filter-pills{display:flex;gap:6px;flex-wrap:wrap;}
+.pill{padding:5px 13px;border-radius:20px;font-size:11.5px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--text2);transition:all .2s;}
+.pill.active{background:var(--teal);border-color:var(--teal);color:white;}
+.search-wrap{display:flex;align-items:center;gap:8px;}
+.search-input{background:transparent;border:none;outline:none;color:var(--text);font-family:'Outfit',sans-serif;font-size:13px;width:160px;}
+.search-input::placeholder{color:var(--text3);}
+.dash-right{background:var(--surface);border-left:1px solid var(--border);backdrop-filter:blur(20px);overflow-y:auto;display:flex;flex-direction:column;}
+.dash-right::-webkit-scrollbar{width:4px;}.dash-right::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.panel-header{padding:20px 20px 14px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);backdrop-filter:blur(20px);z-index:5;}
+.panel-title{font-family:'Fraunces',serif;font-size:17px;font-weight:700;margin-bottom:14px;}
+.status-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.status-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;text-align:center;}
+.status-num{font-family:'Fraunces',serif;font-size:28px;font-weight:900;line-height:1;margin-bottom:4px;}
+.status-lbl{font-size:10px;color:var(--text2);font-weight:600;letter-spacing:.06em;}
+.zones-list{padding:12px;flex:1;}
+.zone-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.zone-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;}
+.zone-card.safe::before{background:var(--safe);}.zone-card.caution::before{background:var(--caution);}.zone-card.warning::before{background:var(--warning);}.zone-card.danger::before{background:var(--danger);}
+.zone-card:hover{border-color:var(--teal);transform:translateX(2px);}
+.zone-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+.zone-name{font-weight:700;font-size:13px;}.zone-region{font-size:10px;color:var(--text3);margin-top:1px;}
+.zone-score-badge{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;padding:2px 8px;border-radius:6px;background:var(--teal-dim);color:var(--teal);}
+.zone-metrics{display:flex;gap:12px;font-size:11px;color:var(--text2);font-family:'DM Mono',monospace;}
+.zone-metrics span{color:var(--text);font-weight:500;}
 
-        /* ── LOADING ── */
-        #loadingScreen {
-            position: fixed; inset: 0; z-index: 9999; background: var(--dark);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.7s ease, visibility 0.7s ease;
-        }
-        #loadingScreen.hide { opacity: 0; visibility: hidden; pointer-events: none; }
-        .ls-wave  { font-size: 52px; margin-bottom: 12px; animation: bob 2s ease-in-out infinite; }
-        @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-        .ls-title { font-family: 'Syne', sans-serif; font-size: 30px; font-weight: 800; color: white; margin-bottom: 6px; }
-        .ls-bar-wrap { width: 220px; height: 3px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; margin-bottom: 14px; }
-        .ls-bar { height: 100%; width: 0; background: linear-gradient(90deg, var(--primary-lt), var(--accent)); animation: bar-fill 2.2s ease forwards; }
-        @keyframes bar-fill { 0% { width: 0%; } 100% { width: 100%; } }
-        .ls-status { font-size: 12px; color: var(--text-dim); }
+/* HISTORY */
+.history-layout{padding:24px;overflow-y:auto;height:100%;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr;gap:20px;align-content:start;}
+.history-layout::-webkit-scrollbar{width:4px;}.history-layout::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;backdrop-filter:blur(16px);}
+.stat-card.full{grid-column:1 / -1;}
+.stat-card-title{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);margin-bottom:6px;}
+.stat-big{font-family:'Fraunces',serif;font-size:42px;font-weight:900;color:var(--teal);line-height:1;margin-bottom:4px;}
+.stat-sub{font-size:12px;color:var(--text2);}
+.chart-wrap{height:220px;position:relative;}
 
-        /* ── PANELS ── */
-        .left-panel { position: fixed; top: 16px; left: 16px; z-index: 500; width: 302px; display: flex; flex-direction: column; gap: 10px; }
-        .brand-card { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dk) 100%); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,0.12); }
-        .brand-name { font-family: 'Syne', sans-serif; font-size: 19px; font-weight: 800; color: white; }
-        .nav-card { background: var(--panel); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-radius: var(--radius); padding: 10px; box-shadow: var(--shadow); border: 1px solid var(--border); display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-        .nav-item { display: flex; flex-direction: column; align-items: center; padding: 9px 4px; border-radius: var(--radius-sm); background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.72); text-decoration: none; font-size: 10px; transition: background 0.2s; }
-        .nav-item.current, .nav-item:hover { background: rgba(0,86,179,0.4); color: white; }
-        .filter-card, .search-card { background: var(--panel); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-radius: var(--radius); padding: 12px; border: 1px solid var(--border); }
-        .filter-pills { display: flex; flex-wrap: wrap; gap: 5px; }
-        .pill { padding: 5px 11px; background: rgba(255,255,255,0.07); border-radius: 20px; font-size: 11px; cursor: pointer; transition: background 0.2s; user-select: none; }
-        .pill.active { background: var(--primary); color: white; }
-        .search-input { width: 100%; background: transparent; border: none; color: white; outline: none; font-size: 13px; }
-        .search-input::placeholder { color: var(--text-dim); }
+/* ALERTS */
+.alerts-layout{padding:24px;overflow-y:auto;height:100%;display:flex;flex-direction:column;gap:20px;}
+.alerts-layout::-webkit-scrollbar{width:4px;}.alerts-layout::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.page-heading{font-family:'Fraunces',serif;font-size:28px;font-weight:900;margin-bottom:4px;}
+.page-sub{font-size:13px;color:var(--text2);}
+.alert-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;display:flex;gap:16px;align-items:flex-start;transition:all .2s;}
+.alert-card:hover{border-color:var(--border-act);box-shadow:var(--glow-teal);}
+.alert-icon-wrap{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.alert-icon-wrap.danger{background:var(--coral-dim);}.alert-icon-wrap.warning{background:var(--amber-dim);}.alert-icon-wrap.info{background:var(--teal-dim);}
+.alert-body{flex:1;}
+.alert-title{font-weight:700;font-size:14px;margin-bottom:4px;}
+.alert-desc{font-size:12.5px;color:var(--text2);line-height:1.5;}
+.alert-meta{font-size:11px;color:var(--text3);margin-top:6px;font-family:'DM Mono',monospace;}
+.alert-action{font-size:11px;font-weight:700;color:var(--teal);background:var(--teal-dim);border:none;padding:6px 14px;border-radius:8px;cursor:pointer;flex-shrink:0;align-self:center;font-family:'Outfit',sans-serif;text-decoration:none;}
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.setting-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;display:flex;justify-content:space-between;align-items:center;}
+.setting-label{font-size:13px;font-weight:600;margin-bottom:2px;}
+.setting-desc{font-size:11px;color:var(--text2);}
+.toggle{width:44px;height:24px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;}
+.toggle.on{background:var(--teal);border-color:var(--teal);}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;background:white;border-radius:50%;top:2px;left:2px;transition:transform .2s;box-shadow:0 2px 4px rgba(0,0,0,.3);}
+.toggle.on::after{transform:translateX(20px);}
 
-        /* ── STATS ── */
-        .stats-panel { position: fixed; bottom: 24px; left: 16px; z-index: 500; background: var(--panel); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-radius: var(--radius); padding: 14px; min-width: 272px; border: 1px solid var(--border); box-shadow: var(--shadow); }
-        .safety-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .safety-box { background: rgba(255,255,255,0.05); border-radius: var(--radius-sm); padding: 9px 5px; text-align: center; }
-        .safety-num { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; }
-        .safety-lbl { font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+/* PROFILE */
+.profile-layout{padding:24px;overflow-y:auto;height:100%;display:grid;grid-template-columns:300px 1fr;gap:20px;align-content:start;}
+.profile-layout::-webkit-scrollbar{width:4px;}.profile-layout::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.profile-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px;text-align:center;backdrop-filter:blur(16px);}
+.profile-avatar{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--teal),#005a52);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 16px;box-shadow:0 0 32px rgba(0,200,180,.3);}
+.profile-name{font-family:'Fraunces',serif;font-size:20px;font-weight:700;margin-bottom:4px;}
+.profile-role{font-size:12px;color:var(--teal);background:var(--teal-dim);display:inline-block;padding:3px 12px;border-radius:12px;margin-bottom:20px;border:1px solid rgba(0,200,180,.2);}
+.profile-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:20px;padding-top:20px;border-top:1px solid var(--border);}
+.profile-stat-num{font-family:'Fraunces',serif;font-size:22px;font-weight:900;color:var(--teal);}
+.profile-stat-lbl{font-size:10px;color:var(--text2);margin-top:2px;}
+.zones-config{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;backdrop-filter:blur(16px);grid-column:1/-1;}
+.zones-config-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-top:16px;}
+.zone-toggle-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;transition:border-color .2s;cursor:pointer;}
+.zone-toggle-item.selected{border-color:var(--teal);}
+.zone-toggle-name{font-size:12px;font-weight:600;}
+.zone-toggle-reg{font-size:10px;color:var(--text3);}
 
-        /* ── SCORE MOYEN ── */
-        .score-avg { margin-top: 10px; background: rgba(255,255,255,0.05); border-radius: var(--radius-sm); padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
-        .score-avg-val { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; color: var(--accent2); }
+/* MARKERS */
+.mk-bubble{background:transparent!important;border:none!important;}
+.mk-pin{padding:5px 10px;border-radius:20px;color:white;font-family:'DM Mono',monospace;font-weight:500;font-size:11px;border:2px solid rgba(255,255,255,.4);text-align:center;box-shadow:0 4px 16px rgba(0,0,0,.4);white-space:nowrap;}
+.leaflet-popup-content-wrapper{border-radius:14px!important;padding:0!important;overflow:hidden!important;background:var(--bg2)!important;border:1px solid var(--border)!important;box-shadow:var(--shadow)!important;color:var(--text)!important;}
+.leaflet-popup-content{margin:0!important;width:auto!important;}
+.leaflet-popup-tip{background:var(--bg2)!important;}
+.popup-head{padding:14px 16px;color:white;}
+.popup-head-name{font-family:'Fraunces',serif;font-size:17px;font-weight:700;}
+.popup-head-desc{font-size:11px;opacity:.8;margin-top:2px;}
+.popup-body{padding:14px 16px;}
+.popup-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.popup-metric{background:var(--bg3);border-radius:8px;padding:9px 6px;text-align:center;}
+.popup-metric-val{font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--teal);}
+.popup-metric-lbl{font-size:9px;color:var(--text2);text-transform:uppercase;margin-top:2px;}
+.popup-status{text-align:center;padding:8px;border-radius:8px;color:white;font-weight:700;font-size:13px;margin-bottom:10px;}
+.score-bar-wrap{height:4px;background:var(--bg3);border-radius:4px;overflow:hidden;margin-top:6px;}
+.score-bar{height:100%;border-radius:4px;transition:width .6s;}
+.popup-wa{display:block;text-align:center;background:#25D366;color:white;text-decoration:none;padding:9px;border-radius:8px;font-weight:700;font-size:12px;margin-top:10px;}
 
-        /* ── FABs ── */
-        .fab-group { position: fixed; right: 16px; bottom: 24px; z-index: 500; display: flex; flex-direction: column; gap: 10px; }
-        .fab { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 19px; cursor: pointer; border: none; box-shadow: var(--shadow); transition: transform 0.15s; }
-        .fab:hover { transform: scale(1.08); }
-        .fab-wa  { background: #25D366; color: white; text-decoration: none; }
-        .fab-ref { background: var(--primary); color: white; }
+/* FABs */
+.fab-group{position:fixed;bottom:24px;right:24px;z-index:400;display:flex;flex-direction:column;gap:10px;}
+.fab{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;border:none;box-shadow:var(--shadow);transition:transform .15s;text-decoration:none;}
+.fab:hover{transform:scale(1.1);}
+.fab-wa{background:#25D366;color:white;}.fab-ref{background:var(--teal);color:white;}
 
-        /* ── MARKERS ── */
-        .mk-bubble { background: transparent; border: none !important; }
-        .mk-inner {
-            color: white; padding: 6px 10px; border-radius: 22px;
-            font-family: 'Syne', sans-serif; font-weight: 800; font-size: 12px;
-            border: 2.5px solid rgba(255,255,255,0.7); text-align: center;
-            min-width: 62px; box-shadow: var(--shadow);
-            display: flex; flex-direction: column; align-items: center;
-        }
-        .mk-wave { font-size: 15px; line-height: 1.1; }
-        .mk-name { font-size: 7px; opacity: 0.85; white-space: nowrap; max-width: 80px; overflow: hidden; text-overflow: ellipsis; }
+/* ANIM */
+.fade-in{animation:fadeIn .3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+*{scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
 
-        /* ── POPUPS ── */
-        .leaflet-popup-content-wrapper { border-radius: 14px !important; padding: 0 !important; overflow: hidden; background: white !important; box-shadow: 0 12px 40px rgba(0,0,0,0.25) !important; }
-        .leaflet-popup-content { margin: 0 !important; }
-        .leaflet-popup-tip-container { display: none; }
-        .pu { color: #222; font-family: 'DM Sans', sans-serif; min-width: 240px; }
-        .pu-head { padding: 14px 16px; color: white; }
-        .pu-head-name { font-weight: 800; font-size: 17px; font-family: 'Syne', sans-serif; }
-        .pu-head-desc { font-size: 11px; opacity: 0.85; margin-top: 2px; }
-        .pu-body { padding: 14px 16px; }
-        .pu-metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-        .pu-metric { background: #f0f4fb; border-radius: 8px; padding: 9px 5px; text-align: center; }
-        .pu-mval { font-size: 18px; font-weight: 800; color: var(--primary); font-family: 'Syne', sans-serif; }
-        .pu-mlbl { font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
-        .pu-safety { padding: 9px; border-radius: 8px; color: white; text-align: center; font-weight: 700; font-size: 13px; margin-bottom: 10px; }
-        .pu-score { text-align: center; font-size: 12px; color: #555; margin-bottom: 10px; }
-        .pu-score b { color: var(--primary); font-size: 15px; }
-        .pu-source { text-align: center; font-size: 10px; color: #aaa; margin-bottom: 10px; }
-        .pu-btn { display: block; padding: 10px; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 12px; }
-        .pu-btn-wa { background: #25D366; color: white; }
-
-        /* ── INDICATORS ── */
-        .sw-indicator { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--text-dim); margin-top: 8px; }
-        .sw-dot { width: 6px; height: 6px; border-radius: 50%; background: #888; transition: background 0.4s; }
-        .sw-dot.online { background: var(--safe); }
-        .live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); animation: pulse 2s infinite; }
-        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
-
-        /* ── RESPONSIVE ── */
-        @media (max-width: 768px) {
-            .left-panel { left: 10px; right: 10px; width: auto; }
-            .stats-panel { right: 70px; left: 10px; min-width: auto; }
-        }
-    </style>
+@media(max-width:900px){
+  .sidebar{display:none;}
+  .dashboard-layout{grid-template-columns:1fr;}
+  .dash-right{display:none;}
+  .history-layout,.profile-layout{grid-template-columns:1fr;}
+  .settings-grid{grid-template-columns:1fr;}
+}
+</style>
 </head>
 <body>
 
-<!-- LOADING -->
-<div id="loadingScreen">
-    <div class="ls-wave">🌊</div>
-    <div class="ls-title">PecheurConnect</div>
-    <div class="ls-bar-wrap"><div class="ls-bar"></div></div>
-    <div class="ls-status" id="lsStatus">Connexion aux satellites...</div>
+<header class="topbar">
+  <div style="display:flex;align-items:center;gap:10px;flex:0 0 auto">
+    <span class="brand-wave">🌊</span>
+    <span class="brand-text">PecheurConnect</span>
+    <span class="brand-tag">v3.0</span>
+  </div>
+  <div class="topbar-center">
+    <div class="live-indicator">
+      <div class="live-dot"></div>
+      <span data-fr="Données en direct — 18 zones Sénégal" data-wo="Xam-xam bu soxor — 18 dëkk Senegaal">Données en direct — 18 zones Sénégal</span>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="lang-switch">
+      <button class="lang-btn active" onclick="setLang('fr')">FR</button>
+      <button class="lang-btn" onclick="setLang('wo')">WO</button>
+    </div>
+    <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+    <div class="topbar-time" id="clock">--:-- UTC</div>
+  </div>
+</header>
+
+<div class="app-body">
+  <nav class="sidebar">
+    <div class="nav-section">
+      <div class="nav-label" data-fr="Navigation" data-wo="Yëgël">Navigation</div>
+      <div class="nav-item active" onclick="showPage('dashboard')">
+        <span class="nav-icon">🗺️</span>
+        <span data-fr="Tableau de bord" data-wo="Dëkk bi">Tableau de bord</span>
+      </div>
+      <div class="nav-item" onclick="showPage('history')">
+        <span class="nav-icon">📊</span>
+        <span data-fr="Historique & Stats" data-wo="Yoon wi ak Stats">Historique & Stats</span>
+      </div>
+      <div class="nav-item" onclick="showPage('alerts')">
+        <span class="nav-icon">🔔</span>
+        <span data-fr="Alertes" data-wo="Xaaral">Alertes</span>
+        <span class="nav-badge" id="alertBadge">—</span>
+      </div>
+      <div class="nav-item" onclick="showPage('profile')">
+        <span class="nav-icon">👤</span>
+        <span data-fr="Profil & Zones" data-wo="Sàmm-sàmm">Profil & Zones</span>
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label" data-fr="Urgence" data-wo="Géréej">Urgence</div>
+      <a class="nav-item" href="https://wa.me/221777020818" target="_blank">
+        <span class="nav-icon">📱</span>
+        <span data-fr="SOS WhatsApp" data-wo="Géréej WA">SOS WhatsApp</span>
+      </a>
+    </div>
+    <div class="sidebar-stats">
+      <div class="nav-label" data-fr="État actuel" data-wo="Sedd bi tey">État actuel</div>
+      <div class="stat-mini"><span data-fr="🟢 Favorables" data-wo="🟢 Baax na">🟢 Favorables</span><span class="stat-mini-val safe" id="sb-safe">—</span></div>
+      <div class="stat-mini"><span data-fr="🟡 Vigilance" data-wo="🟡 Xaaral">🟡 Vigilance</span><span class="stat-mini-val caution" id="sb-caution">—</span></div>
+      <div class="stat-mini"><span data-fr="🟠 Prudence" data-wo="🟠 Yëgël">🟠 Prudence</span><span class="stat-mini-val warning" id="sb-warning">—</span></div>
+      <div class="stat-mini"><span data-fr="🔴 Danger" data-wo="🔴 Réy">🔴 Danger</span><span class="stat-mini-val danger" id="sb-danger">—</span></div>
+    </div>
+  </nav>
+
+  <main class="content">
+
+    <!-- DASHBOARD -->
+    <section class="page active" id="page-dashboard">
+      <div class="dashboard-layout">
+        <div style="position:relative">
+          <div id="map"></div>
+          <div class="map-overlay-top">
+            <div class="map-card">
+              <div class="filter-pills">
+                <div class="pill active" data-region="all" onclick="doFilter(this)" data-fr="Tout" data-wo="Yépp">Tout</div>
+                <div class="pill" data-region="Nord" onclick="doFilter(this)">Nord</div>
+                <div class="pill" data-region="Grande Côte" onclick="doFilter(this)">G.Côte</div>
+                <div class="pill" data-region="Dakar" onclick="doFilter(this)">Dakar</div>
+                <div class="pill" data-region="Petite Côte" onclick="doFilter(this)">P.Côte</div>
+                <div class="pill" data-region="Sine-Saloum" onclick="doFilter(this)">Sine-Saloum</div>
+                <div class="pill" data-region="Casamance" onclick="doFilter(this)">Casamance</div>
+              </div>
+            </div>
+            <div class="map-card search-wrap">
+              <span style="color:var(--text2);font-size:14px">🔍</span>
+              <input class="search-input" id="searchInput" placeholder="Rechercher une zone..." oninput="doSearch(this.value)">
+            </div>
+          </div>
+        </div>
+        <div class="dash-right">
+          <div class="panel-header">
+            <div class="panel-title" data-fr="18 zones surveillées" data-wo="18 dëkk yi xam-xam">18 zones surveillées</div>
+            <div class="status-grid">
+              <div class="status-box"><div class="status-num" style="color:var(--safe)" id="cnt-safe">—</div><div class="status-lbl">🟢 <span data-fr="Sûr" data-wo="Baax">Sûr</span></div></div>
+              <div class="status-box"><div class="status-num" style="color:var(--caution)" id="cnt-caution">—</div><div class="status-lbl">🟡 <span data-fr="Vigilance" data-wo="Xaaral">Vigilance</span></div></div>
+              <div class="status-box"><div class="status-num" style="color:var(--warning)" id="cnt-warning">—</div><div class="status-lbl">🟠 <span data-fr="Prudence" data-wo="Yëgël">Prudence</span></div></div>
+              <div class="status-box"><div class="status-num" style="color:var(--danger)" id="cnt-danger">—</div><div class="status-lbl">🔴 <span data-fr="Danger" data-wo="Réy">Danger</span></div></div>
+            </div>
+          </div>
+          <div class="zones-list" id="zonesList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HISTORIQUE -->
+    <section class="page" id="page-history">
+      <div class="history-layout fade-in">
+        <div class="stat-card">
+          <div class="stat-card-title" data-fr="Score moyen pêche" data-wo="Score bi ci kaw">Score moyen pêche</div>
+          <div class="stat-big" id="hist-avg">—</div>
+          <div class="stat-sub" data-fr="sur 10 — 18 zones analysées" data-wo="ci 10 — 18 dëkk">sur 10 — 18 zones analysées</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title" data-fr="Zones favorables" data-wo="Dëkk yi baax">Zones favorables</div>
+          <div class="stat-big" id="hist-safe" style="color:var(--safe)">—</div>
+          <div class="stat-sub" data-fr="Mer calme / conditions idéales" data-wo="Géej bu dëkk">Mer calme / conditions idéales</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title" data-fr="Meilleure zone pêche" data-wo="Dëkk bu gëna baax">Meilleure zone pêche</div>
+          <div class="stat-big" id="hist-top" style="font-size:20px;padding-top:10px">—</div>
+          <div class="stat-sub" id="hist-top-score"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-title" data-fr="Dernière mise à jour" data-wo="Yëgëlu mujj">Dernière mise à jour</div>
+          <div class="stat-big" id="hist-update" style="font-size:22px;padding-top:10px">—</div>
+          <div class="stat-sub" id="hist-source" data-fr="Source des données" data-wo="Ñëw ci">Source des données</div>
+        </div>
+        <div class="stat-card full">
+          <div class="stat-card-title" data-fr="Scores de pêche par zone — tri décroissant" data-wo="Score yi ci dëkk yi">Scores de pêche par zone</div>
+          <div class="chart-wrap"><canvas id="chartZones"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ALERTES -->
+    <section class="page" id="page-alerts">
+      <div class="alerts-layout fade-in">
+        <div>
+          <div class="page-heading" data-fr="Alertes & Notifications" data-wo="Xaaral ak Xam-xam">Alertes & Notifications</div>
+          <div class="page-sub" data-fr="Conditions maritimes critiques en temps réel" data-wo="Sedd bu rawati géej bi">Conditions maritimes critiques en temps réel</div>
+        </div>
+        <div id="alertsList"></div>
+        <div>
+          <div style="font-family:'Fraunces',serif;font-size:20px;font-weight:900;margin-bottom:16px" data-fr="Paramètres de notification" data-wo="Sëtt xam-xam">Paramètres de notification</div>
+          <div class="settings-grid">
+            <div class="setting-item">
+              <div><div class="setting-label" data-fr="Alertes Telegram" data-wo="Xaaral Telegram">Alertes Telegram</div><div class="setting-desc" data-fr="Bot actif toutes les 6h" data-wo="Bot bi 6 wakht">Bot actif toutes les 6h</div></div>
+              <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="setting-item">
+              <div><div class="setting-label" data-fr="Danger uniquement" data-wo="Réy rekk">Danger uniquement</div><div class="setting-desc" data-fr="Alertes critiques seulement" data-wo="Xaaral yu mag rekk">Alertes critiques seulement</div></div>
+              <div class="toggle" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="setting-item">
+              <div><div class="setting-label" data-fr="Rapport quotidien 6h UTC" data-wo="Rapport 6h UTC">Rapport quotidien 6h UTC</div><div class="setting-desc" data-fr="Résumé complet chaque matin" data-wo="Bës bu xëcc">Résumé complet chaque matin</div></div>
+              <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="setting-item">
+              <div><div class="setting-label" data-fr="SOS WhatsApp" data-wo="WhatsApp Géréej">SOS WhatsApp</div><div class="setting-desc" data-fr="Bouton d'urgence activé" data-wo="Topp géréej bi">Bouton d'urgence activé</div></div>
+              <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROFIL -->
+    <section class="page" id="page-profile">
+      <div class="profile-layout fade-in">
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="profile-card">
+            <div class="profile-avatar">🎣</div>
+            <div class="profile-name" data-fr="Pêcheur Sénégalais" data-wo="Jagalu Senegaal">Pêcheur Sénégalais</div>
+            <div class="profile-role" data-fr="Utilisateur certifié" data-wo="Jëfandikukat">Utilisateur certifié</div>
+            <div style="font-size:12px;color:var(--text2)" data-fr="Côte Atlantique — Sénégal" data-wo="Géej Atlantik — Senegaal">Côte Atlantique — Sénégal</div>
+            <div class="profile-stat-row">
+              <div><div class="profile-stat-num">18</div><div class="profile-stat-lbl" data-fr="Zones" data-wo="Dëkk">Zones</div></div>
+              <div><div class="profile-stat-num" id="prof-safe">—</div><div class="profile-stat-lbl" data-fr="Sûres" data-wo="Baax">Sûres</div></div>
+              <div><div class="profile-stat-num" id="prof-avg">—</div><div class="profile-stat-lbl" data-fr="Score moy." data-wo="Score">Score moy.</div></div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-title" data-fr="Informations plateforme" data-wo="Xam-xam sàmm">Informations plateforme</div>
+            <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text2)">Version</span><span style="font-family:'DM Mono',monospace">v3.0</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text2)" data-fr="Données" data-wo="Xam-xam">Données</span><span style="font-family:'DM Mono',monospace">Copernicus + OpenWeather</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text2)" data-fr="Fréquence" data-wo="Yëgëlu">Fréquence</span><span style="font-family:'DM Mono',monospace" data-fr="Toutes les 6h" data-wo="6 wakht ci 6">Toutes les 6h</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text2)">GitHub Actions</span><span style="font-family:'DM Mono',monospace;color:var(--safe)">✓ Actif</span></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="zones-config">
+            <div class="stat-card-title" data-fr="Zones surveillées — cliquer pour activer/désactiver" data-wo="Dëkk yi — toppal walla toppal du">Zones surveillées</div>
+            <div class="zones-config-grid" id="zonesConfig"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
 </div>
 
-<div id="map"></div>
-
-<!-- PANNEAU GAUCHE -->
-<div class="left-panel">
-
-    <div class="brand-card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
-            <span class="brand-name">🌊 PecheurConnect</span>
-            <span style="font-size:10px; background:rgba(255,255,255,0.2); padding:2px 7px; border-radius:10px">v3.0</span>
-        </div>
-        <div style="display:flex; gap:5px; font-size:11px; flex-wrap:wrap;">
-            <div style="background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:10px">🕑 <span id="lastUpdate">--:--</span></div>
-            <div style="background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:10px">📍 Sénégal</div>
-            <div style="background:rgba(255,255,255,0.1); padding:4px 8px; border-radius:10px" id="srcBadge">🛰️ --</div>
-        </div>
-        <div class="sw-indicator">
-            <div class="sw-dot" id="swDot"></div>
-            <span id="swLabel">Service Worker...</span>
-        </div>
-    </div>
-
-    <div class="nav-card">
-        <a class="nav-item current" href="#">🗺️<br>Carte</a>
-        <a class="nav-item" href="history.html">📊<br>Stats</a>
-        <a class="nav-item" href="alerts-settings.html">🔔<br>Alertes</a>
-        <a class="nav-item" href="https://wa.me/221777020818">📱<br>SOS</a>
-    </div>
-
-    <div class="filter-card">
-        <div class="filter-pills" id="filterPills">
-            <div class="pill active" data-region="all"         onclick="doFilter(this)">Tout</div>
-            <div class="pill" data-region="Nord"               onclick="doFilter(this)">Nord</div>
-            <div class="pill" data-region="Grande Côte"        onclick="doFilter(this)">Grande Côte</div>
-            <div class="pill" data-region="Dakar"              onclick="doFilter(this)">Dakar</div>
-            <div class="pill" data-region="Petite Côte"        onclick="doFilter(this)">P.Côte</div>
-            <div class="pill" data-region="Sine-Saloum"        onclick="doFilter(this)">Sine-Saloum</div>
-            <div class="pill" data-region="Casamance"          onclick="doFilter(this)">Casamance</div>
-        </div>
-    </div>
-
-    <div class="search-card">
-        <input type="text" id="searchInput" class="search-input"
-               placeholder="🔍 Rechercher une zone..."
-               oninput="doSearch(this.value)">
-    </div>
-
-</div>
-
-<!-- STATS BAS GAUCHE -->
-<div class="stats-panel">
-    <div style="display:flex; align-items:center; gap:5px; margin-bottom:10px; font-size:11px; color:var(--accent2)">
-        <div class="live-dot"></div> Direct Mer — <span id="zoneCount">--</span> zones
-    </div>
-    <div class="safety-row">
-        <div class="safety-box">
-            <div class="safety-num" style="color:var(--safe)"    id="cntSafe">0</div>
-            <div class="safety-lbl">🟢 Sûr</div>
-        </div>
-        <div class="safety-box">
-            <div class="safety-num" style="color:var(--caution)" id="cntCaution">0</div>
-            <div class="safety-lbl">🟡 Vigilance</div>
-        </div>
-        <div class="safety-box">
-            <div class="safety-num" style="color:var(--warning)" id="cntWarning">0</div>
-            <div class="safety-lbl">🟠 Prudence</div>
-        </div>
-        <div class="safety-box">
-            <div class="safety-num" style="color:var(--danger)"  id="cntDanger">0</div>
-            <div class="safety-lbl">🔴 Danger</div>
-        </div>
-    </div>
-    <div class="score-avg">
-        <span style="color:var(--text-dim); font-size:11px">Score pêche moyen</span>
-        <span class="score-avg-val" id="scoreAvg">--</span>
-    </div>
-</div>
-
-<!-- FABs -->
 <div class="fab-group">
-    <a class="fab fab-wa" href="https://wa.me/221777020818" target="_blank" title="SOS WhatsApp">📱</a>
-    <button class="fab fab-ref" onclick="location.reload()" title="Actualiser">🔄</button>
+  <a class="fab fab-wa" href="https://wa.me/221777020818" target="_blank">📱</a>
+  <button class="fab fab-ref" onclick="location.reload()">🔄</button>
 </div>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
 <script>
-// ============================================================
-// COORDONNÉES — 18 zones complètes (synchronisées avec script_peche.py)
-// ============================================================
 const COORDS = {
-    "SAINT-LOUIS":           { lat: 16.05, lon: -16.65 },
-    "GANDON":                { lat: 16.00, lon: -16.50 },
-    "SAINT-LOUIS-HYDROBASE": { lat: 16.10, lon: -16.48 },
-    "POTOU":                 { lat: 15.70, lon: -16.55 },
-    "LOMPOUL":               { lat: 15.45, lon: -16.70 },
-    "KAYAR":                 { lat: 14.95, lon: -17.35 },
-    "DAKAR-YOFF":            { lat: 14.80, lon: -17.65 },
-    "DAKAR-SOUMBEDIOUNE":    { lat: 14.68, lon: -17.44 },
-    "DAKAR-HANN":            { lat: 14.72, lon: -17.38 },
-    "THIAROYE-SUR-MER":      { lat: 14.75, lon: -17.40 },
-    "MBOUR-JOAL":            { lat: 14.35, lon: -17.15 },
-    "JOAL-FADIOUTH":         { lat: 14.16, lon: -16.85 },
-    "PALMARIN":              { lat: 14.00, lon: -16.80 },
-    "NDANGANE":              { lat: 13.75, lon: -16.65 },
-    "DJIFER":                { lat: 13.60, lon: -16.75 },
-    "KAFOUNTINE":            { lat: 12.90, lon: -16.75 },
-    "CASAMANCE-ZIGUINCHOR":  { lat: 12.50, lon: -16.95 },
-    "CAP-SKIRRING":          { lat: 12.39, lon: -16.74 },
+  "SAINT-LOUIS":{lat:16.05,lon:-16.65},"GANDON":{lat:16.00,lon:-16.50},
+  "SAINT-LOUIS-HYDROBASE":{lat:16.10,lon:-16.48},"POTOU":{lat:15.70,lon:-16.55},
+  "LOMPOUL":{lat:15.45,lon:-16.70},"KAYAR":{lat:14.95,lon:-17.35},
+  "DAKAR-YOFF":{lat:14.80,lon:-17.65},"DAKAR-SOUMBEDIOUNE":{lat:14.68,lon:-17.44},
+  "DAKAR-HANN":{lat:14.72,lon:-17.38},"THIAROYE-SUR-MER":{lat:14.75,lon:-17.40},
+  "MBOUR-JOAL":{lat:14.35,lon:-17.15},"JOAL-FADIOUTH":{lat:14.16,lon:-16.85},
+  "PALMARIN":{lat:14.00,lon:-16.80},"NDANGANE":{lat:13.75,lon:-16.65},
+  "DJIFER":{lat:13.60,lon:-16.75},"KAFOUNTINE":{lat:12.90,lon:-16.75},
+  "CASAMANCE-ZIGUINCHOR":{lat:12.50,lon:-16.95},"CAP-SKIRRING":{lat:12.39,lon:-16.74}
 };
 
-// ============================================================
-// ÉTAT GLOBAL
-// ============================================================
-let map, clusterLayer;
-let allZones  = [];   // tableau normalisé depuis data.json v3.0
-let metaData  = {};
+let allZones=[], map, markers=[], chartInstance=null, currentLang='fr';
 
-// ============================================================
-// INIT
-// ============================================================
-document.addEventListener('DOMContentLoaded', () => {
-    initMap();
-    loadData();
+document.addEventListener('DOMContentLoaded',()=>{ initMap(); loadData(); startClock(); });
 
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js')
-            .then(() => {
-                document.getElementById('swDot').classList.add('online');
-                document.getElementById('swLabel').innerText = "Mode Hors-ligne OK";
-            })
-            .catch(() => {
-                document.getElementById('swLabel').innerText = "Hors-ligne indisponible";
-            });
-    }
-});
-
-// ============================================================
-// CARTE LEAFLET
-// ============================================================
-function initMap() {
-    map = L.map('map', { center: [14.3, -16.9], zoom: 7, zoomControl: false });
-
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '© OpenStreetMap contributors | © CARTO | PecheurConnect',
-        maxZoom: 18
-    }).addTo(map);
-
-    clusterLayer = L.markerClusterGroup({
-        iconCreateFunction: (cluster) => L.divIcon({
-            html: `<div class="mk-inner" style="background:var(--primary); font-size:14px">${cluster.getChildCount()}</div>`,
-            className: 'mk-bubble',
-            iconSize: [44, 44]
-        }),
-        disableClusteringAtZoom: 10
-    });
-    clusterLayer.addTo(map);
+function initMap(){
+  map=L.map('map',{center:[14.3,-16.9],zoom:7,zoomControl:false});
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap | © CARTO'}).addTo(map);
+  L.control.zoom({position:'bottomright'}).addTo(map);
 }
 
-// ============================================================
-// CHARGEMENT data.json v3.0
-// ============================================================
-async function loadData() {
-    try {
-        document.getElementById('lsStatus').innerText = "Chargement des données marines...";
-        const res  = await fetch('data.json');
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json = await res.json();
-
-        // ── Parsing du format v3.0 ──
-        // Structure : { meta:{...}, stats:{...}, zones:{ ZONE_NAME: {...} } }
-        metaData = json.meta || {};
-        const zonesObj = json.zones || {};
-
-        // Normaliser en tableau pour faciliter les opérations
-        allZones = Object.entries(zonesObj).map(([name, data]) => ({
-            zone:     name,
-            region:   data.region,
-            desc:     data.desc,
-            lat:      data.lat,
-            lon:      data.lon,
-            // Indices halieutiques
-            securite_code:  data.indices?.securite_code  || "safe",
-            securite_texte: data.indices?.securite_texte || "—",
-            peche_score:    data.indices?.peche_score    || 0,
-            peche_texte:    data.indices?.peche_texte    || "—",
-            wave:           data.indices?.wave           || 0,
-            temp:           data.indices?.temp           || 0,
-            current:        data.indices?.current        || 0,
-            // Sources
-            source_ow:  data.openweather?.source  || "simulation",
-            source_cop: data.copernicus?.source   || "simulation",
-            updated_at: data.updated_at || "",
-        }));
-
-        renderMarkers(allZones);
-        updateStats(allZones, json.stats);
-        updateMeta(metaData);
-
-        setTimeout(() => document.getElementById('loadingScreen').classList.add('hide'), 900);
-
-    } catch (e) {
-        console.error("Erreur loadData:", e);
-        document.getElementById('lsStatus').innerText = "⚠️ Erreur de chargement — vérifiez data.json";
-    }
+async function loadData(){
+  try{
+    const res=await fetch('data.json');
+    const json=await res.json();
+    allZones=Object.entries(json.zones||{}).map(([name,d])=>({
+      zone:name, region:d.region, desc:d.desc, lat:d.lat, lon:d.lon,
+      securite_code:d.indices?.securite_code||'safe',
+      securite_texte:d.indices?.securite_texte||'—',
+      peche_score:d.indices?.peche_score||0,
+      wave:d.indices?.wave||0, temp:d.indices?.temp||0, current:d.indices?.current||0,
+      source:d.copernicus?.source||'simulation', updated_at:d.updated_at||''
+    }));
+    render(json);
+  }catch(e){ console.warn('data.json absent, mode demo'); loadDemo(); }
 }
 
-// ============================================================
-// AFFICHAGE DES MARQUEURS
-// ============================================================
-function renderMarkers(zones) {
-    clusterLayer.clearLayers();
-
-    zones.forEach(z => {
-        const coords = COORDS[z.zone];
-        if (!coords) {
-            console.warn(`Coordonnées manquantes pour : ${z.zone}`);
-            return;
-        }
-
-        const color = secColor(z.securite_code);
-
-        const icon = L.divIcon({
-            className: 'mk-bubble',
-            html: `
-                <div class="mk-inner" style="background:${color}">
-                    <div class="mk-wave">${z.wave.toFixed(1)}m</div>
-                    <div class="mk-name">${z.zone}</div>
-                </div>`,
-            iconSize:   [72, 44],
-            iconAnchor: [36, 44],
-        });
-
-        const marker = L.marker([coords.lat, coords.lon], { icon });
-
-        // Score affiché sur 10 (correct — pas de conversion ×10)
-        const scoreBar = scoreBarHtml(z.peche_score);
-        const sourceLabel = z.source_cop === 'copernicus'
-            ? '🛰️ Copernicus + OpenWeather'
-            : z.source_ow === 'openweather'
-                ? '☁️ OpenWeather (simulation Copernicus)'
-                : '🔬 Mode Simulation';
-
-        const updatedLabel = z.updated_at
-            ? new Date(z.updated_at).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})
-            : '--';
-
-        marker.bindPopup(`
-            <div class="pu">
-                <div class="pu-head" style="background:${color}">
-                    <div class="pu-head-name">${z.zone}</div>
-                    <div class="pu-head-desc">${z.region} — ${z.desc}</div>
-                </div>
-                <div class="pu-body">
-                    <div class="pu-metrics">
-                        <div class="pu-metric">
-                            <div class="pu-mval">${z.wave.toFixed(1)}m</div>
-                            <div class="pu-mlbl">Houle</div>
-                        </div>
-                        <div class="pu-metric">
-                            <div class="pu-mval">${z.temp.toFixed(1)}°</div>
-                            <div class="pu-mlbl">SST</div>
-                        </div>
-                        <div class="pu-metric">
-                            <div class="pu-mval">${z.current.toFixed(2)}</div>
-                            <div class="pu-mlbl">m/s</div>
-                        </div>
-                    </div>
-                    <div class="pu-safety" style="background:${color}">${z.securite_texte}</div>
-                    <div class="pu-score">
-                        🎣 Indice Pêche : <b>${z.peche_score}/10</b>
-                        ${scoreBar}
-                    </div>
-                    <div class="pu-source">${sourceLabel} · ${updatedLabel}</div>
-                    <a href="https://wa.me/221777020818?text=Zone+${encodeURIComponent(z.zone)}+:+${encodeURIComponent(z.securite_texte)}"
-                       class="pu-btn pu-btn-wa" target="_blank">📱 Partager sur WhatsApp</a>
-                </div>
-            </div>
-        `, { maxWidth: 290 });
-
-        clusterLayer.addLayer(marker);
-    });
+function loadDemo(){
+  allZones=Object.entries(COORDS).map(([name,c],i)=>{
+    const codes=['safe','safe','caution','warning','danger'];
+    const texts=['🟢 FAVORABLE — Mer calme','🟢 FAVORABLE — Mer calme','🟡 VIGILANCE','🟠 PRUDENCE — Mer formée','🔴 DANGER — Mer agitée'];
+    const sc=codes[i%5];
+    return{zone:name,region:'—',desc:'Sénégal',lat:c.lat,lon:c.lon,
+      securite_code:sc,securite_texte:texts[i%5],
+      peche_score:+(5+Math.random()*4.5).toFixed(1),
+      wave:+(0.4+Math.random()*2.2).toFixed(1),
+      temp:+(22+Math.random()*5).toFixed(1),
+      current:+(0.1+Math.random()*.5).toFixed(2),
+      source:'demo',updated_at:new Date().toISOString()};
+  });
+  render({stats:{},meta:{}});
 }
 
-// ============================================================
-// MISE À JOUR DES STATS
-// ============================================================
-function updateStats(zones, stats) {
-    // Compteurs de sécurité — directement depuis les zones normalisées
-    document.getElementById('cntSafe').innerText    = zones.filter(z => z.securite_code === 'safe').length;
-    document.getElementById('cntCaution').innerText = zones.filter(z => z.securite_code === 'caution').length;
-    document.getElementById('cntWarning').innerText = zones.filter(z => z.securite_code === 'warning').length;
-    document.getElementById('cntDanger').innerText  = zones.filter(z => z.securite_code === 'danger').length;
-    document.getElementById('zoneCount').innerText  = zones.length;
-
-    // Score moyen — depuis stats ou calculé localement si absent
-    const avg = stats?.score_moyen
-        ?? (zones.reduce((s, z) => s + z.peche_score, 0) / (zones.length || 1)).toFixed(1);
-    document.getElementById('scoreAvg').innerText = `${avg}/10`;
+function render(json){
+  renderMarkers(allZones);
+  renderZonesList(allZones);
+  updateCounters(allZones);
+  renderHistory(allZones,json.stats||{},json.meta||{});
+  renderAlerts(allZones);
+  renderProfile(allZones);
+  renderZonesConfig();
 }
 
-function updateMeta(meta) {
-    if (meta.generated_at) {
-        const d = new Date(meta.generated_at);
-        document.getElementById('lastUpdate').innerText =
-            d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-    }
-    if (meta.sources && meta.sources.length) {
-        const hasCop = meta.sources.includes('copernicus');
-        document.getElementById('srcBadge').innerText = hasCop ? '🛰️ Copernicus' : '☁️ Simulation';
-    }
+function secColor(c){return c==='danger'?'#ff1744':c==='warning'?'#ff9100':c==='caution'?'#ffea00':'#00e676';}
+function textColor(c){return c==='caution'?'#222':'white';}
+
+function renderMarkers(zones){
+  markers.forEach(m=>map.removeLayer(m)); markers=[];
+  zones.forEach(z=>{
+    const c=COORDS[z.zone]; if(!c)return;
+    const col=secColor(z.securite_code), tc=textColor(z.securite_code);
+    const icon=L.divIcon({className:'mk-bubble',
+      html:`<div class="mk-pin" style="background:${col};color:${tc}">${z.wave.toFixed(1)}m · ${z.peche_score}/10</div>`,
+      iconAnchor:[40,18]});
+    const scoreBar=`<div class="score-bar-wrap"><div class="score-bar" style="width:${z.peche_score*10}%;background:${col}"></div></div>`;
+    const popup=`<div>
+      <div class="popup-head" style="background:${col}">
+        <div class="popup-head-name">${z.zone}</div>
+        <div class="popup-head-desc">${z.region} — ${z.desc}</div>
+      </div>
+      <div class="popup-body">
+        <div class="popup-metrics">
+          <div class="popup-metric"><div class="popup-metric-val">${z.wave.toFixed(1)}m</div><div class="popup-metric-lbl">Houle</div></div>
+          <div class="popup-metric"><div class="popup-metric-val">${z.temp.toFixed(1)}°</div><div class="popup-metric-lbl">SST</div></div>
+          <div class="popup-metric"><div class="popup-metric-val">${z.current.toFixed(2)}</div><div class="popup-metric-lbl">m/s</div></div>
+        </div>
+        <div class="popup-status" style="background:${col};color:${tc}">${z.securite_texte}</div>
+        <div style="text-align:center;font-size:12px;margin-bottom:8px">🎣 Score pêche : <strong>${z.peche_score}/10</strong>${scoreBar}</div>
+        <a href="https://wa.me/221777020818?text=${encodeURIComponent(z.zone+' : '+z.securite_texte)}" class="popup-wa" target="_blank">📱 Partager sur WhatsApp</a>
+      </div></div>`;
+    const m=L.marker([c.lat,c.lon],{icon}).bindPopup(popup,{maxWidth:280});
+    m.addTo(map); markers.push(m);
+  });
 }
 
-// ============================================================
-// FILTRES ET RECHERCHE
-// ============================================================
-function doFilter(el) {
-    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-    el.classList.add('active');
-    const reg = el.getAttribute('data-region');
-    const filtered = reg === 'all' ? allZones : allZones.filter(z => z.region === reg);
-    renderMarkers(filtered);
-    updateStats(filtered, null);
+function renderZonesList(zones){
+  document.getElementById('zonesList').innerHTML=zones.map(z=>`
+    <div class="zone-card ${z.securite_code}" onclick="focusZone('${z.zone}')">
+      <div class="zone-top">
+        <div><div class="zone-name">${z.zone}</div><div class="zone-region">${z.region}</div></div>
+        <div class="zone-score-badge">${z.peche_score}/10</div>
+      </div>
+      <div class="zone-metrics">🌊 <span>${z.wave.toFixed(1)}m</span>&nbsp; 🌡️ <span>${z.temp.toFixed(1)}°</span>&nbsp; ↗️ <span>${z.current.toFixed(2)}</span></div>
+    </div>`).join('');
 }
 
-function doSearch(q) {
-    const lq = q.toLowerCase().trim();
-    const filtered = lq
-        ? allZones.filter(z =>
-            z.zone.toLowerCase().includes(lq) ||
-            z.region.toLowerCase().includes(lq) ||
-            z.desc.toLowerCase().includes(lq))
-        : allZones;
-    renderMarkers(filtered);
+function focusZone(name){
+  const c=COORDS[name]; if(!c)return;
+  map.flyTo([c.lat,c.lon],11,{duration:.8});
+  const idx=allZones.findIndex(z=>z.zone===name);
+  if(idx>=0&&markers[idx]) setTimeout(()=>markers[idx].openPopup(),800);
 }
 
-// ============================================================
-// UTILITAIRES
-// ============================================================
-function secColor(code) {
-    return code === 'danger'  ? 'var(--danger)'
-         : code === 'warning' ? 'var(--warning)'
-         : code === 'caution' ? 'var(--caution)'
-         : 'var(--safe)';
+function updateCounters(zones){
+  const c={safe:0,caution:0,warning:0,danger:0};
+  zones.forEach(z=>{if(c[z.securite_code]!==undefined)c[z.securite_code]++;});
+  ['safe','caution','warning','danger'].forEach(k=>{
+    const el=document.getElementById('cnt-'+k), sb=document.getElementById('sb-'+k);
+    if(el)el.textContent=c[k]; if(sb)sb.textContent=c[k];
+  });
 }
 
-function scoreBarHtml(score) {
-    const pct   = Math.round((score / 10) * 100);
-    const color = score >= 7 ? '#00c853' : score >= 4 ? '#ffd600' : '#d50000';
-    return `
-        <div style="margin-top:6px; height:4px; background:#eee; border-radius:4px; overflow:hidden">
-            <div style="width:${pct}%; height:100%; background:${color}; border-radius:4px; transition:width 0.6s"></div>
-        </div>`;
+function renderHistory(zones,stats,meta){
+  const scores=zones.map(z=>z.peche_score);
+  const avg=scores.length?(scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1):'—';
+  const safe=zones.filter(z=>z.securite_code==='safe').length;
+  const top=[...zones].sort((a,b)=>b.peche_score-a.peche_score)[0];
+  document.getElementById('hist-avg').textContent=stats.score_moyen||avg;
+  document.getElementById('hist-safe').textContent=safe;
+  document.getElementById('hist-top').textContent=top?.zone||'—';
+  document.getElementById('hist-top-score').textContent=top?`Score : ${top.peche_score}/10 · ${top.region}`:'';
+  document.getElementById('prof-safe').textContent=safe;
+  document.getElementById('prof-avg').textContent=avg;
+  if(meta.generated_at){
+    const d=new Date(meta.generated_at);
+    document.getElementById('hist-update').textContent=d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+' UTC';
+  }
+  if(meta.sources) document.getElementById('hist-source').textContent=meta.sources.join(' + ');
+  buildChart(zones);
+}
+
+function buildChart(zones){
+  const ctx=document.getElementById('chartZones')?.getContext('2d'); if(!ctx)return;
+  if(chartInstance)chartInstance.destroy();
+  const sorted=[...zones].sort((a,b)=>b.peche_score-a.peche_score);
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  const gridColor=isDark?'rgba(255,255,255,.05)':'rgba(0,0,0,.06)';
+  const tickColor=isDark?'#8a9bb5':'#4a5a74';
+  chartInstance=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:sorted.map(z=>z.zone.replace(/-/g,' ')),
+      datasets:[{label:'Score',data:sorted.map(z=>z.peche_score),
+        backgroundColor:sorted.map(z=>secColor(z.securite_code)+'bb'),
+        borderColor:sorted.map(z=>secColor(z.securite_code)),
+        borderWidth:1,borderRadius:6}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{ticks:{color:tickColor,font:{size:9},maxRotation:45},grid:{color:gridColor}},
+        y:{min:0,max:10,ticks:{color:tickColor,font:{size:11}},grid:{color:gridColor}}
+      }}
+  });
+}
+
+function renderAlerts(zones){
+  const danger=zones.filter(z=>z.securite_code==='danger');
+  const warning=zones.filter(z=>z.securite_code==='warning');
+  const count=danger.length+warning.length;
+  const badge=document.getElementById('alertBadge');
+  badge.textContent=count||'✓'; badge.style.background=count?'var(--danger)':'var(--safe)';
+  let html='';
+  danger.forEach(z=>{html+=`
+    <div class="alert-card">
+      <div class="alert-icon-wrap danger">🔴</div>
+      <div class="alert-body">
+        <div class="alert-title">${z.zone} — DANGER</div>
+        <div class="alert-desc">${z.securite_texte} · Houle ${z.wave.toFixed(1)}m · Courant ${z.current.toFixed(2)}m/s</div>
+        <div class="alert-meta">${z.region} · Score pêche ${z.peche_score}/10</div>
+      </div>
+      <a href="https://wa.me/221777020818" class="alert-action" target="_blank">SOS →</a>
+    </div>`;});
+  warning.forEach(z=>{html+=`
+    <div class="alert-card">
+      <div class="alert-icon-wrap warning">🟠</div>
+      <div class="alert-body">
+        <div class="alert-title">${z.zone} — Prudence requise</div>
+        <div class="alert-desc">${z.securite_texte} · Houle ${z.wave.toFixed(1)}m</div>
+        <div class="alert-meta">${z.region} · Score pêche ${z.peche_score}/10</div>
+      </div>
+      <button class="alert-action" onclick="showPage('dashboard');focusZone('${z.zone}')">Voir →</button>
+    </div>`;});
+  if(!html)html=`<div class="alert-card"><div class="alert-icon-wrap info">✅</div><div class="alert-body"><div class="alert-title" data-fr="Aucune alerte active" data-wo="Alerte amul">Aucune alerte active</div><div class="alert-desc" data-fr="Toutes les zones sont dans des conditions acceptables" data-wo="Dëkk yi yépp baax nañu">Toutes les zones sont dans des conditions acceptables</div></div></div>`;
+  document.getElementById('alertsList').innerHTML=html;
+}
+
+function renderProfile(zones){
+  const scores=zones.map(z=>z.peche_score);
+  document.getElementById('prof-safe').textContent=zones.filter(z=>z.securite_code==='safe').length;
+  document.getElementById('prof-avg').textContent=scores.length?(scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1):'—';
+}
+
+function renderZonesConfig(){
+  document.getElementById('zonesConfig').innerHTML=Object.keys(COORDS).map(name=>`
+    <div class="zone-toggle-item selected" onclick="this.classList.toggle('selected')">
+      <div><div class="zone-toggle-name">${name}</div></div>
+      <div class="toggle on" onclick="event.stopPropagation();this.classList.toggle('on')"></div>
+    </div>`).join('');
+}
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{if(n.getAttribute('onclick')?.includes(id))n.classList.add('active');});
+  if(id==='dashboard')setTimeout(()=>map.invalidateSize(),50);
+}
+
+function doFilter(el){
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active')); el.classList.add('active');
+  const reg=el.dataset.region;
+  const f=reg==='all'?allZones:allZones.filter(z=>z.region===reg);
+  renderMarkers(f); renderZonesList(f); updateCounters(f);
+}
+
+function doSearch(q){
+  const lq=q.toLowerCase();
+  const f=lq?allZones.filter(z=>z.zone.toLowerCase().includes(lq)||z.region.toLowerCase().includes(lq)):allZones;
+  renderMarkers(f); renderZonesList(f);
+}
+
+function setLang(lang){
+  currentLang=lang;
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent===lang.toUpperCase()));
+  document.querySelectorAll(`[data-${lang}]`).forEach(el=>el.textContent=el.getAttribute(`data-${lang}`));
+}
+
+function toggleTheme(){
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  document.documentElement.setAttribute('data-theme',isDark?'light':'dark');
+  document.getElementById('themeBtn').textContent=isDark?'☀️':'🌙';
+  if(map){
+    map.eachLayer(l=>{if(l._url)map.removeLayer(l);});
+    L.tileLayer(isDark
+      ?'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
+      :'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+      {attribution:'© OpenStreetMap | © CARTO'}).addTo(map);
+  }
+  if(allZones.length)buildChart(allZones);
+}
+
+function startClock(){
+  const tick=()=>{
+    const n=new Date();
+    document.getElementById('clock').textContent=
+      [n.getUTCHours(),n.getUTCMinutes(),n.getUTCSeconds()].map(v=>String(v).padStart(2,'0')).join(':')+' UTC';
+  };
+  tick(); setInterval(tick,1000);
 }
 </script>
 </body>
