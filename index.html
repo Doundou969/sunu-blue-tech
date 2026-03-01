@@ -2,666 +2,1279 @@
 <html lang="fr" data-theme="dark">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PecheurConnect v3.0 — Plateforme Maritime Sénégal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#030b14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>PecheurConnect v4.0</title>
+<link rel="manifest" href="#" id="manifestLink">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;0,9..144,900;1,9..144,300&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
 <style>
+/* ══════════════════════════════════════════════════════
+   PECHEURCONNECT v4.0 — Nautique Instrumental
+   Syne (géométrique) + Crimson Pro (éditorial) + DM Mono
+   Noir abyssal · Cyan bioluminescent · Ambre solaire
+══════════════════════════════════════════════════════ */
 :root {
-  --bg:#070d18; --bg2:#0d1525; --bg3:#111e35;
-  --surface:rgba(13,21,37,0.95); --border:rgba(255,255,255,0.07); --border-act:rgba(0,200,180,0.35);
-  --text:#e8edf5; --text2:#8a9bb5; --text3:#4a5a74;
-  --teal:#00c8b4; --teal-dim:rgba(0,200,180,0.12);
-  --amber:#f5a623; --amber-dim:rgba(245,166,35,0.12);
-  --coral:#ff5252; --coral-dim:rgba(255,82,82,0.12);
-  --safe:#00e676; --caution:#ffea00; --warning:#ff9100; --danger:#ff1744;
-  --sidebar-w:260px; --topbar-h:64px;
-  --radius:14px; --radius-sm:8px;
-  --shadow:0 16px 48px rgba(0,0,0,0.5); --shadow-sm:0 4px 16px rgba(0,0,0,0.3);
-  --glow-teal:0 0 24px rgba(0,200,180,0.2);
+  --bg:     #030b14;
+  --bg2:    #071525;
+  --bg3:    #0c1e33;
+  --bg4:    #0f2440;
+  --glass:  rgba(7,21,37,0.88);
+  --glass2: rgba(12,30,51,0.7);
+  --b:      rgba(255,255,255,0.06);
+  --b2:     rgba(0,220,200,0.25);
+  --text:   #dce8f0;
+  --text2:  #6a8da8;
+  --text3:  #334d63;
+  --cyan:   #00dcc8;
+  --cyan2:  #00b8a0;
+  --cyan-d: rgba(0,220,200,0.1);
+  --amber:  #f0a500;
+  --amber-d:rgba(240,165,0,0.1);
+  --coral:  #ff4b6e;
+  --coral-d:rgba(255,75,110,0.1);
+  --safe:   #00e87c;
+  --caution:#f0c400;
+  --warning:#ff8c00;
+  --danger: #ff2044;
+  --r:16px; --r2:10px;
+  --sh: 0 24px 64px rgba(0,0,0,0.6);
+  --glow: 0 0 32px rgba(0,220,200,0.15);
+  --sidebar:260px; --top:60px;
 }
 [data-theme="light"] {
-  --bg:#f0f4f8; --bg2:#ffffff; --bg3:#e8edf5;
-  --surface:rgba(255,255,255,0.97); --border:rgba(0,0,0,0.08); --border-act:rgba(0,100,150,0.3);
-  --text:#0d1525; --text2:#4a5a74; --text3:#8a9bb5;
-  --teal:#006b60; --teal-dim:rgba(0,107,96,0.08);
-  --shadow:0 8px 32px rgba(0,0,0,0.12); --shadow-sm:0 2px 8px rgba(0,0,0,0.08);
-  --glow-teal:0 0 16px rgba(0,107,96,0.1);
+  --bg:#edf2f7; --bg2:#ffffff; --bg3:#e2eaf2; --bg4:#d5e0ec;
+  --glass:rgba(255,255,255,0.93); --glass2:rgba(226,234,242,0.8);
+  --b:rgba(0,0,0,0.07); --b2:rgba(0,100,120,0.25);
+  --text:#0a1f30; --text2:#3a5a72; --text3:#8aabb8;
+  --cyan:#006a5e; --cyan2:#005a50; --cyan-d:rgba(0,106,94,0.07);
+  --sh:0 8px 32px rgba(0,0,0,0.1); --glow:0 0 16px rgba(0,106,94,0.08);
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-html{font-size:15px;}
-body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+html{font-size:15px;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;display:flex;flex-direction:column;}
 
-/* TOPBAR */
-.topbar{height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);backdrop-filter:blur(20px);display:flex;align-items:center;padding:0 24px;gap:20px;z-index:200;flex-shrink:0;}
-.brand-wave{font-size:26px;filter:drop-shadow(0 0 8px rgba(0,200,180,.5));}
-.brand-text{font-family:'Fraunces',serif;font-size:20px;font-weight:700;letter-spacing:-.3px;}
-.brand-tag{font-size:10px;font-family:'DM Mono',monospace;color:var(--teal);background:var(--teal-dim);border:1px solid rgba(0,200,180,.2);padding:2px 7px;border-radius:4px;}
-.topbar-center{flex:1;display:flex;justify-content:center;}
-.live-indicator{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);font-family:'DM Mono',monospace;}
-.live-dot{width:7px;height:7px;border-radius:50%;background:var(--safe);box-shadow:0 0 8px var(--safe);animation:pulse-dot 2s infinite;}
-@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
-.topbar-right{display:flex;align-items:center;gap:12px;flex:0 0 auto;}
-.lang-switch{display:flex;background:var(--bg3);border-radius:20px;padding:3px;gap:2px;border:1px solid var(--border);}
-.lang-btn{padding:4px 11px;border-radius:16px;font-size:11px;font-weight:600;cursor:pointer;border:none;background:transparent;color:var(--text2);transition:all .2s;}
-.lang-btn.active{background:var(--teal);color:white;}
-.theme-btn{width:36px;height:36px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
-.theme-btn:hover{border-color:var(--teal);box-shadow:var(--glow-teal);}
-.topbar-time{font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);background:var(--bg3);padding:6px 12px;border-radius:8px;border:1px solid var(--border);}
+/* ── WAVE CANVAS BACKGROUND ── */
+#waveBg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:.35;pointer-events:none;}
 
-/* LAYOUT */
-.app-body{display:flex;flex:1;overflow:hidden;}
+/* ── TOPBAR ── */
+.top{height:var(--top);background:var(--glass);border-bottom:1px solid var(--b);backdrop-filter:blur(24px);display:flex;align-items:center;padding:0 20px;gap:16px;z-index:300;flex-shrink:0;position:relative;}
+.brand{display:flex;align-items:center;gap:9px;flex:0 0 auto;}
+.brand-icon{font-size:22px;animation:bob 3s ease-in-out infinite;}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.brand-name{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;letter-spacing:-.2px;}
+.brand-v{font-size:9px;font-family:'DM Mono',monospace;color:var(--cyan);background:var(--cyan-d);border:1px solid rgba(0,220,200,0.2);padding:2px 6px;border-radius:4px;letter-spacing:.05em;}
+.top-center{flex:1;display:flex;justify-content:center;align-items:center;gap:20px;}
+.live-pill{display:flex;align-items:center;gap:7px;font-size:11px;font-family:'DM Mono',monospace;color:var(--text2);background:var(--bg3);border:1px solid var(--b);padding:5px 12px;border-radius:20px;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--safe);box-shadow:0 0 6px var(--safe);animation:blip 2s infinite;}
+@keyframes blip{0%,100%{opacity:1}50%{opacity:.3}}
+.offline-banner{display:none;background:var(--amber);color:#000;font-size:11px;font-weight:700;padding:4px 14px;border-radius:12px;}
+.top-right{display:flex;align-items:center;gap:10px;flex:0 0 auto;}
+.ls{display:flex;background:var(--bg3);border-radius:20px;padding:3px;gap:1px;border:1px solid var(--b);}
+.lb{padding:4px 10px;border-radius:16px;font-size:11px;font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--text2);font-family:'Syne',sans-serif;transition:all .15s;}
+.lb.on{background:var(--cyan);color:#000;}
+.icnbtn{width:34px;height:34px;border-radius:50%;background:var(--bg3);border:1px solid var(--b);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.icnbtn:hover{border-color:var(--cyan);box-shadow:var(--glow);}
+.clk{font-family:'DM Mono',monospace;font-size:11px;color:var(--text2);background:var(--bg3);padding:5px 10px;border-radius:8px;border:1px solid var(--b);}
 
-/* SIDEBAR */
-.sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--border);backdrop-filter:blur(20px);display:flex;flex-direction:column;z-index:100;flex-shrink:0;}
-.nav-section{padding:20px 14px 8px;}
-.nav-label{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);padding:0 10px;margin-bottom:8px;}
-.nav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:var(--radius-sm);cursor:pointer;transition:all .2s;position:relative;color:var(--text2);font-size:13.5px;font-weight:500;margin-bottom:2px;text-decoration:none;}
-.nav-item:hover{background:var(--teal-dim);color:var(--text);}
-.nav-item.active{background:var(--teal-dim);color:var(--teal);border:1px solid var(--border-act);}
-.nav-item.active::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:60%;background:var(--teal);border-radius:0 3px 3px 0;}
-.nav-icon{font-size:17px;flex-shrink:0;}
-.nav-badge{margin-left:auto;background:var(--danger);color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;font-family:'DM Mono',monospace;}
-.sidebar-stats{margin:auto 0 0;padding:16px;border-top:1px solid var(--border);}
-.stat-mini{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:12px;}
-.stat-mini-val{font-family:'DM Mono',monospace;font-weight:500;}
-.stat-mini-val.safe{color:var(--safe);}.stat-mini-val.caution{color:var(--caution);}.stat-mini-val.warning{color:var(--warning);}.stat-mini-val.danger{color:var(--danger);}
+/* ── BODY LAYOUT ── */
+.body{display:flex;flex:1;overflow:hidden;position:relative;z-index:1;}
 
-/* CONTENT */
-.content{flex:1;overflow:hidden;position:relative;}
-.page{display:none;height:100%;overflow:hidden;}
-.page.active{display:flex;flex-direction:column;}
+/* ── SIDEBAR ── */
+.side{width:var(--sidebar);background:var(--glass);border-right:1px solid var(--b);backdrop-filter:blur(24px);display:flex;flex-direction:column;z-index:200;flex-shrink:0;overflow-y:auto;}
+.side::-webkit-scrollbar{width:3px;}.side::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px;}
+.ns{padding:18px 12px 6px;}
+.nl{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);padding:0 8px;margin-bottom:6px;}
+.ni{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r2);cursor:pointer;transition:all .15s;position:relative;color:var(--text2);font-size:13px;font-weight:600;margin-bottom:1px;text-decoration:none;white-space:nowrap;}
+.ni:hover{background:var(--cyan-d);color:var(--text);}
+.ni.on{background:var(--cyan-d);color:var(--cyan);border:1px solid var(--b2);}
+.ni.on::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:2.5px;height:55%;background:var(--cyan);border-radius:0 2px 2px 0;}
+.ni .ic{font-size:16px;flex-shrink:0;width:22px;text-align:center;}
+.nbadge{margin-left:auto;background:var(--danger);color:white;font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;font-family:'DM Mono',monospace;}
+.nbadge.ok{background:var(--safe);}
+.new-tag{margin-left:auto;font-size:8px;font-weight:800;color:var(--amber);background:var(--amber-d);border:1px solid rgba(240,165,0,.3);padding:1px 5px;border-radius:4px;letter-spacing:.06em;}
 
-/* DASHBOARD */
-.dashboard-layout{display:grid;grid-template-columns:1fr 340px;height:100%;overflow:hidden;}
-#map{position:relative;z-index:1;height:100%;}
-.map-overlay-top{position:absolute;top:16px;left:16px;right:16px;z-index:10;display:flex;gap:10px;pointer-events:none;}
-.map-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);backdrop-filter:blur(16px);padding:10px 14px;pointer-events:all;}
-.filter-pills{display:flex;gap:6px;flex-wrap:wrap;}
-.pill{padding:5px 13px;border-radius:20px;font-size:11.5px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--text2);transition:all .2s;}
-.pill.active{background:var(--teal);border-color:var(--teal);color:white;}
-.search-wrap{display:flex;align-items:center;gap:8px;}
-.search-input{background:transparent;border:none;outline:none;color:var(--text);font-family:'Outfit',sans-serif;font-size:13px;width:160px;}
-.search-input::placeholder{color:var(--text3);}
-.dash-right{background:var(--surface);border-left:1px solid var(--border);backdrop-filter:blur(20px);overflow-y:auto;display:flex;flex-direction:column;}
-.dash-right::-webkit-scrollbar{width:4px;}.dash-right::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
-.panel-header{padding:20px 20px 14px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);backdrop-filter:blur(20px);z-index:5;}
-.panel-title{font-family:'Fraunces',serif;font-size:17px;font-weight:700;margin-bottom:14px;}
-.status-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
-.status-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;text-align:center;}
-.status-num{font-family:'Fraunces',serif;font-size:28px;font-weight:900;line-height:1;margin-bottom:4px;}
-.status-lbl{font-size:10px;color:var(--text2);font-weight:600;letter-spacing:.06em;}
-.zones-list{padding:12px;flex:1;}
-.zone-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
-.zone-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px;}
-.zone-card.safe::before{background:var(--safe);}.zone-card.caution::before{background:var(--caution);}.zone-card.warning::before{background:var(--warning);}.zone-card.danger::before{background:var(--danger);}
-.zone-card:hover{border-color:var(--teal);transform:translateX(2px);}
-.zone-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
-.zone-name{font-weight:700;font-size:13px;}.zone-region{font-size:10px;color:var(--text3);margin-top:1px;}
-.zone-score-badge{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;padding:2px 8px;border-radius:6px;background:var(--teal-dim);color:var(--teal);}
-.zone-metrics{display:flex;gap:12px;font-size:11px;color:var(--text2);font-family:'DM Mono',monospace;}
-.zone-metrics span{color:var(--text);font-weight:500;}
+.side-footer{margin-top:auto;padding:14px;border-top:1px solid var(--b);}
+.sf-row{display:flex;justify-content:space-between;font-size:11px;padding:4px 0;}
+.sf-val{font-family:'DM Mono',monospace;font-weight:500;}
+.sf-val.s{color:var(--safe);}.sf-val.c{color:var(--caution);}.sf-val.w{color:var(--warning);}.sf-val.d{color:var(--danger);}
 
-/* HISTORY */
-.history-layout{padding:24px;overflow-y:auto;height:100%;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto 1fr;gap:20px;align-content:start;}
-.history-layout::-webkit-scrollbar{width:4px;}.history-layout::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;backdrop-filter:blur(16px);}
-.stat-card.full{grid-column:1 / -1;}
-.stat-card-title{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);margin-bottom:6px;}
-.stat-big{font-family:'Fraunces',serif;font-size:42px;font-weight:900;color:var(--teal);line-height:1;margin-bottom:4px;}
-.stat-sub{font-size:12px;color:var(--text2);}
-.chart-wrap{height:220px;position:relative;}
+/* ── PAGES ── */
+.cnt{flex:1;overflow:hidden;position:relative;}
+.pg{display:none;height:100%;overflow:hidden;}
+.pg.on{display:flex;flex-direction:column;}
+.scroll{overflow-y:auto;height:100%;padding:22px;}
+.scroll::-webkit-scrollbar{width:4px;}.scroll::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px;}
 
-/* ALERTS */
-.alerts-layout{padding:24px;overflow-y:auto;height:100%;display:flex;flex-direction:column;gap:20px;}
-.alerts-layout::-webkit-scrollbar{width:4px;}.alerts-layout::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
-.page-heading{font-family:'Fraunces',serif;font-size:28px;font-weight:900;margin-bottom:4px;}
-.page-sub{font-size:13px;color:var(--text2);}
-.alert-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;display:flex;gap:16px;align-items:flex-start;transition:all .2s;}
-.alert-card:hover{border-color:var(--border-act);box-shadow:var(--glow-teal);}
-.alert-icon-wrap{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
-.alert-icon-wrap.danger{background:var(--coral-dim);}.alert-icon-wrap.warning{background:var(--amber-dim);}.alert-icon-wrap.info{background:var(--teal-dim);}
-.alert-body{flex:1;}
-.alert-title{font-weight:700;font-size:14px;margin-bottom:4px;}
-.alert-desc{font-size:12.5px;color:var(--text2);line-height:1.5;}
-.alert-meta{font-size:11px;color:var(--text3);margin-top:6px;font-family:'DM Mono',monospace;}
-.alert-action{font-size:11px;font-weight:700;color:var(--teal);background:var(--teal-dim);border:none;padding:6px 14px;border-radius:8px;cursor:pointer;flex-shrink:0;align-self:center;font-family:'Outfit',sans-serif;text-decoration:none;}
-.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.setting-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;display:flex;justify-content:space-between;align-items:center;}
-.setting-label{font-size:13px;font-weight:600;margin-bottom:2px;}
-.setting-desc{font-size:11px;color:var(--text2);}
-.toggle{width:44px;height:24px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0;}
-.toggle.on{background:var(--teal);border-color:var(--teal);}
-.toggle::after{content:'';position:absolute;width:18px;height:18px;background:white;border-radius:50%;top:2px;left:2px;transition:transform .2s;box-shadow:0 2px 4px rgba(0,0,0,.3);}
-.toggle.on::after{transform:translateX(20px);}
+/* ── PAGE HEADING ── */
+.phead{margin-bottom:22px;}
+.phead h1{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:3px;}
+.phead p{font-family:'Crimson Pro',serif;font-size:15px;color:var(--text2);font-style:italic;}
 
-/* PROFILE */
-.profile-layout{padding:24px;overflow-y:auto;height:100%;display:grid;grid-template-columns:300px 1fr;gap:20px;align-content:start;}
-.profile-layout::-webkit-scrollbar{width:4px;}.profile-layout::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
-.profile-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px;text-align:center;backdrop-filter:blur(16px);}
-.profile-avatar{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--teal),#005a52);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 16px;box-shadow:0 0 32px rgba(0,200,180,.3);}
-.profile-name{font-family:'Fraunces',serif;font-size:20px;font-weight:700;margin-bottom:4px;}
-.profile-role{font-size:12px;color:var(--teal);background:var(--teal-dim);display:inline-block;padding:3px 12px;border-radius:12px;margin-bottom:20px;border:1px solid rgba(0,200,180,.2);}
-.profile-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:20px;padding-top:20px;border-top:1px solid var(--border);}
-.profile-stat-num{font-family:'Fraunces',serif;font-size:22px;font-weight:900;color:var(--teal);}
-.profile-stat-lbl{font-size:10px;color:var(--text2);margin-top:2px;}
-.zones-config{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;backdrop-filter:blur(16px);grid-column:1/-1;}
-.zones-config-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-top:16px;}
-.zone-toggle-item{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;transition:border-color .2s;cursor:pointer;}
-.zone-toggle-item.selected{border-color:var(--teal);}
-.zone-toggle-name{font-size:12px;font-weight:600;}
-.zone-toggle-reg{font-size:10px;color:var(--text3);}
+/* ── CARDS ── */
+.card{background:var(--glass);border:1px solid var(--b);border-radius:var(--r);backdrop-filter:blur(16px);}
+.card-t{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text2);margin-bottom:8px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.full{grid-column:1/-1;}
+.kpi{padding:18px 20px;}
+.kpi-n{font-family:'Syne',sans-serif;font-size:38px;font-weight:800;color:var(--cyan);line-height:1;margin-bottom:3px;}
+.kpi-sub{font-size:11px;color:var(--text2);}
 
-/* MARKERS */
-.mk-bubble{background:transparent!important;border:none!important;}
-.mk-pin{padding:5px 10px;border-radius:20px;color:white;font-family:'DM Mono',monospace;font-weight:500;font-size:11px;border:2px solid rgba(255,255,255,.4);text-align:center;box-shadow:0 4px 16px rgba(0,0,0,.4);white-space:nowrap;}
-.leaflet-popup-content-wrapper{border-radius:14px!important;padding:0!important;overflow:hidden!important;background:var(--bg2)!important;border:1px solid var(--border)!important;box-shadow:var(--shadow)!important;color:var(--text)!important;}
+/* ── DASHBOARD LAYOUT ── */
+.dash{display:grid;grid-template-columns:1fr 320px;height:100%;overflow:hidden;}
+#map{height:100%;z-index:1;position:relative;}
+.moverlay{position:absolute;top:14px;left:14px;right:14px;z-index:10;display:flex;gap:8px;pointer-events:none;flex-wrap:wrap;}
+.mc{background:var(--glass);border:1px solid var(--b);border-radius:var(--r);backdrop-filter:blur(20px);pointer-events:all;padding:8px 12px;}
+.pills{display:flex;gap:5px;flex-wrap:wrap;}
+.pill{padding:5px 12px;border-radius:16px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--b);background:var(--bg3);color:var(--text2);transition:all .15s;font-family:'Syne',sans-serif;}
+.pill.on{background:var(--cyan);border-color:var(--cyan);color:#000;}
+.srch{display:flex;align-items:center;gap:7px;}
+.srch input{background:transparent;border:none;outline:none;color:var(--text);font-family:'Syne',sans-serif;font-size:12px;width:150px;}
+.srch input::placeholder{color:var(--text3);}
+.dpanel{background:var(--glass);border-left:1px solid var(--b);backdrop-filter:blur(20px);display:flex;flex-direction:column;overflow:hidden;}
+.dph{padding:16px 16px 12px;border-bottom:1px solid var(--b);position:sticky;top:0;background:var(--glass);backdrop-filter:blur(20px);z-index:2;}
+.dph h2{font-size:15px;font-weight:800;margin-bottom:12px;}
+.sgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;}
+.sb{background:var(--bg3);border:1px solid var(--b);border-radius:var(--r2);padding:10px;text-align:center;}
+.sbn{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;line-height:1;margin-bottom:3px;}
+.sbl{font-size:9px;color:var(--text2);font-weight:600;letter-spacing:.06em;}
+.zlist{padding:10px;flex:1;overflow-y:auto;}
+.zlist::-webkit-scrollbar{width:3px;}.zlist::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px;}
+.zc{background:var(--bg3);border:1px solid var(--b);border-radius:var(--r);padding:11px 13px;margin-bottom:7px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden;}
+.zc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:2px 0 0 2px;}
+.zc.safe::before{background:var(--safe);}.zc.caution::before{background:var(--caution);}.zc.warning::before{background:var(--warning);}.zc.danger::before{background:var(--danger);}
+.zc:hover{border-color:var(--cyan);transform:translateX(2px);}
+.zt{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;}
+.zn{font-size:12px;font-weight:700;}.zreg{font-size:9px;color:var(--text3);margin-top:1px;}
+.zbadge{font-family:'DM Mono',monospace;font-size:12px;padding:2px 7px;border-radius:6px;background:var(--cyan-d);color:var(--cyan);}
+.zmets{display:flex;gap:10px;font-size:10px;color:var(--text2);font-family:'DM Mono',monospace;}
+.zmets span{color:var(--text);}
+
+/* ── PRÉVISIONS ── */
+.forecast-zone-sel{background:var(--glass);border:1px solid var(--b);border-radius:var(--r);padding:14px 18px;margin-bottom:18px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.fzs-label{font-size:12px;font-weight:700;color:var(--text2);margin-right:4px;}
+.fz-btn{padding:5px 14px;border-radius:16px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--b);background:var(--bg3);color:var(--text2);font-family:'Syne',sans-serif;transition:all .15s;}
+.fz-btn.on{background:var(--cyan);border-color:var(--cyan);color:#000;}
+.forecast-horizon{background:var(--glass);border:1px solid var(--b);border-radius:var(--r);overflow:hidden;margin-bottom:18px;}
+#horizonCanvas{width:100%;height:180px;display:block;}
+.forecast-days{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:18px;}
+.fday{background:var(--glass);border:1px solid var(--b);border-radius:var(--r);padding:14px 10px;text-align:center;transition:border-color .15s;cursor:pointer;}
+.fday:hover,.fday.sel{border-color:var(--cyan);box-shadow:var(--glow);}
+.fd-date{font-size:9px;color:var(--text2);margin-bottom:6px;font-weight:700;letter-spacing:.06em;}
+.fd-icon{font-size:22px;margin-bottom:6px;}
+.fd-score{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:3px;}
+.fd-wave{font-size:10px;font-family:'DM Mono',monospace;color:var(--text2);}
+.fd-safe{font-size:9px;font-weight:700;margin-top:4px;padding:2px 6px;border-radius:4px;color:white;}
+.forecast-detail{background:var(--glass);border:1px solid var(--b);border-radius:var(--r);padding:20px 24px;}
+.fd-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px;}
+.fdm{background:var(--bg3);border-radius:var(--r2);padding:12px;text-align:center;}
+.fdm-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--cyan);margin-bottom:3px;}
+.fdm-lbl{font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;}
+
+/* ── BANCS IA ── */
+.fish-toolbar{background:var(--glass);border:1px solid var(--b);border-radius:var(--r);padding:12px 18px;margin-bottom:16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;}
+.fish-legend{display:flex;gap:14px;align-items:center;flex-wrap:wrap;}
+.fl-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);}
+.fl-dot{width:10px;height:10px;border-radius:50%;}
+#fishCanvas{width:100%;border-radius:var(--r);display:block;cursor:crosshair;}
+.fish-species{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-top:16px;}
+.fspec{background:var(--glass);border:1px solid var(--b);border-radius:var(--r);padding:13px 15px;cursor:pointer;transition:all .15s;}
+.fspec:hover,.fspec.on{border-color:var(--cyan);}
+.fspec-name{font-size:13px;font-weight:700;margin-bottom:4px;}
+.fspec-prob{font-family:'DM Mono',monospace;font-size:20px;font-weight:500;color:var(--cyan);}
+.fspec-bar{height:3px;background:var(--bg3);border-radius:2px;margin-top:6px;overflow:hidden;}
+.fspec-fill{height:100%;border-radius:2px;background:var(--cyan);transition:width .5s;}
+.fspec-season{font-size:9px;color:var(--text2);margin-top:4px;}
+
+/* ── MARÉES ── */
+.tide-zone-sel{background:var(--glass);border:1px solid var(--b);border-radius:var(--r);padding:12px 18px;margin-bottom:16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.tide-chart-wrap{background:var(--glass);border:1px solid var(--b);border-radius:var(--r);padding:20px;margin-bottom:16px;}
+#tideCanvas{width:100%;height:200px;display:block;}
+.tide-today{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.tide-event{background:var(--glass);border:1px solid var(--b);border-radius:var(--r);padding:14px;text-align:center;}
+.te-type{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);margin-bottom:6px;}
+.te-time{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--cyan);margin-bottom:3px;}
+.te-coef{font-size:11px;color:var(--text2);font-family:'DM Mono',monospace;}
+.te-icon{font-size:18px;margin-bottom:4px;}
+.zones-legales{background:var(--glass);border:1px solid var(--b);border-radius:var(--r);padding:18px;}
+.zl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:14px;}
+.zl-item{background:var(--bg3);border-radius:var(--r2);padding:11px 14px;border-left:3px solid;}
+.zl-item.legal{border-color:var(--safe);}.zl-item.restricted{border-color:var(--warning);}.zl-item.forbidden{border-color:var(--danger);}
+.zl-name{font-size:12px;font-weight:700;margin-bottom:3px;}
+.zl-status{font-size:10px;font-weight:700;}
+.zl-item.legal .zl-status{color:var(--safe);}.zl-item.restricted .zl-status{color:var(--warning);}.zl-item.forbidden .zl-status{color:var(--danger);}
+.zl-desc{font-size:10px;color:var(--text2);margin-top:3px;font-family:'Crimson Pro',serif;}
+
+/* ── MARCHÉ ── */
+.market-header{background:linear-gradient(135deg,var(--bg3),var(--bg4));border:1px solid var(--b);border-radius:var(--r);padding:20px 24px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;}
+.mh-title{font-size:13px;font-weight:700;color:var(--text2);margin-bottom:4px;}
+.mh-date{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);}
+.fish-prices{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:16px;}
+.fp{background:var(--glass);border:1px solid var(--b);border-radius:var(--r);padding:16px 18px;cursor:pointer;transition:all .15s;}
+.fp:hover{border-color:var(--cyan);box-shadow:var(--glow);}
+.fp-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+.fp-name{font-size:14px;font-weight:700;}
+.fp-local{font-size:10px;color:var(--text2);font-family:'Crimson Pro',serif;font-style:italic;margin-top:2px;}
+.fp-icon{font-size:28px;}
+.fp-price{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--amber);}
+.fp-unit{font-size:10px;color:var(--text2);margin-top:2px;}
+.fp-trend{display:flex;align-items:center;gap:5px;margin-top:8px;font-size:11px;padding-top:8px;border-top:1px solid var(--b);}
+.fp-trend.up{color:var(--safe);}.fp-trend.dn{color:var(--danger);}.fp-trend.fl{color:var(--text2);}
+.fp-markets{font-size:10px;color:var(--text2);margin-top:6px;}
+
+/* ── COMMUNAUTÉ ── */
+.comm-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.posts-feed{display:flex;flex-direction:column;gap:12px;}
+.post{background:var(--glass);border:1px solid var(--b);border-radius:var(--r);padding:16px 18px;transition:all .15s;}
+.post:hover{border-color:var(--b2);}
+.post-head{display:flex;gap:12px;align-items:flex-start;margin-bottom:10px;}
+.post-ava{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--cyan),var(--cyan2));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.post-meta{flex:1;}
+.post-author{font-weight:700;font-size:13px;}
+.post-zone{font-size:10px;color:var(--text2);margin-top:1px;}
+.post-time{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;}
+.post-type{font-size:9px;font-weight:700;padding:2px 8px;border-radius:6px;margin-left:auto;}
+.post-type.catch{background:rgba(0,232,124,.15);color:var(--safe);}
+.post-type.alert{background:var(--coral-d);color:var(--coral);}
+.post-type.info{background:var(--cyan-d);color:var(--cyan);}
+.post-body{font-family:'Crimson Pro',serif;font-size:14px;line-height:1.6;color:var(--text);}
+.post-data{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;}
+.pd{background:var(--bg3);border-radius:6px;padding:5px 10px;font-size:10px;font-family:'DM Mono',monospace;}
+.post-actions{display:flex;gap:10px;margin-top:10px;padding-top:10px;border-top:1px solid var(--b);}
+.pact{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);cursor:pointer;transition:color .15s;}
+.pact:hover{color:var(--cyan);}
+.post-compose{background:var(--glass);border:1px solid var(--b2);border-radius:var(--r);padding:16px 18px;margin-bottom:16px;}
+.compose-row{display:flex;gap:10px;align-items:center;}
+.compose-input{flex:1;background:var(--bg3);border:1px solid var(--b);border-radius:var(--r2);padding:10px 14px;color:var(--text);font-family:'Crimson Pro',serif;font-size:14px;outline:none;resize:none;}
+.compose-input::placeholder{color:var(--text3);}
+.compose-btn{background:var(--cyan);color:#000;border:none;padding:10px 20px;border-radius:var(--r2);font-family:'Syne',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:opacity .15s;}
+.compose-btn:hover{opacity:.85;}
+
+/* ── CARBURANT ── */
+.fuel-calc{background:var(--glass);border:1px solid var(--b);border-radius:var(--r);padding:24px;margin-bottom:16px;}
+.fc-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.fc-field{display:flex;flex-direction:column;gap:6px;}
+.fc-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text2);}
+.fc-input{background:var(--bg3);border:1px solid var(--b);border-radius:var(--r2);padding:11px 14px;color:var(--text);font-family:'DM Mono',monospace;font-size:16px;outline:none;width:100%;transition:border-color .15s;}
+.fc-input:focus{border-color:var(--cyan);}
+.fc-select{background:var(--bg3);border:1px solid var(--b);border-radius:var(--r2);padding:11px 14px;color:var(--text);font-family:'Syne',sans-serif;font-size:13px;outline:none;width:100%;cursor:pointer;}
+.fc-result{background:linear-gradient(135deg,var(--bg3),var(--bg4));border:1px solid var(--b2);border-radius:var(--r);padding:24px;margin-top:16px;}
+.fcr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px;}
+.fcr-item{text-align:center;}
+.fcr-val{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:var(--amber);margin-bottom:3px;}
+.fcr-lbl{font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;}
+.fuel-zones{background:var(--glass);border:1px solid var(--b);border-radius:var(--r);padding:18px;}
+.fz-routes{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:14px;}
+.fzr{background:var(--bg3);border:1px solid var(--b);border-radius:var(--r2);padding:12px 14px;cursor:pointer;transition:all .15s;}
+.fzr:hover{border-color:var(--amber);}
+.fzr-name{font-size:12px;font-weight:700;margin-bottom:4px;}
+.fzr-dist{font-family:'DM Mono',monospace;font-size:18px;color:var(--amber);margin-bottom:3px;}
+.fzr-fuel{font-size:10px;color:var(--text2);}
+
+/* ── POPUPS LEAFLET ── */
+.mk-b{background:transparent!important;border:none!important;}
+.mk-p{padding:4px 9px;border-radius:18px;font-family:'DM Mono',monospace;font-weight:500;font-size:10px;border:1.5px solid rgba(255,255,255,.35);text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.5);white-space:nowrap;}
+.leaflet-popup-content-wrapper{border-radius:14px!important;padding:0!important;overflow:hidden!important;background:var(--bg2)!important;border:1px solid var(--b)!important;box-shadow:var(--sh)!important;color:var(--text)!important;}
 .leaflet-popup-content{margin:0!important;width:auto!important;}
 .leaflet-popup-tip{background:var(--bg2)!important;}
-.popup-head{padding:14px 16px;color:white;}
-.popup-head-name{font-family:'Fraunces',serif;font-size:17px;font-weight:700;}
-.popup-head-desc{font-size:11px;opacity:.8;margin-top:2px;}
-.popup-body{padding:14px 16px;}
-.popup-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
-.popup-metric{background:var(--bg3);border-radius:8px;padding:9px 6px;text-align:center;}
-.popup-metric-val{font-family:'Fraunces',serif;font-size:18px;font-weight:700;color:var(--teal);}
-.popup-metric-lbl{font-size:9px;color:var(--text2);text-transform:uppercase;margin-top:2px;}
-.popup-status{text-align:center;padding:8px;border-radius:8px;color:white;font-weight:700;font-size:13px;margin-bottom:10px;}
-.score-bar-wrap{height:4px;background:var(--bg3);border-radius:4px;overflow:hidden;margin-top:6px;}
-.score-bar{height:100%;border-radius:4px;transition:width .6s;}
-.popup-wa{display:block;text-align:center;background:#25D366;color:white;text-decoration:none;padding:9px;border-radius:8px;font-weight:700;font-size:12px;margin-top:10px;}
+.ph{padding:13px 16px;color:white;}
+.ph-n{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;}
+.ph-d{font-size:10px;opacity:.8;margin-top:2px;font-family:'Crimson Pro',serif;}
+.pb{padding:13px 16px;}
+.pmets{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:11px;}
+.pmet{background:var(--bg3);border-radius:8px;padding:8px 5px;text-align:center;}
+.pmet-v{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--cyan);}
+.pmet-l{font-size:8px;color:var(--text2);text-transform:uppercase;margin-top:2px;}
+.pstat{text-align:center;padding:7px;border-radius:8px;font-weight:700;font-size:12px;margin-bottom:9px;}
+.pbar-w{height:4px;background:var(--bg3);border-radius:4px;overflow:hidden;margin-top:5px;}
+.pbar{height:100%;border-radius:4px;}
+.pwa{display:block;text-align:center;background:#25D366;color:white;text-decoration:none;padding:8px;border-radius:8px;font-weight:700;font-size:11px;margin-top:8px;font-family:'Syne',sans-serif;}
 
-/* FABs */
-.fab-group{position:fixed;bottom:24px;right:24px;z-index:400;display:flex;flex-direction:column;gap:10px;}
-.fab{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;border:none;box-shadow:var(--shadow);transition:transform .15s;text-decoration:none;}
+/* ── FAB ── */
+.fabs{position:fixed;bottom:22px;right:22px;z-index:500;display:flex;flex-direction:column;gap:9px;}
+.fab{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;border:none;box-shadow:var(--sh);transition:transform .15s;text-decoration:none;}
 .fab:hover{transform:scale(1.1);}
-.fab-wa{background:#25D366;color:white;}.fab-ref{background:var(--teal);color:white;}
+.fab-wa{background:#25D366;color:white;}.fab-r{background:var(--cyan);color:#000;}
 
-/* ANIM */
-.fade-in{animation:fadeIn .3s ease;}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-*{scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+/* ── INSTALL BANNER ── */
+.install-banner{display:none;background:linear-gradient(135deg,var(--cyan),var(--cyan2));color:#000;padding:12px 20px;align-items:center;gap:14px;z-index:999;font-size:13px;font-weight:700;}
+.install-banner.show{display:flex;}
+.ib-btn{background:#000;color:var(--cyan);border:none;padding:7px 16px;border-radius:8px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;cursor:pointer;margin-left:auto;}
+.ib-close{background:transparent;border:none;color:#000;font-size:18px;cursor:pointer;padding:0 4px;}
 
-@media(max-width:900px){
-  .sidebar{display:none;}
-  .dashboard-layout{grid-template-columns:1fr;}
-  .dash-right{display:none;}
-  .history-layout,.profile-layout{grid-template-columns:1fr;}
-  .settings-grid{grid-template-columns:1fr;}
-}
+/* ── RESPONSIVE ── */
+@media(max-width:900px){.side{display:none;}.dash{grid-template-columns:1fr;}.dpanel{display:none;}.grid2,.grid3,.grid4{grid-template-columns:1fr 1fr;}.forecast-days{grid-template-columns:repeat(4,1fr);}.fc-grid{grid-template-columns:1fr;}}
+@media(max-width:600px){.grid2,.grid3,.grid4{grid-template-columns:1fr;}.forecast-days{grid-template-columns:repeat(3,1fr);}.fd-metrics{grid-template-columns:1fr 1fr;}.comm-stats{grid-template-columns:1fr;}}
+
+/* ── ANIM ── */
+.fadein{animation:fi .3s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.stagger>*{animation:fi .35s ease both;}
+.stagger>*:nth-child(1){animation-delay:.05s}.stagger>*:nth-child(2){animation-delay:.1s}.stagger>*:nth-child(3){animation-delay:.15s}.stagger>*:nth-child(4){animation-delay:.2s}.stagger>*:nth-child(5){animation-delay:.25s}.stagger>*:nth-child(6){animation-delay:.3s}
 </style>
 </head>
 <body>
 
-<header class="topbar">
-  <div style="display:flex;align-items:center;gap:10px;flex:0 0 auto">
-    <span class="brand-wave">🌊</span>
-    <span class="brand-text">PecheurConnect</span>
-    <span class="brand-tag">v3.0</span>
+<!-- Wave Background -->
+<canvas id="waveBg"></canvas>
+
+<!-- Install Banner (PWA) -->
+<div class="install-banner" id="installBanner">
+  <span>📱</span>
+  <span data-fr="Installer PecheurConnect sur votre appareil" data-wo="Sëdd PecheurConnect ci sa yëkëti">Installer PecheurConnect sur votre appareil</span>
+  <button class="ib-btn" id="installBtn">Installer</button>
+  <button class="ib-close" onclick="document.getElementById('installBanner').classList.remove('show')">✕</button>
+</div>
+
+<!-- TOPBAR -->
+<header class="top">
+  <div class="brand">
+    <span class="brand-icon">🌊</span>
+    <span class="brand-name">PecheurConnect</span>
+    <span class="brand-v">v4.0</span>
   </div>
-  <div class="topbar-center">
-    <div class="live-indicator">
-      <div class="live-dot"></div>
-      <span data-fr="Données en direct — 18 zones Sénégal" data-wo="Xam-xam bu soxor — 18 dëkk Senegaal">Données en direct — 18 zones Sénégal</span>
-    </div>
+  <div class="top-center">
+    <div class="live-pill"><div class="live-dot"></div><span id="liveText" data-fr="Sénégal · 18 zones actives" data-wo="Senegaal · 18 dëkk">Sénégal · 18 zones actives</span></div>
+    <div class="offline-banner" id="offlineBanner">📡 Hors ligne — données en cache</div>
   </div>
-  <div class="topbar-right">
-    <div class="lang-switch">
-      <button class="lang-btn active" onclick="setLang('fr')">FR</button>
-      <button class="lang-btn" onclick="setLang('wo')">WO</button>
-    </div>
-    <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
-    <div class="topbar-time" id="clock">--:-- UTC</div>
+  <div class="top-right">
+    <div class="ls"><button class="lb on" onclick="setLang('fr')">FR</button><button class="lb" onclick="setLang('wo')">WO</button></div>
+    <button class="icnbtn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+    <div class="clk" id="clk">--:--</div>
   </div>
 </header>
 
-<div class="app-body">
-  <nav class="sidebar">
-    <div class="nav-section">
-      <div class="nav-label" data-fr="Navigation" data-wo="Yëgël">Navigation</div>
-      <div class="nav-item active" onclick="showPage('dashboard')">
-        <span class="nav-icon">🗺️</span>
-        <span data-fr="Tableau de bord" data-wo="Dëkk bi">Tableau de bord</span>
-      </div>
-      <div class="nav-item" onclick="showPage('history')">
-        <span class="nav-icon">📊</span>
-        <span data-fr="Historique & Stats" data-wo="Yoon wi ak Stats">Historique & Stats</span>
-      </div>
-      <div class="nav-item" onclick="showPage('alerts')">
-        <span class="nav-icon">🔔</span>
-        <span data-fr="Alertes" data-wo="Xaaral">Alertes</span>
-        <span class="nav-badge" id="alertBadge">—</span>
-      </div>
-      <div class="nav-item" onclick="showPage('profile')">
-        <span class="nav-icon">👤</span>
-        <span data-fr="Profil & Zones" data-wo="Sàmm-sàmm">Profil & Zones</span>
+<!-- BODY -->
+<div class="body">
+
+<!-- SIDEBAR -->
+<nav class="side">
+  <div class="ns">
+    <div class="nl" data-fr="Principal" data-wo="Kanam">Principal</div>
+    <div class="ni on" onclick="go('dash')"><span class="ic">🗺️</span><span data-fr="Tableau de bord" data-wo="Dëkk bi">Tableau de bord</span></div>
+    <div class="ni" onclick="go('forecast')"><span class="ic">🌤️</span><span data-fr="Prévisions 7 jours" data-wo="7 Bës">Prévisions 7 jours</span><span class="new-tag">NEW</span></div>
+    <div class="ni" onclick="go('fish')"><span class="ic">🐟</span><span data-fr="Bancs de poissons IA" data-wo="Jën yi IA">Bancs IA</span><span class="new-tag">NEW</span></div>
+    <div class="ni" onclick="go('tides')"><span class="ic">🌊</span><span data-fr="Marées & Zones" data-wo="Géej & Dëkk">Marées & Zones</span><span class="new-tag">NEW</span></div>
+  </div>
+  <div class="ns">
+    <div class="nl" data-fr="Économique" data-wo="Xaalis">Économique</div>
+    <div class="ni" onclick="go('market')"><span class="ic">🐠</span><span data-fr="Prix du marché" data-wo="Njëg bu màrse">Prix du marché</span><span class="new-tag">NEW</span></div>
+    <div class="ni" onclick="go('fuel')"><span class="ic">⛽</span><span data-fr="Carburant & Trajets" data-wo="Esañs & Yoon">Carburant</span><span class="new-tag">NEW</span></div>
+  </div>
+  <div class="ns">
+    <div class="nl" data-fr="Communauté" data-wo="Bokk">Communauté</div>
+    <div class="ni" onclick="go('community')"><span class="ic">👥</span><span data-fr="Réseau pêcheurs" data-wo="Bokk jagalu">Réseau pêcheurs</span><span class="new-tag">NEW</span></div>
+    <div class="ni" onclick="go('alerts')"><span class="ic">🔔</span><span data-fr="Alertes" data-wo="Xaaral">Alertes</span><span class="nbadge" id="alertBadge">—</span></div>
+  </div>
+  <div class="ns">
+    <div class="nl" data-fr="Urgence" data-wo="Géréej">Urgence</div>
+    <a class="ni" href="https://wa.me/221777020818" target="_blank"><span class="ic">📱</span><span>SOS WhatsApp</span></a>
+  </div>
+  <div class="side-footer">
+    <div class="nl" style="margin-bottom:8px" data-fr="État zones" data-wo="Sedd dëkk">État zones</div>
+    <div class="sf-row"><span data-fr="🟢 Favorables" data-wo="🟢 Baax">🟢 Favorables</span><span class="sf-val s" id="sf-s">—</span></div>
+    <div class="sf-row"><span data-fr="🟡 Vigilance" data-wo="🟡 Xaaral">🟡 Vigilance</span><span class="sf-val c" id="sf-c">—</span></div>
+    <div class="sf-row"><span data-fr="🟠 Prudence" data-wo="🟠 Yëgël">🟠 Prudence</span><span class="sf-val w" id="sf-w">—</span></div>
+    <div class="sf-row"><span data-fr="🔴 Danger" data-wo="🔴 Réy">🔴 Danger</span><span class="sf-val d" id="sf-d">—</span></div>
+  </div>
+</nav>
+
+<!-- CONTENT -->
+<main class="cnt">
+
+<!-- ═══ DASHBOARD ═══ -->
+<section class="pg on" id="pg-dash">
+  <div class="dash">
+    <div style="position:relative">
+      <div id="map"></div>
+      <div class="moverlay">
+        <div class="mc">
+          <div class="pills">
+            <div class="pill on" data-r="all" onclick="filter(this)" data-fr="Tout" data-wo="Yépp">Tout</div>
+            <div class="pill" data-r="Nord" onclick="filter(this)">Nord</div>
+            <div class="pill" data-r="Grande Côte" onclick="filter(this)">G.Côte</div>
+            <div class="pill" data-r="Dakar" onclick="filter(this)">Dakar</div>
+            <div class="pill" data-r="Petite Côte" onclick="filter(this)">P.Côte</div>
+            <div class="pill" data-r="Sine-Saloum" onclick="filter(this)">Saloum</div>
+            <div class="pill" data-r="Casamance" onclick="filter(this)">Casam.</div>
+          </div>
+        </div>
+        <div class="mc srch">
+          <span style="color:var(--text2);font-size:13px">🔍</span>
+          <input placeholder="Zone..." oninput="search(this.value)">
+        </div>
       </div>
     </div>
-    <div class="nav-section">
-      <div class="nav-label" data-fr="Urgence" data-wo="Géréej">Urgence</div>
-      <a class="nav-item" href="https://wa.me/221777020818" target="_blank">
-        <span class="nav-icon">📱</span>
-        <span data-fr="SOS WhatsApp" data-wo="Géréej WA">SOS WhatsApp</span>
-      </a>
+    <div class="dpanel">
+      <div class="dph">
+        <h2 data-fr="18 zones surveillées" data-wo="18 dëkk">18 zones surveillées</h2>
+        <div class="sgrid">
+          <div class="sb"><div class="sbn" style="color:var(--safe)" id="cs">—</div><div class="sbl">🟢 <span data-fr="Sûr" data-wo="Baax">Sûr</span></div></div>
+          <div class="sb"><div class="sbn" style="color:var(--caution)" id="cc">—</div><div class="sbl">🟡 <span data-fr="Vigilance" data-wo="Xaaral">Vigilance</span></div></div>
+          <div class="sb"><div class="sbn" style="color:var(--warning)" id="cw">—</div><div class="sbl">🟠 <span data-fr="Prudence" data-wo="Yëgël">Prudence</span></div></div>
+          <div class="sb"><div class="sbn" style="color:var(--danger)" id="cd">—</div><div class="sbl">🔴 <span data-fr="Danger" data-wo="Réy">Danger</span></div></div>
+        </div>
+      </div>
+      <div class="zlist" id="zlist"></div>
     </div>
-    <div class="sidebar-stats">
-      <div class="nav-label" data-fr="État actuel" data-wo="Sedd bi tey">État actuel</div>
-      <div class="stat-mini"><span data-fr="🟢 Favorables" data-wo="🟢 Baax na">🟢 Favorables</span><span class="stat-mini-val safe" id="sb-safe">—</span></div>
-      <div class="stat-mini"><span data-fr="🟡 Vigilance" data-wo="🟡 Xaaral">🟡 Vigilance</span><span class="stat-mini-val caution" id="sb-caution">—</span></div>
-      <div class="stat-mini"><span data-fr="🟠 Prudence" data-wo="🟠 Yëgël">🟠 Prudence</span><span class="stat-mini-val warning" id="sb-warning">—</span></div>
-      <div class="stat-mini"><span data-fr="🔴 Danger" data-wo="🔴 Réy">🔴 Danger</span><span class="stat-mini-val danger" id="sb-danger">—</span></div>
+  </div>
+</section>
+
+<!-- ═══ PRÉVISIONS ═══ -->
+<section class="pg" id="pg-forecast">
+  <div class="scroll fadein">
+    <div class="phead"><h1 data-fr="Prévisions 7 jours" data-wo="7 Bës ci kanam">Prévisions 7 jours</h1><p data-fr="Sélectionnez une zone pour afficher les prévisions météo-marines détaillées" data-wo="Tann dëkk bi ngir xam xam bu 7 bës">Sélectionnez une zone pour afficher les prévisions</p></div>
+    <div class="forecast-zone-sel">
+      <span class="fzs-label" data-fr="Zone :" data-wo="Dëkk :">Zone :</span>
+      <div id="fzoneButtons"></div>
     </div>
-  </nav>
+    <div class="forecast-horizon card">
+      <canvas id="horizonCanvas"></canvas>
+    </div>
+    <div class="forecast-days stagger" id="forecastDays"></div>
+    <div class="forecast-detail card fadein" id="forecastDetail" style="padding:20px 24px">
+      <div class="card-t" data-fr="Détail du jour sélectionné" data-wo="Xam xam bës bi tann">Détail du jour sélectionné</div>
+      <div class="fd-metrics" id="fdMetrics"></div>
+    </div>
+  </div>
+</section>
 
-  <main class="content">
+<!-- ═══ BANCS IA ═══ -->
+<section class="pg" id="pg-fish">
+  <div class="scroll fadein">
+    <div class="phead"><h1 data-fr="Carte des bancs de poissons — IA" data-wo="Kàrt jën yi — IA">Carte des bancs de poissons IA</h1><p data-fr="Prédiction basée sur SST, courants et données saisonnières Copernicus" data-wo="Xam-xam ci SST, jëm ak xam-xam Copernicus">Prédiction basée sur SST, courants et données saisonnières</p></div>
+    <div class="fish-toolbar card" style="padding:12px 18px">
+      <div class="fish-legend">
+        <span style="font-size:12px;font-weight:700;color:var(--text2)" data-fr="Probabilité de banc :" data-wo="Xeex jën :">Probabilité :</span>
+        <div class="fl-item"><div class="fl-dot" style="background:#ff2044"></div><span data-fr="Très forte" data-wo="Dafa bari">Très forte</span></div>
+        <div class="fl-item"><div class="fl-dot" style="background:#ff8c00"></div><span data-fr="Forte" data-wo="Bari">Forte</span></div>
+        <div class="fl-item"><div class="fl-dot" style="background:#f0c400"></div><span data-fr="Modérée" data-wo="Dafa fa">Modérée</span></div>
+        <div class="fl-item"><div class="fl-dot" style="background:#00e87c"></div><span data-fr="Faible" data-wo="Doy dafa">Faible</span></div>
+      </div>
+      <button style="margin-left:auto;background:var(--cyan);color:#000;border:none;padding:7px 16px;border-radius:8px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;cursor:pointer" onclick="drawFishMap()" data-fr="🔄 Actualiser IA" data-wo="🔄 Yëgëlu IA">🔄 Actualiser IA</button>
+    </div>
+    <canvas id="fishCanvas" style="margin-bottom:16px;border-radius:var(--r);border:1px solid var(--b)"></canvas>
+    <div class="card" style="padding:18px;margin-bottom:16px">
+      <div class="card-t" data-fr="Espèces attendues cette saison — probabilité par zone" data-wo="Jën yi ci xarnu bi">Espèces attendues cette saison</div>
+      <div class="fish-species stagger" id="fishSpecies"></div>
+    </div>
+  </div>
+</section>
 
-    <!-- DASHBOARD -->
-    <section class="page active" id="page-dashboard">
-      <div class="dashboard-layout">
-        <div style="position:relative">
-          <div id="map"></div>
-          <div class="map-overlay-top">
-            <div class="map-card">
-              <div class="filter-pills">
-                <div class="pill active" data-region="all" onclick="doFilter(this)" data-fr="Tout" data-wo="Yépp">Tout</div>
-                <div class="pill" data-region="Nord" onclick="doFilter(this)">Nord</div>
-                <div class="pill" data-region="Grande Côte" onclick="doFilter(this)">G.Côte</div>
-                <div class="pill" data-region="Dakar" onclick="doFilter(this)">Dakar</div>
-                <div class="pill" data-region="Petite Côte" onclick="doFilter(this)">P.Côte</div>
-                <div class="pill" data-region="Sine-Saloum" onclick="doFilter(this)">Sine-Saloum</div>
-                <div class="pill" data-region="Casamance" onclick="doFilter(this)">Casamance</div>
-              </div>
-            </div>
-            <div class="map-card search-wrap">
-              <span style="color:var(--text2);font-size:14px">🔍</span>
-              <input class="search-input" id="searchInput" placeholder="Rechercher une zone..." oninput="doSearch(this.value)">
-            </div>
-          </div>
-        </div>
-        <div class="dash-right">
-          <div class="panel-header">
-            <div class="panel-title" data-fr="18 zones surveillées" data-wo="18 dëkk yi xam-xam">18 zones surveillées</div>
-            <div class="status-grid">
-              <div class="status-box"><div class="status-num" style="color:var(--safe)" id="cnt-safe">—</div><div class="status-lbl">🟢 <span data-fr="Sûr" data-wo="Baax">Sûr</span></div></div>
-              <div class="status-box"><div class="status-num" style="color:var(--caution)" id="cnt-caution">—</div><div class="status-lbl">🟡 <span data-fr="Vigilance" data-wo="Xaaral">Vigilance</span></div></div>
-              <div class="status-box"><div class="status-num" style="color:var(--warning)" id="cnt-warning">—</div><div class="status-lbl">🟠 <span data-fr="Prudence" data-wo="Yëgël">Prudence</span></div></div>
-              <div class="status-box"><div class="status-num" style="color:var(--danger)" id="cnt-danger">—</div><div class="status-lbl">🔴 <span data-fr="Danger" data-wo="Réy">Danger</span></div></div>
-            </div>
-          </div>
-          <div class="zones-list" id="zonesList"></div>
+<!-- ═══ MARÉES ═══ -->
+<section class="pg" id="pg-tides">
+  <div class="scroll fadein">
+    <div class="phead"><h1 data-fr="Marées & Zones de pêche" data-wo="Géej & Dëkk">Marées & Zones de pêche</h1><p data-fr="Horaires de marées, coefficients et statut légal des zones" data-wo="Wakht géej, koefisyan ak xam-xam dëkk">Horaires, coefficients et statut légal des zones</p></div>
+    <div class="tide-zone-sel card" style="padding:12px 18px">
+      <span class="fzs-label" data-fr="Zone :" data-wo="Dëkk :">Zone :</span>
+      <div id="tideZoneBtns"></div>
+    </div>
+    <div class="tide-today stagger" id="tideEvents"></div>
+    <div class="tide-chart-wrap card">
+      <div class="card-t" data-fr="Courbe de marée — 24 heures" data-wo="Géej bi — 24 wakht">Courbe de marée — 24 heures</div>
+      <canvas id="tideCanvas"></canvas>
+    </div>
+    <div class="zones-legales card">
+      <div class="card-t" data-fr="Statut légal des zones de pêche" data-wo="Xam-xam dëkk yi">Statut légal des zones de pêche</div>
+      <div class="zl-grid stagger" id="zonesLegales"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ MARCHÉ ═══ -->
+<section class="pg" id="pg-market">
+  <div class="scroll fadein">
+    <div class="phead"><h1 data-fr="Prix du poisson — Marchés Sénégal" data-wo="Njëg jën — Màrse Senegaal">Prix du poisson</h1><p data-fr="Cours du jour — marchés de Dakar, Saint-Louis, Ziguinchor" data-wo="Njëg tey — Dakar, Saint-Louis, Ziguinchor">Cours du jour — Dakar, Saint-Louis, Ziguinchor</p></div>
+    <div class="market-header">
+      <div><div class="mh-title" data-fr="Indice prix marché" data-wo="Njëg màrse">Indice prix marché</div><div style="font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--amber)">+3.2%</div><div class="mh-date" id="marketDate">—</div></div>
+      <div style="font-size:48px;opacity:.4">🐠</div>
+    </div>
+    <div class="fish-prices stagger" id="fishPrices"></div>
+    <div class="card" style="padding:18px">
+      <div class="card-t" data-fr="Évolution des prix — 7 derniers jours" data-wo="Njëg — 7 bës">Évolution des prix — 7 jours</div>
+      <div style="height:200px;position:relative"><canvas id="chartMarket"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CARBURANT ═══ -->
+<section class="pg" id="pg-fuel">
+  <div class="scroll fadein">
+    <div class="phead"><h1 data-fr="Calcul carburant & Trajets" data-wo="Xayma esañs & Yoon">Calcul carburant</h1><p data-fr="Estimez votre consommation selon la zone de pêche et le type de pirogue" data-wo="Xayma sa esañs ci dëkk ak pirogue">Estimez votre consommation selon la zone et la pirogue</p></div>
+    <div class="fuel-calc card">
+      <div class="card-t" data-fr="Paramètres du trajet" data-wo="Sëtt yoon bi">Paramètres du trajet</div>
+      <div class="fc-grid" style="margin-top:14px">
+        <div class="fc-field"><label class="fc-label" data-fr="Zone de départ" data-wo="Dëkk bi dem">Zone de départ</label>
+          <select class="fc-select" id="fuelFrom"><option value="DAKAR-YOFF">DAKAR-YOFF</option><option value="KAYAR">KAYAR</option><option value="MBOUR-JOAL">MBOUR-JOAL</option><option value="SAINT-LOUIS">SAINT-LOUIS</option></select></div>
+        <div class="fc-field"><label class="fc-label" data-fr="Zone de pêche" data-wo="Dëkk bu jagal">Zone de pêche</label>
+          <select class="fc-select" id="fuelTo"><option value="KAYAR">KAYAR (Fosse)</option><option value="DAKAR-YOFF">DAKAR-YOFF</option><option value="SAINT-LOUIS-HYDROBASE">SAINT-LOUIS HYDRO</option><option value="CAP-SKIRRING">CAP-SKIRRING</option></select></div>
+        <div class="fc-field"><label class="fc-label" data-fr="Type de pirogue" data-wo="Xël bi">Type de pirogue</label>
+          <select class="fc-select" id="boatType">
+            <option value="6">Petite pirogue (6m) — 40cv</option>
+            <option value="9" selected>Pirogue moyenne (9m) — 75cv</option>
+            <option value="12">Grande pirogue (12m) — 115cv</option>
+            <option value="15">Super pirogue (15m) — 200cv</option>
+          </select></div>
+        <div class="fc-field"><label class="fc-label" data-fr="Prix carburant (FCFA/L)" data-wo="Njëg esañs">Prix carburant FCFA/L</label>
+          <input class="fc-input" id="fuelPrice" type="number" value="850" min="500" max="2000"></div>
+      </div>
+      <button style="margin-top:18px;background:var(--amber);color:#000;border:none;padding:12px 28px;border-radius:var(--r2);font-family:'Syne',sans-serif;font-size:13px;font-weight:800;cursor:pointer;width:100%" onclick="calcFuel()" data-fr="⚡ Calculer" data-wo="⚡ Xayma">⚡ Calculer</button>
+      <div class="fc-result" id="fuelResult" style="display:none">
+        <div class="card-t" data-fr="Résultat estimé" data-wo="Xayma bi">Résultat estimé</div>
+        <div class="fcr-grid">
+          <div class="fcr-item"><div class="fcr-val" id="fr-dist">—</div><div class="fcr-lbl" data-fr="Distance (nm)" data-wo="Distan (nm)">Distance (nm)</div></div>
+          <div class="fcr-item"><div class="fcr-val" id="fr-liters">—</div><div class="fcr-lbl" data-fr="Litres aller-retour" data-wo="Litre">Litres A/R</div></div>
+          <div class="fcr-item"><div class="fcr-val" id="fr-cost">—</div><div class="fcr-lbl" data-fr="Coût FCFA" data-wo="Xaalis FCFA">Coût FCFA</div></div>
         </div>
       </div>
-    </section>
+    </div>
+    <div class="fuel-zones card" style="padding:18px">
+      <div class="card-t" data-fr="Routes de pêche préenregistrées" data-wo="Yoon yi ci kaw">Routes préenregistrées</div>
+      <div class="fz-routes stagger" id="fuelRoutes"></div>
+    </div>
+  </div>
+</section>
 
-    <!-- HISTORIQUE -->
-    <section class="page" id="page-history">
-      <div class="history-layout fade-in">
-        <div class="stat-card">
-          <div class="stat-card-title" data-fr="Score moyen pêche" data-wo="Score bi ci kaw">Score moyen pêche</div>
-          <div class="stat-big" id="hist-avg">—</div>
-          <div class="stat-sub" data-fr="sur 10 — 18 zones analysées" data-wo="ci 10 — 18 dëkk">sur 10 — 18 zones analysées</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-card-title" data-fr="Zones favorables" data-wo="Dëkk yi baax">Zones favorables</div>
-          <div class="stat-big" id="hist-safe" style="color:var(--safe)">—</div>
-          <div class="stat-sub" data-fr="Mer calme / conditions idéales" data-wo="Géej bu dëkk">Mer calme / conditions idéales</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-card-title" data-fr="Meilleure zone pêche" data-wo="Dëkk bu gëna baax">Meilleure zone pêche</div>
-          <div class="stat-big" id="hist-top" style="font-size:20px;padding-top:10px">—</div>
-          <div class="stat-sub" id="hist-top-score"></div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-card-title" data-fr="Dernière mise à jour" data-wo="Yëgëlu mujj">Dernière mise à jour</div>
-          <div class="stat-big" id="hist-update" style="font-size:22px;padding-top:10px">—</div>
-          <div class="stat-sub" id="hist-source" data-fr="Source des données" data-wo="Ñëw ci">Source des données</div>
-        </div>
-        <div class="stat-card full">
-          <div class="stat-card-title" data-fr="Scores de pêche par zone — tri décroissant" data-wo="Score yi ci dëkk yi">Scores de pêche par zone</div>
-          <div class="chart-wrap"><canvas id="chartZones"></canvas></div>
-        </div>
+<!-- ═══ COMMUNAUTÉ ═══ -->
+<section class="pg" id="pg-community">
+  <div class="scroll fadein">
+    <div class="phead"><h1 data-fr="Réseau d'entraide pêcheurs" data-wo="Bokk jagalu">Réseau d'entraide pêcheurs</h1><p data-fr="Partagez vos prises, alertes et conditions de mer en temps réel" data-wo="Séq sa jën, xaaral ak sedd géej">Partagez prises, alertes et conditions en temps réel</p></div>
+    <div class="comm-stats stagger">
+      <div class="card kpi"><div class="card-t" data-fr="Pêcheurs actifs" data-wo="Jagalu yi">Pêcheurs actifs</div><div class="kpi-n">247</div><div class="kpi-sub" data-fr="en ligne aujourd'hui" data-wo="tey ci internet">en ligne aujourd'hui</div></div>
+      <div class="card kpi"><div class="card-t" data-fr="Alertes partagées" data-wo="Xaaral yi">Alertes partagées</div><div class="kpi-n" style="color:var(--warning)">12</div><div class="kpi-sub" data-fr="cette semaine" data-wo="ci ayubés bi">cette semaine</div></div>
+      <div class="card kpi"><div class="card-t" data-fr="Prises déclarées" data-wo="Jën yi wax">Prises déclarées</div><div class="kpi-n" style="color:var(--safe)">89</div><div class="kpi-sub" data-fr="ce mois" data-wo="ci weer bi">ce mois</div></div>
+    </div>
+    <div class="post-compose card" style="padding:16px 18px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:10px" data-fr="Partager avec la communauté" data-wo="Wax ak bokk yi">Partager avec la communauté</div>
+      <div class="compose-row">
+        <textarea class="compose-input" rows="2" id="composeText" placeholder="Votre prise, alerte météo, conseil..."></textarea>
+        <button class="compose-btn" onclick="postMessage()" data-fr="Publier" data-wo="Wax">Publier</button>
       </div>
-    </section>
+    </div>
+    <div class="posts-feed stagger" id="postsFeed"></div>
+  </div>
+</section>
 
-    <!-- ALERTES -->
-    <section class="page" id="page-alerts">
-      <div class="alerts-layout fade-in">
-        <div>
-          <div class="page-heading" data-fr="Alertes & Notifications" data-wo="Xaaral ak Xam-xam">Alertes & Notifications</div>
-          <div class="page-sub" data-fr="Conditions maritimes critiques en temps réel" data-wo="Sedd bu rawati géej bi">Conditions maritimes critiques en temps réel</div>
-        </div>
-        <div id="alertsList"></div>
-        <div>
-          <div style="font-family:'Fraunces',serif;font-size:20px;font-weight:900;margin-bottom:16px" data-fr="Paramètres de notification" data-wo="Sëtt xam-xam">Paramètres de notification</div>
-          <div class="settings-grid">
-            <div class="setting-item">
-              <div><div class="setting-label" data-fr="Alertes Telegram" data-wo="Xaaral Telegram">Alertes Telegram</div><div class="setting-desc" data-fr="Bot actif toutes les 6h" data-wo="Bot bi 6 wakht">Bot actif toutes les 6h</div></div>
-              <div class="toggle on" onclick="this.classList.toggle('on')"></div>
-            </div>
-            <div class="setting-item">
-              <div><div class="setting-label" data-fr="Danger uniquement" data-wo="Réy rekk">Danger uniquement</div><div class="setting-desc" data-fr="Alertes critiques seulement" data-wo="Xaaral yu mag rekk">Alertes critiques seulement</div></div>
-              <div class="toggle" onclick="this.classList.toggle('on')"></div>
-            </div>
-            <div class="setting-item">
-              <div><div class="setting-label" data-fr="Rapport quotidien 6h UTC" data-wo="Rapport 6h UTC">Rapport quotidien 6h UTC</div><div class="setting-desc" data-fr="Résumé complet chaque matin" data-wo="Bës bu xëcc">Résumé complet chaque matin</div></div>
-              <div class="toggle on" onclick="this.classList.toggle('on')"></div>
-            </div>
-            <div class="setting-item">
-              <div><div class="setting-label" data-fr="SOS WhatsApp" data-wo="WhatsApp Géréej">SOS WhatsApp</div><div class="setting-desc" data-fr="Bouton d'urgence activé" data-wo="Topp géréej bi">Bouton d'urgence activé</div></div>
-              <div class="toggle on" onclick="this.classList.toggle('on')"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+<!-- ═══ ALERTES ═══ -->
+<section class="pg" id="pg-alerts">
+  <div class="scroll fadein">
+    <div class="phead"><h1 data-fr="Alertes actives" data-wo="Xaaral yi nekk">Alertes actives</h1><p data-fr="Zones critiques en temps réel · Paramètres de notification" data-wo="Dëkk yu rawati · Sëtt xam-xam">Zones critiques · Paramètres de notification</p></div>
+    <div id="alertsList" class="stagger" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px"></div>
+    <div class="card" style="padding:18px">
+      <div class="card-t" data-fr="Paramètres de notification" data-wo="Sëtt xam-xam">Paramètres</div>
+      <div class="grid2" style="margin-top:14px;gap:10px" id="settingsGrid"></div>
+    </div>
+  </div>
+</section>
 
-    <!-- PROFIL -->
-    <section class="page" id="page-profile">
-      <div class="profile-layout fade-in">
-        <div style="display:flex;flex-direction:column;gap:16px">
-          <div class="profile-card">
-            <div class="profile-avatar">🎣</div>
-            <div class="profile-name" data-fr="Pêcheur Sénégalais" data-wo="Jagalu Senegaal">Pêcheur Sénégalais</div>
-            <div class="profile-role" data-fr="Utilisateur certifié" data-wo="Jëfandikukat">Utilisateur certifié</div>
-            <div style="font-size:12px;color:var(--text2)" data-fr="Côte Atlantique — Sénégal" data-wo="Géej Atlantik — Senegaal">Côte Atlantique — Sénégal</div>
-            <div class="profile-stat-row">
-              <div><div class="profile-stat-num">18</div><div class="profile-stat-lbl" data-fr="Zones" data-wo="Dëkk">Zones</div></div>
-              <div><div class="profile-stat-num" id="prof-safe">—</div><div class="profile-stat-lbl" data-fr="Sûres" data-wo="Baax">Sûres</div></div>
-              <div><div class="profile-stat-num" id="prof-avg">—</div><div class="profile-stat-lbl" data-fr="Score moy." data-wo="Score">Score moy.</div></div>
-            </div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-card-title" data-fr="Informations plateforme" data-wo="Xam-xam sàmm">Informations plateforme</div>
-            <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px">
-              <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text2)">Version</span><span style="font-family:'DM Mono',monospace">v3.0</span></div>
-              <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text2)" data-fr="Données" data-wo="Xam-xam">Données</span><span style="font-family:'DM Mono',monospace">Copernicus + OpenWeather</span></div>
-              <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text2)" data-fr="Fréquence" data-wo="Yëgëlu">Fréquence</span><span style="font-family:'DM Mono',monospace" data-fr="Toutes les 6h" data-wo="6 wakht ci 6">Toutes les 6h</span></div>
-              <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--text2)">GitHub Actions</span><span style="font-family:'DM Mono',monospace;color:var(--safe)">✓ Actif</span></div>
-            </div>
-          </div>
-        </div>
-        <div>
-          <div class="zones-config">
-            <div class="stat-card-title" data-fr="Zones surveillées — cliquer pour activer/désactiver" data-wo="Dëkk yi — toppal walla toppal du">Zones surveillées</div>
-            <div class="zones-config-grid" id="zonesConfig"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-  </main>
+</main>
 </div>
 
-<div class="fab-group">
+<!-- FABs -->
+<div class="fabs">
   <a class="fab fab-wa" href="https://wa.me/221777020818" target="_blank">📱</a>
-  <button class="fab fab-ref" onclick="location.reload()">🔄</button>
+  <button class="fab fab-r" onclick="location.reload()">🔄</button>
 </div>
 
 <script>
-const COORDS = {
-  "SAINT-LOUIS":{lat:16.05,lon:-16.65},"GANDON":{lat:16.00,lon:-16.50},
-  "SAINT-LOUIS-HYDROBASE":{lat:16.10,lon:-16.48},"POTOU":{lat:15.70,lon:-16.55},
-  "LOMPOUL":{lat:15.45,lon:-16.70},"KAYAR":{lat:14.95,lon:-17.35},
-  "DAKAR-YOFF":{lat:14.80,lon:-17.65},"DAKAR-SOUMBEDIOUNE":{lat:14.68,lon:-17.44},
-  "DAKAR-HANN":{lat:14.72,lon:-17.38},"THIAROYE-SUR-MER":{lat:14.75,lon:-17.40},
-  "MBOUR-JOAL":{lat:14.35,lon:-17.15},"JOAL-FADIOUTH":{lat:14.16,lon:-16.85},
-  "PALMARIN":{lat:14.00,lon:-16.80},"NDANGANE":{lat:13.75,lon:-16.65},
-  "DJIFER":{lat:13.60,lon:-16.75},"KAFOUNTINE":{lat:12.90,lon:-16.75},
-  "CASAMANCE-ZIGUINCHOR":{lat:12.50,lon:-16.95},"CAP-SKIRRING":{lat:12.39,lon:-16.74}
+// ════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════
+const COORDS={
+  "SAINT-LOUIS":{lat:16.05,lon:-16.65,region:"Nord",desc:"Ndar - Nord"},
+  "GANDON":{lat:16.00,lon:-16.50,region:"Nord",desc:"Gandon"},
+  "SAINT-LOUIS-HYDROBASE":{lat:16.10,lon:-16.48,region:"Nord",desc:"Hydrobase"},
+  "POTOU":{lat:15.70,lon:-16.55,region:"Grande Côte",desc:"Potou"},
+  "LOMPOUL":{lat:15.45,lon:-16.70,region:"Grande Côte",desc:"Lompoul"},
+  "KAYAR":{lat:14.95,lon:-17.35,region:"Grande Côte",desc:"Fosse de Kayar"},
+  "DAKAR-YOFF":{lat:14.80,lon:-17.65,region:"Dakar",desc:"Yoff - Virage"},
+  "DAKAR-SOUMBEDIOUNE":{lat:14.68,lon:-17.44,region:"Dakar",desc:"Soumbedioune"},
+  "DAKAR-HANN":{lat:14.72,lon:-17.38,region:"Dakar",desc:"Baie de Hann"},
+  "THIAROYE-SUR-MER":{lat:14.75,lon:-17.40,region:"Dakar",desc:"Thiaroye"},
+  "MBOUR-JOAL":{lat:14.35,lon:-17.15,region:"Petite Côte",desc:"Port de Mbour"},
+  "JOAL-FADIOUTH":{lat:14.16,lon:-16.85,region:"Petite Côte",desc:"Joal"},
+  "PALMARIN":{lat:14.00,lon:-16.80,region:"Petite Côte",desc:"Palmarin"},
+  "NDANGANE":{lat:13.75,lon:-16.65,region:"Sine-Saloum",desc:"Ndangane"},
+  "DJIFER":{lat:13.60,lon:-16.75,region:"Sine-Saloum",desc:"Djifer"},
+  "KAFOUNTINE":{lat:12.90,lon:-16.75,region:"Casamance",desc:"Kafountine"},
+  "CASAMANCE-ZIGUINCHOR":{lat:12.50,lon:-16.95,region:"Casamance",desc:"Ziguinchor"},
+  "CAP-SKIRRING":{lat:12.39,lon:-16.74,region:"Casamance",desc:"Cap-Skirring"}
 };
 
-let allZones=[], map, markers=[], chartInstance=null, currentLang='fr';
+let allZones=[], map, mks=[], chartMkt=null, selectedForecastZone='KAYAR', selectedDay=0;
+let deferredInstall=null;
 
-document.addEventListener('DOMContentLoaded',()=>{ initMap(); loadData(); startClock(); });
+// ════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  initWave(); initMap(); loadData();
+  clock(); setInterval(clock,1000);
+  buildForecastZones(); buildFishSpecies(); buildTides();
+  buildMarket(); buildFuel(); buildCommunity(); buildSettings();
+  checkOnline();
+  window.addEventListener('online',()=>setOffline(false));
+  window.addEventListener('offline',()=>setOffline(true));
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;document.getElementById('installBanner').classList.add('show');});
+  document.getElementById('installBtn')?.addEventListener('click',()=>{deferredInstall?.prompt();});
+});
 
+// ════════════════════════════════════════════════════════
+// WAVE BACKGROUND
+// ════════════════════════════════════════════════════════
+function initWave(){
+  const c=document.getElementById('waveBg'),ctx=c.getContext('2d');
+  let t=0;
+  function draw(){
+    c.width=window.innerWidth;c.height=window.innerHeight;
+    ctx.clearRect(0,0,c.width,c.height);
+    const isDark=document.documentElement.getAttribute('data-theme')!=='light';
+    const waves=[
+      {a:60,s:.004,sp:.008,y:.7,col:isDark?'rgba(0,220,200,0.04)':'rgba(0,106,94,0.03)'},
+      {a:40,s:.006,sp:.012,y:.75,col:isDark?'rgba(0,150,200,0.03)':'rgba(0,80,130,0.02)'},
+      {a:80,s:.003,sp:.006,y:.8,col:isDark?'rgba(0,220,200,0.025)':'rgba(0,106,94,0.02)'},
+    ];
+    waves.forEach(w=>{
+      ctx.beginPath();ctx.moveTo(0,c.height);
+      for(let x=0;x<=c.width;x+=4){const y=c.height*w.y+Math.sin(x*w.s+t*w.sp)*w.a;ctx.lineTo(x,y);}
+      ctx.lineTo(c.width,c.height);ctx.closePath();
+      ctx.fillStyle=w.col;ctx.fill();
+    });
+    t+=1;requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ════════════════════════════════════════════════════════
+// MAP
+// ════════════════════════════════════════════════════════
 function initMap(){
   map=L.map('map',{center:[14.3,-16.9],zoom:7,zoomControl:false});
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap | © CARTO'}).addTo(map);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© CARTO'}).addTo(map);
   L.control.zoom({position:'bottomright'}).addTo(map);
 }
 
+function sc(c){return c==='danger'?'#ff2044':c==='warning'?'#ff8c00':c==='caution'?'#f0c400':'#00e87c';}
+function tc(c){return c==='caution'?'#111':'white';}
+
+function renderMks(zones){
+  mks.forEach(m=>map.removeLayer(m));mks=[];
+  zones.forEach(z=>{
+    const c=COORDS[z.zone];if(!c)return;
+    const col=sc(z.securite_code),tx=tc(z.securite_code);
+    const ico=L.divIcon({className:'mk-b',html:`<div class="mk-p" style="background:${col};color:${tx}">${z.wave.toFixed(1)}m·${z.peche_score}/10</div>`,iconAnchor:[38,17]});
+    const bar=`<div class="pbar-w"><div class="pbar" style="width:${z.peche_score*10}%;background:${col}"></div></div>`;
+    const pop=`<div>
+      <div class="ph" style="background:${col}"><div class="ph-n">${z.zone}</div><div class="ph-d">${z.region} — ${z.desc}</div></div>
+      <div class="pb">
+        <div class="pmets">
+          <div class="pmet"><div class="pmet-v">${z.wave.toFixed(1)}m</div><div class="pmet-l">Houle</div></div>
+          <div class="pmet"><div class="pmet-v">${z.temp.toFixed(1)}°</div><div class="pmet-l">SST</div></div>
+          <div class="pmet"><div class="pmet-v">${z.current.toFixed(2)}</div><div class="pmet-l">m/s</div></div>
+        </div>
+        <div class="pstat" style="background:${col};color:${tx}">${z.securite_texte}</div>
+        <div style="text-align:center;font-size:11px;margin-bottom:6px">🎣 ${z.peche_score}/10 ${bar}</div>
+        <a href="https://wa.me/221777020818?text=${encodeURIComponent(z.zone+': '+z.securite_texte)}" class="pwa" target="_blank">📱 WhatsApp</a>
+      </div></div>`;
+    const m=L.marker([c.lat,c.lon],{icon:ico}).bindPopup(pop,{maxWidth:270});
+    m.addTo(map);mks.push(m);
+  });
+}
+
+// ════════════════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════════════════
 async function loadData(){
   try{
-    const res=await fetch('data.json');
-    const json=await res.json();
-    allZones=Object.entries(json.zones||{}).map(([name,d])=>({
-      zone:name, region:d.region, desc:d.desc, lat:d.lat, lon:d.lon,
+    const r=await fetch('data.json');const j=await r.json();
+    allZones=Object.entries(j.zones||{}).map(([n,d])=>({
+      zone:n,region:d.region,desc:d.desc,lat:d.lat,lon:d.lon,
       securite_code:d.indices?.securite_code||'safe',
       securite_texte:d.indices?.securite_texte||'—',
-      peche_score:d.indices?.peche_score||0,
-      wave:d.indices?.wave||0, temp:d.indices?.temp||0, current:d.indices?.current||0,
-      source:d.copernicus?.source||'simulation', updated_at:d.updated_at||''
+      peche_score:+(d.indices?.peche_score||0).toFixed(1),
+      wave:+(d.indices?.wave||0).toFixed(1),
+      temp:+(d.indices?.temp||0).toFixed(1),
+      current:+(d.indices?.current||0).toFixed(2),
+      source:d.copernicus?.source||'simulation'
     }));
-    render(json);
-  }catch(e){ console.warn('data.json absent, mode demo'); loadDemo(); }
+    refreshDash();
+  }catch{genDemo();refreshDash();}
 }
 
-function loadDemo(){
-  allZones=Object.entries(COORDS).map(([name,c],i)=>{
-    const codes=['safe','safe','caution','warning','danger'];
-    const texts=['🟢 FAVORABLE — Mer calme','🟢 FAVORABLE — Mer calme','🟡 VIGILANCE','🟠 PRUDENCE — Mer formée','🔴 DANGER — Mer agitée'];
-    const sc=codes[i%5];
-    return{zone:name,region:'—',desc:'Sénégal',lat:c.lat,lon:c.lon,
-      securite_code:sc,securite_texte:texts[i%5],
-      peche_score:+(5+Math.random()*4.5).toFixed(1),
-      wave:+(0.4+Math.random()*2.2).toFixed(1),
-      temp:+(22+Math.random()*5).toFixed(1),
-      current:+(0.1+Math.random()*.5).toFixed(2),
-      source:'demo',updated_at:new Date().toISOString()};
-  });
-  render({stats:{},meta:{}});
-}
-
-function render(json){
-  renderMarkers(allZones);
-  renderZonesList(allZones);
-  updateCounters(allZones);
-  renderHistory(allZones,json.stats||{},json.meta||{});
-  renderAlerts(allZones);
-  renderProfile(allZones);
-  renderZonesConfig();
-}
-
-function secColor(c){return c==='danger'?'#ff1744':c==='warning'?'#ff9100':c==='caution'?'#ffea00':'#00e676';}
-function textColor(c){return c==='caution'?'#222':'white';}
-
-function renderMarkers(zones){
-  markers.forEach(m=>map.removeLayer(m)); markers=[];
-  zones.forEach(z=>{
-    const c=COORDS[z.zone]; if(!c)return;
-    const col=secColor(z.securite_code), tc=textColor(z.securite_code);
-    const icon=L.divIcon({className:'mk-bubble',
-      html:`<div class="mk-pin" style="background:${col};color:${tc}">${z.wave.toFixed(1)}m · ${z.peche_score}/10</div>`,
-      iconAnchor:[40,18]});
-    const scoreBar=`<div class="score-bar-wrap"><div class="score-bar" style="width:${z.peche_score*10}%;background:${col}"></div></div>`;
-    const popup=`<div>
-      <div class="popup-head" style="background:${col}">
-        <div class="popup-head-name">${z.zone}</div>
-        <div class="popup-head-desc">${z.region} — ${z.desc}</div>
-      </div>
-      <div class="popup-body">
-        <div class="popup-metrics">
-          <div class="popup-metric"><div class="popup-metric-val">${z.wave.toFixed(1)}m</div><div class="popup-metric-lbl">Houle</div></div>
-          <div class="popup-metric"><div class="popup-metric-val">${z.temp.toFixed(1)}°</div><div class="popup-metric-lbl">SST</div></div>
-          <div class="popup-metric"><div class="popup-metric-val">${z.current.toFixed(2)}</div><div class="popup-metric-lbl">m/s</div></div>
-        </div>
-        <div class="popup-status" style="background:${col};color:${tc}">${z.securite_texte}</div>
-        <div style="text-align:center;font-size:12px;margin-bottom:8px">🎣 Score pêche : <strong>${z.peche_score}/10</strong>${scoreBar}</div>
-        <a href="https://wa.me/221777020818?text=${encodeURIComponent(z.zone+' : '+z.securite_texte)}" class="popup-wa" target="_blank">📱 Partager sur WhatsApp</a>
-      </div></div>`;
-    const m=L.marker([c.lat,c.lon],{icon}).bindPopup(popup,{maxWidth:280});
-    m.addTo(map); markers.push(m);
+function genDemo(){
+  const sc_=['safe','safe','safe','caution','caution','warning','warning','danger'];
+  const tx_=['🟢 FAVORABLE — Mer calme','🟢 FAVORABLE','🟢 FAVORABLE','🟡 VIGILANCE','🟡 VIGILANCE','🟠 PRUDENCE — Mer formée','🟠 PRUDENCE','🔴 DANGER — Mer agitée'];
+  allZones=Object.entries(COORDS).map(([n,c],i)=>{
+    const s=sc_[i%8];
+    return{zone:n,region:c.region,desc:c.desc,lat:c.lat,lon:c.lon,
+      securite_code:s,securite_texte:tx_[i%8],
+      peche_score:+(4.5+Math.random()*5).toFixed(1),
+      wave:+(0.3+Math.random()*2.5).toFixed(1),
+      temp:+(21+Math.random()*6).toFixed(1),
+      current:+(0.05+Math.random()*.6).toFixed(2),
+      source:'demo'};
   });
 }
 
-function renderZonesList(zones){
-  document.getElementById('zonesList').innerHTML=zones.map(z=>`
-    <div class="zone-card ${z.securite_code}" onclick="focusZone('${z.zone}')">
-      <div class="zone-top">
-        <div><div class="zone-name">${z.zone}</div><div class="zone-region">${z.region}</div></div>
-        <div class="zone-score-badge">${z.peche_score}/10</div>
-      </div>
-      <div class="zone-metrics">🌊 <span>${z.wave.toFixed(1)}m</span>&nbsp; 🌡️ <span>${z.temp.toFixed(1)}°</span>&nbsp; ↗️ <span>${z.current.toFixed(2)}</span></div>
+function refreshDash(){
+  renderMks(allZones);renderZlist(allZones);updateCounts(allZones);buildAlerts();
+}
+
+function renderZlist(zones){
+  document.getElementById('zlist').innerHTML=zones.map(z=>`
+    <div class="zc ${z.securite_code}" onclick="flyTo('${z.zone}')">
+      <div class="zt"><div><div class="zn">${z.zone}</div><div class="zreg">${z.region}</div></div><div class="zbadge">${z.peche_score}/10</div></div>
+      <div class="zmets">🌊 <span>${z.wave}m</span> 🌡️ <span>${z.temp}°</span> ↗ <span>${z.current}</span></div>
     </div>`).join('');
 }
 
-function focusZone(name){
-  const c=COORDS[name]; if(!c)return;
-  map.flyTo([c.lat,c.lon],11,{duration:.8});
-  const idx=allZones.findIndex(z=>z.zone===name);
-  if(idx>=0&&markers[idx]) setTimeout(()=>markers[idx].openPopup(),800);
+function flyTo(n){
+  const c=COORDS[n];if(!c)return;
+  map.flyTo([c.lat,c.lon],11,{duration:.7});
+  const i=allZones.findIndex(z=>z.zone===n);
+  if(i>=0&&mks[i])setTimeout(()=>mks[i].openPopup(),700);
 }
 
-function updateCounters(zones){
+function updateCounts(zones){
   const c={safe:0,caution:0,warning:0,danger:0};
-  zones.forEach(z=>{if(c[z.securite_code]!==undefined)c[z.securite_code]++;});
-  ['safe','caution','warning','danger'].forEach(k=>{
-    const el=document.getElementById('cnt-'+k), sb=document.getElementById('sb-'+k);
-    if(el)el.textContent=c[k]; if(sb)sb.textContent=c[k];
+  zones.forEach(z=>c[z.securite_code]!==undefined&&c[z.securite_code]++);
+  ['s','c','w','d'].forEach((k,i)=>{
+    const key=['safe','caution','warning','danger'][i];
+    ['cs','cc','cw','cd'].forEach((id,j)=>{if(j===i){const e=document.getElementById(id);if(e)e.textContent=c[key];}});
+    const sf=document.getElementById('sf-'+k);if(sf)sf.textContent=c[key];
+  });
+  document.getElementById('cs').textContent=c.safe;
+  document.getElementById('cc').textContent=c.caution;
+  document.getElementById('cw').textContent=c.warning;
+  document.getElementById('cd').textContent=c.danger;
+  document.getElementById('sf-s').textContent=c.safe;
+  document.getElementById('sf-c').textContent=c.caution;
+  document.getElementById('sf-w').textContent=c.warning;
+  document.getElementById('sf-d').textContent=c.danger;
+}
+
+function filter(el){
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('on'));el.classList.add('on');
+  const r=el.dataset.r;
+  const f=r==='all'?allZones:allZones.filter(z=>z.region===r);
+  renderMks(f);renderZlist(f);updateCounts(f);
+}
+function search(q){
+  const f=q?allZones.filter(z=>z.zone.toLowerCase().includes(q.toLowerCase())||z.region.toLowerCase().includes(q.toLowerCase())):allZones;
+  renderMks(f);renderZlist(f);
+}
+
+// ════════════════════════════════════════════════════════
+// PRÉVISIONS 7J
+// ════════════════════════════════════════════════════════
+const WEATHER_ICONS=['⛅','🌤️','🌦️','🌊','☀️','🌧️','🌤️'];
+const DAY_NAMES=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+
+function buildForecastZones(){
+  const sel=['KAYAR','DAKAR-YOFF','MBOUR-JOAL','SAINT-LOUIS','CAP-SKIRRING','CASAMANCE-ZIGUINCHOR'];
+  const el=document.getElementById('fzoneButtons');
+  el.innerHTML=sel.map(n=>`<button class="fz-btn${n===selectedForecastZone?' on':''}" onclick="selectFZone('${n}',this)">${n}</button>`).join('');
+  buildForecastDays();
+}
+
+function selectFZone(n,btn){
+  selectedForecastZone=n;
+  document.querySelectorAll('.fz-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  buildForecastDays();
+}
+
+function fakeScore(base,day){
+  const seed=(base.charCodeAt(0)+day)*137;
+  return Math.min(9.5,Math.max(3,base.length*.3+((seed%17)*.35)));
+}
+
+function buildForecastDays(){
+  const el=document.getElementById('forecastDays');
+  const now=new Date();
+  const days=Array.from({length:7},(_,i)=>{
+    const d=new Date(now);d.setDate(d.getDate()+i);
+    const score=+fakeScore(selectedForecastZone,i).toFixed(1);
+    const wave=+(0.4+Math.random()*2).toFixed(1);
+    const codes=['safe','safe','caution','warning','danger'];
+    const sc=codes[Math.floor(wave)>2?4:Math.floor(wave)>1.5?3:Math.floor(wave)>1?2:Math.floor(wave)>.5?1:0];
+    return{date:d,day:DAY_NAMES[d.getDay()],icon:WEATHER_ICONS[i%7],score,wave,sc};
+  });
+  el.innerHTML=days.map((d,i)=>`
+    <div class="fday${i===selectedDay?' sel':''}" onclick="selectDay(${i},${JSON.stringify(d).replace(/"/g,"'")})">
+      <div class="fd-date">${d.day} ${d.date.getDate()}/${d.date.getMonth()+1}</div>
+      <div class="fd-icon">${d.icon}</div>
+      <div class="fd-score" style="color:${sc(d.sc)}">${d.score}</div>
+      <div class="fd-wave">${d.wave}m</div>
+      <div class="fd-safe" style="background:${sc(d.sc)};color:${tc(d.sc)}">${d.sc==='safe'?'✓':d.sc==='caution'?'!':d.sc==='warning'?'⚠':'✕'}</div>
+    </div>`).join('');
+  drawHorizon(days);
+  selectDayObj(days[0],0);
+}
+
+function selectDay(i,d){
+  selectedDay=i;
+  document.querySelectorAll('.fday').forEach((el,j)=>el.classList.toggle('sel',j===i));
+  selectDayObj(d,i);
+}
+
+function selectDayObj(d,i){
+  const wind=+(3+Math.random()*15).toFixed(0);
+  const curr=+(0.1+Math.random()*.5).toFixed(2);
+  const temp=+(21+Math.random()*6).toFixed(1);
+  document.getElementById('fdMetrics').innerHTML=`
+    <div class="fdm"><div class="fdm-val">${d.wave}m</div><div class="fdm-lbl">Houle</div></div>
+    <div class="fdm"><div class="fdm-val">${wind}kn</div><div class="fdm-lbl">Vent</div></div>
+    <div class="fdm"><div class="fdm-val">${temp}°C</div><div class="fdm-lbl">SST</div></div>
+    <div class="fdm"><div class="fdm-val">${curr}m/s</div><div class="fdm-lbl">Courant</div></div>`;
+}
+
+function drawHorizon(days){
+  const cv=document.getElementById('horizonCanvas');
+  const ctx=cv.getContext('2d');
+  cv.width=cv.offsetWidth||800;cv.height=180;
+  const w=cv.width,h=cv.height;
+  const isDark=document.documentElement.getAttribute('data-theme')!=='light';
+
+  // Sky gradient
+  const sky=ctx.createLinearGradient(0,0,0,h*.6);
+  sky.addColorStop(0,isDark?'#030b14':'#c8e4f0');
+  sky.addColorStop(1,isDark?'#071525':'#e8f4fa');
+  ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
+
+  // Sun/moon
+  const sunX=w*.85,sunY=h*.25;
+  const sunG=ctx.createRadialGradient(sunX,sunY,0,sunX,sunY,40);
+  sunG.addColorStop(0,isDark?'rgba(240,165,0,.9)':'rgba(255,200,50,.9)');
+  sunG.addColorStop(1,'transparent');
+  ctx.fillStyle=sunG;ctx.fillRect(0,0,w,h);
+
+  // Horizon line
+  ctx.beginPath();ctx.moveTo(0,h*.58);ctx.lineTo(w,h*.58);
+  ctx.strokeStyle=isDark?'rgba(0,220,200,.3)':'rgba(0,107,96,.2)';ctx.lineWidth=1;ctx.stroke();
+
+  // Wave score overlay
+  const pts=days.map((d,i)=>({x:(i/(days.length-1))*w,y:h*.58+(1-d.score/10)*(h*.35)}));
+  const seaG=ctx.createLinearGradient(0,h*.4,0,h);
+  seaG.addColorStop(0,isDark?'rgba(0,220,200,.35)':'rgba(0,107,96,.25)');
+  seaG.addColorStop(1,isDark?'rgba(0,80,100,.1)':'rgba(0,107,96,.05)');
+  ctx.beginPath();ctx.moveTo(0,h);
+  pts.forEach((p,i)=>{
+    if(i===0)ctx.lineTo(p.x,p.y);
+    else{const pp=pts[i-1];ctx.bezierCurveTo((pp.x+p.x)/2,pp.y,(pp.x+p.x)/2,p.y,p.x,p.y);}
+  });
+  ctx.lineTo(w,h);ctx.closePath();ctx.fillStyle=seaG;ctx.fill();
+
+  // Score line
+  ctx.beginPath();
+  pts.forEach((p,i)=>{
+    if(i===0)ctx.moveTo(p.x,p.y);
+    else{const pp=pts[i-1];ctx.bezierCurveTo((pp.x+p.x)/2,pp.y,(pp.x+p.x)/2,p.y,p.x,p.y);}
+  });
+  ctx.strokeStyle=isDark?'rgba(0,220,200,.7)':'rgba(0,107,96,.6)';ctx.lineWidth=2;ctx.stroke();
+
+  // Score dots
+  pts.forEach((p,i)=>{
+    ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);
+    ctx.fillStyle=sc(days[i].sc);ctx.fill();
   });
 }
 
-function renderHistory(zones,stats,meta){
-  const scores=zones.map(z=>z.peche_score);
-  const avg=scores.length?(scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1):'—';
-  const safe=zones.filter(z=>z.securite_code==='safe').length;
-  const top=[...zones].sort((a,b)=>b.peche_score-a.peche_score)[0];
-  document.getElementById('hist-avg').textContent=stats.score_moyen||avg;
-  document.getElementById('hist-safe').textContent=safe;
-  document.getElementById('hist-top').textContent=top?.zone||'—';
-  document.getElementById('hist-top-score').textContent=top?`Score : ${top.peche_score}/10 · ${top.region}`:'';
-  document.getElementById('prof-safe').textContent=safe;
-  document.getElementById('prof-avg').textContent=avg;
-  if(meta.generated_at){
-    const d=new Date(meta.generated_at);
-    document.getElementById('hist-update').textContent=d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})+' UTC';
-  }
-  if(meta.sources) document.getElementById('hist-source').textContent=meta.sources.join(' + ');
-  buildChart(zones);
+// ════════════════════════════════════════════════════════
+// BANCS POISSONS IA
+// ════════════════════════════════════════════════════════
+const FISH_SPECIES=[
+  {name:'Thiof',local:'Mérou',icon:'🐠',prob:.82,season:'Nov–Mar'},
+  {name:'Yaboi',local:'Bonite',icon:'🐟',prob:.75,season:'Oct–Fév'},
+  {name:'Tollo',local:'Requin',icon:'🦈',prob:.45,season:'Toute année'},
+  {name:'Kapitaine',local:'Capitaine',icon:'🐡',prob:.68,season:'Déc–Avr'},
+  {name:'Sompat',local:'Pagre',icon:'🐟',prob:.71,season:'Jan–Mai'},
+  {name:'Jaxatu',local:'Sardine',icon:'🐟',prob:.88,season:'Toute année'},
+  {name:'Seer',local:'Barracuda',icon:'🐠',prob:.55,season:'Nov–Fév'},
+  {name:'Liiche',local:'Langouste',icon:'🦞',prob:.40,season:'Oct–Mar'},
+];
+
+function buildFishSpecies(){
+  document.getElementById('fishSpecies').innerHTML=FISH_SPECIES.map(f=>`
+    <div class="fspec">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="fspec-name">${f.icon} ${f.name}<span style="font-size:10px;color:var(--text2);font-family:'Crimson Pro',serif;font-style:italic"> — ${f.local}</span></div>
+      </div>
+      <div class="fspec-prob">${Math.round(f.prob*100)}%</div>
+      <div class="fspec-bar"><div class="fspec-fill" style="width:${f.prob*100}%"></div></div>
+      <div class="fspec-season" data-fr="Saison : ${f.season}" data-wo="Xarnu : ${f.season}">Saison : ${f.season}</div>
+    </div>`).join('');
+  drawFishMap();
 }
 
-function buildChart(zones){
-  const ctx=document.getElementById('chartZones')?.getContext('2d'); if(!ctx)return;
-  if(chartInstance)chartInstance.destroy();
-  const sorted=[...zones].sort((a,b)=>b.peche_score-a.peche_score);
-  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
-  const gridColor=isDark?'rgba(255,255,255,.05)':'rgba(0,0,0,.06)';
-  const tickColor=isDark?'#8a9bb5':'#4a5a74';
-  chartInstance=new Chart(ctx,{
-    type:'bar',
-    data:{
-      labels:sorted.map(z=>z.zone.replace(/-/g,' ')),
-      datasets:[{label:'Score',data:sorted.map(z=>z.peche_score),
-        backgroundColor:sorted.map(z=>secColor(z.securite_code)+'bb'),
-        borderColor:sorted.map(z=>secColor(z.securite_code)),
-        borderWidth:1,borderRadius:6}]
-    },
+function drawFishMap(){
+  const cv=document.getElementById('fishCanvas');
+  const w=cv.parentElement.offsetWidth||800;
+  cv.width=w;cv.height=Math.round(w*.5);
+  const ctx=cv.getContext('2d');
+  const h=cv.height;
+  const isDark=document.documentElement.getAttribute('data-theme')!=='light';
+  ctx.fillStyle=isDark?'#071525':'#e2eaf2';ctx.fillRect(0,0,w,h);
+
+  // Coastline
+  ctx.beginPath();ctx.moveTo(w*.08,0);ctx.lineTo(w*.08,h);
+  ctx.strokeStyle=isDark?'rgba(255,255,255,.2)':'rgba(0,0,0,.15)';ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=isDark?'rgba(7,21,37,.8)':'rgba(240,244,248,.8)';ctx.fillRect(0,0,w*.08,h);
+
+  // Hotspots IA
+  const hs=[
+    {x:.25,y:.15,r:.12,p:.85},{x:.40,y:.35,r:.10,p:.72},{x:.55,y:.55,r:.14,p:.90},
+    {x:.70,y:.25,r:.08,p:.60},{x:.30,y:.65,r:.09,p:.68},{x:.60,y:.72,r:.11,p:.78},
+    {x:.20,y:.45,r:.07,p:.55},{x:.80,y:.60,r:.10,p:.70},
+  ];
+  hs.forEach(h2=>{
+    const gx=h2.x*w,gy=h2.y*h,gr=h2.r*Math.min(w,h);
+    const g=ctx.createRadialGradient(gx,gy,0,gx,gy,gr);
+    const col=h2.p>.8?'255,32,68':h2.p>.65?'255,140,0':h2.p>.5?'240,196,0':'0,232,124';
+    g.addColorStop(0,`rgba(${col},.55)`);g.addColorStop(1,'transparent');
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(gx,gy,gr,0,Math.PI*2);ctx.fill();
+  });
+
+  // Grid lines
+  ctx.strokeStyle=isDark?'rgba(255,255,255,.04)':'rgba(0,0,0,.04)';ctx.lineWidth=1;
+  for(let x=0;x<w;x+=w/10){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();}
+  for(let y=0;y<h;y+=h/5){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}
+
+  // Labels zones
+  ctx.fillStyle=isDark?'rgba(0,220,200,.8)':'rgba(0,106,94,.8)';ctx.font=`bold 10px Syne,sans-serif`;
+  [['KAYAR',w*.28,h*.12],['DAKAR',w*.42,h*.32],['MBOUR',w*.57,h*.52],['DJIFER',w*.65,h*.70]].forEach(([t,x,y])=>{ctx.fillText(t,x,y);});
+
+  // IA label
+  ctx.fillStyle=isDark?'rgba(0,220,200,.5)':'rgba(0,106,94,.4)';
+  ctx.font=`700 11px Syne,sans-serif`;
+  ctx.fillText('🤖 Prédiction IA — Copernicus SST + Courants',w*.1,h*.95);
+}
+
+// ════════════════════════════════════════════════════════
+// MARÉES
+// ════════════════════════════════════════════════════════
+const TIDE_ZONES=['DAKAR-YOFF','KAYAR','MBOUR-JOAL','SAINT-LOUIS','CAP-SKIRRING'];
+const ZONES_LEGALES=[
+  {name:'Fosse de Kayar',status:'legal',desc:'Pêche autorisée toute l\'année'},
+  {name:'Parc Marin de Bamboung',status:'forbidden',desc:'Zone protégée — pêche interdite'},
+  {name:'AMP de Joal-Fadiouth',status:'restricted',desc:'Pêche artisanale uniquement'},
+  {name:'Delta du Saloum',status:'restricted',desc:'Quotas saisonniers en vigueur'},
+  {name:'Cap-Vert (12 milles)',status:'legal',desc:'ZEE — pêche libre'},
+  {name:'Embouchure Casamance',status:'restricted',desc:'Accès réglementé – saison sèche'},
+  {name:'Réserve Saint-Louis',status:'forbidden',desc:'Zone de repos biologique'},
+  {name:'Petite Côte — Ouverture',status:'legal',desc:'Saison ouverte Nov–Mai'},
+];
+
+function buildTides(){
+  // Zone selector
+  document.getElementById('tideZoneBtns').innerHTML=TIDE_ZONES.map((n,i)=>
+    `<button class="fz-btn${i===0?' on':''}" onclick="selectTideZone('${n}',this)">${n}</button>`).join('');
+  drawTideChart('DAKAR-YOFF');
+  buildTideEvents();
+  document.getElementById('zonesLegales').innerHTML=ZONES_LEGALES.map(z=>`
+    <div class="zl-item ${z.status}">
+      <div class="zl-name">${z.name}</div>
+      <div class="zl-status">${z.status==='legal'?'✅ Autorisé':z.status==='restricted'?'⚠️ Restreint':'🚫 Interdit'}</div>
+      <div class="zl-desc">${z.desc}</div>
+    </div>`).join('');
+}
+
+function selectTideZone(n,btn){
+  document.querySelectorAll('#tideZoneBtns .fz-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
+  drawTideChart(n);buildTideEvents();
+}
+
+function buildTideEvents(){
+  const evs=[
+    {type:'BM',icon:'🔽',time:'02:34',coef:65},{type:'PM',icon:'🔼',time:'08:47',coef:88},
+    {type:'BM',icon:'🔽',time:'15:12',coef:62},{type:'PM',icon:'🔼',time:'21:05',coef:91},
+  ];
+  document.getElementById('tideEvents').innerHTML=evs.map(e=>`
+    <div class="tide-event">
+      <div class="te-type" data-fr="${e.type==='PM'?'Pleine mer':'Basse mer'}" data-wo="${e.type}">${e.type==='PM'?'Pleine mer':'Basse mer'}</div>
+      <div class="te-icon">${e.icon}</div>
+      <div class="te-time">${e.time}</div>
+      <div class="te-coef">Coef. ${e.coef}</div>
+    </div>`).join('');
+}
+
+function drawTideChart(zone){
+  const cv=document.getElementById('tideCanvas');
+  const ctx=cv.getContext('2d');
+  cv.width=cv.parentElement.offsetWidth-40||700;cv.height=200;
+  const w=cv.width,h=cv.height;
+  const isDark=document.documentElement.getAttribute('data-theme')!=='light';
+  ctx.clearRect(0,0,w,h);
+
+  const pad={l:40,r:20,t:15,b:30};
+  const cw=w-pad.l-pad.r,ch=h-pad.t-pad.b;
+
+  // Grid
+  ctx.strokeStyle=isDark?'rgba(255,255,255,.05)':'rgba(0,0,0,.05)';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){const y=pad.t+ch/4*i;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cw,y);ctx.stroke();}
+  for(let i=0;i<=24;i+=6){const x=pad.l+cw/24*i;ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,pad.t+ch);ctx.stroke();}
+
+  // Tide curve (sinusoidal approximation)
+  const seed=zone.charCodeAt(0)*.01;
+  const pts=Array.from({length:241},(_,i)=>{
+    const t=i/10;
+    const y=Math.sin((t+seed)*Math.PI/6.2)*(.42+Math.sin(t*.5)*.08)+Math.sin((t+seed+2)*Math.PI/12.4)*.12+.5;
+    return{x:pad.l+cw/24*t,y:pad.t+ch*(1-y*.9)};
+  });
+
+  const grad=ctx.createLinearGradient(0,pad.t,0,pad.t+ch);
+  grad.addColorStop(0,isDark?'rgba(0,220,200,.3)':'rgba(0,107,96,.2)');
+  grad.addColorStop(1,'transparent');
+  ctx.beginPath();ctx.moveTo(pts[0].x,pad.t+ch);
+  pts.forEach(p=>ctx.lineTo(p.x,p.y));
+  ctx.lineTo(pts[pts.length-1].x,pad.t+ch);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+
+  ctx.beginPath();pts.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+  ctx.strokeStyle=isDark?'rgba(0,220,200,.8)':'rgba(0,107,96,.7)';ctx.lineWidth=2;ctx.stroke();
+
+  // Now line
+  const now=new Date().getHours()+new Date().getMinutes()/60;
+  const nx=pad.l+cw/24*now;
+  ctx.beginPath();ctx.moveTo(nx,pad.t);ctx.lineTo(nx,pad.t+ch);
+  ctx.strokeStyle=isDark?'rgba(240,165,0,.7)':'rgba(200,120,0,.6)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);ctx.stroke();ctx.setLineDash([]);
+
+  // Labels
+  ctx.fillStyle=isDark?'#6a8da8':'#3a5a72';ctx.font='10px DM Mono,monospace';
+  ['00h','06h','12h','18h','24h'].forEach((l,i)=>ctx.fillText(l,pad.l+cw/4*i-6,pad.t+ch+20));
+  ['HM','','','','BM'].forEach((l,i)=>ctx.fillText(l,4,pad.t+ch/4*i+5));
+}
+
+// ════════════════════════════════════════════════════════
+// MARCHÉ
+// ════════════════════════════════════════════════════════
+const FISH_MARKET=[
+  {name:'Thiof',local:'Mérou blanc',icon:'🐠',price:6800,unit:'kg',trend:'up',delta:'+4%',markets:'Dakar, Mbour'},
+  {name:'Yaboi',local:'Bonite / Thon',icon:'🐟',price:1200,unit:'kg',trend:'dn',delta:'-2%',markets:'Kayar, Ziguinchor'},
+  {name:'Jaxatu',local:'Sardinelle',icon:'🐟',price:450,unit:'kg',trend:'fl',delta:'0%',markets:'Tous marchés'},
+  {name:'Sompat',local:'Pagre rouge',icon:'🐡',price:3500,unit:'kg',trend:'up',delta:'+7%',markets:'Dakar, Saint-Louis'},
+  {name:'Kapitaine',local:'Capitaine',icon:'🐠',price:4200,unit:'kg',trend:'up',delta:'+2%',markets:'Dakar, Mbour'},
+  {name:'Liiche',local:'Langouste',icon:'🦞',price:18000,unit:'kg',trend:'dn',delta:'-5%',markets:'Dakar (export)'},
+  {name:'Seer',local:'Barracuda',icon:'🐟',price:2800,unit:'kg',trend:'fl',delta:'0%',markets:'Saint-Louis'},
+  {name:'Tollo',local:'Requin',icon:'🦈',price:900,unit:'kg',trend:'dn',delta:'-8%',markets:'Ziguinchor'},
+];
+
+function buildMarket(){
+  const now=new Date();
+  document.getElementById('marketDate').textContent=now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('fishPrices').innerHTML=FISH_MARKET.map(f=>`
+    <div class="fp">
+      <div class="fp-top">
+        <div><div class="fp-name">${f.name}</div><div class="fp-local">${f.local}</div></div>
+        <div class="fp-icon">${f.icon}</div>
+      </div>
+      <div class="fp-price">${f.price.toLocaleString()}</div>
+      <div class="fp-unit">FCFA / ${f.unit}</div>
+      <div class="fp-trend ${f.trend}">${f.trend==='up'?'↑':f.trend==='dn'?'↓':'→'} ${f.delta} cette semaine</div>
+      <div class="fp-markets">📍 ${f.markets}</div>
+    </div>`).join('');
+  buildMarketChart();
+}
+
+function buildMarketChart(){
+  const ctx=document.getElementById('chartMarket')?.getContext('2d');if(!ctx)return;
+  if(chartMkt)chartMkt.destroy();
+  const isDark=document.documentElement.getAttribute('data-theme')!=='light';
+  const days=['L','M','M','J','V','S','D'];
+  chartMkt=new Chart(ctx,{
+    type:'line',
+    data:{labels:days,datasets:[
+      {label:'Thiof',data:[6200,6400,6600,6500,6700,6750,6800],borderColor:'#00dcc8',tension:.4,borderWidth:2,pointRadius:3,fill:false},
+      {label:'Sompat',data:[3200,3300,3500,3400,3600,3550,4200],borderColor:'#f0a500',tension:.4,borderWidth:2,pointRadius:3,fill:false},
+      {label:'Jaxatu',data:[480,460,450,455,445,450,450],borderColor:'#00e87c',tension:.4,borderWidth:2,pointRadius:3,fill:false},
+    ]},
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false}},
-      scales:{
-        x:{ticks:{color:tickColor,font:{size:9},maxRotation:45},grid:{color:gridColor}},
-        y:{min:0,max:10,ticks:{color:tickColor,font:{size:11}},grid:{color:gridColor}}
-      }}
+      plugins:{legend:{labels:{color:isDark?'#6a8da8':'#3a5a72',font:{family:'DM Mono'}}}},
+      scales:{x:{ticks:{color:isDark?'#6a8da8':'#3a5a72'},grid:{color:isDark?'rgba(255,255,255,.04)':'rgba(0,0,0,.05)'}},
+        y:{ticks:{color:isDark?'#6a8da8':'#3a5a72'},grid:{color:isDark?'rgba(255,255,255,.04)':'rgba(0,0,0,.05)'}}}
+    }
   });
 }
 
-function renderAlerts(zones){
-  const danger=zones.filter(z=>z.securite_code==='danger');
-  const warning=zones.filter(z=>z.securite_code==='warning');
+// ════════════════════════════════════════════════════════
+// CARBURANT
+// ════════════════════════════════════════════════════════
+const FUEL_ROUTES=[
+  {name:'Dakar → Fosse Kayar',dist:28,base_fuel:42},{name:'Mbour → Djifer',dist:45,base_fuel:67},
+  {name:'Saint-Louis → Potou',dist:18,base_fuel:27},{name:'Ziguinchor → Cap-Skirring',dist:35,base_fuel:52},
+  {name:'Kayar → SLHB',dist:55,base_fuel:82},{name:'Dakar → Cap-Vert 12nm',dist:22,base_fuel:33},
+];
+const BOAT_CONSO={6:6,9:10,12:15,15:22}; // L/h
+
+function buildFuel(){
+  document.getElementById('fuelRoutes').innerHTML=FUEL_ROUTES.map(r=>`
+    <div class="fzr" onclick="fillRoute(${r.dist},${r.base_fuel})">
+      <div class="fzr-name">${r.name}</div>
+      <div class="fzr-dist">${r.dist} nm</div>
+      <div class="fzr-fuel">~${r.base_fuel}L aller-retour</div>
+    </div>`).join('');
+}
+
+function fillRoute(dist,fuel){
+  document.getElementById('fr-dist').textContent=dist;
+  document.getElementById('fr-liters').textContent=fuel;
+  const price=parseInt(document.getElementById('fuelPrice').value)||850;
+  document.getElementById('fr-cost').textContent=(fuel*price).toLocaleString();
+  document.getElementById('fuelResult').style.display='block';
+}
+
+function calcFuel(){
+  const boat=document.getElementById('boatType').value;
+  const conso=BOAT_CONSO[boat]||10;
+  const from=document.getElementById('fuelFrom').value;
+  const to=document.getElementById('fuelTo').value;
+  const price=parseInt(document.getElementById('fuelPrice').value)||850;
+  const cf=COORDS[from],ct=COORDS[to];
+  let dist=30;
+  if(cf&&ct){const dlat=cf.lat-ct.lat,dlon=cf.lon-ct.lon;dist=Math.round(Math.sqrt(dlat*dlat+dlon*dlon)*60);}
+  const speed=8;const hours=dist/speed;const liters=Math.round(hours*conso*2);
+  document.getElementById('fr-dist').textContent=dist;
+  document.getElementById('fr-liters').textContent=liters;
+  document.getElementById('fr-cost').textContent=(liters*price).toLocaleString();
+  document.getElementById('fuelResult').style.display='block';
+}
+
+// ════════════════════════════════════════════════════════
+// COMMUNAUTÉ
+// ════════════════════════════════════════════════════════
+const SAMPLE_POSTS=[
+  {author:'Ibrahima Ndiaye',zone:'KAYAR',avatar:'🧑‍🌾',type:'catch',time:'il y a 23 min',body:'Belle sortie ce matin à la fosse de Kayar. Bonne prise de thiof et de sompat. Mer calme, courant favorable vers le large.',data:['🐠 12 kg Thiof','🐟 8 kg Sompat','⏱ 4h sortie']},
+  {author:'Fatou Diallo',zone:'MBOUR-JOAL',avatar:'👩‍💼',type:'alert',time:'il y a 1h',body:'Attention — vents forts observés côté sud Mbour depuis 30 min. Houle en augmentation. Déconseillé de sortir avant 15h.',data:['🌊 1.8m houle','💨 22 kn vent','⚠️ Prudence']},
+  {author:'Moussa Sarr',zone:'SAINT-LOUIS',avatar:'👨‍🔧',type:'info',time:'il y a 2h',body:'Bonne saison pour le yaboi en ce moment dans le nord. Les filets tournants donnent de bons résultats entre Saint-Louis et Potou.',data:['🐟 Yaboi abondant','📍 Nord Sénégal','📅 Novembre–Février']},
+  {author:'Alassane Fall',zone:'DAKAR-YOFF',avatar:'🧑‍🚀',type:'catch',time:'il y a 3h',body:'Sortie à 3h du matin, retour à 11h. Excellente prise de capitaine. La fosse de Dakar-Yoff est productive ce matin.',data:['🐠 18 kg Kapitaine','⛽ 35L carburant','💰 75 600 FCFA']},
+];
+
+let posts=[...SAMPLE_POSTS];
+
+function buildCommunity(){
+  renderPosts();
+}
+
+function renderPosts(){
+  document.getElementById('postsFeed').innerHTML=posts.map(p=>`
+    <div class="post">
+      <div class="post-head">
+        <div class="post-ava">${p.avatar}</div>
+        <div class="post-meta">
+          <div class="post-author">${p.author}</div>
+          <div class="post-zone">📍 ${p.zone}</div>
+        </div>
+        <div class="post-time">${p.time}</div>
+        <div class="post-type ${p.type}">${p.type==='catch'?'🎣 Prise':p.type==='alert'?'⚠️ Alerte':'ℹ️ Info'}</div>
+      </div>
+      <div class="post-body">${p.body}</div>
+      ${p.data?`<div class="post-data">${p.data.map(d=>`<div class="pd">${d}</div>`).join('')}</div>`:''}
+      <div class="post-actions">
+        <div class="pact" onclick="this.innerHTML='👍 '+((parseInt(this.innerHTML.replace(/\D/g,''))||0)+1)">👍 Utile</div>
+        <div class="pact">💬 Répondre</div>
+        <a class="pact" href="https://wa.me/" target="_blank">📱 Partager</a>
+      </div>
+    </div>`).join('');
+}
+
+function postMessage(){
+  const t=document.getElementById('composeText').value.trim();if(!t)return;
+  posts.unshift({author:'Vous',zone:'Ma zone',avatar:'🎣',type:'info',time:'À l\'instant',body:t,data:[]});
+  renderPosts();document.getElementById('composeText').value='';
+}
+
+// ════════════════════════════════════════════════════════
+// ALERTES
+// ════════════════════════════════════════════════════════
+function buildAlerts(){
+  const danger=allZones.filter(z=>z.securite_code==='danger');
+  const warning=allZones.filter(z=>z.securite_code==='warning');
   const count=danger.length+warning.length;
   const badge=document.getElementById('alertBadge');
-  badge.textContent=count||'✓'; badge.style.background=count?'var(--danger)':'var(--safe)';
+  badge.textContent=count||'✓';badge.className='nbadge'+(count?'':' ok');
   let html='';
-  danger.forEach(z=>{html+=`
-    <div class="alert-card">
-      <div class="alert-icon-wrap danger">🔴</div>
-      <div class="alert-body">
-        <div class="alert-title">${z.zone} — DANGER</div>
-        <div class="alert-desc">${z.securite_texte} · Houle ${z.wave.toFixed(1)}m · Courant ${z.current.toFixed(2)}m/s</div>
-        <div class="alert-meta">${z.region} · Score pêche ${z.peche_score}/10</div>
-      </div>
-      <a href="https://wa.me/221777020818" class="alert-action" target="_blank">SOS →</a>
-    </div>`;});
-  warning.forEach(z=>{html+=`
-    <div class="alert-card">
-      <div class="alert-icon-wrap warning">🟠</div>
-      <div class="alert-body">
-        <div class="alert-title">${z.zone} — Prudence requise</div>
-        <div class="alert-desc">${z.securite_texte} · Houle ${z.wave.toFixed(1)}m</div>
-        <div class="alert-meta">${z.region} · Score pêche ${z.peche_score}/10</div>
-      </div>
-      <button class="alert-action" onclick="showPage('dashboard');focusZone('${z.zone}')">Voir →</button>
-    </div>`;});
-  if(!html)html=`<div class="alert-card"><div class="alert-icon-wrap info">✅</div><div class="alert-body"><div class="alert-title" data-fr="Aucune alerte active" data-wo="Alerte amul">Aucune alerte active</div><div class="alert-desc" data-fr="Toutes les zones sont dans des conditions acceptables" data-wo="Dëkk yi yépp baax nañu">Toutes les zones sont dans des conditions acceptables</div></div></div>`;
+  danger.forEach(z=>html+=alertCard(z,'danger'));
+  warning.forEach(z=>html+=alertCard(z,'warning'));
+  if(!html)html=`<div class="card" style="padding:20px 24px;display:flex;gap:14px;align-items:center"><div style="font-size:28px">✅</div><div><div style="font-weight:700;font-size:14px" data-fr="Aucune alerte" data-wo="Alerte amul">Aucune alerte</div><div style="font-size:12px;color:var(--text2)" data-fr="Toutes les zones sont sûres" data-wo="Dëkk yi yépp baax">Toutes les zones sont sûres</div></div></div>`;
   document.getElementById('alertsList').innerHTML=html;
 }
 
-function renderProfile(zones){
-  const scores=zones.map(z=>z.peche_score);
-  document.getElementById('prof-safe').textContent=zones.filter(z=>z.securite_code==='safe').length;
-  document.getElementById('prof-avg').textContent=scores.length?(scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1):'—';
+function alertCard(z,type){
+  return`<div class="card" style="padding:16px 18px;display:flex;gap:14px;align-items:flex-start;border-color:var(--${type==='danger'?'danger':'warning'})">
+    <div style="width:42px;height:42px;border-radius:10px;background:var(--${type==='danger'?'coral-d':'amber-d'});display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${type==='danger'?'🔴':'🟠'}</div>
+    <div style="flex:1"><div style="font-weight:700;font-size:13px;margin-bottom:4px">${z.zone} — ${type==='danger'?'DANGER':'Prudence requise'}</div>
+    <div style="font-size:12px;color:var(--text2)">${z.securite_texte} · Houle ${z.wave}m · ${z.current}m/s</div>
+    <div style="font-size:10px;color:var(--text3);margin-top:5px;font-family:'DM Mono',monospace">${z.region} · Score ${z.peche_score}/10</div></div>
+    <a href="https://wa.me/221777020818" style="font-size:11px;font-weight:700;color:#000;background:var(--${type==='danger'?'danger':'warning'});border:none;padding:6px 12px;border-radius:7px;cursor:pointer;text-decoration:none;align-self:center">SOS →</a>
+  </div>`;
 }
 
-function renderZonesConfig(){
-  document.getElementById('zonesConfig').innerHTML=Object.keys(COORDS).map(name=>`
-    <div class="zone-toggle-item selected" onclick="this.classList.toggle('selected')">
-      <div><div class="zone-toggle-name">${name}</div></div>
-      <div class="toggle on" onclick="event.stopPropagation();this.classList.toggle('on')"></div>
+function buildSettings(){
+  const settings=[
+    {label:'Alertes Telegram',desc:'Bot actif toutes les 6h',on:true},
+    {label:'Danger uniquement',desc:'Filtrer alertes critiques',on:false},
+    {label:'Rapport quotidien',desc:'6h UTC chaque matin',on:true},
+    {label:'WhatsApp SOS',desc:'Bouton urgence activé',on:true},
+    {label:'Bancs IA',desc:'Notifications prédictions',on:false},
+    {label:'Prix marché',desc:'Alertes hausse/baisse >10%',on:true},
+  ];
+  document.getElementById('settingsGrid').innerHTML=settings.map(s=>`
+    <div style="background:var(--glass);border:1px solid var(--b);border-radius:var(--r);padding:14px 16px;display:flex;justify-content:space-between;align-items:center">
+      <div><div style="font-size:12px;font-weight:700;margin-bottom:2px">${s.label}</div><div style="font-size:10px;color:var(--text2)">${s.desc}</div></div>
+      <div style="width:42px;height:22px;background:${s.on?'var(--cyan)':'var(--bg3)'};border:1px solid ${s.on?'var(--cyan)':'var(--b)'};border-radius:11px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0" onclick="this.style.background=this.style.background.includes('cyan')?'var(--bg3)':'var(--cyan)';this.children[0].style.transform=this.style.background.includes('cyan')?'translateX(20px)':'translateX(0)'">
+        <div style="position:absolute;width:16px;height:16px;background:white;border-radius:50%;top:2px;left:2px;transition:transform .2s;transform:${s.on?'translateX(20px)':'none'};box-shadow:0 1px 3px rgba(0,0,0,.3)"></div>
+      </div>
     </div>`).join('');
 }
 
-function showPage(id){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n=>{if(n.getAttribute('onclick')?.includes(id))n.classList.add('active');});
-  if(id==='dashboard')setTimeout(()=>map.invalidateSize(),50);
+// ════════════════════════════════════════════════════════
+// NAV / THEME / LANG / CLOCK
+// ════════════════════════════════════════════════════════
+function go(id){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('on'));
+  document.getElementById('pg-'+id).classList.add('on');
+  document.querySelectorAll('.ni').forEach(n=>{if(n.getAttribute('onclick')?.includes("'"+id+"'"))n.classList.add('on');});
+  if(id==='dash')setTimeout(()=>map.invalidateSize(),50);
+  if(id==='forecast')setTimeout(()=>drawHorizon&&buildForecastDays(),100);
+  if(id==='fish')setTimeout(()=>drawFishMap(),100);
+  if(id==='market')setTimeout(()=>buildMarketChart(),100);
+  if(id==='tides')setTimeout(()=>drawTideChart('DAKAR-YOFF'),100);
 }
 
-function doFilter(el){
-  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active')); el.classList.add('active');
-  const reg=el.dataset.region;
-  const f=reg==='all'?allZones:allZones.filter(z=>z.region===reg);
-  renderMarkers(f); renderZonesList(f); updateCounters(f);
-}
-
-function doSearch(q){
-  const lq=q.toLowerCase();
-  const f=lq?allZones.filter(z=>z.zone.toLowerCase().includes(lq)||z.region.toLowerCase().includes(lq)):allZones;
-  renderMarkers(f); renderZonesList(f);
-}
-
-function setLang(lang){
-  currentLang=lang;
-  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent===lang.toUpperCase()));
-  document.querySelectorAll(`[data-${lang}]`).forEach(el=>el.textContent=el.getAttribute(`data-${lang}`));
+let lang='fr';
+function setLang(l){
+  lang=l;
+  document.querySelectorAll('.lb').forEach(b=>b.classList.toggle('on',b.textContent===l.toUpperCase()));
+  document.querySelectorAll(`[data-${l}]`).forEach(el=>el.textContent=el.getAttribute(`data-${l}`));
 }
 
 function toggleTheme(){
-  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
-  document.documentElement.setAttribute('data-theme',isDark?'light':'dark');
-  document.getElementById('themeBtn').textContent=isDark?'☀️':'🌙';
-  if(map){
-    map.eachLayer(l=>{if(l._url)map.removeLayer(l);});
-    L.tileLayer(isDark
+  const dark=document.documentElement.getAttribute('data-theme')==='dark';
+  document.documentElement.setAttribute('data-theme',dark?'light':'dark');
+  document.getElementById('themeBtn').textContent=dark?'☀️':'🌙';
+  if(map){map.eachLayer(l=>{if(l._url)map.removeLayer(l);});
+    L.tileLayer(dark
       ?'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
-      :'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-      {attribution:'© OpenStreetMap | © CARTO'}).addTo(map);
-  }
-  if(allZones.length)buildChart(allZones);
+      :'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© CARTO'}).addTo(map);}
+  setTimeout(()=>{buildForecastDays();drawFishMap();buildMarketChart();drawTideChart('DAKAR-YOFF');},100);
 }
 
-function startClock(){
-  const tick=()=>{
-    const n=new Date();
-    document.getElementById('clock').textContent=
-      [n.getUTCHours(),n.getUTCMinutes(),n.getUTCSeconds()].map(v=>String(v).padStart(2,'0')).join(':')+' UTC';
-  };
-  tick(); setInterval(tick,1000);
+function clock(){
+  const n=new Date();
+  document.getElementById('clk').textContent=
+    [n.getUTCHours(),n.getUTCMinutes(),n.getUTCSeconds()].map(v=>String(v).padStart(2,'0')).join(':')+' UTC';
 }
+
+function checkOnline(){setOffline(!navigator.onLine);}
+function setOffline(offline){document.getElementById('offlineBanner').style.display=offline?'block':'none';}
 </script>
 </body>
 </html>
