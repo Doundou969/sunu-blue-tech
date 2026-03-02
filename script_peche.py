@@ -362,18 +362,44 @@ async def fetch_copernicus(lat: float, lon: float) -> dict:
     def _blocking_fetch():
         try:
             now = datetime.utcnow()
-            # API v2.x : credentials lus automatiquement depuis
-            # COPERNICUS_USERNAME / COPERNICUS_PASSWORD (variables d'env)
-            ds = cm.open_dataset(
-                dataset_id        = "cmems_mod_glo_phy-cur_anfc_0.083deg_PT6H-i",
-                variables         = ["uo", "vo", "thetao"],
-                minimum_latitude  = lat - 0.1,
-                maximum_latitude  = lat + 0.1,
-                minimum_longitude = lon - 0.1,
-                maximum_longitude = lon + 0.1,
-                start_datetime    = now.strftime("%Y-%m-%dT%H:%M:%S"),
-                end_datetime      = now.strftime("%Y-%m-%dT%H:%M:%S"),
-            )
+
+            # ── Tentative 1 : cm.open_dataset() standard (copernicusmarine v2.x) ──
+            try:
+                ds = cm.open_dataset(
+                    dataset_id        = "cmems_mod_glo_phy-cur_anfc_0.083deg_PT6H-i",
+                    variables         = ["uo", "vo", "thetao"],
+                    minimum_latitude  = lat - 0.1,
+                    maximum_latitude  = lat + 0.1,
+                    minimum_longitude = lon - 0.1,
+                    maximum_longitude = lon + 0.1,
+                    start_datetime    = now.strftime("%Y-%m-%dT%H:%M:%S"),
+                    end_datetime      = now.strftime("%Y-%m-%dT%H:%M:%S"),
+                )
+            except TypeError as te:
+                # zarr v3 incompatibilité : open_zarr() got unexpected keyword 'zarr_format'
+                # Solution : monkey-patch zarr pour ignorer l'argument
+                if "zarr_format" in str(te):
+                    logger.warning("zarr v3 détecté — application du patch de compatibilité...")
+                    import zarr
+                    _orig_open_zarr = zarr.open
+                    def _patched_open(*args, **kwargs):
+                        kwargs.pop("zarr_format", None)
+                        return _orig_open_zarr(*args, **kwargs)
+                    zarr.open = _patched_open
+                    # Retry avec patch appliqué
+                    ds = cm.open_dataset(
+                        dataset_id        = "cmems_mod_glo_phy-cur_anfc_0.083deg_PT6H-i",
+                        variables         = ["uo", "vo", "thetao"],
+                        minimum_latitude  = lat - 0.1,
+                        maximum_latitude  = lat + 0.1,
+                        minimum_longitude = lon - 0.1,
+                        maximum_longitude = lon + 0.1,
+                        start_datetime    = now.strftime("%Y-%m-%dT%H:%M:%S"),
+                        end_datetime      = now.strftime("%Y-%m-%dT%H:%M:%S"),
+                    )
+                    zarr.open = _orig_open_zarr  # Restaurer
+                else:
+                    raise
 
             # Sélection première valeur temporelle disponible
             ds_sel = ds.isel(time=0) if "time" in ds.dims else ds
@@ -552,7 +578,6 @@ async def fetch_zone_data(
         },
         "updated_at":  datetime.utcnow().isoformat(),
         "forecast_7j": forecast_7j,
-        "marees":      tides_data.get(zone_name) if tides_data else None,
     }
 
 
