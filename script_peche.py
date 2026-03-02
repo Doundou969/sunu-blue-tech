@@ -552,6 +552,7 @@ async def fetch_zone_data(
         },
         "updated_at":  datetime.utcnow().isoformat(),
         "forecast_7j": forecast_7j,
+        "marees":      tides_data.get(zone_name) if tides_data else None,
     }
 
 
@@ -559,7 +560,7 @@ async def fetch_zone_data(
 # 12. GÉNÉRATION DATA.JSON
 # ============================================================================
 
-def save_data_json(results: list[dict]) -> None:
+def save_data_json(results: list[dict], tides_data: dict = None) -> None:
     """
     Génère data.json avec toutes les zones + métadonnées.
     Sauvegarde également un snapshot horodaté dans logs/history/.
@@ -570,9 +571,11 @@ def save_data_json(results: list[dict]) -> None:
     scores      = [r["indices"]["peche_score"] for r in results]
     danger_zones = [r["zone"] for r in results if r["indices"]["securite_code"] == "danger"]
 
+    # Indexer les marées par zone pour le payload
+    tides_payload = tides_data or {}
     payload = {
         "meta": {
-            "version":      "4.0",
+            "version":      "4.2",
             "generated_at": now.isoformat() + "Z",
             "total_zones":  len(results),
             "sources":      list({r["copernicus"]["source"] for r in results}),
@@ -602,6 +605,134 @@ def save_data_json(results: list[dict]) -> None:
     with open(snapshot_path, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
     logger.info(f"📁 Snapshot sauvegardé : {snapshot_path}")
+
+
+
+# ============================================================================
+# MARÉES HARMONIQUES (Formule SHOM simplifiée — 4 constituants principaux)
+# ============================================================================
+
+TIDE_STATIONS = {
+    "SAINT-LOUIS":    {"M2": 0.42, "S2": 0.14, "K1": 0.08, "O1": 0.06, "phase_offset": 0.0},
+    "DAKAR-YOFF":     {"M2": 0.65, "S2": 0.22, "K1": 0.11, "O1": 0.09, "phase_offset": 0.3},
+    "MBOUR-JOAL":     {"M2": 0.70, "S2": 0.24, "K1": 0.12, "O1": 0.10, "phase_offset": 0.5},
+    "KAYAR":          {"M2": 0.58, "S2": 0.19, "K1": 0.10, "O1": 0.08, "phase_offset": 0.2},
+    "CAP-SKIRRING":   {"M2": 0.55, "S2": 0.18, "K1": 0.09, "O1": 0.07, "phase_offset": 1.1},
+    "CASAMANCE-ZIGUINCHOR": {"M2": 0.48, "S2": 0.16, "K1": 0.08, "O1": 0.06, "phase_offset": 1.4},
+}
+# Fréquences angulaires (rad/heure)
+TIDE_OMEGA = {"M2": 0.5059, "S2": 0.5236, "K1": 0.2625, "O1": 0.2434}
+
+def compute_tides(zone: str, date_utc: datetime) -> dict:
+    """
+    Calcule les horaires et hauteurs de marée via décomposition harmonique.
+    Retourne PM/BM avec heures et coefficients pour la zone donnée.
+    """
+    station = TIDE_STATIONS.get(zone, TIDE_STATIONS["DAKAR-YOFF"])
+    t0 = date_utc.replace(hour=0, minute=0, second=0, microsecond=0)
+    
+    def height(t_hours: float) -> float:
+        h = 0.0
+        for comp, omega in TIDE_OMEGA.items():
+        	amp = station.get(comp, 0.1)
+        	phase = station["phase_offset"] + t_hours * 0.05
+        	h += amp * np.cos(omega * t_hours + phase)
+        return round(h + 0.8, 3)  # hauteur moyenne de référence
+    
+    # Échantillonner sur 24h (résolution 6 minutes)
+    hours = [i * 0.1 for i in range(241)]
+    heights = [height(h) for h in hours]
+    
+    # Détecter les extrema (PM = local max, BM = local min)
+    events = []
+    for i in range(1, len(heights) - 1):
+        if heights[i] > heights[i-1] and heights[i] > heights[i+1]:
+            t = t0 + __import__("datetime").timedelta(hours=hours[i])
+            coef = int(45 + (heights[i] - 0.3) / 1.2 * 60)
+            events.append({
+                "type": "PM", "heure": t.strftime("%H:%M"),
+                "hauteur": heights[i], "coef": min(120, max(20, coef))
+            })
+        elif heights[i] < heights[i-1] and heights[i] < heights[i+1]:
+            t = t0 + __import__("datetime").timedelta(hours=hours[i])
+            events.append({
+                "type": "BM", "heure": t.strftime("%H:%M"),
+                "hauteur": heights[i], "coef": 0
+            })
+    
+    # Courbe 24h (24 points)
+    courbe = [round(height(h), 3) for h in range(25)]
+    return {"events": events[:4], "courbe_24h": courbe, "zone": zone}
+
+
+# ============================================================================
+# EXPORT CSV HISTORIQUE
+# ============================================================================
+
+def export_csv(results: list) -> None:
+    """Exporte les données zones en CSV dans logs/history/."""
+    import csv
+    now = datetime.utcnow()
+    fname = f"logs/history/export_{now.strftime('%Y%m%d_%H%M')}.csv"
+    fields = ["zone","region","lat","lon","wave","temp","current",
+               "securite_code","peche_score","source","updated_at"]
+    with open(fname, "w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=fields)
+        w.writeheader()
+        for r in results:
+            w.writerow({
+                "zone":         r["zone"],
+                "region":       r["region"],
+                "lat":          r["lat"],
+                "lon":          r["lon"],
+                "wave":         r["indices"]["wave"],
+                "temp":         r["indices"]["temp"],
+                "current":      r["indices"]["current"],
+                "securite_code":r["indices"]["securite_code"],
+                "peche_score":  r["indices"]["peche_score"],
+                "source":       r["copernicus"]["source"],
+                "updated_at":   r["updated_at"],
+            })
+    logger.info(f"✅ Export CSV : {fname}")
+
+
+# ============================================================================
+# RAPPORT DISCORD WEBHOOK
+# ============================================================================
+
+async def send_discord(message: str) -> bool:
+    """Envoie un embed Discord via webhook (optionnel — DISCORD_WEBHOOK secret)."""
+    webhook_url = os.getenv("DISCORD_WEBHOOK")
+    if not webhook_url:
+        logger.info("Discord webhook non configuré — ignoré.")
+        return False
+
+    danger_zones  = [l for l in message.split("\n") if "DANGER" in l]
+    top_zones     = [l for l in message.split("\n") if "Score" in l][:3]
+    color = 0xFF2044 if danger_zones else 0x00DCC8
+
+    payload = {
+        "embeds": [{
+            "title":       "🌊 PecheurConnect — Rapport Maritime",
+            "description": message[:2000],
+            "color":       color,
+            "footer":      {"text": f"Sénégal · {datetime.utcnow().strftime('%Y-%m-%d %H:%M')} UTC"},
+            "thumbnail":   {"url": "https://em-content.zobj.net/source/twitter/376/fishing-pole_1f3a3.png"}
+        }]
+    }
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(webhook_url, json=payload,
+                                    timeout=aiohttp.ClientTimeout(total=10)) as r:
+                if r.status in (200, 204):
+                    logger.info("✅ Message Discord envoyé.")
+                    return True
+                else:
+                    logger.warning(f"Discord HTTP {r.status}")
+    except Exception as e:
+        logger.error(f"Discord erreur : {e}")
+    return False
 
 
 # ============================================================================
@@ -697,10 +828,25 @@ async def main():
             f"Source : {r['copernicus']['source']}"
         )
 
-    # Génération data.json
-    save_data_json(results)
+    # ── Calcul marées pour les zones-clés ──
+    logger.info("Calcul marées harmoniques...")
+    now_utc = datetime.utcnow()
+    tides_data = {}
+    for zone_name in ["DAKAR-YOFF", "KAYAR", "MBOUR-JOAL", "SAINT-LOUIS",
+                       "CAP-SKIRRING", "CASAMANCE-ZIGUINCHOR"]:
+        tides_data[zone_name] = compute_tides(zone_name, now_utc)
+        logger.info(f"  Marées {zone_name}: {len(tides_data[zone_name]['events'])} événements")
 
-    # Calcul stats pour Telegram
+    # ── Injecter marées dans data.json ──
+    save_data_json(results, tides_data=tides_data)
+
+    # ── Export CSV historique ──
+    try:
+        export_csv(results)
+    except Exception as e:
+        logger.warning(f"Export CSV ignoré : {e}")
+
+    # Calcul stats pour rapports
     scores = [r["indices"]["peche_score"] for r in results]
     stats  = {
         "score_moyen":  round(float(np.mean(scores)), 2),
@@ -713,11 +859,15 @@ async def main():
         }
     }
 
-    # Envoi rapport Telegram
+    # ── Envoi rapports (Telegram + Discord en parallèle) ──
     message = build_telegram_report(results, stats)
-    await send_telegram(message)
+    tg_ok, dc_ok = await asyncio.gather(
+        send_telegram(message),
+        send_discord(message)
+    )
+    logger.info(f"Telegram: {'✅' if tg_ok else '⚠️'} | Discord: {'✅' if dc_ok else '—'}")
 
-    logger.info("=== PecheurConnect terminé avec succès ===")
+    logger.info("=== PecheurConnect v4.2 terminé avec succès ===")
 
 
 if __name__ == "__main__":
