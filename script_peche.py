@@ -359,59 +359,79 @@ async def fetch_copernicus(lat: float, lon: float) -> dict:
         logger.warning("Copernicus : credentials absents — simulation activée.")
         return _simulate_marine_data(lat, lon)
 
+    def _open_cm_dataset(dataset_id: str, variables: list, bbox: dict, dt: str) -> object:
+        """
+        Ouvre un dataset Copernicus avec gestion automatique du conflit zarr v3.
+        Applique un monkey-patch si zarr_format est refusé, puis restaure.
+        """
+        kwargs = dict(
+            dataset_id        = dataset_id,
+            variables         = variables,
+            minimum_latitude  = bbox["lat_min"],
+            maximum_latitude  = bbox["lat_max"],
+            minimum_longitude = bbox["lon_min"],
+            maximum_longitude = bbox["lon_max"],
+            start_datetime    = dt,
+            end_datetime      = dt,
+        )
+        try:
+            return cm.open_dataset(**kwargs)
+        except TypeError as te:
+            if "zarr_format" not in str(te):
+                raise
+            logger.warning(f"zarr v3 patch appliqué pour {dataset_id}")
+            import zarr as _zarr
+            _orig = _zarr.open
+            _zarr.open = lambda *a, **kw: _orig(*a, **{k: v for k, v in kw.items() if k != "zarr_format"})
+            try:
+                return cm.open_dataset(**kwargs)
+            finally:
+                _zarr.open = _orig  # Toujours restaurer
+
     def _blocking_fetch():
         try:
             now = datetime.utcnow()
+            dt  = now.strftime("%Y-%m-%dT%H:%M:%S")
+            bbox = {
+                "lat_min": lat - 0.1, "lat_max": lat + 0.1,
+                "lon_min": lon - 0.1, "lon_max": lon + 0.1,
+            }
 
-            # ── Tentative 1 : cm.open_dataset() standard (copernicusmarine v2.x) ──
-            try:
-                ds = cm.open_dataset(
-                    dataset_id        = "cmems_mod_glo_phy-cur_anfc_0.083deg_PT6H-i",
-                    variables         = ["uo", "vo", "thetao"],
-                    minimum_latitude  = lat - 0.1,
-                    maximum_latitude  = lat + 0.1,
-                    minimum_longitude = lon - 0.1,
-                    maximum_longitude = lon + 0.1,
-                    start_datetime    = now.strftime("%Y-%m-%dT%H:%M:%S"),
-                    end_datetime      = now.strftime("%Y-%m-%dT%H:%M:%S"),
-                )
-            except TypeError as te:
-                # zarr v3 incompatibilité : open_zarr() got unexpected keyword 'zarr_format'
-                # Solution : monkey-patch zarr pour ignorer l'argument
-                if "zarr_format" in str(te):
-                    logger.warning("zarr v3 détecté — application du patch de compatibilité...")
-                    import zarr
-                    _orig_open_zarr = zarr.open
-                    def _patched_open(*args, **kwargs):
-                        kwargs.pop("zarr_format", None)
-                        return _orig_open_zarr(*args, **kwargs)
-                    zarr.open = _patched_open
-                    # Retry avec patch appliqué
-                    ds = cm.open_dataset(
-                        dataset_id        = "cmems_mod_glo_phy-cur_anfc_0.083deg_PT6H-i",
-                        variables         = ["uo", "vo", "thetao"],
-                        minimum_latitude  = lat - 0.1,
-                        maximum_latitude  = lat + 0.1,
-                        minimum_longitude = lon - 0.1,
-                        maximum_longitude = lon + 0.1,
-                        start_datetime    = now.strftime("%Y-%m-%dT%H:%M:%S"),
-                        end_datetime      = now.strftime("%Y-%m-%dT%H:%M:%S"),
-                    )
-                    zarr.open = _orig_open_zarr  # Restaurer
-                else:
-                    raise
-
-            # Sélection première valeur temporelle disponible
-            ds_sel = ds.isel(time=0) if "time" in ds.dims else ds
-
-            uo  = float(ds_sel["uo"].mean().values)
-            vo  = float(ds_sel["vo"].mean().values)
-            sst = float(ds_sel["thetao"].mean().values)
+            # ── Dataset 1 : Courants de surface (uo, vo) ──
+            # cmems_mod_glo_phy-cur : uniquement uo/vo, PAS de thetao
+            ds_cur = _open_cm_dataset(
+                "cmems_mod_glo_phy-cur_anfc_0.083deg_PT6H-i",
+                ["uo", "vo"],
+                bbox, dt
+            )
+            sel_cur = ds_cur.isel(time=0) if "time" in ds_cur.dims else ds_cur
+            uo = float(sel_cur["uo"].mean().values)
+            vo = float(sel_cur["vo"].mean().values)
             current_speed = round(float(np.sqrt(uo**2 + vo**2)), 3)
+            logger.info(f"Copernicus courants OK ({lat},{lon}) — {current_speed} m/s")
+
+            # ── Dataset 2 : SST (thetao) ──
+            # cmems_mod_glo_phy-thetao : dataset dédié à la température
+            sst = None
+            try:
+                ds_sst = _open_cm_dataset(
+                    "cmems_mod_glo_phy_anfc_0.083deg_P1D-m",
+                    ["thetao"],
+                    bbox, dt
+                )
+                sel_sst = ds_sst.isel(time=0) if "time" in ds_sst.dims else ds_sst
+                # Prendre la couche de surface (depth index 0)
+                if "depth" in sel_sst.dims:
+                    sel_sst = sel_sst.isel(depth=0)
+                sst = round(float(sel_sst["thetao"].mean().values), 2)
+                logger.info(f"Copernicus SST OK ({lat},{lon}) — {sst}°C")
+            except Exception as e_sst:
+                logger.warning(f"Copernicus SST ignorée ({lat},{lon}) : {e_sst}")
+                sst = None  # OpenWeather prendra le relais
 
             return {
                 "source":        "copernicus",
-                "sst":           round(sst, 2),
+                "sst":           sst,
                 "current_speed": current_speed,
                 "current_u":     round(uo, 3),
                 "current_v":     round(vo, 3),
