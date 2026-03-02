@@ -1,0 +1,45 @@
+# PecheurConnect — Changelog complet
+
+## v4.2 (actuelle)
+### Frontend
+- ⚖️ **Comparateur de zones** : tableau côte-à-côte jusqu'à 4 zones, radar multi-zones, recommandation IA motivée
+- 📄 **Rapport PDF** : rapport complet dans une nouvelle fenêtre (KPIs, zones danger, top 5, tableau 18 zones) — impression native via Ctrl+P
+- 🍞 **Toast notifications** : messages non-bloquants pour alertes danger, confirmations GPS, PDF
+- 🌊 **Marées réelles** : lecture de `data.json.marees` (données harmoniques du script) avec graphe authentique
+
+### Backend (script_peche.py)
+- 🌊 **Marées harmoniques** : `compute_tides()` — 4 constituants (M2, S2, K1, O1), 6 stations SHOM
+- 📤 **Export CSV** : snapshot horodaté dans `logs/history/` à chaque exécution
+- 🎮 **Discord webhook** : `send_discord()` — embed riche avec couleur selon niveau danger, envoi parallèle avec Telegram
+- 🔄 **main() amélioré** : marées → CSV → Telegram+Discord en asyncio.gather
+
+## v4.1 (précédente)
+### Frontend
+- 📍 GPS temps réel + zone la plus proche
+- 🔔 Web Notifications API (alertes toutes les heures si zones danger)
+- 🎯 Radar profil de zone (Chart.js) dans le panneau latéral
+- 🗺️ Trajet carburant sur carte (Leaflet polyline + bulle coût)
+- 📡 Prévisions 7J réelles depuis data.json (fallback simulé)
+
+### Backend
+- ⛅ `fetch_forecast_7days()` : OpenWeather One Call API + fallback harmonique
+- Appel parallèle OW + Copernicus + Forecast dans `fetch_zone_data()`
+
+## v4.0 (base)
+### Frontend (8 sections)
+- 🗺️ Tableau de bord carte temps réel
+- 🌤️ Prévisions 7J avec horizon animé canvas
+- 🐟 Bancs de poissons IA (heatmap canvas + 8 espèces)
+- 🌊 Marées & Zones légales/interdites
+- 🐠 Prix du poisson marché (8 espèces + tendances)
+- ⛽ Calculateur carburant & routes
+- 👥 Réseau communauté pêcheurs
+- 🔔 Alertes & paramètres notification
+- PWA installable, switch FR/Wolof, dark/light, GPS, horloge UTC
+
+### Backend (script_peche.py v3.0→4.0)
+- Corrections API Copernicus v2.x (env vars, zarr)
+- load_dotenv() pour développement local
+
+## v3.0 (origine)
+- Script Python 18 zones, GitHub Actions, HTML frontend initial
