@@ -402,6 +402,108 @@ async def fetch_copernicus(lat: float, lon: float) -> dict:
     return result if result else _simulate_marine_data(lat, lon)
 
 
+
+# ============================================================================
+# 10b. PRÉVISIONS 7 JOURS OPENWEATHER
+# ============================================================================
+
+async def fetch_forecast_7days(lat: float, lon: float) -> list:
+    """
+    Récupère les prévisions météo-marines sur 7 jours via OpenWeather One Call API.
+    Retourne une liste de 7 dict avec score, houle estimée, vent, température.
+    """
+    api_key = SECRETS.get("OPENWEATHER_KEY")
+    if not api_key:
+        return _simulate_forecast(lat, lon)
+
+    url = (
+        f"https://api.openweathermap.org/data/3.0/onecall"
+        f"?lat={lat}&lon={lon}&exclude=minutely,alerts"
+        f"&appid={api_key}&units=metric"
+    )
+
+    async with aiohttp.ClientSession() as session:
+        for attempt in range(1, 4):
+            try:
+                async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        daily = data.get("daily", [])[:7]
+                        result = []
+                        for d in daily:
+                            wind_ms = d.get("wind_speed", 5)
+                            # Estimation Bretschneider : Hs ≈ 0.0248 * U^2 (U en m/s, fetch 200km)
+                            wave = round(min(4.0, 0.0248 * wind_ms ** 2), 2)
+                            temp = d.get("temp", {}).get("day", 25)
+                            pop  = d.get("pop", 0)  # probabilité pluie
+                            uvi  = d.get("uvi", 5)
+
+                            # Score pêche prévisionnel
+                            s_wave  = max(0, 10 - wave * 4)
+                            s_temp  = 10 - abs(temp - 24.5) * 0.6
+                            s_wind  = max(0, 10 - wind_ms * 0.4)
+                            score   = round((s_wave*.45 + s_temp*.3 + s_wind*.25), 1)
+
+                            # Code sécurité
+                            if wave <= 1.0:
+                                sec = "safe"
+                            elif wave <= 1.5:
+                                sec = "caution"
+                            elif wave <= 2.5:
+                                sec = "warning"
+                            else:
+                                sec = "danger"
+
+                            result.append({
+                                "dt":         d.get("dt"),
+                                "wave":       wave,
+                                "wind_ms":    round(wind_ms, 1),
+                                "wind_kn":    round(wind_ms * 1.944, 1),
+                                "temp":       round(temp, 1),
+                                "pop":        round(pop * 100),
+                                "uvi":        round(uvi, 1),
+                                "peche_score":  score,
+                                "securite_code": sec,
+                            })
+                        logger.info(f"OpenWeather Forecast 7J OK ({lat},{lon})")
+                        return result
+                    elif resp.status == 429:
+                        await asyncio.sleep(2 ** attempt)
+                    else:
+                        logger.warning(f"Forecast HTTP {resp.status} — simulation")
+                        return _simulate_forecast(lat, lon)
+            except Exception as e:
+                logger.warning(f"Forecast erreur ({lat},{lon}) tentative {attempt}: {e}")
+                await asyncio.sleep(1)
+
+    return _simulate_forecast(lat, lon)
+
+
+def _simulate_forecast(lat: float, lon: float) -> list:
+    """Génère des prévisions simulées réalistes sur 7 jours."""
+    import random, time
+    rng = random.Random(int(lat * 1000 + lon * 100))
+    now = int(time.time())
+    result = []
+    base_wave = rng.uniform(0.5, 1.8)
+    for i in range(7):
+        wave = round(max(0.2, base_wave + rng.gauss(0, 0.4) + i * 0.05), 2)
+        wind = round(wave / 0.0248 ** 0.5 + rng.gauss(0, 1), 1)
+        temp = round(23.5 + rng.gauss(0, 1.5), 1)
+        s_wave = max(0, 10 - wave * 4)
+        s_temp = 10 - abs(temp - 24.5) * 0.6
+        s_wind = max(0, 10 - wind * 0.4)
+        score  = round(s_wave*.45 + s_temp*.3 + s_wind*.25, 1)
+        sec = "safe" if wave <= 1.0 else "caution" if wave <= 1.5 else "warning" if wave <= 2.5 else "danger"
+        result.append({
+            "dt": now + i * 86400,
+            "wave": wave, "wind_ms": wind, "wind_kn": round(wind * 1.944, 1),
+            "temp": temp, "pop": rng.randint(0, 40), "uvi": round(rng.uniform(4, 9), 1),
+            "peche_score": score, "securite_code": sec,
+        })
+    return result
+
+
 # ============================================================================
 # 11. AGRÉGATION PAR ZONE (OpenWeather + Copernicus → Indices)
 # ============================================================================
@@ -417,10 +519,11 @@ async def fetch_zone_data(
     """
     lat, lon = zone_info["lat"], zone_info["lon"]
 
-    # Appels parallèles
-    ow_data, cop_data = await asyncio.gather(
+    # Appels parallèles (OpenWeather + Copernicus + Prévisions 7J)
+    ow_data, cop_data, forecast_7j = await asyncio.gather(
         fetch_openweather(session, lat, lon),
-        fetch_copernicus(lat, lon)
+        fetch_copernicus(lat, lon),
+        fetch_forecast_7days(lat, lon)
     )
 
     # Fusion : Copernicus prioritaire pour SST et courants
@@ -447,7 +550,8 @@ async def fetch_zone_data(
             "temp":           indices.temp,
             "current":        indices.current,
         },
-        "updated_at": datetime.utcnow().isoformat()
+        "updated_at":  datetime.utcnow().isoformat(),
+        "forecast_7j": forecast_7j,
     }
 
 
@@ -468,7 +572,7 @@ def save_data_json(results: list[dict]) -> None:
 
     payload = {
         "meta": {
-            "version":      "3.0",
+            "version":      "4.0",
             "generated_at": now.isoformat() + "Z",
             "total_zones":  len(results),
             "sources":      list({r["copernicus"]["source"] for r in results}),
