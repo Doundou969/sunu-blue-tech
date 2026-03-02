@@ -11,8 +11,432 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+// ════════════════════════════════════════════════════════
+// GPS — GÉOLOCALISATION
+// ════════════════════════════════════════════════════════
+let gpsActive=false, gpsMarker=null, gpsWatch=null;
+
+function toggleGPS(){
+  if(!navigator.geolocation){alert("Géolocalisation non disponible sur cet appareil.");return;}
+  const btn=document.getElementById('gpsBtn');
+  if(gpsActive){
+    if(gpsWatch)navigator.geolocation.clearWatch(gpsWatch);
+    if(gpsMarker)map.removeLayer(gpsMarker);
+    gpsActive=false;btn.style.background='';btn.style.boxShadow='';
+    return;
+  }
+  btn.style.background='var(--cyan)';btn.style.boxShadow='0 0 12px rgba(0,220,200,.5)';
+  gpsWatch=navigator.geolocation.watchPosition(pos=>{
+    const {latitude:la,longitude:lo,accuracy:ac}=pos.coords;
+    gpsActive=true;
+    if(gpsMarker)map.removeLayer(gpsMarker);
+    const ico=L.divIcon({className:'mk-b',
+      html:`<div style="width:16px;height:16px;border-radius:50%;background:var(--amber);border:3px solid white;box-shadow:0 0 12px rgba(240,165,0,.8)"></div>`,
+      iconAnchor:[8,8]});
+    gpsMarker=L.marker([la,lo],{icon:ico}).addTo(map)
+      .bindPopup(`<div class="pb"><div style="font-weight:700;margin-bottom:6px">📍 Votre position</div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text2)">${la.toFixed(5)}°N · ${lo.toFixed(5)}°W</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:4px">Précision : ±${Math.round(ac)}m</div>
+        <button onclick="findNearestZone(${la},${lo})" style="margin-top:10px;background:var(--cyan);color:#000;border:none;padding:7px 14px;border-radius:8px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;cursor:pointer;width:100%">Zone la plus proche →</button>
+      </div>`);
+    map.flyTo([la,lo],11,{duration:.8});
+  },err=>{
+    console.warn('GPS:',err);
+    btn.style.background='';gpsActive=false;
+    if(err.code===1)alert("Autorisation GPS refusée. Activez la géolocalisation dans les paramètres.");
+  },{enableHighAccuracy:true,maximumAge:10000});
+}
+
+function findNearestZone(lat,lon){
+  let best=null,minDist=Infinity;
+  Object.entries(COORDS).forEach(([name,c])=>{
+    const d=Math.sqrt((c.lat-lat)**2+(c.lon-lon)**2);
+    if(d<minDist){minDist=d;best=name;}
+  });
+  if(best)flyTo(best);
+  const zone=allZones.find(z=>z.zone===best);
+  if(zone)updateRadar(zone);
+}
+
+// ════════════════════════════════════════════════════════
+// NOTIFICATIONS PUSH (Web Notifications API)
+// ════════════════════════════════════════════════════════
+async function requestNotifs(){
+  const btn=document.getElementById('notifBtn');
+  if(!('Notification' in window)){alert("Notifications non supportées.");return;}
+  if(Notification.permission==='granted'){
+    sendTestNotif();return;
+  }
+  const perm=await Notification.requestPermission();
+  if(perm==='granted'){
+    btn.style.background='var(--safe)';
+    btn.style.boxShadow='0 0 12px rgba(0,232,124,.4)';
+    sendTestNotif();
+    scheduleAlertNotifs();
+  }else{
+    btn.style.background='var(--coral-d)';
+  }
+}
+
+function sendTestNotif(){
+  new Notification('🌊 PecheurConnect',{
+    body:'Notifications activées. Vous recevrez les alertes maritimes en temps réel.',
+    icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🌊</text></svg>'
+  });
+}
+
+function scheduleAlertNotifs(){
+  setInterval(()=>{
+    const danger=allZones.filter(z=>z.securite_code==='danger');
+    if(danger.length&&Notification.permission==='granted'){
+      new Notification(`⚠️ ${danger.length} zone(s) en danger`,{
+        body:danger.map(z=>z.zone).join(', ')+' — Conditions dangereuses',
+        icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">⚠️</text></svg>'
+      });
+    }
+  }, 60*60*1000); // toutes les heures
+}
+
+// ════════════════════════════════════════════════════════
+// RADAR CHART — PROFIL DE ZONE
+// ════════════════════════════════════════════════════════
+let radarChart=null;
+
+function updateRadar(zone){
+  const ctx=document.getElementById('radarChart')?.getContext('2d');if(!ctx)return;
+  if(radarChart)radarChart.destroy();
+  const isDark=document.documentElement.getAttribute('data-theme')!=='light';
+  const grd=isDark?'rgba(255,255,255,.1)':'rgba(0,0,0,.08)';
+  const textCol=isDark?'#6a8da8':'#3a5a72';
+
+  // Normalisation 0-10
+  const waveScore=Math.max(0,10-zone.wave*4);
+  const tempScore=10-Math.abs(zone.temp-24.5)*.6;
+  const currScore=10-Math.abs(zone.current-.25)*8;
+  const safeScore=zone.securite_code==='safe'?10:zone.securite_code==='caution'?7:zone.securite_code==='warning'?4:1;
+
+  radarChart=new Chart(ctx,{
+    type:'radar',
+    data:{
+      labels:['Score 🎣','Houle','SST','Courant','Sécurité'],
+      datasets:[{
+        label:zone.zone,
+        data:[zone.peche_score, waveScore, tempScore, currScore, safeScore],
+        fill:true,
+        backgroundColor:`${sc(zone.securite_code)}22`,
+        borderColor:sc(zone.securite_code),
+        pointBackgroundColor:sc(zone.securite_code),
+        pointRadius:3,borderWidth:2
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{r:{
+        min:0,max:10,
+        ticks:{display:false,stepSize:2},
+        grid:{color:grd},
+        pointLabels:{color:textCol,font:{size:9,family:'Syne'}},
+        angleLines:{color:grd}
+      }}
+    }
+  });
+}
+
+// Mettre à jour le radar quand on clique sur une zone
+const origFlyTo=flyTo;
+window.flyTo=function(name){
+  origFlyTo(name);
+  const zone=allZones.find(z=>z.zone===name);
+  if(zone)updateRadar(zone);
+};
+
+// ════════════════════════════════════════════════════════
+// TRAJET CARBURANT SUR CARTE (Leaflet Polyline)
+// ════════════════════════════════════════════════════════
+let routeLayer=null, fuelMap=null;
+
+function calcFuel(){
+  const boat=document.getElementById('boatType').value;
+  const conso={6:6,9:10,12:15,15:22}[boat]||10;
+  const from=document.getElementById('fuelFrom').value;
+  const to=document.getElementById('fuelTo').value;
+  const price=parseInt(document.getElementById('fuelPrice').value)||850;
+  const cf=COORDS[from],ct=COORDS[to];
+  let dist=30;
+  if(cf&&ct){const dlat=cf.lat-ct.lat,dlon=cf.lon-ct.lon;dist=Math.round(Math.sqrt(dlat*dlat+dlon*dlon)*60);}
+  const speed=8;const hours=dist/speed;const liters=Math.round(hours*conso*2);
+  document.getElementById('fr-dist').textContent=dist;
+  document.getElementById('fr-liters').textContent=liters;
+  document.getElementById('fr-cost').textContent=(liters*price).toLocaleString();
+  document.getElementById('fuelResult').style.display='block';
+  drawRouteOnMap(from,to,dist,liters,price);
+}
+
+function drawRouteOnMap(from,to,dist,liters,price){
+  const wrap=document.getElementById('fuelRouteMapWrap');
+  wrap.style.display='block';
+  if(!fuelMap){
+    fuelMap=L.map('fuelRouteMap',{zoomControl:true,scrollWheelZoom:false});
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© CARTO'}).addTo(fuelMap);
+  }
+  if(routeLayer)fuelMap.removeLayer(routeLayer);
+
+  const cf=COORDS[from],ct=COORDS[to];if(!cf||!ct)return;
+
+  // Polyline avec courbe légère (point intermédiaire décalé vers le large)
+  const midLat=(cf.lat+ct.lat)/2;
+  const midLon=(cf.lon+ct.lon)/2-0.3; // décalage vers le large
+  const pts=[[cf.lat,cf.lon],[midLat,midLon],[ct.lat,ct.lon]];
+
+  routeLayer=L.layerGroup();
+  L.polyline(pts,{color:'#f0a500',weight:3,opacity:.9,dashArray:'8,4'}).addTo(routeLayer);
+
+  // Marqueur départ
+  const icoD=L.divIcon({className:'mk-b',html:'<div style="background:#00e87c;color:#000;padding:4px 8px;border-radius:12px;font-family:Syne,sans-serif;font-size:10px;font-weight:700;white-space:nowrap">▶ '+from+'</div>',iconAnchor:[40,12]});
+  L.marker([cf.lat,cf.lon],{icon:icoD}).addTo(routeLayer);
+
+  // Marqueur arrivée
+  const icoA=L.divIcon({className:'mk-b',html:'<div style="background:#f0a500;color:#000;padding:4px 8px;border-radius:12px;font-family:Syne,sans-serif;font-size:10px;font-weight:700;white-space:nowrap">⚓ '+to+'</div>',iconAnchor:[40,12]});
+  L.marker([ct.lat,ct.lon],{icon:icoA}).addTo(routeLayer);
+
+  // Info bulle au milieu
+  const icoM=L.divIcon({className:'mk-b',html:`<div style="background:var(--bg3);border:1px solid var(--b2);padding:6px 10px;border-radius:10px;font-family:'DM Mono',monospace;font-size:10px;text-align:center;color:var(--amber);white-space:nowrap">${dist}nm · ${liters}L · ${(liters*price/1000).toFixed(0)}k FCFA</div>`,iconAnchor:[60,14]});
+  L.marker([midLat,midLon],{icon:icoM}).addTo(routeLayer);
+
+  routeLayer.addTo(fuelMap);
+  fuelMap.fitBounds([[cf.lat,cf.lon],[ct.lat,ct.lon]],{padding:[30,30]});
+  setTimeout(()=>fuelMap.invalidateSize(),100);
+}
+
+// ════════════════════════════════════════════════════════
+// RADAR AUTO au premier chargement
+// ════════════════════════════════════════════════════════
+const origRefreshDash=refreshDash;
+window.refreshDash=function(){
+  origRefreshDash();
+  setTimeout(()=>{
+    if(allZones.length>0){
+      const top=[...allZones].sort((a,b)=>b.peche_score-a.peche_score)[0];
+      if(top)updateRadar(top);
+    }
+  },300);
+};
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
+// ════════════════════════════════════════════════════════
+// GPS — GÉOLOCALISATION
+// ════════════════════════════════════════════════════════
+let gpsActive=false, gpsMarker=null, gpsWatch=null;
+
+function toggleGPS(){
+  if(!navigator.geolocation){alert("Géolocalisation non disponible sur cet appareil.");return;}
+  const btn=document.getElementById('gpsBtn');
+  if(gpsActive){
+    if(gpsWatch)navigator.geolocation.clearWatch(gpsWatch);
+    if(gpsMarker)map.removeLayer(gpsMarker);
+    gpsActive=false;btn.style.background='';btn.style.boxShadow='';
+    return;
+  }
+  btn.style.background='var(--cyan)';btn.style.boxShadow='0 0 12px rgba(0,220,200,.5)';
+  gpsWatch=navigator.geolocation.watchPosition(pos=>{
+    const {latitude:la,longitude:lo,accuracy:ac}=pos.coords;
+    gpsActive=true;
+    if(gpsMarker)map.removeLayer(gpsMarker);
+    const ico=L.divIcon({className:'mk-b',
+      html:`<div style="width:16px;height:16px;border-radius:50%;background:var(--amber);border:3px solid white;box-shadow:0 0 12px rgba(240,165,0,.8)"></div>`,
+      iconAnchor:[8,8]});
+    gpsMarker=L.marker([la,lo],{icon:ico}).addTo(map)
+      .bindPopup(`<div class="pb"><div style="font-weight:700;margin-bottom:6px">📍 Votre position</div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text2)">${la.toFixed(5)}°N · ${lo.toFixed(5)}°W</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:4px">Précision : ±${Math.round(ac)}m</div>
+        <button onclick="findNearestZone(${la},${lo})" style="margin-top:10px;background:var(--cyan);color:#000;border:none;padding:7px 14px;border-radius:8px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;cursor:pointer;width:100%">Zone la plus proche →</button>
+      </div>`);
+    map.flyTo([la,lo],11,{duration:.8});
+  },err=>{
+    console.warn('GPS:',err);
+    btn.style.background='';gpsActive=false;
+    if(err.code===1)alert("Autorisation GPS refusée. Activez la géolocalisation dans les paramètres.");
+  },{enableHighAccuracy:true,maximumAge:10000});
+}
+
+function findNearestZone(lat,lon){
+  let best=null,minDist=Infinity;
+  Object.entries(COORDS).forEach(([name,c])=>{
+    const d=Math.sqrt((c.lat-lat)**2+(c.lon-lon)**2);
+    if(d<minDist){minDist=d;best=name;}
+  });
+  if(best)flyTo(best);
+  const zone=allZones.find(z=>z.zone===best);
+  if(zone)updateRadar(zone);
+}
+
+// ════════════════════════════════════════════════════════
+// NOTIFICATIONS PUSH (Web Notifications API)
+// ════════════════════════════════════════════════════════
+async function requestNotifs(){
+  const btn=document.getElementById('notifBtn');
+  if(!('Notification' in window)){alert("Notifications non supportées.");return;}
+  if(Notification.permission==='granted'){
+    sendTestNotif();return;
+  }
+  const perm=await Notification.requestPermission();
+  if(perm==='granted'){
+    btn.style.background='var(--safe)';
+    btn.style.boxShadow='0 0 12px rgba(0,232,124,.4)';
+    sendTestNotif();
+    scheduleAlertNotifs();
+  }else{
+    btn.style.background='var(--coral-d)';
+  }
+}
+
+function sendTestNotif(){
+  new Notification('🌊 PecheurConnect',{
+    body:'Notifications activées. Vous recevrez les alertes maritimes en temps réel.',
+    icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🌊</text></svg>'
+  });
+}
+
+function scheduleAlertNotifs(){
+  setInterval(()=>{
+    const danger=allZones.filter(z=>z.securite_code==='danger');
+    if(danger.length&&Notification.permission==='granted'){
+      new Notification(`⚠️ ${danger.length} zone(s) en danger`,{
+        body:danger.map(z=>z.zone).join(', ')+' — Conditions dangereuses',
+        icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">⚠️</text></svg>'
+      });
+    }
+  }, 60*60*1000); // toutes les heures
+}
+
+// ════════════════════════════════════════════════════════
+// RADAR CHART — PROFIL DE ZONE
+// ════════════════════════════════════════════════════════
+let radarChart=null;
+
+function updateRadar(zone){
+  const ctx=document.getElementById('radarChart')?.getContext('2d');if(!ctx)return;
+  if(radarChart)radarChart.destroy();
+  const isDark=document.documentElement.getAttribute('data-theme')!=='light';
+  const grd=isDark?'rgba(255,255,255,.1)':'rgba(0,0,0,.08)';
+  const textCol=isDark?'#6a8da8':'#3a5a72';
+
+  // Normalisation 0-10
+  const waveScore=Math.max(0,10-zone.wave*4);
+  const tempScore=10-Math.abs(zone.temp-24.5)*.6;
+  const currScore=10-Math.abs(zone.current-.25)*8;
+  const safeScore=zone.securite_code==='safe'?10:zone.securite_code==='caution'?7:zone.securite_code==='warning'?4:1;
+
+  radarChart=new Chart(ctx,{
+    type:'radar',
+    data:{
+      labels:['Score 🎣','Houle','SST','Courant','Sécurité'],
+      datasets:[{
+        label:zone.zone,
+        data:[zone.peche_score, waveScore, tempScore, currScore, safeScore],
+        fill:true,
+        backgroundColor:`${sc(zone.securite_code)}22`,
+        borderColor:sc(zone.securite_code),
+        pointBackgroundColor:sc(zone.securite_code),
+        pointRadius:3,borderWidth:2
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{r:{
+        min:0,max:10,
+        ticks:{display:false,stepSize:2},
+        grid:{color:grd},
+        pointLabels:{color:textCol,font:{size:9,family:'Syne'}},
+        angleLines:{color:grd}
+      }}
+    }
+  });
+}
+
+// Mettre à jour le radar quand on clique sur une zone
+const origFlyTo=flyTo;
+window.flyTo=function(name){
+  origFlyTo(name);
+  const zone=allZones.find(z=>z.zone===name);
+  if(zone)updateRadar(zone);
+};
+
+// ════════════════════════════════════════════════════════
+// TRAJET CARBURANT SUR CARTE (Leaflet Polyline)
+// ════════════════════════════════════════════════════════
+let routeLayer=null, fuelMap=null;
+
+function calcFuel(){
+  const boat=document.getElementById('boatType').value;
+  const conso={6:6,9:10,12:15,15:22}[boat]||10;
+  const from=document.getElementById('fuelFrom').value;
+  const to=document.getElementById('fuelTo').value;
+  const price=parseInt(document.getElementById('fuelPrice').value)||850;
+  const cf=COORDS[from],ct=COORDS[to];
+  let dist=30;
+  if(cf&&ct){const dlat=cf.lat-ct.lat,dlon=cf.lon-ct.lon;dist=Math.round(Math.sqrt(dlat*dlat+dlon*dlon)*60);}
+  const speed=8;const hours=dist/speed;const liters=Math.round(hours*conso*2);
+  document.getElementById('fr-dist').textContent=dist;
+  document.getElementById('fr-liters').textContent=liters;
+  document.getElementById('fr-cost').textContent=(liters*price).toLocaleString();
+  document.getElementById('fuelResult').style.display='block';
+  drawRouteOnMap(from,to,dist,liters,price);
+}
+
+function drawRouteOnMap(from,to,dist,liters,price){
+  const wrap=document.getElementById('fuelRouteMapWrap');
+  wrap.style.display='block';
+  if(!fuelMap){
+    fuelMap=L.map('fuelRouteMap',{zoomControl:true,scrollWheelZoom:false});
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© CARTO'}).addTo(fuelMap);
+  }
+  if(routeLayer)fuelMap.removeLayer(routeLayer);
+
+  const cf=COORDS[from],ct=COORDS[to];if(!cf||!ct)return;
+
+  // Polyline avec courbe légère (point intermédiaire décalé vers le large)
+  const midLat=(cf.lat+ct.lat)/2;
+  const midLon=(cf.lon+ct.lon)/2-0.3; // décalage vers le large
+  const pts=[[cf.lat,cf.lon],[midLat,midLon],[ct.lat,ct.lon]];
+
+  routeLayer=L.layerGroup();
+  L.polyline(pts,{color:'#f0a500',weight:3,opacity:.9,dashArray:'8,4'}).addTo(routeLayer);
+
+  // Marqueur départ
+  const icoD=L.divIcon({className:'mk-b',html:'<div style="background:#00e87c;color:#000;padding:4px 8px;border-radius:12px;font-family:Syne,sans-serif;font-size:10px;font-weight:700;white-space:nowrap">▶ '+from+'</div>',iconAnchor:[40,12]});
+  L.marker([cf.lat,cf.lon],{icon:icoD}).addTo(routeLayer);
+
+  // Marqueur arrivée
+  const icoA=L.divIcon({className:'mk-b',html:'<div style="background:#f0a500;color:#000;padding:4px 8px;border-radius:12px;font-family:Syne,sans-serif;font-size:10px;font-weight:700;white-space:nowrap">⚓ '+to+'</div>',iconAnchor:[40,12]});
+  L.marker([ct.lat,ct.lon],{icon:icoA}).addTo(routeLayer);
+
+  // Info bulle au milieu
+  const icoM=L.divIcon({className:'mk-b',html:`<div style="background:var(--bg3);border:1px solid var(--b2);padding:6px 10px;border-radius:10px;font-family:'DM Mono',monospace;font-size:10px;text-align:center;color:var(--amber);white-space:nowrap">${dist}nm · ${liters}L · ${(liters*price/1000).toFixed(0)}k FCFA</div>`,iconAnchor:[60,14]});
+  L.marker([midLat,midLon],{icon:icoM}).addTo(routeLayer);
+
+  routeLayer.addTo(fuelMap);
+  fuelMap.fitBounds([[cf.lat,cf.lon],[ct.lat,ct.lon]],{padding:[30,30]});
+  setTimeout(()=>fuelMap.invalidateSize(),100);
+}
+
+// ════════════════════════════════════════════════════════
+// RADAR AUTO au premier chargement
+// ════════════════════════════════════════════════════════
+const origRefreshDash=refreshDash;
+window.refreshDash=function(){
+  origRefreshDash();
+  setTimeout(()=>{
+    if(allZones.length>0){
+      const top=[...allZones].sort((a,b)=>b.peche_score-a.peche_score)[0];
+      if(top)updateRadar(top);
+    }
+  },300);
+};
+
+</script>
 
 <style>
 /* ══════════════════════════════════════════════════════
@@ -319,6 +743,17 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
 @keyframes fi{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .stagger>*{animation:fi .35s ease both;}
 .stagger>*:nth-child(1){animation-delay:.05s}.stagger>*:nth-child(2){animation-delay:.1s}.stagger>*:nth-child(3){animation-delay:.15s}.stagger>*:nth-child(4){animation-delay:.2s}.stagger>*:nth-child(5){animation-delay:.25s}.stagger>*:nth-child(6){animation-delay:.3s}
+
+/* ── RADAR ZONE ── */
+.radar-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.radar-card{background:var(--glass);border:1px solid var(--b);border-radius:var(--r);padding:18px;}
+.gps-bar{background:var(--glass);border:1px solid var(--b2);border-radius:var(--r);padding:12px 18px;display:flex;align-items:center;gap:14px;margin-bottom:16px;}
+.gps-coords{font-family:"DM Mono",monospace;font-size:12px;color:var(--cyan);}
+.notif-btn{background:var(--amber);color:#000;border:none;padding:8px 18px;border-radius:var(--r2);font-family:"Syne",sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:opacity .15s;}
+.notif-btn:hover{opacity:.85;}
+.notif-btn.active{background:var(--safe);}
+.route-line-card{background:var(--glass);border:1px solid var(--b);border-radius:var(--r);padding:14px 18px;margin-top:14px;}
+
 </style>
 </head>
 <body>
@@ -342,6 +777,8 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
     <span class="brand-v">v4.0</span>
   </div>
   <div class="top-center">
+    <button class="icnbtn" id="gpsBtn" onclick="toggleGPS()" title="Ma position GPS">📍</button>
+    <button class="icnbtn" id="notifBtn" onclick="requestNotifs()" title="Activer notifications">🔔</button>
     <div class="live-pill"><div class="live-dot"></div><span id="liveText" data-fr="Sénégal · 18 zones actives" data-wo="Senegaal · 18 dëkk">Sénégal · 18 zones actives</span></div>
     <div class="offline-banner" id="offlineBanner">📡 Hors ligne — données en cache</div>
   </div>
@@ -423,7 +860,11 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
           <div class="sb"><div class="sbn" style="color:var(--danger)" id="cd">—</div><div class="sbl">🔴 <span data-fr="Danger" data-wo="Réy">Danger</span></div></div>
         </div>
       </div>
-      <div class="zlist" id="zlist"></div>
+      <div style="padding:10px 10px 0">
+          <div class="card-t" style="margin-bottom:8px" data-fr="Profil de zone sélectionnée" data-wo="Profil dëkk bi">Profil radar — zone sélectionnée</div>
+          <canvas id="radarChart" height="160" style="max-height:160px"></canvas>
+        </div>
+        <div class="zlist" id="zlist"></div>
     </div>
   </div>
 </section>
@@ -538,7 +979,11 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
     </div>
     <div class="fuel-zones card" style="padding:18px">
       <div class="card-t" data-fr="Routes de pêche préenregistrées" data-wo="Yoon yi ci kaw">Routes préenregistrées</div>
-      <div class="fz-routes stagger" id="fuelRoutes"></div>
+      <div id="fuelRouteMapWrap" style="display:none;margin-top:14px">
+          <div class="card-t" style="margin-bottom:8px" data-fr="Trajet sur carte" data-wo="Yoon bi ci kàrt">Trajet sur carte</div>
+          <div id="fuelRouteMap" style="height:260px;border-radius:var(--r);border:1px solid var(--b)"></div>
+        </div>
+        <div class="fz-routes stagger" id="fuelRoutes"></div>
     </div>
   </div>
 </section>
@@ -798,6 +1243,12 @@ function fakeScore(base,day){
 }
 
 function buildForecastDays(){
+  // Chercher prévisions réelles depuis data.json (zone sélectionnée)
+  const zone = allZones.find(z=>z.zone===selectedForecastZone);
+  if(zone?.forecast_7j?.length){
+    renderForecastDays(zone.forecast_7j);
+    return;
+  }
   const el=document.getElementById('forecastDays');
   const now=new Date();
   const days=Array.from({length:7},(_,i)=>{
@@ -820,6 +1271,27 @@ function buildForecastDays(){
   selectDayObj(days[0],0);
 }
 
+function renderForecastDays(forecast){
+  const now=new Date();
+  const el=document.getElementById('forecastDays');
+  el.innerHTML=forecast.map((d,i)=>{
+    const date=new Date(d.dt*1000);
+    const icon=d.pop>60?'🌧️':d.wave>2?'🌊':d.wave>1?'⛅':'☀️';
+    return `<div class="fday${i===selectedDay?' sel':''}" onclick="selectDay(${i},${JSON.stringify(d).replace(/"/g,"'")})">
+      <div class="fd-date">${DAY_NAMES[date.getDay()]} ${date.getDate()}/${date.getMonth()+1}</div>
+      <div class="fd-icon">${icon}</div>
+      <div class="fd-score" style="color:${sc(d.securite_code)}">${d.peche_score}</div>
+      <div class="fd-wave">${d.wave}m · ${d.wind_kn||'?'}kn</div>
+      <div class="fd-safe" style="background:${sc(d.securite_code)};color:${tc(d.securite_code)}">${d.securite_code==='safe'?'✓':d.securite_code==='caution'?'!':d.securite_code==='warning'?'⚠':'✕'}</div>
+    </div>`;
+  }).join('');
+  // Horizon avec vraies données
+  const fakeForChart=forecast.map((d,i)=>({date:new Date(d.dt*1000),day:DAY_NAMES[new Date(d.dt*1000).getDay()],
+    icon:'☀️',score:d.peche_score,wave:d.wave,sc:d.securite_code}));
+  drawHorizon(fakeForChart);
+  selectDayObj(forecast[0],0);
+}
+
 function selectDay(i,d){
   selectedDay=i;
   document.querySelectorAll('.fday').forEach((el,j)=>el.classList.toggle('sel',j===i));
@@ -827,14 +1299,17 @@ function selectDay(i,d){
 }
 
 function selectDayObj(d,i){
-  const wind=+(3+Math.random()*15).toFixed(0);
-  const curr=+(0.1+Math.random()*.5).toFixed(2);
-  const temp=+(21+Math.random()*6).toFixed(1);
+  const wave=d.wave??1;
+  const wind=d.wind_kn??(+(3+Math.random()*15).toFixed(0));
+  const temp=d.temp??(+(21+Math.random()*6).toFixed(1));
+  const pop=d.pop??Math.round(Math.random()*40);
+  const uvi=d.uvi??(+(4+Math.random()*5).toFixed(1));
   document.getElementById('fdMetrics').innerHTML=`
-    <div class="fdm"><div class="fdm-val">${d.wave}m</div><div class="fdm-lbl">Houle</div></div>
+    <div class="fdm"><div class="fdm-val">${(+wave).toFixed(1)}m</div><div class="fdm-lbl">Houle</div></div>
     <div class="fdm"><div class="fdm-val">${wind}kn</div><div class="fdm-lbl">Vent</div></div>
-    <div class="fdm"><div class="fdm-val">${temp}°C</div><div class="fdm-lbl">SST</div></div>
-    <div class="fdm"><div class="fdm-val">${curr}m/s</div><div class="fdm-lbl">Courant</div></div>`;
+    <div class="fdm"><div class="fdm-val">${(+temp).toFixed(1)}°C</div><div class="fdm-lbl">Temp</div></div>
+    <div class="fdm"><div class="fdm-val">${pop}%</div><div class="fdm-lbl">Pluie</div></div>
+    <div class="fdm"><div class="fdm-val">${uvi}</div><div class="fdm-lbl">UV</div></div>`;
 }
 
 function drawHorizon(days){
@@ -1275,6 +1750,218 @@ function clock(){
 
 function checkOnline(){setOffline(!navigator.onLine);}
 function setOffline(offline){document.getElementById('offlineBanner').style.display=offline?'block':'none';}
+
+// ════════════════════════════════════════════════════════
+// GPS — GÉOLOCALISATION
+// ════════════════════════════════════════════════════════
+let gpsActive=false, gpsMarker=null, gpsWatch=null;
+
+function toggleGPS(){
+  if(!navigator.geolocation){alert("Géolocalisation non disponible sur cet appareil.");return;}
+  const btn=document.getElementById('gpsBtn');
+  if(gpsActive){
+    if(gpsWatch)navigator.geolocation.clearWatch(gpsWatch);
+    if(gpsMarker)map.removeLayer(gpsMarker);
+    gpsActive=false;btn.style.background='';btn.style.boxShadow='';
+    return;
+  }
+  btn.style.background='var(--cyan)';btn.style.boxShadow='0 0 12px rgba(0,220,200,.5)';
+  gpsWatch=navigator.geolocation.watchPosition(pos=>{
+    const {latitude:la,longitude:lo,accuracy:ac}=pos.coords;
+    gpsActive=true;
+    if(gpsMarker)map.removeLayer(gpsMarker);
+    const ico=L.divIcon({className:'mk-b',
+      html:`<div style="width:16px;height:16px;border-radius:50%;background:var(--amber);border:3px solid white;box-shadow:0 0 12px rgba(240,165,0,.8)"></div>`,
+      iconAnchor:[8,8]});
+    gpsMarker=L.marker([la,lo],{icon:ico}).addTo(map)
+      .bindPopup(`<div class="pb"><div style="font-weight:700;margin-bottom:6px">📍 Votre position</div>
+        <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text2)">${la.toFixed(5)}°N · ${lo.toFixed(5)}°W</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:4px">Précision : ±${Math.round(ac)}m</div>
+        <button onclick="findNearestZone(${la},${lo})" style="margin-top:10px;background:var(--cyan);color:#000;border:none;padding:7px 14px;border-radius:8px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;cursor:pointer;width:100%">Zone la plus proche →</button>
+      </div>`);
+    map.flyTo([la,lo],11,{duration:.8});
+  },err=>{
+    console.warn('GPS:',err);
+    btn.style.background='';gpsActive=false;
+    if(err.code===1)alert("Autorisation GPS refusée. Activez la géolocalisation dans les paramètres.");
+  },{enableHighAccuracy:true,maximumAge:10000});
+}
+
+function findNearestZone(lat,lon){
+  let best=null,minDist=Infinity;
+  Object.entries(COORDS).forEach(([name,c])=>{
+    const d=Math.sqrt((c.lat-lat)**2+(c.lon-lon)**2);
+    if(d<minDist){minDist=d;best=name;}
+  });
+  if(best)flyTo(best);
+  const zone=allZones.find(z=>z.zone===best);
+  if(zone)updateRadar(zone);
+}
+
+// ════════════════════════════════════════════════════════
+// NOTIFICATIONS PUSH (Web Notifications API)
+// ════════════════════════════════════════════════════════
+async function requestNotifs(){
+  const btn=document.getElementById('notifBtn');
+  if(!('Notification' in window)){alert("Notifications non supportées.");return;}
+  if(Notification.permission==='granted'){
+    sendTestNotif();return;
+  }
+  const perm=await Notification.requestPermission();
+  if(perm==='granted'){
+    btn.style.background='var(--safe)';
+    btn.style.boxShadow='0 0 12px rgba(0,232,124,.4)';
+    sendTestNotif();
+    scheduleAlertNotifs();
+  }else{
+    btn.style.background='var(--coral-d)';
+  }
+}
+
+function sendTestNotif(){
+  new Notification('🌊 PecheurConnect',{
+    body:'Notifications activées. Vous recevrez les alertes maritimes en temps réel.',
+    icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🌊</text></svg>'
+  });
+}
+
+function scheduleAlertNotifs(){
+  setInterval(()=>{
+    const danger=allZones.filter(z=>z.securite_code==='danger');
+    if(danger.length&&Notification.permission==='granted'){
+      new Notification(`⚠️ ${danger.length} zone(s) en danger`,{
+        body:danger.map(z=>z.zone).join(', ')+' — Conditions dangereuses',
+        icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">⚠️</text></svg>'
+      });
+    }
+  }, 60*60*1000); // toutes les heures
+}
+
+// ════════════════════════════════════════════════════════
+// RADAR CHART — PROFIL DE ZONE
+// ════════════════════════════════════════════════════════
+let radarChart=null;
+
+function updateRadar(zone){
+  const ctx=document.getElementById('radarChart')?.getContext('2d');if(!ctx)return;
+  if(radarChart)radarChart.destroy();
+  const isDark=document.documentElement.getAttribute('data-theme')!=='light';
+  const grd=isDark?'rgba(255,255,255,.1)':'rgba(0,0,0,.08)';
+  const textCol=isDark?'#6a8da8':'#3a5a72';
+
+  // Normalisation 0-10
+  const waveScore=Math.max(0,10-zone.wave*4);
+  const tempScore=10-Math.abs(zone.temp-24.5)*.6;
+  const currScore=10-Math.abs(zone.current-.25)*8;
+  const safeScore=zone.securite_code==='safe'?10:zone.securite_code==='caution'?7:zone.securite_code==='warning'?4:1;
+
+  radarChart=new Chart(ctx,{
+    type:'radar',
+    data:{
+      labels:['Score 🎣','Houle','SST','Courant','Sécurité'],
+      datasets:[{
+        label:zone.zone,
+        data:[zone.peche_score, waveScore, tempScore, currScore, safeScore],
+        fill:true,
+        backgroundColor:`${sc(zone.securite_code)}22`,
+        borderColor:sc(zone.securite_code),
+        pointBackgroundColor:sc(zone.securite_code),
+        pointRadius:3,borderWidth:2
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{r:{
+        min:0,max:10,
+        ticks:{display:false,stepSize:2},
+        grid:{color:grd},
+        pointLabels:{color:textCol,font:{size:9,family:'Syne'}},
+        angleLines:{color:grd}
+      }}
+    }
+  });
+}
+
+// Mettre à jour le radar quand on clique sur une zone
+const origFlyTo=flyTo;
+window.flyTo=function(name){
+  origFlyTo(name);
+  const zone=allZones.find(z=>z.zone===name);
+  if(zone)updateRadar(zone);
+};
+
+// ════════════════════════════════════════════════════════
+// TRAJET CARBURANT SUR CARTE (Leaflet Polyline)
+// ════════════════════════════════════════════════════════
+let routeLayer=null, fuelMap=null;
+
+function calcFuel(){
+  const boat=document.getElementById('boatType').value;
+  const conso={6:6,9:10,12:15,15:22}[boat]||10;
+  const from=document.getElementById('fuelFrom').value;
+  const to=document.getElementById('fuelTo').value;
+  const price=parseInt(document.getElementById('fuelPrice').value)||850;
+  const cf=COORDS[from],ct=COORDS[to];
+  let dist=30;
+  if(cf&&ct){const dlat=cf.lat-ct.lat,dlon=cf.lon-ct.lon;dist=Math.round(Math.sqrt(dlat*dlat+dlon*dlon)*60);}
+  const speed=8;const hours=dist/speed;const liters=Math.round(hours*conso*2);
+  document.getElementById('fr-dist').textContent=dist;
+  document.getElementById('fr-liters').textContent=liters;
+  document.getElementById('fr-cost').textContent=(liters*price).toLocaleString();
+  document.getElementById('fuelResult').style.display='block';
+  drawRouteOnMap(from,to,dist,liters,price);
+}
+
+function drawRouteOnMap(from,to,dist,liters,price){
+  const wrap=document.getElementById('fuelRouteMapWrap');
+  wrap.style.display='block';
+  if(!fuelMap){
+    fuelMap=L.map('fuelRouteMap',{zoomControl:true,scrollWheelZoom:false});
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© CARTO'}).addTo(fuelMap);
+  }
+  if(routeLayer)fuelMap.removeLayer(routeLayer);
+
+  const cf=COORDS[from],ct=COORDS[to];if(!cf||!ct)return;
+
+  // Polyline avec courbe légère (point intermédiaire décalé vers le large)
+  const midLat=(cf.lat+ct.lat)/2;
+  const midLon=(cf.lon+ct.lon)/2-0.3; // décalage vers le large
+  const pts=[[cf.lat,cf.lon],[midLat,midLon],[ct.lat,ct.lon]];
+
+  routeLayer=L.layerGroup();
+  L.polyline(pts,{color:'#f0a500',weight:3,opacity:.9,dashArray:'8,4'}).addTo(routeLayer);
+
+  // Marqueur départ
+  const icoD=L.divIcon({className:'mk-b',html:'<div style="background:#00e87c;color:#000;padding:4px 8px;border-radius:12px;font-family:Syne,sans-serif;font-size:10px;font-weight:700;white-space:nowrap">▶ '+from+'</div>',iconAnchor:[40,12]});
+  L.marker([cf.lat,cf.lon],{icon:icoD}).addTo(routeLayer);
+
+  // Marqueur arrivée
+  const icoA=L.divIcon({className:'mk-b',html:'<div style="background:#f0a500;color:#000;padding:4px 8px;border-radius:12px;font-family:Syne,sans-serif;font-size:10px;font-weight:700;white-space:nowrap">⚓ '+to+'</div>',iconAnchor:[40,12]});
+  L.marker([ct.lat,ct.lon],{icon:icoA}).addTo(routeLayer);
+
+  // Info bulle au milieu
+  const icoM=L.divIcon({className:'mk-b',html:`<div style="background:var(--bg3);border:1px solid var(--b2);padding:6px 10px;border-radius:10px;font-family:'DM Mono',monospace;font-size:10px;text-align:center;color:var(--amber);white-space:nowrap">${dist}nm · ${liters}L · ${(liters*price/1000).toFixed(0)}k FCFA</div>`,iconAnchor:[60,14]});
+  L.marker([midLat,midLon],{icon:icoM}).addTo(routeLayer);
+
+  routeLayer.addTo(fuelMap);
+  fuelMap.fitBounds([[cf.lat,cf.lon],[ct.lat,ct.lon]],{padding:[30,30]});
+  setTimeout(()=>fuelMap.invalidateSize(),100);
+}
+
+// ════════════════════════════════════════════════════════
+// RADAR AUTO au premier chargement
+// ════════════════════════════════════════════════════════
+const origRefreshDash=refreshDash;
+window.refreshDash=function(){
+  origRefreshDash();
+  setTimeout(()=>{
+    if(allZones.length>0){
+      const top=[...allZones].sort((a,b)=>b.peche_score-a.peche_score)[0];
+      if(top)updateRadar(top);
+    }
+  },300);
+};
+
 </script>
 </body>
 </html>
