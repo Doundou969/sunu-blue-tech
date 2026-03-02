@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#030b14">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>PecheurConnect v4.0</title>
+<title>PecheurConnect v4.2</title>
 <link rel="manifest" href="#" id="manifestLink">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -223,6 +223,366 @@ window.refreshDash=function(){
   },300);
 };
 
+
+// ════════════════════════════════════════════════════════
+// TOAST SYSTEM
+// ════════════════════════════════════════════════════════
+function toast(msg, color='var(--cyan)'){
+  const w=document.getElementById('toastWrap');
+  const t=document.createElement('div');
+  t.className='toast';
+  t.style.color=color;
+  t.textContent=msg;
+  w.appendChild(t);
+  setTimeout(()=>t.remove(), 3200);
+}
+
+// ════════════════════════════════════════════════════════
+// COMPARATEUR DE ZONES
+// ════════════════════════════════════════════════════════
+let compareSelected=new Set();
+let compareRadarChart=null;
+
+function buildComparePage(){
+  const el=document.getElementById('compareZonePills');
+  if(!el||!allZones.length)return;
+  el.innerHTML=allZones.map(z=>`
+    <div class="pill${compareSelected.has(z.zone)?' on':''}"
+         onclick="toggleCompare('${z.zone}',this)"
+         style="font-size:10px">
+      ${z.zone}
+    </div>`).join('');
+  renderCompare();
+}
+
+function toggleCompare(name, el){
+  if(compareSelected.has(name)){
+    compareSelected.delete(name);
+    el.classList.remove('on');
+  } else {
+    if(compareSelected.size>=4){toast('⚠️ Maximum 4 zones','var(--warning)');return;}
+    compareSelected.add(name);
+    el.classList.add('on');
+  }
+  renderCompare();
+}
+
+function renderCompare(){
+  const zones=[...compareSelected].map(n=>allZones.find(z=>z.zone===n)).filter(Boolean);
+  if(!zones.length){
+    document.getElementById('compareTable').innerHTML='<div class="card" style="padding:30px;text-align:center;color:var(--text2)"><div style="font-size:32px;margin-bottom:8px">⚖️</div><div data-fr="Sélectionnez des zones ci-dessus" data-wo="Tann dëkk yi ci kaw">Sélectionnez des zones ci-dessus</div></div>';
+    document.getElementById('compareReco').innerHTML='';
+    return;
+  }
+  // Trier par score décroissant
+  zones.sort((a,b)=>b.peche_score-a.peche_score);
+  const rankClass=['r1','r2','r3','r4'];
+
+  // Tableau comparatif
+  const metrics=[
+    {label:'Score pêche',key:'peche_score',unit:'/10',fmt:v=>`${v}/10`},
+    {label:'Houle',key:'wave',unit:'m',fmt:v=>`${v}m`},
+    {label:'SST',key:'temp',unit:'°C',fmt:v=>`${v}°C`},
+    {label:'Courant',key:'current',unit:'m/s',fmt:v=>`${v}m/s`},
+    {label:'Sécurité',key:'securite_code',fmt:v=>v==='safe'?'🟢 Sûr':v==='caution'?'🟡 Vigilance':v==='warning'?'🟠 Prudence':'🔴 Danger'},
+    {label:'Source',key:'source',fmt:v=>v==='copernicus'?'🛰️ Copernicus':'📡 OpenWeather / Sim'},
+  ];
+
+  let tableHtml=`<div class="card" style="overflow:auto"><table class="cmp-table">
+    <thead><tr><th>Critère</th>${zones.map((z,i)=>`<th><span class="cmp-rank ${rankClass[i]}">${i+1}</span>${z.zone}</th>`).join('')}</tr></thead>
+    <tbody>`;
+
+  metrics.forEach(m=>{
+    tableHtml+=`<tr><td style="font-weight:700;color:var(--text2);font-size:11px">${m.label}</td>`;
+    const vals=zones.map(z=>z[m.key]);
+    const maxScore=m.key==='peche_score'?Math.max(...vals.map(Number)):null;
+    zones.forEach((z,i)=>{
+      const v=z[m.key];
+      const isMax=maxScore!==null&&Number(v)===maxScore;
+      const barW=m.key==='peche_score'?Number(v)*10:null;
+      tableHtml+=`<td style="${isMax?'color:var(--cyan);font-weight:700':''}">
+        ${m.fmt(v)}
+        ${barW!==null?`<div class="cmp-score-bar" style="width:${barW}%;background:${sc(z.securite_code)}"></div>`:''}
+      </td>`;
+    });
+    tableHtml+=`</tr>`;
+  });
+  tableHtml+=`</tbody></table></div>`;
+  document.getElementById('compareTable').innerHTML=tableHtml;
+
+  // Radar comparatif
+  buildCompareRadar(zones);
+
+  // Recommandation
+  const best=zones[0];
+  const reasons=[];
+  if(best.peche_score>=8)reasons.push(`Score pêche exceptionnel (${best.peche_score}/10)`);
+  if(best.wave<=1)reasons.push(`Mer calme (houle ${best.wave}m)`);
+  if(best.securite_code==='safe')reasons.push('Conditions de sécurité idéales');
+  if(best.temp>=23&&best.temp<=26)reasons.push(`SST optimale pour les espèces cibles (${best.temp}°C)`);
+
+  document.getElementById('compareReco').innerHTML=`
+    <div class="reco-card">
+      <div class="reco-icon">🎣</div>
+      <div>
+        <div class="reco-title">${best.zone}</div>
+        <div class="reco-score">${best.peche_score}/10 · ${best.region}</div>
+        <div class="reco-reason">${reasons.length?reasons.join('. ')+'.':'Meilleur score parmi les zones sélectionnées.'}</div>
+        <button style="margin-top:10px;background:var(--cyan);color:#000;border:none;padding:7px 16px;border-radius:8px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;cursor:pointer" onclick="go('dash');flyTo('${best.zone}')">
+          Voir sur la carte →
+        </button>
+      </div>
+    </div>`;
+}
+
+function buildCompareRadar(zones){
+  const ctx=document.getElementById('compareRadar')?.getContext('2d');if(!ctx)return;
+  if(compareRadarChart)compareRadarChart.destroy();
+  const isDark=document.documentElement.getAttribute('data-theme')!=='light';
+  const gridC=isDark?'rgba(255,255,255,.08)':'rgba(0,0,0,.07)';
+  const colors=['#00dcc8','#f0a500','#ff4b6e','#00e87c'];
+
+  compareRadarChart=new Chart(ctx,{
+    type:'radar',
+    data:{
+      labels:['🎣 Score','🌊 Mer calme','🌡️ SST','↗️ Courant','🛡️ Sécurité'],
+      datasets:zones.map((z,i)=>({
+        label:z.zone.replace(/-/g,' '),
+        data:[
+          z.peche_score,
+          Math.max(0,10-z.wave*4),
+          10-Math.abs(z.temp-24.5)*.6,
+          Math.max(0,10-z.current*8),
+          z.securite_code==='safe'?10:z.securite_code==='caution'?7:z.securite_code==='warning'?4:1
+        ],
+        fill:true,
+        backgroundColor:colors[i]+'25',
+        borderColor:colors[i],
+        pointBackgroundColor:colors[i],
+        pointRadius:4,borderWidth:2
+      }))
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:isDark?'#6a8da8':'#3a5a72',font:{family:'Syne',size:10}}}},
+      scales:{r:{min:0,max:10,ticks:{display:false},
+        grid:{color:gridC},angleLines:{color:gridC},
+        pointLabels:{color:isDark?'#6a8da8':'#3a5a72',font:{size:10,family:'Syne'}}
+      }}
+    }
+  });
+}
+
+// ════════════════════════════════════════════════════════
+// RAPPORT PDF (window.print + mise en page auto)
+// ════════════════════════════════════════════════════════
+function generatePDF(){
+  toast('📄 Génération du rapport...','var(--amber)');
+
+  // Créer une fenêtre de rapport propre
+  const win=window.open('','_blank','width=900,height=700');
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  const danger=allZones.filter(z=>z.securite_code==='danger');
+  const warning=allZones.filter(z=>z.securite_code==='warning');
+  const safe=allZones.filter(z=>z.securite_code==='safe');
+  const scores=allZones.map(z=>z.peche_score);
+  const avg=scores.length?(scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1):'—';
+  const top=[...allZones].sort((a,b)=>b.peche_score-a.peche_score).slice(0,5);
+
+  const rows=allZones.map(z=>`
+    <tr>
+      <td><strong>${z.zone}</strong><br><small style="color:#666">${z.region}</small></td>
+      <td style="color:${z.securite_code==='safe'?'#009944':z.securite_code==='caution'?'#cc8800':z.securite_code==='warning'?'#cc5500':'#cc0022'};font-weight:700">
+        ${z.securite_texte}
+      </td>
+      <td style="text-align:center;font-weight:700">${z.peche_score}/10</td>
+      <td style="text-align:center">${z.wave}m</td>
+      <td style="text-align:center">${z.temp}°C</td>
+      <td style="text-align:center">${z.current}m/s</td>
+      <td style="text-align:center;font-size:11px;color:#888">${z.source}</td>
+    </tr>`).join('');
+
+  win.document.write(`<!DOCTYPE html><html><head>
+<meta charset="UTF-8">
+<title>Rapport PecheurConnect — ${dateStr}</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:Arial,sans-serif;font-size:12px;color:#111;padding:30px 40px;}
+  .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #006b60;}
+  .brand{font-size:24px;font-weight:900;color:#006b60;}
+  .brand span{font-size:11px;background:#006b60;color:white;padding:2px 7px;border-radius:4px;margin-left:8px;vertical-align:middle;}
+  .meta{text-align:right;font-size:11px;color:#666;}
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+  .kpi{background:#f5f5f5;border-radius:8px;padding:14px;text-align:center;}
+  .kpi-n{font-size:28px;font-weight:900;margin-bottom:3px;}
+  .kpi-l{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.06em;}
+  h2{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#333;margin-bottom:10px;margin-top:20px;}
+  table{width:100%;border-collapse:collapse;font-size:11px;}
+  th{background:#006b60;color:white;padding:8px 10px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.06em;}
+  td{padding:7px 10px;border-bottom:1px solid #eee;}
+  tr:nth-child(even) td{background:#fafafa;}
+  .danger-box{background:#fff0f0;border-left:4px solid #cc0022;padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:12px;}
+  .footer{margin-top:30px;padding-top:14px;border-top:1px solid #ddd;font-size:10px;color:#999;display:flex;justify-content:space-between;}
+  @media print{body{padding:15px 20px;}button{display:none!important;}}
+</style>
+</head><body>
+
+<div class="header">
+  <div>
+    <div class="brand">🌊 PecheurConnect<span>v4.2</span></div>
+    <div style="font-size:13px;color:#006b60;margin-top:4px;font-style:italic">Rapport Maritime Quotidien — Sénégal</div>
+  </div>
+  <div class="meta">
+    <div>${dateStr}</div>
+    <div>${now.getUTCHours().toString().padStart(2,'0')}:${now.getUTCMinutes().toString().padStart(2,'0')} UTC</div>
+    <div>18 zones surveillées</div>
+  </div>
+</div>
+
+<div class="kpi-row">
+  <div class="kpi"><div class="kpi-n" style="color:#006b60">${avg}</div><div class="kpi-l">Score moyen /10</div></div>
+  <div class="kpi"><div class="kpi-n" style="color:#009944">${safe.length}</div><div class="kpi-l">🟢 Zones sûres</div></div>
+  <div class="kpi"><div class="kpi-n" style="color:#cc5500">${warning.length}</div><div class="kpi-l">🟠 Prudence</div></div>
+  <div class="kpi"><div class="kpi-n" style="color:#cc0022">${danger.length}</div><div class="kpi-l">🔴 Zones danger</div></div>
+</div>
+
+${danger.length?`<h2>⚠️ Zones en danger</h2>${danger.map(z=>`<div class="danger-box"><strong>${z.zone}</strong> — ${z.region}<br>${z.securite_texte} · Houle ${z.wave}m · Score ${z.peche_score}/10</div>`).join('')}`:''}
+
+<h2>🏆 Top 5 zones de pêche</h2>
+<table><thead><tr><th>#</th><th>Zone</th><th>Score</th><th>Houle</th><th>SST</th></tr></thead><tbody>
+${top.map((z,i)=>`<tr><td><strong>${i+1}</strong></td><td><strong>${z.zone}</strong><br><small style="color:#666">${z.region}</small></td><td><strong>${z.peche_score}/10</strong></td><td>${z.wave}m</td><td>${z.temp}°C</td></tr>`).join('')}
+</tbody></table>
+
+<h2>📋 Tableau complet — 18 zones</h2>
+<table><thead><tr><th>Zone</th><th>État sécurité</th><th>Score</th><th>Houle</th><th>SST</th><th>Courant</th><th>Source</th></tr></thead>
+<tbody>${rows}</tbody></table>
+
+<div class="footer">
+  <span>PecheurConnect v4.2 · Données : Copernicus Marine Service + OpenWeather</span>
+  <span>Généré automatiquement — usage maritime professionnel</span>
+</div>
+
+<div style="text-align:center;margin-top:20px">
+  <button onclick="window.print()" style="background:#006b60;color:white;border:none;padding:10px 24px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">
+    🖨️ Imprimer / Sauvegarder PDF
+  </button>
+</div>
+</body></html>`);
+  win.document.close();
+  toast('✅ Rapport ouvert — utilisez Ctrl+P pour PDF','var(--safe)');
+}
+
+// ════════════════════════════════════════════════════════
+// MARÉES : Lire depuis data.json (si disponible)
+// ════════════════════════════════════════════════════════
+let tidesDataGlobal = {};
+
+// Override de drawTideChart pour utiliser les vraies données si dispo
+const _origDrawTide = drawTideChart;
+window.drawTideChart = function(zone){
+  const real = tidesDataGlobal[zone];
+  if(real?.courbe_24h?.length){
+    drawRealTideChart(zone, real);
+    if(real.events?.length) renderRealTideEvents(real.events);
+  } else {
+    _origDrawTide(zone);
+  }
+};
+
+function drawRealTideChart(zone, data){
+  const cv=document.getElementById('tideCanvas');
+  const ctx=cv.getContext('2d');
+  cv.width=cv.parentElement.offsetWidth-40||700;cv.height=200;
+  const w=cv.width,h=cv.height;
+  const isDark=document.documentElement.getAttribute('data-theme')!=='light';
+  ctx.clearRect(0,0,w,h);
+  const pad={l:40,r:20,t:15,b:30};
+  const cw=w-pad.l-pad.r,ch=h-pad.t-pad.b;
+  const vals=data.courbe_24h;
+  const mn=Math.min(...vals),mx=Math.max(...vals);
+  const norm=v=>(v-mn)/(mx-mn);
+
+  const gridC=isDark?'rgba(255,255,255,.05)':'rgba(0,0,0,.05)';
+  ctx.strokeStyle=gridC;ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){const y=pad.t+ch/4*i;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cw,y);ctx.stroke();}
+  for(let i=0;i<=24;i+=6){const x=pad.l+cw/24*i;ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,pad.t+ch);ctx.stroke();}
+
+  const pts=vals.map((v,i)=>({x:pad.l+cw/24*i,y:pad.t+ch*(1-norm(v)*.9-.05)}));
+  const grad=ctx.createLinearGradient(0,pad.t,0,pad.t+ch);
+  grad.addColorStop(0,isDark?'rgba(0,220,200,.35)':'rgba(0,107,96,.2)');
+  grad.addColorStop(1,'transparent');
+  ctx.beginPath();ctx.moveTo(pts[0].x,pad.t+ch);
+  pts.forEach(p=>ctx.lineTo(p.x,p.y));
+  ctx.lineTo(pts[pts.length-1].x,pad.t+ch);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+  ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
+  ctx.strokeStyle=isDark?'rgba(0,220,200,.8)':'rgba(0,107,96,.7)';ctx.lineWidth=2;ctx.stroke();
+
+  const nowH=new Date().getHours()+new Date().getMinutes()/60;
+  const nx=pad.l+cw/24*nowH;
+  ctx.beginPath();ctx.moveTo(nx,pad.t);ctx.lineTo(nx,pad.t+ch);
+  ctx.strokeStyle='rgba(240,165,0,.7)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);ctx.stroke();ctx.setLineDash([]);
+
+  ctx.fillStyle=isDark?'#6a8da8':'#3a5a72';ctx.font='10px DM Mono,monospace';
+  ['00h','06h','12h','18h','24h'].forEach((l,i)=>ctx.fillText(l,pad.l+cw/4*i-6,pad.t+ch+20));
+  [mx.toFixed(1)+'m','','','',mn.toFixed(1)+'m'].forEach((l,i)=>ctx.fillText(l,2,pad.t+ch/4*i+5));
+}
+
+function renderRealTideEvents(events){
+  document.getElementById('tideEvents').innerHTML=events.map(e=>`
+    <div class="tide-event">
+      <div class="te-type">${e.type==='PM'?'Pleine mer':'Basse mer'}</div>
+      <div class="te-icon">${e.type==='PM'?'🔼':'🔽'}</div>
+      <div class="te-time">${e.heure}</div>
+      <div class="te-coef">${e.type==='PM'?`Coef. ${e.coef}`:''}</div>
+    </div>`).join('');
+}
+
+// Patcher loadData pour extraire tidesDataGlobal
+const _origLoad = loadData;
+window.loadData = async function(){
+  try{
+    const r=await fetch('data.json');const j=await r.json();
+    if(j.marees) tidesDataGlobal=j.marees;
+    // Enrichir allZones avec forecast et marées
+    allZones=(Object.entries(j.zones||{})).map(([n,d])=>({
+      zone:n, region:d.region, desc:d.desc, lat:d.lat, lon:d.lon,
+      securite_code:d.indices?.securite_code||'safe',
+      securite_texte:d.indices?.securite_texte||'—',
+      peche_score:+(d.indices?.peche_score||0).toFixed(1),
+      wave:+(d.indices?.wave||0).toFixed(1),
+      temp:+(d.indices?.temp||0).toFixed(1),
+      current:+(d.indices?.current||0).toFixed(2),
+      source:d.copernicus?.source||'simulation',
+      updated_at:d.updated_at||'',
+      forecast_7j:d.forecast_7j||null,
+      marees:d.marees||tidesDataGlobal[n]||null,
+    }));
+    refreshDash();
+  }catch{genDemo();refreshDash();}
+};
+
+// Patcher go() pour initialiser le comparateur
+const _origGo=go;
+window.go=function(id){
+  _origGo(id);
+  if(id==='compare')setTimeout(buildComparePage,50);
+};
+
+// Patcher refreshDash pour les toasts
+const _origRefresh=window.refreshDash||refreshDash;
+window.refreshDash=function(){
+  _origRefresh();
+  const cnt=allZones.filter(z=>z.securite_code==='danger').length;
+  if(cnt>0)setTimeout(()=>toast(`🔴 ${cnt} zone(s) en DANGER actuellement`,'var(--danger)'),500);
+  setTimeout(()=>{
+    if(allZones.length>0){
+      const top2=[...allZones].sort((a,b)=>b.peche_score-a.peche_score)[0];
+      if(top2&&document.getElementById('radarChart'))updateRadar(top2);
+    }
+  },400);
+};
+
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">
 // ════════════════════════════════════════════════════════
@@ -434,6 +794,366 @@ window.refreshDash=function(){
       if(top)updateRadar(top);
     }
   },300);
+};
+
+
+// ════════════════════════════════════════════════════════
+// TOAST SYSTEM
+// ════════════════════════════════════════════════════════
+function toast(msg, color='var(--cyan)'){
+  const w=document.getElementById('toastWrap');
+  const t=document.createElement('div');
+  t.className='toast';
+  t.style.color=color;
+  t.textContent=msg;
+  w.appendChild(t);
+  setTimeout(()=>t.remove(), 3200);
+}
+
+// ════════════════════════════════════════════════════════
+// COMPARATEUR DE ZONES
+// ════════════════════════════════════════════════════════
+let compareSelected=new Set();
+let compareRadarChart=null;
+
+function buildComparePage(){
+  const el=document.getElementById('compareZonePills');
+  if(!el||!allZones.length)return;
+  el.innerHTML=allZones.map(z=>`
+    <div class="pill${compareSelected.has(z.zone)?' on':''}"
+         onclick="toggleCompare('${z.zone}',this)"
+         style="font-size:10px">
+      ${z.zone}
+    </div>`).join('');
+  renderCompare();
+}
+
+function toggleCompare(name, el){
+  if(compareSelected.has(name)){
+    compareSelected.delete(name);
+    el.classList.remove('on');
+  } else {
+    if(compareSelected.size>=4){toast('⚠️ Maximum 4 zones','var(--warning)');return;}
+    compareSelected.add(name);
+    el.classList.add('on');
+  }
+  renderCompare();
+}
+
+function renderCompare(){
+  const zones=[...compareSelected].map(n=>allZones.find(z=>z.zone===n)).filter(Boolean);
+  if(!zones.length){
+    document.getElementById('compareTable').innerHTML='<div class="card" style="padding:30px;text-align:center;color:var(--text2)"><div style="font-size:32px;margin-bottom:8px">⚖️</div><div data-fr="Sélectionnez des zones ci-dessus" data-wo="Tann dëkk yi ci kaw">Sélectionnez des zones ci-dessus</div></div>';
+    document.getElementById('compareReco').innerHTML='';
+    return;
+  }
+  // Trier par score décroissant
+  zones.sort((a,b)=>b.peche_score-a.peche_score);
+  const rankClass=['r1','r2','r3','r4'];
+
+  // Tableau comparatif
+  const metrics=[
+    {label:'Score pêche',key:'peche_score',unit:'/10',fmt:v=>`${v}/10`},
+    {label:'Houle',key:'wave',unit:'m',fmt:v=>`${v}m`},
+    {label:'SST',key:'temp',unit:'°C',fmt:v=>`${v}°C`},
+    {label:'Courant',key:'current',unit:'m/s',fmt:v=>`${v}m/s`},
+    {label:'Sécurité',key:'securite_code',fmt:v=>v==='safe'?'🟢 Sûr':v==='caution'?'🟡 Vigilance':v==='warning'?'🟠 Prudence':'🔴 Danger'},
+    {label:'Source',key:'source',fmt:v=>v==='copernicus'?'🛰️ Copernicus':'📡 OpenWeather / Sim'},
+  ];
+
+  let tableHtml=`<div class="card" style="overflow:auto"><table class="cmp-table">
+    <thead><tr><th>Critère</th>${zones.map((z,i)=>`<th><span class="cmp-rank ${rankClass[i]}">${i+1}</span>${z.zone}</th>`).join('')}</tr></thead>
+    <tbody>`;
+
+  metrics.forEach(m=>{
+    tableHtml+=`<tr><td style="font-weight:700;color:var(--text2);font-size:11px">${m.label}</td>`;
+    const vals=zones.map(z=>z[m.key]);
+    const maxScore=m.key==='peche_score'?Math.max(...vals.map(Number)):null;
+    zones.forEach((z,i)=>{
+      const v=z[m.key];
+      const isMax=maxScore!==null&&Number(v)===maxScore;
+      const barW=m.key==='peche_score'?Number(v)*10:null;
+      tableHtml+=`<td style="${isMax?'color:var(--cyan);font-weight:700':''}">
+        ${m.fmt(v)}
+        ${barW!==null?`<div class="cmp-score-bar" style="width:${barW}%;background:${sc(z.securite_code)}"></div>`:''}
+      </td>`;
+    });
+    tableHtml+=`</tr>`;
+  });
+  tableHtml+=`</tbody></table></div>`;
+  document.getElementById('compareTable').innerHTML=tableHtml;
+
+  // Radar comparatif
+  buildCompareRadar(zones);
+
+  // Recommandation
+  const best=zones[0];
+  const reasons=[];
+  if(best.peche_score>=8)reasons.push(`Score pêche exceptionnel (${best.peche_score}/10)`);
+  if(best.wave<=1)reasons.push(`Mer calme (houle ${best.wave}m)`);
+  if(best.securite_code==='safe')reasons.push('Conditions de sécurité idéales');
+  if(best.temp>=23&&best.temp<=26)reasons.push(`SST optimale pour les espèces cibles (${best.temp}°C)`);
+
+  document.getElementById('compareReco').innerHTML=`
+    <div class="reco-card">
+      <div class="reco-icon">🎣</div>
+      <div>
+        <div class="reco-title">${best.zone}</div>
+        <div class="reco-score">${best.peche_score}/10 · ${best.region}</div>
+        <div class="reco-reason">${reasons.length?reasons.join('. ')+'.':'Meilleur score parmi les zones sélectionnées.'}</div>
+        <button style="margin-top:10px;background:var(--cyan);color:#000;border:none;padding:7px 16px;border-radius:8px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;cursor:pointer" onclick="go('dash');flyTo('${best.zone}')">
+          Voir sur la carte →
+        </button>
+      </div>
+    </div>`;
+}
+
+function buildCompareRadar(zones){
+  const ctx=document.getElementById('compareRadar')?.getContext('2d');if(!ctx)return;
+  if(compareRadarChart)compareRadarChart.destroy();
+  const isDark=document.documentElement.getAttribute('data-theme')!=='light';
+  const gridC=isDark?'rgba(255,255,255,.08)':'rgba(0,0,0,.07)';
+  const colors=['#00dcc8','#f0a500','#ff4b6e','#00e87c'];
+
+  compareRadarChart=new Chart(ctx,{
+    type:'radar',
+    data:{
+      labels:['🎣 Score','🌊 Mer calme','🌡️ SST','↗️ Courant','🛡️ Sécurité'],
+      datasets:zones.map((z,i)=>({
+        label:z.zone.replace(/-/g,' '),
+        data:[
+          z.peche_score,
+          Math.max(0,10-z.wave*4),
+          10-Math.abs(z.temp-24.5)*.6,
+          Math.max(0,10-z.current*8),
+          z.securite_code==='safe'?10:z.securite_code==='caution'?7:z.securite_code==='warning'?4:1
+        ],
+        fill:true,
+        backgroundColor:colors[i]+'25',
+        borderColor:colors[i],
+        pointBackgroundColor:colors[i],
+        pointRadius:4,borderWidth:2
+      }))
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:isDark?'#6a8da8':'#3a5a72',font:{family:'Syne',size:10}}}},
+      scales:{r:{min:0,max:10,ticks:{display:false},
+        grid:{color:gridC},angleLines:{color:gridC},
+        pointLabels:{color:isDark?'#6a8da8':'#3a5a72',font:{size:10,family:'Syne'}}
+      }}
+    }
+  });
+}
+
+// ════════════════════════════════════════════════════════
+// RAPPORT PDF (window.print + mise en page auto)
+// ════════════════════════════════════════════════════════
+function generatePDF(){
+  toast('📄 Génération du rapport...','var(--amber)');
+
+  // Créer une fenêtre de rapport propre
+  const win=window.open('','_blank','width=900,height=700');
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  const danger=allZones.filter(z=>z.securite_code==='danger');
+  const warning=allZones.filter(z=>z.securite_code==='warning');
+  const safe=allZones.filter(z=>z.securite_code==='safe');
+  const scores=allZones.map(z=>z.peche_score);
+  const avg=scores.length?(scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1):'—';
+  const top=[...allZones].sort((a,b)=>b.peche_score-a.peche_score).slice(0,5);
+
+  const rows=allZones.map(z=>`
+    <tr>
+      <td><strong>${z.zone}</strong><br><small style="color:#666">${z.region}</small></td>
+      <td style="color:${z.securite_code==='safe'?'#009944':z.securite_code==='caution'?'#cc8800':z.securite_code==='warning'?'#cc5500':'#cc0022'};font-weight:700">
+        ${z.securite_texte}
+      </td>
+      <td style="text-align:center;font-weight:700">${z.peche_score}/10</td>
+      <td style="text-align:center">${z.wave}m</td>
+      <td style="text-align:center">${z.temp}°C</td>
+      <td style="text-align:center">${z.current}m/s</td>
+      <td style="text-align:center;font-size:11px;color:#888">${z.source}</td>
+    </tr>`).join('');
+
+  win.document.write(`<!DOCTYPE html><html><head>
+<meta charset="UTF-8">
+<title>Rapport PecheurConnect — ${dateStr}</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:Arial,sans-serif;font-size:12px;color:#111;padding:30px 40px;}
+  .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #006b60;}
+  .brand{font-size:24px;font-weight:900;color:#006b60;}
+  .brand span{font-size:11px;background:#006b60;color:white;padding:2px 7px;border-radius:4px;margin-left:8px;vertical-align:middle;}
+  .meta{text-align:right;font-size:11px;color:#666;}
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+  .kpi{background:#f5f5f5;border-radius:8px;padding:14px;text-align:center;}
+  .kpi-n{font-size:28px;font-weight:900;margin-bottom:3px;}
+  .kpi-l{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.06em;}
+  h2{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#333;margin-bottom:10px;margin-top:20px;}
+  table{width:100%;border-collapse:collapse;font-size:11px;}
+  th{background:#006b60;color:white;padding:8px 10px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.06em;}
+  td{padding:7px 10px;border-bottom:1px solid #eee;}
+  tr:nth-child(even) td{background:#fafafa;}
+  .danger-box{background:#fff0f0;border-left:4px solid #cc0022;padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:12px;}
+  .footer{margin-top:30px;padding-top:14px;border-top:1px solid #ddd;font-size:10px;color:#999;display:flex;justify-content:space-between;}
+  @media print{body{padding:15px 20px;}button{display:none!important;}}
+</style>
+</head><body>
+
+<div class="header">
+  <div>
+    <div class="brand">🌊 PecheurConnect<span>v4.2</span></div>
+    <div style="font-size:13px;color:#006b60;margin-top:4px;font-style:italic">Rapport Maritime Quotidien — Sénégal</div>
+  </div>
+  <div class="meta">
+    <div>${dateStr}</div>
+    <div>${now.getUTCHours().toString().padStart(2,'0')}:${now.getUTCMinutes().toString().padStart(2,'0')} UTC</div>
+    <div>18 zones surveillées</div>
+  </div>
+</div>
+
+<div class="kpi-row">
+  <div class="kpi"><div class="kpi-n" style="color:#006b60">${avg}</div><div class="kpi-l">Score moyen /10</div></div>
+  <div class="kpi"><div class="kpi-n" style="color:#009944">${safe.length}</div><div class="kpi-l">🟢 Zones sûres</div></div>
+  <div class="kpi"><div class="kpi-n" style="color:#cc5500">${warning.length}</div><div class="kpi-l">🟠 Prudence</div></div>
+  <div class="kpi"><div class="kpi-n" style="color:#cc0022">${danger.length}</div><div class="kpi-l">🔴 Zones danger</div></div>
+</div>
+
+${danger.length?`<h2>⚠️ Zones en danger</h2>${danger.map(z=>`<div class="danger-box"><strong>${z.zone}</strong> — ${z.region}<br>${z.securite_texte} · Houle ${z.wave}m · Score ${z.peche_score}/10</div>`).join('')}`:''}
+
+<h2>🏆 Top 5 zones de pêche</h2>
+<table><thead><tr><th>#</th><th>Zone</th><th>Score</th><th>Houle</th><th>SST</th></tr></thead><tbody>
+${top.map((z,i)=>`<tr><td><strong>${i+1}</strong></td><td><strong>${z.zone}</strong><br><small style="color:#666">${z.region}</small></td><td><strong>${z.peche_score}/10</strong></td><td>${z.wave}m</td><td>${z.temp}°C</td></tr>`).join('')}
+</tbody></table>
+
+<h2>📋 Tableau complet — 18 zones</h2>
+<table><thead><tr><th>Zone</th><th>État sécurité</th><th>Score</th><th>Houle</th><th>SST</th><th>Courant</th><th>Source</th></tr></thead>
+<tbody>${rows}</tbody></table>
+
+<div class="footer">
+  <span>PecheurConnect v4.2 · Données : Copernicus Marine Service + OpenWeather</span>
+  <span>Généré automatiquement — usage maritime professionnel</span>
+</div>
+
+<div style="text-align:center;margin-top:20px">
+  <button onclick="window.print()" style="background:#006b60;color:white;border:none;padding:10px 24px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">
+    🖨️ Imprimer / Sauvegarder PDF
+  </button>
+</div>
+</body></html>`);
+  win.document.close();
+  toast('✅ Rapport ouvert — utilisez Ctrl+P pour PDF','var(--safe)');
+}
+
+// ════════════════════════════════════════════════════════
+// MARÉES : Lire depuis data.json (si disponible)
+// ════════════════════════════════════════════════════════
+let tidesDataGlobal = {};
+
+// Override de drawTideChart pour utiliser les vraies données si dispo
+const _origDrawTide = drawTideChart;
+window.drawTideChart = function(zone){
+  const real = tidesDataGlobal[zone];
+  if(real?.courbe_24h?.length){
+    drawRealTideChart(zone, real);
+    if(real.events?.length) renderRealTideEvents(real.events);
+  } else {
+    _origDrawTide(zone);
+  }
+};
+
+function drawRealTideChart(zone, data){
+  const cv=document.getElementById('tideCanvas');
+  const ctx=cv.getContext('2d');
+  cv.width=cv.parentElement.offsetWidth-40||700;cv.height=200;
+  const w=cv.width,h=cv.height;
+  const isDark=document.documentElement.getAttribute('data-theme')!=='light';
+  ctx.clearRect(0,0,w,h);
+  const pad={l:40,r:20,t:15,b:30};
+  const cw=w-pad.l-pad.r,ch=h-pad.t-pad.b;
+  const vals=data.courbe_24h;
+  const mn=Math.min(...vals),mx=Math.max(...vals);
+  const norm=v=>(v-mn)/(mx-mn);
+
+  const gridC=isDark?'rgba(255,255,255,.05)':'rgba(0,0,0,.05)';
+  ctx.strokeStyle=gridC;ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){const y=pad.t+ch/4*i;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cw,y);ctx.stroke();}
+  for(let i=0;i<=24;i+=6){const x=pad.l+cw/24*i;ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,pad.t+ch);ctx.stroke();}
+
+  const pts=vals.map((v,i)=>({x:pad.l+cw/24*i,y:pad.t+ch*(1-norm(v)*.9-.05)}));
+  const grad=ctx.createLinearGradient(0,pad.t,0,pad.t+ch);
+  grad.addColorStop(0,isDark?'rgba(0,220,200,.35)':'rgba(0,107,96,.2)');
+  grad.addColorStop(1,'transparent');
+  ctx.beginPath();ctx.moveTo(pts[0].x,pad.t+ch);
+  pts.forEach(p=>ctx.lineTo(p.x,p.y));
+  ctx.lineTo(pts[pts.length-1].x,pad.t+ch);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+  ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
+  ctx.strokeStyle=isDark?'rgba(0,220,200,.8)':'rgba(0,107,96,.7)';ctx.lineWidth=2;ctx.stroke();
+
+  const nowH=new Date().getHours()+new Date().getMinutes()/60;
+  const nx=pad.l+cw/24*nowH;
+  ctx.beginPath();ctx.moveTo(nx,pad.t);ctx.lineTo(nx,pad.t+ch);
+  ctx.strokeStyle='rgba(240,165,0,.7)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);ctx.stroke();ctx.setLineDash([]);
+
+  ctx.fillStyle=isDark?'#6a8da8':'#3a5a72';ctx.font='10px DM Mono,monospace';
+  ['00h','06h','12h','18h','24h'].forEach((l,i)=>ctx.fillText(l,pad.l+cw/4*i-6,pad.t+ch+20));
+  [mx.toFixed(1)+'m','','','',mn.toFixed(1)+'m'].forEach((l,i)=>ctx.fillText(l,2,pad.t+ch/4*i+5));
+}
+
+function renderRealTideEvents(events){
+  document.getElementById('tideEvents').innerHTML=events.map(e=>`
+    <div class="tide-event">
+      <div class="te-type">${e.type==='PM'?'Pleine mer':'Basse mer'}</div>
+      <div class="te-icon">${e.type==='PM'?'🔼':'🔽'}</div>
+      <div class="te-time">${e.heure}</div>
+      <div class="te-coef">${e.type==='PM'?`Coef. ${e.coef}`:''}</div>
+    </div>`).join('');
+}
+
+// Patcher loadData pour extraire tidesDataGlobal
+const _origLoad = loadData;
+window.loadData = async function(){
+  try{
+    const r=await fetch('data.json');const j=await r.json();
+    if(j.marees) tidesDataGlobal=j.marees;
+    // Enrichir allZones avec forecast et marées
+    allZones=(Object.entries(j.zones||{})).map(([n,d])=>({
+      zone:n, region:d.region, desc:d.desc, lat:d.lat, lon:d.lon,
+      securite_code:d.indices?.securite_code||'safe',
+      securite_texte:d.indices?.securite_texte||'—',
+      peche_score:+(d.indices?.peche_score||0).toFixed(1),
+      wave:+(d.indices?.wave||0).toFixed(1),
+      temp:+(d.indices?.temp||0).toFixed(1),
+      current:+(d.indices?.current||0).toFixed(2),
+      source:d.copernicus?.source||'simulation',
+      updated_at:d.updated_at||'',
+      forecast_7j:d.forecast_7j||null,
+      marees:d.marees||tidesDataGlobal[n]||null,
+    }));
+    refreshDash();
+  }catch{genDemo();refreshDash();}
+};
+
+// Patcher go() pour initialiser le comparateur
+const _origGo=go;
+window.go=function(id){
+  _origGo(id);
+  if(id==='compare')setTimeout(buildComparePage,50);
+};
+
+// Patcher refreshDash pour les toasts
+const _origRefresh=window.refreshDash||refreshDash;
+window.refreshDash=function(){
+  _origRefresh();
+  const cnt=allZones.filter(z=>z.securite_code==='danger').length;
+  if(cnt>0)setTimeout(()=>toast(`🔴 ${cnt} zone(s) en DANGER actuellement`,'var(--danger)'),500);
+  setTimeout(()=>{
+    if(allZones.length>0){
+      const top2=[...allZones].sort((a,b)=>b.peche_score-a.peche_score)[0];
+      if(top2&&document.getElementById('radarChart'))updateRadar(top2);
+    }
+  },400);
 };
 
 </script>
@@ -754,6 +1474,57 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
 .notif-btn.active{background:var(--safe);}
 .route-line-card{background:var(--glass);border:1px solid var(--b);border-radius:var(--r);padding:14px 18px;margin-top:14px;}
 
+
+/* ── COMPARATEUR ── */
+.cmp-table{width:100%;border-collapse:collapse;font-size:12px;}
+.cmp-table th{background:var(--bg3);padding:10px 14px;text-align:left;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);border-bottom:1px solid var(--b);}
+.cmp-table td{padding:11px 14px;border-bottom:1px solid var(--b);vertical-align:middle;}
+.cmp-table tr:hover td{background:var(--bg3);}
+.cmp-score-bar{height:5px;border-radius:3px;margin-top:5px;transition:width .6s;}
+.cmp-zone-header{font-weight:800;font-size:13px;margin-bottom:3px;}
+.cmp-region{font-size:10px;color:var(--text2);}
+.cmp-rank{width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;font-family:'DM Mono',monospace;margin-right:8px;}
+.cmp-rank.r1{background:gold;color:#000;}.cmp-rank.r2{background:silver;color:#000;}.cmp-rank.r3{background:#cd7f32;color:white;}.cmp-rank.r4{background:var(--bg3);color:var(--text2);}
+.reco-card{background:linear-gradient(135deg,var(--bg3),var(--bg4));border:1px solid var(--b2);border-radius:var(--r);padding:20px 24px;display:flex;gap:20px;align-items:center;}
+.reco-icon{font-size:48px;flex-shrink:0;}
+.reco-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:4px;}
+.reco-score{font-family:'DM Mono',monospace;font-size:14px;color:var(--cyan);}
+.reco-reason{font-family:'Crimson Pro',serif;font-size:14px;color:var(--text2);margin-top:6px;line-height:1.5;}
+
+/* ── RAPPORT PDF (print) ── */
+@media print {
+  .side,.fabs,.top .top-right,.top-center,.moverlay{display:none!important;}
+  .body{display:block;}
+  .cnt,.pg{overflow:visible!important;height:auto!important;}
+  .pg{display:block!important;page-break-inside:avoid;}
+  body{background:white;color:#000;}
+  .card{border:1px solid #ddd;background:white;}
+  .cmp-table th{background:#f5f5f5;}
+}
+
+/* ── HISTORIQUE ── */
+.hist-timeline{display:flex;flex-direction:column;gap:3px;margin-top:12px;}
+.ht-item{display:flex;align-items:center;gap:10px;padding:6px 10px;border-radius:6px;background:var(--bg3);font-size:11px;}
+.ht-time{font-family:'DM Mono',monospace;color:var(--text3);flex-shrink:0;width:50px;}
+.ht-zone{flex:1;font-weight:600;}
+.ht-sc{flex-shrink:0;font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;color:white;}
+.ht-sc.safe{background:var(--safe);color:#000;}.ht-sc.caution{background:var(--caution);color:#000;}.ht-sc.warning{background:var(--warning);}.ht-sc.danger{background:var(--danger);}
+
+/* ── MARÉES DANS SIDEBAR ── */
+.tide-mini{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.tide-mini-ev{background:var(--bg3);border-radius:6px;padding:5px 8px;font-size:10px;text-align:center;}
+.tide-mini-ev strong{display:block;font-family:'DM Mono',monospace;font-size:13px;color:var(--cyan);}
+
+/* ── SPINNER CHARGEMENT ── */
+.spinner{width:32px;height:32px;border:3px solid var(--b);border-top-color:var(--cyan);border-radius:50%;animation:spin .8s linear infinite;margin:20px auto;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── TOAST NOTIFICATIONS ── */
+.toast-wrap{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:600;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+.toast{background:var(--glass);border:1px solid var(--b2);border-radius:12px;padding:10px 20px;font-size:12px;font-weight:600;backdrop-filter:blur(20px);animation:toastIn .3s ease,toastOut .3s ease 2.7s both;white-space:nowrap;}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes toastOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-10px)}}
+
 </style>
 </head>
 <body>
@@ -774,11 +1545,12 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
   <div class="brand">
     <span class="brand-icon">🌊</span>
     <span class="brand-name">PecheurConnect</span>
-    <span class="brand-v">v4.0</span>
+    <span class="brand-v">v4.2</span>
   </div>
   <div class="top-center">
     <button class="icnbtn" id="gpsBtn" onclick="toggleGPS()" title="Ma position GPS">📍</button>
     <button class="icnbtn" id="notifBtn" onclick="requestNotifs()" title="Activer notifications">🔔</button>
+    <button class="icnbtn" onclick="generatePDF()" title="Télécharger rapport PDF">📄</button>
     <div class="live-pill"><div class="live-dot"></div><span id="liveText" data-fr="Sénégal · 18 zones actives" data-wo="Senegaal · 18 dëkk">Sénégal · 18 zones actives</span></div>
     <div class="offline-banner" id="offlineBanner">📡 Hors ligne — données en cache</div>
   </div>
@@ -1008,6 +1780,30 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
   </div>
 </section>
 
+
+<!-- ═══ COMPARATEUR ZONES ═══ -->
+<section class="pg" id="pg-compare">
+  <div class="scroll fadein">
+    <div class="phead"><h1 data-fr="Comparateur de zones" data-wo="Sossal dëkk yi">Comparateur de zones</h1><p data-fr="Sélectionnez jusqu'à 4 zones pour les comparer côte à côte" data-wo="Tann 4 dëkk yi ngir sossal leen">Sélectionnez jusqu'à 4 zones à comparer</p></div>
+
+    <div class="card" style="padding:16px 20px;margin-bottom:16px">
+      <div class="card-t" data-fr="Zones à comparer" data-wo="Dëkk yi tann">Zones à comparer</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px" id="compareZonePills"></div>
+    </div>
+
+    <div id="compareTable" style="margin-bottom:16px"></div>
+
+    <div class="card" style="padding:18px;margin-bottom:16px">
+      <div class="card-t" data-fr="Radar comparatif" data-wo="Radar sossal">Radar comparatif</div>
+      <div style="height:300px;position:relative"><canvas id="compareRadar"></canvas></div>
+    </div>
+
+    <div class="card" style="padding:18px">
+      <div class="card-t" data-fr="Meilleure zone recommandée" data-wo="Dëkk bu gëna baax">Recommandation IA</div>
+      <div id="compareReco" style="margin-top:12px"></div>
+    </div>
+  </div>
+</section>
 <!-- ═══ ALERTES ═══ -->
 <section class="pg" id="pg-alerts">
   <div class="scroll fadein">
@@ -1024,6 +1820,7 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);height
 </div>
 
 <!-- FABs -->
+<div class="toast-wrap" id="toastWrap"></div>
 <div class="fabs">
   <a class="fab fab-wa" href="https://wa.me/221777020818" target="_blank">📱</a>
   <button class="fab fab-r" onclick="location.reload()">🔄</button>
@@ -1960,6 +2757,366 @@ window.refreshDash=function(){
       if(top)updateRadar(top);
     }
   },300);
+};
+
+
+// ════════════════════════════════════════════════════════
+// TOAST SYSTEM
+// ════════════════════════════════════════════════════════
+function toast(msg, color='var(--cyan)'){
+  const w=document.getElementById('toastWrap');
+  const t=document.createElement('div');
+  t.className='toast';
+  t.style.color=color;
+  t.textContent=msg;
+  w.appendChild(t);
+  setTimeout(()=>t.remove(), 3200);
+}
+
+// ════════════════════════════════════════════════════════
+// COMPARATEUR DE ZONES
+// ════════════════════════════════════════════════════════
+let compareSelected=new Set();
+let compareRadarChart=null;
+
+function buildComparePage(){
+  const el=document.getElementById('compareZonePills');
+  if(!el||!allZones.length)return;
+  el.innerHTML=allZones.map(z=>`
+    <div class="pill${compareSelected.has(z.zone)?' on':''}"
+         onclick="toggleCompare('${z.zone}',this)"
+         style="font-size:10px">
+      ${z.zone}
+    </div>`).join('');
+  renderCompare();
+}
+
+function toggleCompare(name, el){
+  if(compareSelected.has(name)){
+    compareSelected.delete(name);
+    el.classList.remove('on');
+  } else {
+    if(compareSelected.size>=4){toast('⚠️ Maximum 4 zones','var(--warning)');return;}
+    compareSelected.add(name);
+    el.classList.add('on');
+  }
+  renderCompare();
+}
+
+function renderCompare(){
+  const zones=[...compareSelected].map(n=>allZones.find(z=>z.zone===n)).filter(Boolean);
+  if(!zones.length){
+    document.getElementById('compareTable').innerHTML='<div class="card" style="padding:30px;text-align:center;color:var(--text2)"><div style="font-size:32px;margin-bottom:8px">⚖️</div><div data-fr="Sélectionnez des zones ci-dessus" data-wo="Tann dëkk yi ci kaw">Sélectionnez des zones ci-dessus</div></div>';
+    document.getElementById('compareReco').innerHTML='';
+    return;
+  }
+  // Trier par score décroissant
+  zones.sort((a,b)=>b.peche_score-a.peche_score);
+  const rankClass=['r1','r2','r3','r4'];
+
+  // Tableau comparatif
+  const metrics=[
+    {label:'Score pêche',key:'peche_score',unit:'/10',fmt:v=>`${v}/10`},
+    {label:'Houle',key:'wave',unit:'m',fmt:v=>`${v}m`},
+    {label:'SST',key:'temp',unit:'°C',fmt:v=>`${v}°C`},
+    {label:'Courant',key:'current',unit:'m/s',fmt:v=>`${v}m/s`},
+    {label:'Sécurité',key:'securite_code',fmt:v=>v==='safe'?'🟢 Sûr':v==='caution'?'🟡 Vigilance':v==='warning'?'🟠 Prudence':'🔴 Danger'},
+    {label:'Source',key:'source',fmt:v=>v==='copernicus'?'🛰️ Copernicus':'📡 OpenWeather / Sim'},
+  ];
+
+  let tableHtml=`<div class="card" style="overflow:auto"><table class="cmp-table">
+    <thead><tr><th>Critère</th>${zones.map((z,i)=>`<th><span class="cmp-rank ${rankClass[i]}">${i+1}</span>${z.zone}</th>`).join('')}</tr></thead>
+    <tbody>`;
+
+  metrics.forEach(m=>{
+    tableHtml+=`<tr><td style="font-weight:700;color:var(--text2);font-size:11px">${m.label}</td>`;
+    const vals=zones.map(z=>z[m.key]);
+    const maxScore=m.key==='peche_score'?Math.max(...vals.map(Number)):null;
+    zones.forEach((z,i)=>{
+      const v=z[m.key];
+      const isMax=maxScore!==null&&Number(v)===maxScore;
+      const barW=m.key==='peche_score'?Number(v)*10:null;
+      tableHtml+=`<td style="${isMax?'color:var(--cyan);font-weight:700':''}">
+        ${m.fmt(v)}
+        ${barW!==null?`<div class="cmp-score-bar" style="width:${barW}%;background:${sc(z.securite_code)}"></div>`:''}
+      </td>`;
+    });
+    tableHtml+=`</tr>`;
+  });
+  tableHtml+=`</tbody></table></div>`;
+  document.getElementById('compareTable').innerHTML=tableHtml;
+
+  // Radar comparatif
+  buildCompareRadar(zones);
+
+  // Recommandation
+  const best=zones[0];
+  const reasons=[];
+  if(best.peche_score>=8)reasons.push(`Score pêche exceptionnel (${best.peche_score}/10)`);
+  if(best.wave<=1)reasons.push(`Mer calme (houle ${best.wave}m)`);
+  if(best.securite_code==='safe')reasons.push('Conditions de sécurité idéales');
+  if(best.temp>=23&&best.temp<=26)reasons.push(`SST optimale pour les espèces cibles (${best.temp}°C)`);
+
+  document.getElementById('compareReco').innerHTML=`
+    <div class="reco-card">
+      <div class="reco-icon">🎣</div>
+      <div>
+        <div class="reco-title">${best.zone}</div>
+        <div class="reco-score">${best.peche_score}/10 · ${best.region}</div>
+        <div class="reco-reason">${reasons.length?reasons.join('. ')+'.':'Meilleur score parmi les zones sélectionnées.'}</div>
+        <button style="margin-top:10px;background:var(--cyan);color:#000;border:none;padding:7px 16px;border-radius:8px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;cursor:pointer" onclick="go('dash');flyTo('${best.zone}')">
+          Voir sur la carte →
+        </button>
+      </div>
+    </div>`;
+}
+
+function buildCompareRadar(zones){
+  const ctx=document.getElementById('compareRadar')?.getContext('2d');if(!ctx)return;
+  if(compareRadarChart)compareRadarChart.destroy();
+  const isDark=document.documentElement.getAttribute('data-theme')!=='light';
+  const gridC=isDark?'rgba(255,255,255,.08)':'rgba(0,0,0,.07)';
+  const colors=['#00dcc8','#f0a500','#ff4b6e','#00e87c'];
+
+  compareRadarChart=new Chart(ctx,{
+    type:'radar',
+    data:{
+      labels:['🎣 Score','🌊 Mer calme','🌡️ SST','↗️ Courant','🛡️ Sécurité'],
+      datasets:zones.map((z,i)=>({
+        label:z.zone.replace(/-/g,' '),
+        data:[
+          z.peche_score,
+          Math.max(0,10-z.wave*4),
+          10-Math.abs(z.temp-24.5)*.6,
+          Math.max(0,10-z.current*8),
+          z.securite_code==='safe'?10:z.securite_code==='caution'?7:z.securite_code==='warning'?4:1
+        ],
+        fill:true,
+        backgroundColor:colors[i]+'25',
+        borderColor:colors[i],
+        pointBackgroundColor:colors[i],
+        pointRadius:4,borderWidth:2
+      }))
+    },
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:isDark?'#6a8da8':'#3a5a72',font:{family:'Syne',size:10}}}},
+      scales:{r:{min:0,max:10,ticks:{display:false},
+        grid:{color:gridC},angleLines:{color:gridC},
+        pointLabels:{color:isDark?'#6a8da8':'#3a5a72',font:{size:10,family:'Syne'}}
+      }}
+    }
+  });
+}
+
+// ════════════════════════════════════════════════════════
+// RAPPORT PDF (window.print + mise en page auto)
+// ════════════════════════════════════════════════════════
+function generatePDF(){
+  toast('📄 Génération du rapport...','var(--amber)');
+
+  // Créer une fenêtre de rapport propre
+  const win=window.open('','_blank','width=900,height=700');
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  const danger=allZones.filter(z=>z.securite_code==='danger');
+  const warning=allZones.filter(z=>z.securite_code==='warning');
+  const safe=allZones.filter(z=>z.securite_code==='safe');
+  const scores=allZones.map(z=>z.peche_score);
+  const avg=scores.length?(scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(1):'—';
+  const top=[...allZones].sort((a,b)=>b.peche_score-a.peche_score).slice(0,5);
+
+  const rows=allZones.map(z=>`
+    <tr>
+      <td><strong>${z.zone}</strong><br><small style="color:#666">${z.region}</small></td>
+      <td style="color:${z.securite_code==='safe'?'#009944':z.securite_code==='caution'?'#cc8800':z.securite_code==='warning'?'#cc5500':'#cc0022'};font-weight:700">
+        ${z.securite_texte}
+      </td>
+      <td style="text-align:center;font-weight:700">${z.peche_score}/10</td>
+      <td style="text-align:center">${z.wave}m</td>
+      <td style="text-align:center">${z.temp}°C</td>
+      <td style="text-align:center">${z.current}m/s</td>
+      <td style="text-align:center;font-size:11px;color:#888">${z.source}</td>
+    </tr>`).join('');
+
+  win.document.write(`<!DOCTYPE html><html><head>
+<meta charset="UTF-8">
+<title>Rapport PecheurConnect — ${dateStr}</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:Arial,sans-serif;font-size:12px;color:#111;padding:30px 40px;}
+  .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #006b60;}
+  .brand{font-size:24px;font-weight:900;color:#006b60;}
+  .brand span{font-size:11px;background:#006b60;color:white;padding:2px 7px;border-radius:4px;margin-left:8px;vertical-align:middle;}
+  .meta{text-align:right;font-size:11px;color:#666;}
+  .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+  .kpi{background:#f5f5f5;border-radius:8px;padding:14px;text-align:center;}
+  .kpi-n{font-size:28px;font-weight:900;margin-bottom:3px;}
+  .kpi-l{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:.06em;}
+  h2{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#333;margin-bottom:10px;margin-top:20px;}
+  table{width:100%;border-collapse:collapse;font-size:11px;}
+  th{background:#006b60;color:white;padding:8px 10px;text-align:left;font-size:10px;font-weight:700;letter-spacing:.06em;}
+  td{padding:7px 10px;border-bottom:1px solid #eee;}
+  tr:nth-child(even) td{background:#fafafa;}
+  .danger-box{background:#fff0f0;border-left:4px solid #cc0022;padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:12px;}
+  .footer{margin-top:30px;padding-top:14px;border-top:1px solid #ddd;font-size:10px;color:#999;display:flex;justify-content:space-between;}
+  @media print{body{padding:15px 20px;}button{display:none!important;}}
+</style>
+</head><body>
+
+<div class="header">
+  <div>
+    <div class="brand">🌊 PecheurConnect<span>v4.2</span></div>
+    <div style="font-size:13px;color:#006b60;margin-top:4px;font-style:italic">Rapport Maritime Quotidien — Sénégal</div>
+  </div>
+  <div class="meta">
+    <div>${dateStr}</div>
+    <div>${now.getUTCHours().toString().padStart(2,'0')}:${now.getUTCMinutes().toString().padStart(2,'0')} UTC</div>
+    <div>18 zones surveillées</div>
+  </div>
+</div>
+
+<div class="kpi-row">
+  <div class="kpi"><div class="kpi-n" style="color:#006b60">${avg}</div><div class="kpi-l">Score moyen /10</div></div>
+  <div class="kpi"><div class="kpi-n" style="color:#009944">${safe.length}</div><div class="kpi-l">🟢 Zones sûres</div></div>
+  <div class="kpi"><div class="kpi-n" style="color:#cc5500">${warning.length}</div><div class="kpi-l">🟠 Prudence</div></div>
+  <div class="kpi"><div class="kpi-n" style="color:#cc0022">${danger.length}</div><div class="kpi-l">🔴 Zones danger</div></div>
+</div>
+
+${danger.length?`<h2>⚠️ Zones en danger</h2>${danger.map(z=>`<div class="danger-box"><strong>${z.zone}</strong> — ${z.region}<br>${z.securite_texte} · Houle ${z.wave}m · Score ${z.peche_score}/10</div>`).join('')}`:''}
+
+<h2>🏆 Top 5 zones de pêche</h2>
+<table><thead><tr><th>#</th><th>Zone</th><th>Score</th><th>Houle</th><th>SST</th></tr></thead><tbody>
+${top.map((z,i)=>`<tr><td><strong>${i+1}</strong></td><td><strong>${z.zone}</strong><br><small style="color:#666">${z.region}</small></td><td><strong>${z.peche_score}/10</strong></td><td>${z.wave}m</td><td>${z.temp}°C</td></tr>`).join('')}
+</tbody></table>
+
+<h2>📋 Tableau complet — 18 zones</h2>
+<table><thead><tr><th>Zone</th><th>État sécurité</th><th>Score</th><th>Houle</th><th>SST</th><th>Courant</th><th>Source</th></tr></thead>
+<tbody>${rows}</tbody></table>
+
+<div class="footer">
+  <span>PecheurConnect v4.2 · Données : Copernicus Marine Service + OpenWeather</span>
+  <span>Généré automatiquement — usage maritime professionnel</span>
+</div>
+
+<div style="text-align:center;margin-top:20px">
+  <button onclick="window.print()" style="background:#006b60;color:white;border:none;padding:10px 24px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">
+    🖨️ Imprimer / Sauvegarder PDF
+  </button>
+</div>
+</body></html>`);
+  win.document.close();
+  toast('✅ Rapport ouvert — utilisez Ctrl+P pour PDF','var(--safe)');
+}
+
+// ════════════════════════════════════════════════════════
+// MARÉES : Lire depuis data.json (si disponible)
+// ════════════════════════════════════════════════════════
+let tidesDataGlobal = {};
+
+// Override de drawTideChart pour utiliser les vraies données si dispo
+const _origDrawTide = drawTideChart;
+window.drawTideChart = function(zone){
+  const real = tidesDataGlobal[zone];
+  if(real?.courbe_24h?.length){
+    drawRealTideChart(zone, real);
+    if(real.events?.length) renderRealTideEvents(real.events);
+  } else {
+    _origDrawTide(zone);
+  }
+};
+
+function drawRealTideChart(zone, data){
+  const cv=document.getElementById('tideCanvas');
+  const ctx=cv.getContext('2d');
+  cv.width=cv.parentElement.offsetWidth-40||700;cv.height=200;
+  const w=cv.width,h=cv.height;
+  const isDark=document.documentElement.getAttribute('data-theme')!=='light';
+  ctx.clearRect(0,0,w,h);
+  const pad={l:40,r:20,t:15,b:30};
+  const cw=w-pad.l-pad.r,ch=h-pad.t-pad.b;
+  const vals=data.courbe_24h;
+  const mn=Math.min(...vals),mx=Math.max(...vals);
+  const norm=v=>(v-mn)/(mx-mn);
+
+  const gridC=isDark?'rgba(255,255,255,.05)':'rgba(0,0,0,.05)';
+  ctx.strokeStyle=gridC;ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){const y=pad.t+ch/4*i;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cw,y);ctx.stroke();}
+  for(let i=0;i<=24;i+=6){const x=pad.l+cw/24*i;ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,pad.t+ch);ctx.stroke();}
+
+  const pts=vals.map((v,i)=>({x:pad.l+cw/24*i,y:pad.t+ch*(1-norm(v)*.9-.05)}));
+  const grad=ctx.createLinearGradient(0,pad.t,0,pad.t+ch);
+  grad.addColorStop(0,isDark?'rgba(0,220,200,.35)':'rgba(0,107,96,.2)');
+  grad.addColorStop(1,'transparent');
+  ctx.beginPath();ctx.moveTo(pts[0].x,pad.t+ch);
+  pts.forEach(p=>ctx.lineTo(p.x,p.y));
+  ctx.lineTo(pts[pts.length-1].x,pad.t+ch);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+  ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y));
+  ctx.strokeStyle=isDark?'rgba(0,220,200,.8)':'rgba(0,107,96,.7)';ctx.lineWidth=2;ctx.stroke();
+
+  const nowH=new Date().getHours()+new Date().getMinutes()/60;
+  const nx=pad.l+cw/24*nowH;
+  ctx.beginPath();ctx.moveTo(nx,pad.t);ctx.lineTo(nx,pad.t+ch);
+  ctx.strokeStyle='rgba(240,165,0,.7)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);ctx.stroke();ctx.setLineDash([]);
+
+  ctx.fillStyle=isDark?'#6a8da8':'#3a5a72';ctx.font='10px DM Mono,monospace';
+  ['00h','06h','12h','18h','24h'].forEach((l,i)=>ctx.fillText(l,pad.l+cw/4*i-6,pad.t+ch+20));
+  [mx.toFixed(1)+'m','','','',mn.toFixed(1)+'m'].forEach((l,i)=>ctx.fillText(l,2,pad.t+ch/4*i+5));
+}
+
+function renderRealTideEvents(events){
+  document.getElementById('tideEvents').innerHTML=events.map(e=>`
+    <div class="tide-event">
+      <div class="te-type">${e.type==='PM'?'Pleine mer':'Basse mer'}</div>
+      <div class="te-icon">${e.type==='PM'?'🔼':'🔽'}</div>
+      <div class="te-time">${e.heure}</div>
+      <div class="te-coef">${e.type==='PM'?`Coef. ${e.coef}`:''}</div>
+    </div>`).join('');
+}
+
+// Patcher loadData pour extraire tidesDataGlobal
+const _origLoad = loadData;
+window.loadData = async function(){
+  try{
+    const r=await fetch('data.json');const j=await r.json();
+    if(j.marees) tidesDataGlobal=j.marees;
+    // Enrichir allZones avec forecast et marées
+    allZones=(Object.entries(j.zones||{})).map(([n,d])=>({
+      zone:n, region:d.region, desc:d.desc, lat:d.lat, lon:d.lon,
+      securite_code:d.indices?.securite_code||'safe',
+      securite_texte:d.indices?.securite_texte||'—',
+      peche_score:+(d.indices?.peche_score||0).toFixed(1),
+      wave:+(d.indices?.wave||0).toFixed(1),
+      temp:+(d.indices?.temp||0).toFixed(1),
+      current:+(d.indices?.current||0).toFixed(2),
+      source:d.copernicus?.source||'simulation',
+      updated_at:d.updated_at||'',
+      forecast_7j:d.forecast_7j||null,
+      marees:d.marees||tidesDataGlobal[n]||null,
+    }));
+    refreshDash();
+  }catch{genDemo();refreshDash();}
+};
+
+// Patcher go() pour initialiser le comparateur
+const _origGo=go;
+window.go=function(id){
+  _origGo(id);
+  if(id==='compare')setTimeout(buildComparePage,50);
+};
+
+// Patcher refreshDash pour les toasts
+const _origRefresh=window.refreshDash||refreshDash;
+window.refreshDash=function(){
+  _origRefresh();
+  const cnt=allZones.filter(z=>z.securite_code==='danger').length;
+  if(cnt>0)setTimeout(()=>toast(`🔴 ${cnt} zone(s) en DANGER actuellement`,'var(--danger)'),500);
+  setTimeout(()=>{
+    if(allZones.length>0){
+      const top2=[...allZones].sort((a,b)=>b.peche_score-a.peche_score)[0];
+      if(top2&&document.getElementById('radarChart'))updateRadar(top2);
+    }
+  },400);
 };
 
 </script>
