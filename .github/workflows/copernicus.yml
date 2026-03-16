@@ -5,6 +5,12 @@ on:
   schedule:
     - cron: "0 */6 * * *"
 
+# ============================================================================
+# ✅ AJOUT : Force Node.js 24 (élimine warnings deprecation)
+# ============================================================================
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 jobs:
   update-data:
     runs-on: ubuntu-latest
@@ -12,6 +18,10 @@ jobs:
 
     permissions:
       contents: write
+
+    # ✅ AJOUT : Redéfinir au niveau job pour garantie
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
     steps:
       - name: 📥 Checkout
