@@ -1,0 +1,209 @@
+name: Collecte Données - Planifiée (Node.js 24)
+
+on:
+  schedule:
+    # Toutes les 6 heures: 00:00, 06:00, 12:00, 18:00 UTC
+    - cron: '0 */6 * * *'
+  workflow_dispatch:  # Permet déclenchement manuel
+
+# ============================================================================
+# CONFIGURATION GLOBALE - Node.js 24
+# ============================================================================
+env:
+  PYTHON_VERSION: "3.11"
+  # ✅ CRITICAL: Force Node.js 24
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  # ============================================================================
+  # COLLECTE DES DONNÉES MARINES
+  # ============================================================================
+  collect:
+    name: Collecte Copernicus Marine
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+      
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      
+      - name: 📦 Install dependencies
+        run: |
+          pip install -r requirements_bot.txt
+      
+      - name: 🌊 Run data collection
+        id: collect
+        env:
+          COPERNICUS_USERNAME: ${{ secrets.COPERNICUS_USERNAME }}
+          COPERNICUS_PASSWORD: ${{ secrets.COPERNICUS_PASSWORD }}
+          OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          TG_ID: ${{ secrets.TG_ID }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          echo "🚀 Démarrage collecte..."
+          python script_peche_complet.py 2>&1 | tee collection.log
+          
+          # Vérifier succès
+          if [ -f data.json ]; then
+            ZONES=$(python -c "import json; print(len(json.load(open('data.json'))))")
+            echo "zones_collected=$ZONES" >> $GITHUB_OUTPUT
+            echo "✅ $ZONES zones collectées"
+          else
+            echo "❌ Échec: data.json non généré"
+            exit 1
+          fi
+      
+      - name: 📊 Upload data artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: data-${{ github.run_number }}
+          path: |
+            data.json
+            logs/history/*.json
+            logs/stats/*.json
+            collection.log
+          retention-days: 30
+      
+      - name: 💾 Commit updated data
+        run: |
+          git config user.name "PecheurConnect Bot"
+          git config user.email "bot@pecheurconnect.sn"
+          
+          git add data.json logs/
+          git diff --quiet && git diff --staged --quiet || \
+            git commit -m "📊 Data update: ${{ steps.collect.outputs.zones_collected }} zones [skip ci]"
+          
+          git push
+      
+      - name: 📱 Send Telegram notification
+        if: always()
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TG_TOKEN }}
+          format: markdown
+          message: |
+            🌊 **Collecte de données** - ${{ job.status }}
+            
+            **Zones:** ${{ steps.collect.outputs.zones_collected }}/18
+            **Heure:** $(date -u +"%Y-%m-%d %H:%M UTC")
+            
+            ${{ job.status == 'success' && '✅ Succès' || '❌ Échec - Action requise' }}
+
+  # ============================================================================
+  # ANALYSE ET ALERTES
+  # ============================================================================
+  analyze:
+    name: Analyse et Alertes
+    runs-on: ubuntu-latest
+    needs: collect
+    
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: main
+      
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: 📦 Install dependencies
+        run: |
+          pip install numpy pandas
+      
+      - name: 🔍 Analyze conditions
+        id: analyze
+        run: |
+          python << 'EOF'
+          import json
+          
+          with open('data.json') as f:
+              data = json.load(f)
+          
+          # Compter par niveau de sécurité
+          safe = len([z for z in data if z.get('safety_level') == 'safe'])
+          caution = len([z for z in data if z.get('safety_level') == 'caution'])
+          warning = len([z for z in data if z.get('safety_level') == 'warning'])
+          danger = len([z for z in data if z.get('safety_level') == 'danger'])
+          
+          print(f"safe={safe}")
+          print(f"caution={caution}")
+          print(f"warning={warning}")
+          print(f"danger={danger}")
+          
+          # Zones dangereuses
+          if danger > 0 or warning > 2:
+              danger_zones = [z['zone'] for z in data if z.get('safety_level') in ['danger', 'warning']]
+              print(f"danger_zones={','.join(danger_zones[:5])}")
+              print("alert_needed=true")
+          else:
+              print("alert_needed=false")
+          EOF
+      
+      - name: 🚨 Send danger alert
+        if: steps.analyze.outputs.alert_needed == 'true'
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_CHAT_ID }}
+          token: ${{ secrets.TG_TOKEN }}
+          format: markdown
+          message: |
+            ⚠️ **ALERTE MÉTÉO MARINE**
+            
+            **Zones à risque:** ${{ steps.analyze.outputs.danger_zones }}
+            
+            🔴 Danger: ${{ steps.analyze.outputs.danger }}
+            🟠 Prudence: ${{ steps.analyze.outputs.warning }}
+            
+            Ne pas sortir en mer dans ces zones !
+
+  # ============================================================================
+  # BACKUP
+  # ============================================================================
+  backup:
+    name: Backup données
+    runs-on: ubuntu-latest
+    needs: collect
+    
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: main
+      
+      - name: 💾 Create backup
+        run: |
+          BACKUP_NAME="backup-$(date +%Y%m%d-%H%M%S).tar.gz"
+          
+          tar -czf $BACKUP_NAME \
+            data.json \
+            logs/history \
+            logs/stats \
+            data/cache.db
+          
+          echo "backup_file=$BACKUP_NAME" >> $GITHUB_ENV
+      
+      - name: ☁️ Upload to artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.backup_file }}
+          path: ${{ env.backup_file }}
+          retention-days: 90
