@@ -1,22 +1,22 @@
 {
   "meta": {
     "version": "4.2",
-    "generated_at": "2026-03-20T12:35:50.063790Z",
+    "generated_at": "2026-03-20T18:34:45.360747Z",
     "total_zones": 18,
     "sources": [
       "copernicus"
     ]
   },
   "stats": {
-    "score_moyen": 7.24,
-    "score_max": 8.7,
-    "score_min": 5.8,
+    "score_moyen": 7.26,
+    "score_max": 9.1,
+    "score_min": 4.5,
     "zones_danger": [],
     "zones_count": {
       "danger": 0,
-      "warning": 0,
-      "caution": 1,
-      "safe": 17
+      "warning": 1,
+      "caution": 4,
+      "safe": 13
     }
   },
   "zones": {
@@ -28,41 +28,41 @@
       "lon": -16.65,
       "openweather": {
         "source": "openweather",
-        "temp_air": 27.02,
+        "temp_air": 24.02,
         "wind_speed": 4.12,
         "wave_height": 0.42,
-        "humidity": 54,
+        "humidity": 60,
         "weather_id": 800,
-        "timestamp": "2026-03-20T12:34:09.679698"
+        "timestamp": "2026-03-20T18:33:06.997710"
       },
       "copernicus": {
         "source": "copernicus",
         "sst": null,
-        "current_speed": 0.155,
-        "current_u": -0.034,
-        "current_v": -0.151,
-        "timestamp": "2026-03-20T12:34:09.366059"
+        "current_speed": 0.159,
+        "current_u": -0.031,
+        "current_v": -0.156,
+        "timestamp": "2026-03-20T18:33:06.929051"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
         "securite_code": "safe",
-        "peche_score": 8.1,
+        "peche_score": 9.1,
         "peche_texte": "🎣 Excellentes conditions de pêche",
         "wave": 0.42,
-        "temp": 27.02,
-        "current": 0.155
+        "temp": 24.02,
+        "current": 0.159
       },
-      "updated_at": "2026-03-20T12:34:41.561275",
+      "updated_at": "2026-03-20T18:33:39.355084",
       "forecast_7j": [
         {
           "dt": 1774011600,
           "wave": 0.73,
           "wind_ms": 5.4,
           "wind_kn": 10.6,
-          "temp": 27.0,
+          "temp": 19.1,
           "pop": 0,
-          "uvi": 10.6,
-          "peche_score": 7.7,
+          "uvi": 11.0,
+          "peche_score": 7.2,
           "securite_code": "safe"
         },
         {
@@ -72,7 +72,7 @@
           "wind_kn": 12.4,
           "temp": 19.7,
           "pop": 0,
-          "uvi": 10.2,
+          "uvi": 10.6,
           "peche_score": 6.7,
           "securite_code": "safe"
         },
@@ -83,7 +83,7 @@
           "wind_kn": 11.8,
           "temp": 19.3,
           "pop": 0,
-          "uvi": 9.2,
+          "uvi": 8.8,
           "peche_score": 6.8,
           "securite_code": "safe"
         },
@@ -94,7 +94,7 @@
           "wind_kn": 11.0,
           "temp": 19.1,
           "pop": 0,
-          "uvi": 11.4,
+          "uvi": 11.0,
           "peche_score": 7.0,
           "securite_code": "safe"
         },
@@ -105,7 +105,7 @@
           "wind_kn": 11.3,
           "temp": 18.9,
           "pop": 0,
-          "uvi": 10.8,
+          "uvi": 10.2,
           "peche_score": 6.9,
           "securite_code": "safe"
         },
@@ -116,7 +116,7 @@
           "wind_kn": 12.7,
           "temp": 18.8,
           "pop": 0,
-          "uvi": 11,
+          "uvi": 11.1,
           "peche_score": 6.4,
           "securite_code": "caution"
         },
@@ -127,7 +127,7 @@
           "wind_kn": 13.9,
           "temp": 18.8,
           "pop": 0,
-          "uvi": 11,
+          "uvi": 12,
           "peche_score": 6.0,
           "securite_code": "caution"
         }
@@ -141,41 +141,41 @@
       "lon": -16.5,
       "openweather": {
         "source": "openweather",
-        "temp_air": 27.01,
+        "temp_air": 24.01,
         "wind_speed": 4.12,
         "wave_height": 0.42,
-        "humidity": 54,
+        "humidity": 60,
         "weather_id": 800,
-        "timestamp": "2026-03-20T12:34:09.661876"
+        "timestamp": "2026-03-20T18:33:07.007177"
       },
       "copernicus": {
         "source": "copernicus",
         "sst": null,
-        "current_speed": 0.128,
-        "current_u": -0.047,
-        "current_v": -0.119,
-        "timestamp": "2026-03-20T12:34:09.368385"
+        "current_speed": 0.135,
+        "current_u": -0.041,
+        "current_v": -0.129,
+        "timestamp": "2026-03-20T18:33:06.931340"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
         "securite_code": "safe",
-        "peche_score": 8.1,
+        "peche_score": 9.1,
         "peche_texte": "🎣 Excellentes conditions de pêche",
         "wave": 0.42,
-        "temp": 27.01,
-        "current": 0.128
+        "temp": 24.01,
+        "current": 0.135
       },
-      "updated_at": "2026-03-20T12:34:41.701894",
+      "updated_at": "2026-03-20T18:33:38.975216",
       "forecast_7j": [
         {
           "dt": 1774011600,
           "wave": 0.91,
           "wind_ms": 6.0,
           "wind_kn": 11.8,
-          "temp": 27.0,
+          "temp": 18.9,
           "pop": 0,
-          "uvi": 11.6,
-          "peche_score": 7.3,
+          "uvi": 11.7,
+          "peche_score": 6.8,
           "securite_code": "safe"
         },
         {
@@ -185,7 +185,7 @@
           "wind_kn": 13.0,
           "temp": 19.7,
           "pop": 0,
-          "uvi": 9.7,
+          "uvi": 7.6,
           "peche_score": 6.4,
           "securite_code": "caution"
         },
@@ -196,19 +196,19 @@
           "wind_kn": 15.1,
           "temp": 19.6,
           "pop": 0,
-          "uvi": 10.3,
+          "uvi": 8.5,
           "peche_score": 5.7,
           "securite_code": "caution"
         },
         {
           "dt": 1774270800,
-          "wave": 0.83,
-          "wind_ms": 5.8,
-          "wind_kn": 11.2,
+          "wave": 0.89,
+          "wind_ms": 6,
+          "wind_kn": 11.7,
           "temp": 19.2,
           "pop": 0,
-          "uvi": 11.4,
-          "peche_score": 7.0,
+          "uvi": 9.4,
+          "peche_score": 6.8,
           "securite_code": "safe"
         },
         {
@@ -218,7 +218,7 @@
           "wind_kn": 11.7,
           "temp": 19.1,
           "pop": 0,
-          "uvi": 11.1,
+          "uvi": 10.9,
           "peche_score": 6.8,
           "securite_code": "safe"
         },
@@ -229,7 +229,7 @@
           "wind_kn": 13.8,
           "temp": 19.4,
           "pop": 0,
-          "uvi": 12,
+          "uvi": 10.8,
           "peche_score": 6.1,
           "securite_code": "caution"
         },
@@ -240,7 +240,7 @@
           "wind_kn": 14.4,
           "temp": 19.4,
           "pop": 0,
-          "uvi": 12,
+          "uvi": 11,
           "peche_score": 5.9,
           "securite_code": "caution"
         }
@@ -254,41 +254,41 @@
       "lon": -16.48,
       "openweather": {
         "source": "openweather",
-        "temp_air": 27.01,
+        "temp_air": 24.01,
         "wind_speed": 4.12,
         "wave_height": 0.42,
-        "humidity": 54,
+        "humidity": 60,
         "weather_id": 800,
-        "timestamp": "2026-03-20T12:34:09.665438"
+        "timestamp": "2026-03-20T18:33:07.034670"
       },
       "copernicus": {
         "source": "copernicus",
         "sst": null,
-        "current_speed": 0.082,
-        "current_u": -0.049,
-        "current_v": -0.065,
-        "timestamp": "2026-03-20T12:34:09.370959"
+        "current_speed": 0.083,
+        "current_u": -0.039,
+        "current_v": -0.074,
+        "timestamp": "2026-03-20T18:33:06.933134"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
         "securite_code": "safe",
-        "peche_score": 7.6,
+        "peche_score": 8.6,
         "peche_texte": "🎣 Excellentes conditions de pêche",
         "wave": 0.42,
-        "temp": 27.01,
-        "current": 0.082
+        "temp": 24.01,
+        "current": 0.083
       },
-      "updated_at": "2026-03-20T12:34:41.952935",
+      "updated_at": "2026-03-20T18:33:39.307154",
       "forecast_7j": [
         {
           "dt": 1774011600,
           "wave": 1.01,
           "wind_ms": 6.4,
           "wind_kn": 12.4,
-          "temp": 27.0,
+          "temp": 21.3,
           "pop": 0,
-          "uvi": 11.5,
-          "peche_score": 7.1,
+          "uvi": 11.1,
+          "peche_score": 7.0,
           "securite_code": "caution"
         },
         {
@@ -298,7 +298,7 @@
           "wind_kn": 13.5,
           "temp": 21.7,
           "pop": 0,
-          "uvi": 9.4,
+          "uvi": 8.9,
           "peche_score": 6.7,
           "securite_code": "caution"
         },
@@ -309,7 +309,7 @@
           "wind_kn": 15.2,
           "temp": 21.6,
           "pop": 0,
-          "uvi": 9.4,
+          "uvi": 9.7,
           "peche_score": 6.0,
           "securite_code": "warning"
         },
@@ -318,9 +318,9 @@
           "wave": 0.94,
           "wind_ms": 6.2,
           "wind_kn": 12.0,
-          "temp": 20.6,
+          "temp": 20.9,
           "pop": 0,
-          "uvi": 10.2,
+          "uvi": 10.5,
           "peche_score": 7.0,
           "securite_code": "safe"
         },
@@ -331,7 +331,7 @@
           "wind_kn": 11.9,
           "temp": 20.7,
           "pop": 0,
-          "uvi": 11.1,
+          "uvi": 11.4,
           "peche_score": 7.1,
           "securite_code": "safe"
         },
@@ -342,7 +342,7 @@
           "wind_kn": 13.5,
           "temp": 21.3,
           "pop": 0,
-          "uvi": 12,
+          "uvi": 11,
           "peche_score": 6.6,
           "securite_code": "caution"
         },
@@ -353,7 +353,7 @@
           "wind_kn": 14.9,
           "temp": 21,
           "pop": 0,
-          "uvi": 12,
+          "uvi": 11,
           "peche_score": 6.0,
           "securite_code": "caution"
         }
@@ -367,31 +367,31 @@
       "lon": -16.55,
       "openweather": {
         "source": "openweather",
-        "temp_air": 19.77,
-        "wind_speed": 4.27,
-        "wave_height": 0.45,
-        "humidity": 75,
-        "weather_id": 803,
-        "timestamp": "2026-03-20T12:34:09.670871"
+        "temp_air": 19.62,
+        "wind_speed": 4.86,
+        "wave_height": 0.59,
+        "humidity": 82,
+        "weather_id": 804,
+        "timestamp": "2026-03-20T18:33:06.998230"
       },
       "copernicus": {
         "source": "copernicus",
         "sst": null,
-        "current_speed": 0.096,
-        "current_u": -0.087,
-        "current_v": -0.043,
-        "timestamp": "2026-03-20T12:34:09.373005"
+        "current_speed": 0.093,
+        "current_u": -0.082,
+        "current_v": -0.044,
+        "timestamp": "2026-03-20T18:33:06.934869"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
         "securite_code": "safe",
-        "peche_score": 6.5,
+        "peche_score": 6.2,
         "peche_texte": "🎣 Conditions acceptables",
-        "wave": 0.45,
-        "temp": 19.77,
-        "current": 0.096
+        "wave": 0.59,
+        "temp": 19.62,
+        "current": 0.093
       },
-      "updated_at": "2026-03-20T12:34:41.788034",
+      "updated_at": "2026-03-20T18:33:39.266677",
       "forecast_7j": [
         {
           "dt": 1774011600,
@@ -400,7 +400,7 @@
           "wind_kn": 10.9,
           "temp": 19.8,
           "pop": 0,
-          "uvi": 11.4,
+          "uvi": 10.7,
           "peche_score": 7.2,
           "securite_code": "safe"
         },
@@ -411,7 +411,7 @@
           "wind_kn": 12.2,
           "temp": 20.3,
           "pop": 0,
-          "uvi": 9.6,
+          "uvi": 9.0,
           "peche_score": 6.9,
           "securite_code": "safe"
         },
@@ -422,19 +422,19 @@
           "wind_kn": 15.0,
           "temp": 20.1,
           "pop": 0,
-          "uvi": 10.8,
+          "uvi": 10.4,
           "peche_score": 5.8,
           "securite_code": "caution"
         },
         {
           "dt": 1774270800,
-          "wave": 0.72,
-          "wind_ms": 5.4,
-          "wind_kn": 10.5,
+          "wave": 0.93,
+          "wind_ms": 6.1,
+          "wind_kn": 11.9,
           "temp": 19.6,
           "pop": 0,
-          "uvi": 10.9,
-          "peche_score": 7.3,
+          "uvi": 9.1,
+          "peche_score": 6.8,
           "securite_code": "safe"
         },
         {
@@ -444,7 +444,7 @@
           "wind_kn": 12.0,
           "temp": 19.3,
           "pop": 0,
-          "uvi": 11.1,
+          "uvi": 10.9,
           "peche_score": 6.8,
           "securite_code": "safe"
         },
@@ -455,7 +455,7 @@
           "wind_kn": 13.9,
           "temp": 19.5,
           "pop": 0,
-          "uvi": 12,
+          "uvi": 10.9,
           "peche_score": 6.1,
           "securite_code": "caution"
         },
@@ -466,7 +466,7 @@
           "wind_kn": 15.1,
           "temp": 19.4,
           "pop": 0,
-          "uvi": 12,
+          "uvi": 11,
           "peche_score": 5.6,
           "securite_code": "caution"
         }
@@ -480,31 +480,31 @@
       "lon": -16.7,
       "openweather": {
         "source": "openweather",
-        "temp_air": 22.21,
-        "wind_speed": 4.61,
-        "wave_height": 0.53,
-        "humidity": 62,
+        "temp_air": 20.3,
+        "wind_speed": 4.94,
+        "wave_height": 0.61,
+        "humidity": 77,
         "weather_id": 804,
-        "timestamp": "2026-03-20T12:34:09.681337"
+        "timestamp": "2026-03-20T18:33:07.019760"
       },
       "copernicus": {
         "source": "copernicus",
         "sst": null,
-        "current_speed": 0.121,
-        "current_u": -0.105,
-        "current_v": -0.06,
-        "timestamp": "2026-03-20T12:34:09.374534"
+        "current_speed": 0.113,
+        "current_u": -0.095,
+        "current_v": -0.062,
+        "timestamp": "2026-03-20T18:33:06.936396"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
         "securite_code": "safe",
-        "peche_score": 8.1,
+        "peche_score": 7.0,
         "peche_texte": "🎣 Excellentes conditions de pêche",
-        "wave": 0.53,
-        "temp": 22.21,
-        "current": 0.121
+        "wave": 0.61,
+        "temp": 20.3,
+        "current": 0.113
       },
-      "updated_at": "2026-03-20T12:34:41.702024",
+      "updated_at": "2026-03-20T18:33:38.934051",
       "forecast_7j": [
         {
           "dt": 1774011600,
@@ -513,7 +513,7 @@
           "wind_kn": 10.5,
           "temp": 22.2,
           "pop": 0,
-          "uvi": 11.4,
+          "uvi": 11.9,
           "peche_score": 7.8,
           "securite_code": "safe"
         },
@@ -524,7 +524,7 @@
           "wind_kn": 12.5,
           "temp": 22.7,
           "pop": 0,
-          "uvi": 9.7,
+          "uvi": 9.6,
           "peche_score": 7.2,
           "securite_code": "caution"
         },
@@ -535,19 +535,19 @@
           "wind_kn": 14.1,
           "temp": 22.4,
           "pop": 0,
-          "uvi": 10.5,
+          "uvi": 10.7,
           "peche_score": 6.5,
           "securite_code": "caution"
         },
         {
           "dt": 1774270800,
-          "wave": 0.75,
-          "wind_ms": 5.5,
-          "wind_kn": 10.7,
-          "temp": 21.3,
+          "wave": 0.82,
+          "wind_ms": 5.8,
+          "wind_kn": 11.2,
+          "temp": 21.4,
           "pop": 0,
-          "uvi": 10.8,
-          "peche_score": 7.5,
+          "uvi": 7.7,
+          "peche_score": 7.4,
           "securite_code": "safe"
         },
         {
@@ -557,7 +557,7 @@
           "wind_kn": 11.6,
           "temp": 21.2,
           "pop": 0,
-          "uvi": 11.2,
+          "uvi": 11.0,
           "peche_score": 7.2,
           "securite_code": "safe"
         },
@@ -568,7 +568,7 @@
           "wind_kn": 13.1,
           "temp": 21.4,
           "pop": 0,
-          "uvi": 12,
+          "uvi": 11.1,
           "peche_score": 6.7,
           "securite_code": "caution"
         },
@@ -594,40 +594,40 @@
       "openweather": {
         "source": "openweather",
         "temp_air": 22.99,
-        "wind_speed": 3.84,
-        "wave_height": 0.37,
-        "humidity": 83,
-        "weather_id": 802,
-        "timestamp": "2026-03-20T12:34:09.671276"
+        "wind_speed": 5.13,
+        "wave_height": 0.65,
+        "humidity": 84,
+        "weather_id": 803,
+        "timestamp": "2026-03-20T18:33:06.997472"
       },
       "copernicus": {
         "source": "copernicus",
         "sst": null,
-        "current_speed": 0.179,
-        "current_u": -0.149,
-        "current_v": -0.098,
-        "timestamp": "2026-03-20T12:34:09.376414"
+        "current_speed": 0.199,
+        "current_u": -0.166,
+        "current_v": -0.109,
+        "timestamp": "2026-03-20T18:33:06.937856"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
         "securite_code": "safe",
-        "peche_score": 8.7,
+        "peche_score": 8.2,
         "peche_texte": "🎣 Excellentes conditions de pêche",
-        "wave": 0.37,
+        "wave": 0.65,
         "temp": 22.99,
-        "current": 0.179
+        "current": 0.199
       },
-      "updated_at": "2026-03-20T12:34:41.788362",
+      "updated_at": "2026-03-20T18:33:39.397389",
       "forecast_7j": [
         {
           "dt": 1774011600,
           "wave": 0.74,
           "wind_ms": 5.5,
           "wind_kn": 10.7,
-          "temp": 23.0,
+          "temp": 19.6,
           "pop": 0,
-          "uvi": 11.8,
-          "peche_score": 7.8,
+          "uvi": 11.9,
+          "peche_score": 7.2,
           "securite_code": "safe"
         },
         {
@@ -637,7 +637,7 @@
           "wind_kn": 12.2,
           "temp": 20.2,
           "pop": 0,
-          "uvi": 10.8,
+          "uvi": 9.9,
           "peche_score": 6.9,
           "securite_code": "safe"
         },
@@ -648,7 +648,7 @@
           "wind_kn": 11.7,
           "temp": 19.7,
           "pop": 0,
-          "uvi": 10.1,
+          "uvi": 11.1,
           "peche_score": 6.9,
           "securite_code": "safe"
         },
@@ -659,7 +659,7 @@
           "wind_kn": 10.5,
           "temp": 19.4,
           "pop": 0,
-          "uvi": 11.5,
+          "uvi": 9.8,
           "peche_score": 7.3,
           "securite_code": "safe"
         },
@@ -670,7 +670,7 @@
           "wind_kn": 11.7,
           "temp": 19.4,
           "pop": 0,
-          "uvi": 11.2,
+          "uvi": 9.8,
           "peche_score": 6.9,
           "securite_code": "safe"
         },
@@ -681,7 +681,7 @@
           "wind_kn": 13.1,
           "temp": 19.2,
           "pop": 0,
-          "uvi": 12,
+          "uvi": 11.2,
           "peche_score": 6.3,
           "securite_code": "caution"
         },
@@ -706,41 +706,41 @@
       "lon": -17.65,
       "openweather": {
         "source": "openweather",
-        "temp_air": 23.14,
-        "wind_speed": 6.17,
-        "wave_height": 0.94,
-        "humidity": 68,
+        "temp_air": 22.14,
+        "wind_speed": 3.09,
+        "wave_height": 0.24,
+        "humidity": 73,
         "weather_id": 800,
-        "timestamp": "2026-03-20T12:34:43.001614"
+        "timestamp": "2026-03-20T18:33:40.485007"
       },
       "copernicus": {
         "source": "copernicus",
         "sst": null,
-        "current_speed": 0.043,
-        "current_u": -0.025,
-        "current_v": -0.035,
-        "timestamp": "2026-03-20T12:34:42.955287"
+        "current_speed": 0.054,
+        "current_u": -0.038,
+        "current_v": -0.039,
+        "timestamp": "2026-03-20T18:33:40.399593"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
         "securite_code": "safe",
-        "peche_score": 7.2,
+        "peche_score": 7.9,
         "peche_texte": "🎣 Excellentes conditions de pêche",
-        "wave": 0.94,
-        "temp": 23.14,
-        "current": 0.043
+        "wave": 0.24,
+        "temp": 22.14,
+        "current": 0.054
       },
-      "updated_at": "2026-03-20T12:35:15.247260",
+      "updated_at": "2026-03-20T18:34:07.839192",
       "forecast_7j": [
         {
           "dt": 1774011600,
           "wave": 0.77,
           "wind_ms": 5.6,
           "wind_kn": 10.8,
-          "temp": 23.1,
+          "temp": 19.6,
           "pop": 0,
-          "uvi": 11.2,
-          "peche_score": 7.8,
+          "uvi": 11.8,
+          "peche_score": 7.2,
           "securite_code": "safe"
         },
         {
@@ -750,7 +750,7 @@
           "wind_kn": 12.5,
           "temp": 20.2,
           "pop": 0,
-          "uvi": 11.0,
+          "uvi": 8.4,
           "peche_score": 6.7,
           "securite_code": "caution"
         },
@@ -761,7 +761,7 @@
           "wind_kn": 13.2,
           "temp": 19.9,
           "pop": 0,
-          "uvi": 11.2,
+          "uvi": 11.5,
           "peche_score": 6.4,
           "securite_code": "caution"
         },
@@ -770,9 +770,9 @@
           "wave": 0.84,
           "wind_ms": 5.8,
           "wind_kn": 11.3,
-          "temp": 19.6,
+          "temp": 19.7,
           "pop": 0,
-          "uvi": 10.4,
+          "uvi": 9.9,
           "peche_score": 7.0,
           "securite_code": "safe"
         },
@@ -783,7 +783,7 @@
           "wind_kn": 11.7,
           "temp": 19.5,
           "pop": 0,
-          "uvi": 11.0,
+          "uvi": 10.9,
           "peche_score": 6.9,
           "securite_code": "safe"
         },
@@ -794,7 +794,7 @@
           "wind_kn": 13.5,
           "temp": 19.3,
           "pop": 0,
-          "uvi": 12,
+          "uvi": 11.2,
           "peche_score": 6.2,
           "securite_code": "caution"
         },
@@ -820,40 +820,40 @@
       "openweather": {
         "source": "openweather",
         "temp_air": 22.94,
-        "wind_speed": 6.17,
-        "wave_height": 0.94,
-        "humidity": 72,
+        "wind_speed": 3.13,
+        "wave_height": 0.24,
+        "humidity": 76,
         "weather_id": 800,
-        "timestamp": "2026-03-20T12:34:43.007184"
+        "timestamp": "2026-03-20T18:33:40.452398"
       },
       "copernicus": {
         "source": "copernicus",
         "sst": null,
-        "current_speed": 0.285,
-        "current_u": 0.158,
-        "current_v": -0.238,
-        "timestamp": "2026-03-20T12:34:42.957600"
+        "current_speed": 0.269,
+        "current_u": 0.151,
+        "current_v": -0.222,
+        "timestamp": "2026-03-20T18:33:40.400987"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
         "securite_code": "safe",
-        "peche_score": 7.7,
+        "peche_score": 8.9,
         "peche_texte": "🎣 Excellentes conditions de pêche",
-        "wave": 0.94,
+        "wave": 0.24,
         "temp": 22.94,
-        "current": 0.285
+        "current": 0.269
       },
-      "updated_at": "2026-03-20T12:35:16.122916",
+      "updated_at": "2026-03-20T18:34:08.149307",
       "forecast_7j": [
         {
           "dt": 1774011600,
           "wave": 1.0,
           "wind_ms": 6.3,
           "wind_kn": 12.3,
-          "temp": 22.9,
+          "temp": 19.8,
           "pop": 0,
-          "uvi": 11.8,
-          "peche_score": 7.3,
+          "uvi": 11.9,
+          "peche_score": 6.7,
           "securite_code": "safe"
         },
         {
@@ -863,7 +863,7 @@
           "wind_kn": 13.2,
           "temp": 20.4,
           "pop": 0,
-          "uvi": 10.8,
+          "uvi": 9.9,
           "peche_score": 6.5,
           "securite_code": "caution"
         },
@@ -874,7 +874,7 @@
           "wind_kn": 13.0,
           "temp": 19.8,
           "pop": 0,
-          "uvi": 10.1,
+          "uvi": 11.1,
           "peche_score": 6.5,
           "securite_code": "caution"
         },
@@ -885,7 +885,7 @@
           "wind_kn": 11.9,
           "temp": 19.6,
           "pop": 0,
-          "uvi": 11.5,
+          "uvi": 9.8,
           "peche_score": 6.9,
           "securite_code": "safe"
         },
@@ -896,7 +896,7 @@
           "wind_kn": 12.2,
           "temp": 19.6,
           "pop": 0,
-          "uvi": 11.2,
+          "uvi": 9.8,
           "peche_score": 6.7,
           "securite_code": "safe"
         },
@@ -907,7 +907,7 @@
           "wind_kn": 13.9,
           "temp": 19.3,
           "pop": 0,
-          "uvi": 12,
+          "uvi": 11.2,
           "peche_score": 6.1,
           "securite_code": "caution"
         },
@@ -933,40 +933,40 @@
       "openweather": {
         "source": "openweather",
         "temp_air": 22.99,
-        "wind_speed": 6.17,
-        "wave_height": 0.94,
-        "humidity": 72,
+        "wind_speed": 3.13,
+        "wave_height": 0.24,
+        "humidity": 76,
         "weather_id": 800,
-        "timestamp": "2026-03-20T12:34:43.003482"
+        "timestamp": "2026-03-20T18:33:40.461616"
       },
       "copernicus": {
         "source": "copernicus",
         "sst": null,
-        "current_speed": 0.22,
-        "current_u": 0.1,
-        "current_v": -0.196,
-        "timestamp": "2026-03-20T12:34:42.959457"
+        "current_speed": 0.207,
+        "current_u": 0.088,
+        "current_v": -0.188,
+        "timestamp": "2026-03-20T18:33:40.402968"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
         "securite_code": "safe",
-        "peche_score": 7.8,
+        "peche_score": 8.9,
         "peche_texte": "🎣 Excellentes conditions de pêche",
-        "wave": 0.94,
+        "wave": 0.24,
         "temp": 22.99,
-        "current": 0.22
+        "current": 0.207
       },
-      "updated_at": "2026-03-20T12:35:13.731648",
+      "updated_at": "2026-03-20T18:34:15.496320",
       "forecast_7j": [
         {
           "dt": 1774011600,
           "wave": 1.0,
           "wind_ms": 6.3,
           "wind_kn": 12.3,
-          "temp": 23.0,
+          "temp": 20.7,
           "pop": 0,
-          "uvi": 11.8,
-          "peche_score": 7.3,
+          "uvi": 11.9,
+          "peche_score": 6.9,
           "securite_code": "safe"
         },
         {
@@ -976,7 +976,7 @@
           "wind_kn": 12.9,
           "temp": 21.2,
           "pop": 0,
-          "uvi": 10.8,
+          "uvi": 9.9,
           "peche_score": 6.8,
           "securite_code": "caution"
         },
@@ -987,7 +987,7 @@
           "wind_kn": 12.8,
           "temp": 20.3,
           "pop": 0,
-          "uvi": 10.1,
+          "uvi": 11.1,
           "peche_score": 6.7,
           "securite_code": "caution"
         },
@@ -996,9 +996,9 @@
           "wave": 0.9,
           "wind_ms": 6.0,
           "wind_kn": 11.7,
-          "temp": 20.2,
+          "temp": 20.1,
           "pop": 0,
-          "uvi": 11.5,
+          "uvi": 9.8,
           "peche_score": 7.0,
           "securite_code": "safe"
         },
@@ -1009,7 +1009,7 @@
           "wind_kn": 12.4,
           "temp": 20.2,
           "pop": 0,
-          "uvi": 11.2,
+          "uvi": 9.8,
           "peche_score": 6.8,
           "securite_code": "caution"
         },
@@ -1020,7 +1020,7 @@
           "wind_kn": 13.9,
           "temp": 20,
           "pop": 0,
-          "uvi": 12,
+          "uvi": 11.2,
           "peche_score": 6.2,
           "securite_code": "caution"
         },
@@ -1046,40 +1046,40 @@
       "openweather": {
         "source": "openweather",
         "temp_air": 22.9,
-        "wind_speed": 6.17,
-        "wave_height": 0.94,
-        "humidity": 72,
+        "wind_speed": 3.13,
+        "wave_height": 0.24,
+        "humidity": 76,
         "weather_id": 800,
-        "timestamp": "2026-03-20T12:34:43.012144"
+        "timestamp": "2026-03-20T18:33:40.464288"
       },
       "copernicus": {
         "source": "copernicus",
         "sst": null,
-        "current_speed": 0.148,
-        "current_u": -0.054,
-        "current_v": -0.138,
-        "timestamp": "2026-03-20T12:34:42.961690"
+        "current_speed": 0.142,
+        "current_u": -0.064,
+        "current_v": -0.127,
+        "timestamp": "2026-03-20T18:33:40.404473"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
         "securite_code": "safe",
-        "peche_score": 7.7,
+        "peche_score": 8.8,
         "peche_texte": "🎣 Excellentes conditions de pêche",
-        "wave": 0.94,
+        "wave": 0.24,
         "temp": 22.9,
-        "current": 0.148
+        "current": 0.142
       },
-      "updated_at": "2026-03-20T12:35:13.950287",
+      "updated_at": "2026-03-20T18:34:08.364240",
       "forecast_7j": [
         {
           "dt": 1774011600,
           "wave": 0.89,
           "wind_ms": 6.0,
           "wind_kn": 11.6,
-          "temp": 22.9,
+          "temp": 20.2,
           "pop": 0,
-          "uvi": 11.8,
-          "peche_score": 7.5,
+          "uvi": 11.9,
+          "peche_score": 7.0,
           "securite_code": "safe"
         },
         {
@@ -1089,7 +1089,7 @@
           "wind_kn": 12.8,
           "temp": 20.8,
           "pop": 0,
-          "uvi": 10.8,
+          "uvi": 9.9,
           "peche_score": 6.7,
           "securite_code": "caution"
         },
@@ -1100,7 +1100,7 @@
           "wind_kn": 12.8,
           "temp": 20.1,
           "pop": 0,
-          "uvi": 10.1,
+          "uvi": 11.1,
           "peche_score": 6.6,
           "securite_code": "caution"
         },
@@ -1109,9 +1109,9 @@
           "wave": 0.87,
           "wind_ms": 5.9,
           "wind_kn": 11.5,
-          "temp": 19.9,
+          "temp": 19.8,
           "pop": 0,
-          "uvi": 11.5,
+          "uvi": 9.8,
           "peche_score": 7.0,
           "securite_code": "safe"
         },
@@ -1122,7 +1122,7 @@
           "wind_kn": 11.8,
           "temp": 19.9,
           "pop": 0,
-          "uvi": 11.2,
+          "uvi": 9.8,
           "peche_score": 6.9,
           "securite_code": "safe"
         },
@@ -1133,7 +1133,7 @@
           "wind_kn": 13.6,
           "temp": 19.6,
           "pop": 0,
-          "uvi": 12,
+          "uvi": 11.2,
           "peche_score": 6.3,
           "securite_code": "caution"
         },
@@ -1158,31 +1158,31 @@
       "lon": -17.15,
       "openweather": {
         "source": "openweather",
-        "temp_air": 18.94,
-        "wind_speed": 6.07,
-        "wave_height": 0.91,
-        "humidity": 81,
-        "weather_id": 802,
-        "timestamp": "2026-03-20T12:34:43.007051"
+        "temp_air": 19.48,
+        "wind_speed": 8.82,
+        "wave_height": 1.93,
+        "humidity": 85,
+        "weather_id": 800,
+        "timestamp": "2026-03-20T18:33:40.464229"
       },
       "copernicus": {
         "source": "copernicus",
         "sst": null,
-        "current_speed": 0.187,
-        "current_u": 0.049,
-        "current_v": -0.18,
-        "timestamp": "2026-03-20T12:34:42.963022"
+        "current_speed": 0.196,
+        "current_u": 0.061,
+        "current_v": -0.186,
+        "timestamp": "2026-03-20T18:33:40.405919"
       },
       "indices": {
-        "securite_texte": "🟢 FAVORABLE — Mer calme",
-        "securite_code": "safe",
-        "peche_score": 5.9,
+        "securite_texte": "🟠 PRUDENCE — Mer formée",
+        "securite_code": "warning",
+        "peche_score": 4.5,
         "peche_texte": "🎣 Conditions acceptables",
-        "wave": 0.91,
-        "temp": 18.94,
-        "current": 0.187
+        "wave": 1.93,
+        "temp": 19.48,
+        "current": 0.196
       },
-      "updated_at": "2026-03-20T12:35:15.151206",
+      "updated_at": "2026-03-20T18:34:07.883743",
       "forecast_7j": [
         {
           "dt": 1774011600,
@@ -1191,7 +1191,7 @@
           "wind_kn": 17.1,
           "temp": 18.9,
           "pop": 0,
-          "uvi": 12.1,
+          "uvi": 12,
           "peche_score": 4.6,
           "securite_code": "warning"
         },
@@ -1202,7 +1202,7 @@
           "wind_kn": 18.2,
           "temp": 19.5,
           "pop": 0,
-          "uvi": 11.4,
+          "uvi": 12,
           "peche_score": 4.2,
           "securite_code": "warning"
         },
@@ -1213,19 +1213,19 @@
           "wind_kn": 20.7,
           "temp": 19.8,
           "pop": 0,
-          "uvi": 10.3,
+          "uvi": 11.0,
           "peche_score": 3.6,
           "securite_code": "danger"
         },
         {
           "dt": 1774270800,
-          "wave": 1.53,
-          "wind_ms": 7.9,
-          "wind_kn": 15.3,
-          "temp": 19.4,
+          "wave": 1.83,
+          "wind_ms": 8.6,
+          "wind_kn": 16.7,
+          "temp": 19.1,
           "pop": 0,
-          "uvi": 9.8,
-          "peche_score": 5.5,
+          "uvi": 10.9,
+          "peche_score": 4.9,
           "securite_code": "warning"
         },
         {
@@ -1235,7 +1235,7 @@
           "wind_kn": 18.0,
           "temp": 19.4,
           "pop": 0,
-          "uvi": 11.3,
+          "uvi": 10.6,
           "peche_score": 4.3,
           "securite_code": "warning"
         },
@@ -1246,7 +1246,7 @@
           "wind_kn": 20.4,
           "temp": 20.0,
           "pop": 0,
-          "uvi": 12,
+          "uvi": 11.3,
           "peche_score": 3.6,
           "securite_code": "danger"
         },
@@ -1271,31 +1271,31 @@
       "lon": -16.85,
       "openweather": {
         "source": "openweather",
-        "temp_air": 22.59,
-        "wind_speed": 4.94,
-        "wave_height": 0.61,
-        "humidity": 64,
+        "temp_air": 20.26,
+        "wind_speed": 7.6,
+        "wave_height": 1.43,
+        "humidity": 77,
         "weather_id": 802,
-        "timestamp": "2026-03-20T12:34:43.011741"
+        "timestamp": "2026-03-20T18:33:40.464478"
       },
       "copernicus": {
         "source": "copernicus",
         "sst": null,
-        "current_speed": 0.064,
-        "current_u": 0.034,
-        "current_v": -0.054,
-        "timestamp": "2026-03-20T12:34:42.964780"
+        "current_speed": 0.089,
+        "current_u": 0.049,
+        "current_v": -0.075,
+        "timestamp": "2026-03-20T18:33:40.407285"
       },
       "indices": {
-        "securite_texte": "🟢 FAVORABLE — Mer calme",
-        "securite_code": "safe",
-        "peche_score": 7.5,
-        "peche_texte": "🎣 Excellentes conditions de pêche",
-        "wave": 0.61,
-        "temp": 22.59,
-        "current": 0.064
+        "securite_texte": "🟡 VIGILANCE — Mer légèrement agitée",
+        "securite_code": "caution",
+        "peche_score": 5.2,
+        "peche_texte": "🎣 Conditions acceptables",
+        "wave": 1.43,
+        "temp": 20.26,
+        "current": 0.089
       },
-      "updated_at": "2026-03-20T12:35:13.692834",
+      "updated_at": "2026-03-20T18:34:08.424566",
       "forecast_7j": [
         {
           "dt": 1774011600,
@@ -1304,7 +1304,7 @@
           "wind_kn": 14.8,
           "temp": 22.6,
           "pop": 0,
-          "uvi": 12.2,
+          "uvi": 12.1,
           "peche_score": 6.3,
           "securite_code": "caution"
         },
@@ -1315,7 +1315,7 @@
           "wind_kn": 18.0,
           "temp": 23.0,
           "pop": 0,
-          "uvi": 12.1,
+          "uvi": 11.9,
           "peche_score": 5.0,
           "securite_code": "warning"
         },
@@ -1326,19 +1326,19 @@
           "wind_kn": 20.9,
           "temp": 23.4,
           "pop": 0,
-          "uvi": 12.3,
+          "uvi": 11.5,
           "peche_score": 4.2,
           "securite_code": "danger"
         },
         {
           "dt": 1774270800,
-          "wave": 1.77,
-          "wind_ms": 8.4,
-          "wind_kn": 16.4,
+          "wave": 2.4,
+          "wind_ms": 9.8,
+          "wind_kn": 19.1,
           "temp": 22.4,
           "pop": 0,
-          "uvi": 8.2,
-          "peche_score": 5.6,
+          "uvi": 11.0,
+          "peche_score": 4.3,
           "securite_code": "warning"
         },
         {
@@ -1348,7 +1348,7 @@
           "wind_kn": 18.3,
           "temp": 22.3,
           "pop": 0,
-          "uvi": 10.9,
+          "uvi": 10.7,
           "peche_score": 4.7,
           "securite_code": "warning"
         },
@@ -1359,7 +1359,7 @@
           "wind_kn": 19.6,
           "temp": 23.2,
           "pop": 0,
-          "uvi": 11,
+          "uvi": 11.3,
           "peche_score": 4.3,
           "securite_code": "danger"
         },
@@ -1370,7 +1370,7 @@
           "wind_kn": 19.2,
           "temp": 23.5,
           "pop": 0,
-          "uvi": 11,
+          "uvi": 12,
           "peche_score": 4.5,
           "securite_code": "warning"
         }
@@ -1384,31 +1384,31 @@
       "lon": -16.8,
       "openweather": {
         "source": "openweather",
-        "temp_air": 20.32,
-        "wind_speed": 5.93,
-        "wave_height": 0.87,
-        "humidity": 68,
-        "weather_id": 803,
-        "timestamp": "2026-03-20T12:35:17.197673"
+        "temp_air": 19.64,
+        "wind_speed": 6.86,
+        "wave_height": 1.17,
+        "humidity": 81,
+        "weather_id": 802,
+        "timestamp": "2026-03-20T18:34:16.576608"
       },
       "copernicus": {
         "source": "copernicus",
         "sst": null,
-        "current_speed": 0.056,
-        "current_u": 0.019,
-        "current_v": -0.053,
-        "timestamp": "2026-03-20T12:35:17.125372"
+        "current_speed": 0.075,
+        "current_u": 0.027,
+        "current_v": -0.07,
+        "timestamp": "2026-03-20T18:34:16.498528"
       },
       "indices": {
-        "securite_texte": "🟢 FAVORABLE — Mer calme",
-        "securite_code": "safe",
-        "peche_score": 6.0,
+        "securite_texte": "🟡 VIGILANCE — Mer légèrement agitée",
+        "securite_code": "caution",
+        "peche_score": 5.3,
         "peche_texte": "🎣 Conditions acceptables",
-        "wave": 0.87,
-        "temp": 20.32,
-        "current": 0.056
+        "wave": 1.17,
+        "temp": 19.64,
+        "current": 0.075
       },
-      "updated_at": "2026-03-20T12:35:49.683812",
+      "updated_at": "2026-03-20T18:34:44.566764",
       "forecast_7j": [
         {
           "dt": 1774011600,
@@ -1417,7 +1417,7 @@
           "wind_kn": 15.8,
           "temp": 20.3,
           "pop": 0,
-          "uvi": 12.2,
+          "uvi": 12.1,
           "peche_score": 5.5,
           "securite_code": "warning"
         },
@@ -1428,7 +1428,7 @@
           "wind_kn": 17.9,
           "temp": 21.2,
           "pop": 32,
-          "uvi": 10.9,
+          "uvi": 10.3,
           "peche_score": 4.7,
           "securite_code": "warning"
         },
@@ -1439,19 +1439,19 @@
           "wind_kn": 21.5,
           "temp": 21.6,
           "pop": 17,
-          "uvi": 12.6,
+          "uvi": 11.1,
           "peche_score": 3.9,
           "securite_code": "danger"
         },
         {
           "dt": 1774270800,
-          "wave": 2.06,
-          "wind_ms": 9.1,
-          "wind_kn": 17.7,
-          "temp": 20.8,
+          "wave": 2.09,
+          "wind_ms": 9.2,
+          "wind_kn": 17.8,
+          "temp": 20.1,
           "pop": 0,
-          "uvi": 10.5,
-          "peche_score": 4.7,
+          "uvi": 11.0,
+          "peche_score": 4.5,
           "securite_code": "warning"
         },
         {
@@ -1461,7 +1461,7 @@
           "wind_kn": 18.7,
           "temp": 21.0,
           "pop": 0,
-          "uvi": 8.1,
+          "uvi": 11.7,
           "peche_score": 4.3,
           "securite_code": "warning"
         },
@@ -1472,7 +1472,7 @@
           "wind_kn": 19.8,
           "temp": 21.9,
           "pop": 0,
-          "uvi": 9,
+          "uvi": 11.4,
           "peche_score": 4.0,
           "securite_code": "danger"
         },
@@ -1483,7 +1483,7 @@
           "wind_kn": 21.2,
           "temp": 21.9,
           "pop": 0,
-          "uvi": 9,
+          "uvi": 12,
           "peche_score": 4.0,
           "securite_code": "danger"
         }
@@ -1497,31 +1497,31 @@
       "lon": -16.65,
       "openweather": {
         "source": "openweather",
-        "temp_air": 24.49,
-        "wind_speed": 5.81,
-        "wave_height": 0.84,
-        "humidity": 57,
-        "weather_id": 804,
-        "timestamp": "2026-03-20T12:35:17.179928"
+        "temp_air": 21.1,
+        "wind_speed": 6.88,
+        "wave_height": 1.17,
+        "humidity": 71,
+        "weather_id": 802,
+        "timestamp": "2026-03-20T18:34:16.561988"
       },
       "copernicus": {
         "source": "copernicus",
         "sst": null,
-        "current_speed": 0.031,
-        "current_u": 0.013,
-        "current_v": -0.029,
-        "timestamp": "2026-03-20T12:35:17.127523"
+        "current_speed": 0.04,
+        "current_u": 0.012,
+        "current_v": -0.038,
+        "timestamp": "2026-03-20T18:34:16.500073"
       },
       "indices": {
-        "securite_texte": "🟢 FAVORABLE — Mer calme",
-        "securite_code": "safe",
-        "peche_score": 8.0,
-        "peche_texte": "🎣 Excellentes conditions de pêche",
-        "wave": 0.84,
-        "temp": 24.49,
-        "current": 0.031
+        "securite_texte": "🟡 VIGILANCE — Mer légèrement agitée",
+        "securite_code": "caution",
+        "peche_score": 5.9,
+        "peche_texte": "🎣 Conditions acceptables",
+        "wave": 1.17,
+        "temp": 21.1,
+        "current": 0.04
       },
-      "updated_at": "2026-03-20T12:35:50.046715",
+      "updated_at": "2026-03-20T18:34:44.523491",
       "forecast_7j": [
         {
           "dt": 1774011600,
@@ -1530,7 +1530,7 @@
           "wind_kn": 14.6,
           "temp": 24.5,
           "pop": 0,
-          "uvi": 12.2,
+          "uvi": 12.1,
           "peche_score": 6.7,
           "securite_code": "caution"
         },
@@ -1541,7 +1541,7 @@
           "wind_kn": 16.1,
           "temp": 25.1,
           "pop": 87,
-          "uvi": 10.9,
+          "uvi": 10.3,
           "peche_score": 6.0,
           "securite_code": "warning"
         },
@@ -1552,18 +1552,18 @@
           "wind_kn": 18.4,
           "temp": 24.7,
           "pop": 47,
-          "uvi": 12.6,
+          "uvi": 11.1,
           "peche_score": 5.0,
           "securite_code": "warning"
         },
         {
           "dt": 1774270800,
-          "wave": 1.66,
+          "wave": 1.69,
           "wind_ms": 8.2,
-          "wind_kn": 15.9,
-          "temp": 23.9,
+          "wind_kn": 16.0,
+          "temp": 24.4,
           "pop": 0,
-          "uvi": 10.5,
+          "uvi": 11.0,
           "peche_score": 6.1,
           "securite_code": "warning"
         },
@@ -1574,7 +1574,7 @@
           "wind_kn": 14.5,
           "temp": 23.9,
           "pop": 0,
-          "uvi": 8.1,
+          "uvi": 11.7,
           "peche_score": 6.7,
           "securite_code": "caution"
         },
@@ -1585,7 +1585,7 @@
           "wind_kn": 15.6,
           "temp": 24.7,
           "pop": 0,
-          "uvi": 9,
+          "uvi": 11.4,
           "peche_score": 6.3,
           "securite_code": "warning"
         },
@@ -1596,7 +1596,7 @@
           "wind_kn": 18.2,
           "temp": 24.9,
           "pop": 0,
-          "uvi": 9,
+          "uvi": 12,
           "peche_score": 5.1,
           "securite_code": "warning"
         }
@@ -1610,31 +1610,31 @@
       "lon": -16.75,
       "openweather": {
         "source": "openweather",
-        "temp_air": 20.15,
-        "wind_speed": 5.44,
-        "wave_height": 0.73,
-        "humidity": 76,
-        "weather_id": 803,
-        "timestamp": "2026-03-20T12:35:17.190454"
+        "temp_air": 20.09,
+        "wind_speed": 7.09,
+        "wave_height": 1.25,
+        "humidity": 81,
+        "weather_id": 801,
+        "timestamp": "2026-03-20T18:34:16.577214"
       },
       "copernicus": {
         "source": "copernicus",
         "sst": null,
-        "current_speed": 0.045,
-        "current_u": 0.007,
-        "current_v": -0.044,
-        "timestamp": "2026-03-20T12:35:17.129493"
+        "current_speed": 0.05,
+        "current_u": -0.003,
+        "current_v": -0.05,
+        "timestamp": "2026-03-20T18:34:16.504848"
       },
       "indices": {
-        "securite_texte": "🟢 FAVORABLE — Mer calme",
-        "securite_code": "safe",
-        "peche_score": 6.1,
+        "securite_texte": "🟡 VIGILANCE — Mer légèrement agitée",
+        "securite_code": "caution",
+        "peche_score": 5.3,
         "peche_texte": "🎣 Conditions acceptables",
-        "wave": 0.73,
-        "temp": 20.15,
-        "current": 0.045
+        "wave": 1.25,
+        "temp": 20.09,
+        "current": 0.05
       },
-      "updated_at": "2026-03-20T12:35:46.616018",
+      "updated_at": "2026-03-20T18:34:45.344970",
       "forecast_7j": [
         {
           "dt": 1774011600,
@@ -1643,7 +1643,7 @@
           "wind_kn": 16.3,
           "temp": 20.1,
           "pop": 0,
-          "uvi": 12.2,
+          "uvi": 12.1,
           "peche_score": 5.2,
           "securite_code": "warning"
         },
@@ -1654,7 +1654,7 @@
           "wind_kn": 19.0,
           "temp": 20.6,
           "pop": 84,
-          "uvi": 10.9,
+          "uvi": 10.3,
           "peche_score": 4.1,
           "securite_code": "warning"
         },
@@ -1665,7 +1665,7 @@
           "wind_kn": 19.0,
           "temp": 20.0,
           "pop": 15,
-          "uvi": 12.6,
+          "uvi": 11.1,
           "peche_score": 3.9,
           "securite_code": "warning"
         },
@@ -1674,10 +1674,10 @@
           "wave": 2.07,
           "wind_ms": 9.1,
           "wind_kn": 17.7,
-          "temp": 19.6,
+          "temp": 20.0,
           "pop": 0,
-          "uvi": 10.5,
-          "peche_score": 4.5,
+          "uvi": 11.0,
+          "peche_score": 4.6,
           "securite_code": "warning"
         },
         {
@@ -1687,7 +1687,7 @@
           "wind_kn": 16.6,
           "temp": 19.6,
           "pop": 0,
-          "uvi": 8.1,
+          "uvi": 11.7,
           "peche_score": 5.0,
           "securite_code": "warning"
         },
@@ -1698,7 +1698,7 @@
           "wind_kn": 17.1,
           "temp": 19.5,
           "pop": 0,
-          "uvi": 9,
+          "uvi": 11.4,
           "peche_score": 4.8,
           "securite_code": "warning"
         },
@@ -1709,7 +1709,7 @@
           "wind_kn": 19.2,
           "temp": 19.5,
           "pop": 0,
-          "uvi": 9,
+          "uvi": 12,
           "peche_score": 3.7,
           "securite_code": "warning"
         }
@@ -1723,107 +1723,107 @@
       "lon": -16.75,
       "openweather": {
         "source": "openweather",
-        "temp_air": 22.05,
-        "wind_speed": 6.94,
-        "wave_height": 1.19,
-        "humidity": 64,
-        "weather_id": 802,
-        "timestamp": "2026-03-20T12:35:17.197441"
+        "temp_air": 20.48,
+        "wind_speed": 6.2,
+        "wave_height": 0.95,
+        "humidity": 75,
+        "weather_id": 803,
+        "timestamp": "2026-03-20T18:34:16.560741"
       },
       "copernicus": {
         "source": "copernicus",
         "sst": null,
-        "current_speed": 0.067,
+        "current_speed": 0.073,
         "current_u": 0.006,
-        "current_v": -0.067,
-        "timestamp": "2026-03-20T12:35:17.131373"
+        "current_v": -0.073,
+        "timestamp": "2026-03-20T18:34:16.506018"
       },
       "indices": {
-        "securite_texte": "🟡 VIGILANCE — Mer légèrement agitée",
-        "securite_code": "caution",
-        "peche_score": 6.4,
+        "securite_texte": "🟢 FAVORABLE — Mer calme",
+        "securite_code": "safe",
+        "peche_score": 6.0,
         "peche_texte": "🎣 Conditions acceptables",
-        "wave": 1.19,
-        "temp": 22.05,
-        "current": 0.067
+        "wave": 0.95,
+        "temp": 20.48,
+        "current": 0.073
       },
-      "updated_at": "2026-03-20T12:35:47.072722",
+      "updated_at": "2026-03-20T18:34:45.193754",
       "forecast_7j": [
         {
           "dt": 1774011600,
-          "wave": 1.4,
-          "wind_ms": 7.5,
-          "wind_kn": 14.6,
-          "temp": 22.1,
+          "wave": 1.45,
+          "wind_ms": 7.6,
+          "wind_kn": 14.9,
+          "temp": 21.9,
           "pop": 0,
-          "uvi": 12.4,
-          "peche_score": 6.3,
+          "uvi": 12.2,
+          "peche_score": 6.2,
           "securite_code": "caution"
         },
         {
           "dt": 1774098000,
-          "wave": 2.35,
-          "wind_ms": 9.7,
-          "wind_kn": 18.9,
-          "temp": 22.6,
+          "wave": 2.02,
+          "wind_ms": 9.0,
+          "wind_kn": 17.5,
+          "temp": 22.4,
           "pop": 0,
-          "uvi": 12.1,
-          "peche_score": 4.4,
+          "uvi": 12.0,
+          "peche_score": 5.1,
           "securite_code": "warning"
         },
         {
           "dt": 1774184400,
-          "wave": 1.58,
-          "wind_ms": 8.0,
-          "wind_kn": 15.5,
-          "temp": 22.4,
-          "pop": 10,
-          "uvi": 12.6,
-          "peche_score": 6.0,
+          "wave": 1.78,
+          "wind_ms": 8.5,
+          "wind_kn": 16.5,
+          "temp": 22.7,
+          "pop": 0,
+          "uvi": 11.8,
+          "peche_score": 5.6,
           "securite_code": "warning"
         },
         {
           "dt": 1774270800,
-          "wave": 1.72,
-          "wind_ms": 8.3,
-          "wind_kn": 16.2,
-          "temp": 22.6,
-          "pop": 0,
-          "uvi": 11.5,
+          "wave": 1.67,
+          "wind_ms": 8.2,
+          "wind_kn": 16.0,
+          "temp": 22.1,
+          "pop": 4,
+          "uvi": 12.2,
           "peche_score": 5.7,
           "securite_code": "warning"
         },
         {
           "dt": 1774357200,
-          "wave": 1.67,
-          "wind_ms": 8.2,
-          "wind_kn": 16.0,
-          "temp": 22.6,
+          "wave": 1.47,
+          "wind_ms": 7.7,
+          "wind_kn": 15.0,
+          "temp": 22.2,
           "pop": 0,
-          "uvi": 11.5,
+          "uvi": 12.4,
+          "peche_score": 6.2,
+          "securite_code": "caution"
+        },
+        {
+          "dt": 1774443600,
+          "wave": 1.72,
+          "wind_ms": 8.3,
+          "wind_kn": 16.2,
+          "temp": 22.9,
+          "pop": 0,
+          "uvi": 11.9,
           "peche_score": 5.8,
           "securite_code": "warning"
         },
         {
-          "dt": 1774443600,
-          "wave": 2.06,
-          "wind_ms": 9.1,
-          "wind_kn": 17.7,
-          "temp": 23.0,
-          "pop": 0,
-          "uvi": 12,
-          "peche_score": 5.1,
-          "securite_code": "warning"
-        },
-        {
           "dt": 1774530000,
-          "wave": 1.86,
-          "wind_ms": 8.7,
-          "wind_kn": 16.8,
-          "temp": 22.8,
+          "wave": 1.8,
+          "wind_ms": 8.5,
+          "wind_kn": 16.5,
+          "temp": 22.7,
           "pop": 0,
           "uvi": 12,
-          "peche_score": 5.5,
+          "peche_score": 5.6,
           "securite_code": "warning"
         }
       ]
@@ -1836,107 +1836,107 @@
       "lon": -16.95,
       "openweather": {
         "source": "openweather",
-        "temp_air": 29.12,
-        "wind_speed": 6.15,
-        "wave_height": 0.94,
-        "humidity": 78,
-        "weather_id": 800,
-        "timestamp": "2026-03-20T12:35:17.188331"
+        "temp_air": 27.12,
+        "wind_speed": 5.89,
+        "wave_height": 0.86,
+        "humidity": 80,
+        "weather_id": 803,
+        "timestamp": "2026-03-20T18:34:16.608514"
       },
       "copernicus": {
         "source": "copernicus",
         "sst": null,
-        "current_speed": 0.095,
-        "current_u": 0.023,
-        "current_v": -0.093,
-        "timestamp": "2026-03-20T12:35:17.133000"
+        "current_speed": 0.119,
+        "current_u": 0.034,
+        "current_v": -0.114,
+        "timestamp": "2026-03-20T18:34:16.507351"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
         "securite_code": "safe",
-        "peche_score": 5.8,
-        "peche_texte": "🎣 Conditions acceptables",
-        "wave": 0.94,
-        "temp": 29.12,
-        "current": 0.095
+        "peche_score": 7.4,
+        "peche_texte": "🎣 Excellentes conditions de pêche",
+        "wave": 0.86,
+        "temp": 27.12,
+        "current": 0.119
       },
-      "updated_at": "2026-03-20T12:35:46.155252",
+      "updated_at": "2026-03-20T18:34:45.039541",
       "forecast_7j": [
         {
           "dt": 1774011600,
-          "wave": 1.24,
-          "wind_ms": 7.1,
-          "wind_kn": 13.7,
-          "temp": 29.1,
+          "wave": 1.37,
+          "wind_ms": 7.4,
+          "wind_kn": 14.4,
+          "temp": 20.4,
           "pop": 0,
-          "uvi": 12.3,
-          "peche_score": 6.2,
+          "uvi": 12.1,
+          "peche_score": 6.0,
           "securite_code": "caution"
         },
         {
           "dt": 1774098000,
-          "wave": 2.3,
-          "wind_ms": 9.6,
-          "wind_kn": 18.7,
-          "temp": 20.8,
+          "wave": 2.08,
+          "wind_ms": 9.2,
+          "wind_kn": 17.8,
+          "temp": 20.5,
           "pop": 0,
-          "uvi": 12.4,
-          "peche_score": 4.2,
+          "uvi": 11.9,
+          "peche_score": 4.6,
           "securite_code": "warning"
         },
         {
           "dt": 1774184400,
-          "wave": 1.76,
-          "wind_ms": 8.4,
-          "wind_kn": 16.4,
+          "wave": 1.94,
+          "wind_ms": 8.8,
+          "wind_kn": 17.2,
           "temp": 20.8,
-          "pop": 8,
-          "uvi": 11.3,
-          "peche_score": 5.3,
+          "pop": 0,
+          "uvi": 12.3,
+          "peche_score": 5.0,
           "securite_code": "warning"
         },
         {
           "dt": 1774270800,
-          "wave": 1.61,
-          "wind_ms": 8.1,
-          "wind_kn": 15.6,
-          "temp": 20.6,
+          "wave": 1.77,
+          "wind_ms": 8.4,
+          "wind_kn": 16.4,
+          "temp": 20.4,
           "pop": 0,
-          "uvi": 12.2,
-          "peche_score": 5.6,
+          "uvi": 12.3,
+          "peche_score": 5.2,
           "securite_code": "warning"
         },
         {
           "dt": 1774357200,
           "wave": 1.49,
-          "wind_ms": 7.7,
-          "wind_kn": 15.0,
-          "temp": 20.7,
+          "wind_ms": 7.8,
+          "wind_kn": 15.1,
+          "temp": 20.5,
           "pop": 0,
-          "uvi": 11.6,
-          "peche_score": 5.9,
+          "uvi": 13.2,
+          "peche_score": 5.8,
           "securite_code": "caution"
         },
         {
           "dt": 1774443600,
-          "wave": 2.32,
-          "wind_ms": 9.7,
-          "wind_kn": 18.8,
-          "temp": 20.6,
+          "wave": 1.98,
+          "wind_ms": 8.9,
+          "wind_kn": 17.4,
+          "temp": 20.5,
           "pop": 0,
-          "uvi": 12,
-          "peche_score": 4.2,
+          "uvi": 11.9,
+          "peche_score": 4.8,
           "securite_code": "warning"
         },
         {
           "dt": 1774530000,
-          "wave": 2.1,
-          "wind_ms": 9.2,
-          "wind_kn": 17.9,
-          "temp": 20.5,
+          "wave": 2.01,
+          "wind_ms": 9.0,
+          "wind_kn": 17.5,
+          "temp": 20.4,
           "pop": 0,
           "uvi": 12,
-          "peche_score": 4.6,
+          "peche_score": 4.8,
           "securite_code": "warning"
         }
       ]
@@ -1949,107 +1949,107 @@
       "lon": -16.74,
       "openweather": {
         "source": "openweather",
-        "temp_air": 29,
-        "wind_speed": 4.12,
-        "wave_height": 0.42,
-        "humidity": 37,
+        "temp_air": 27,
+        "wind_speed": 3.09,
+        "wave_height": 0.24,
+        "humidity": 47,
         "weather_id": 800,
-        "timestamp": "2026-03-20T12:35:17.191003"
+        "timestamp": "2026-03-20T18:34:16.604972"
       },
       "copernicus": {
         "source": "copernicus",
         "sst": null,
-        "current_speed": 0.117,
-        "current_u": 0.056,
-        "current_v": -0.103,
-        "timestamp": "2026-03-20T12:35:17.134366"
+        "current_speed": 0.136,
+        "current_u": 0.072,
+        "current_v": -0.115,
+        "timestamp": "2026-03-20T18:34:16.509057"
       },
       "indices": {
         "securite_texte": "🟢 FAVORABLE — Mer calme",
         "securite_code": "safe",
-        "peche_score": 7.2,
+        "peche_score": 8.4,
         "peche_texte": "🎣 Excellentes conditions de pêche",
-        "wave": 0.42,
-        "temp": 29,
-        "current": 0.117
+        "wave": 0.24,
+        "temp": 27,
+        "current": 0.136
       },
-      "updated_at": "2026-03-20T12:35:48.203947",
+      "updated_at": "2026-03-20T18:34:45.129213",
       "forecast_7j": [
         {
           "dt": 1774011600,
-          "wave": 1.38,
-          "wind_ms": 7.5,
-          "wind_kn": 14.5,
-          "temp": 29,
+          "wave": 1.42,
+          "wind_ms": 7.6,
+          "wind_kn": 14.7,
+          "temp": 21.7,
           "pop": 0,
-          "uvi": 12.3,
-          "peche_score": 6.0,
+          "uvi": 12.1,
+          "peche_score": 6.2,
           "securite_code": "caution"
         },
         {
           "dt": 1774098000,
-          "wave": 2.09,
+          "wave": 2.08,
           "wind_ms": 9.2,
           "wind_kn": 17.8,
-          "temp": 22.1,
+          "temp": 21.9,
           "pop": 0,
-          "uvi": 12.4,
+          "uvi": 11.9,
           "peche_score": 4.9,
           "securite_code": "warning"
         },
         {
           "dt": 1774184400,
-          "wave": 1.78,
-          "wind_ms": 8.5,
-          "wind_kn": 16.5,
+          "wave": 1.86,
+          "wind_ms": 8.7,
+          "wind_kn": 16.8,
           "temp": 22.6,
-          "pop": 4,
-          "uvi": 11.3,
-          "peche_score": 5.6,
+          "pop": 0,
+          "uvi": 12.3,
+          "peche_score": 5.4,
           "securite_code": "warning"
         },
         {
           "dt": 1774270800,
-          "wave": 2.02,
-          "wind_ms": 9.0,
-          "wind_kn": 17.5,
-          "temp": 22.2,
+          "wave": 2.14,
+          "wind_ms": 9.3,
+          "wind_kn": 18.1,
+          "temp": 21.5,
           "pop": 0,
-          "uvi": 12.2,
-          "peche_score": 5.1,
+          "uvi": 12.3,
+          "peche_score": 4.7,
           "securite_code": "warning"
         },
         {
           "dt": 1774357200,
-          "wave": 1.54,
-          "wind_ms": 7.9,
-          "wind_kn": 15.3,
-          "temp": 22.6,
+          "wave": 1.94,
+          "wind_ms": 8.8,
+          "wind_kn": 17.2,
+          "temp": 22.3,
           "pop": 0,
-          "uvi": 11.6,
-          "peche_score": 6.1,
-          "securite_code": "warning"
-        },
-        {
-          "dt": 1774443600,
-          "wave": 1.99,
-          "wind_ms": 8.9,
-          "wind_kn": 17.4,
-          "temp": 22.7,
-          "pop": 0,
-          "uvi": 12,
+          "uvi": 13.2,
           "peche_score": 5.2,
           "securite_code": "warning"
         },
         {
-          "dt": 1774530000,
-          "wave": 1.91,
+          "dt": 1774443600,
+          "wave": 1.9,
           "wind_ms": 8.8,
-          "wind_kn": 17.1,
+          "wind_kn": 17.0,
+          "temp": 22.5,
+          "pop": 0,
+          "uvi": 11.9,
+          "peche_score": 5.3,
+          "securite_code": "warning"
+        },
+        {
+          "dt": 1774530000,
+          "wave": 1.86,
+          "wind_ms": 8.7,
+          "wind_kn": 16.8,
           "temp": 22.4,
           "pop": 0,
           "uvi": 12,
-          "peche_score": 5.3,
+          "peche_score": 5.4,
           "securite_code": "warning"
         }
       ]
